@@ -9,7 +9,10 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get appTitle => 'Ayletna Restaurant';
+  String get appTitle => 'عيلتنا';
+
+  @override
+  String get brandName => 'عيلتنا';
 
   @override
   String get brandNameAr => 'مطعم عيلتنا';
@@ -28,6 +31,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get actionSave => 'حفظ';
+
+  @override
+  String get favoritesSaved => 'أُضيف إلى المفضلة';
+
+  @override
+  String get favoritesRemoved => 'أُزيل من المفضلة';
 
   @override
   String get actionAddToCart => 'أضف إلى السلة';
@@ -81,10 +90,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get registerAsStaff => 'طلب دور تشغيلي (بانتظار الموافقة)';
 
   @override
-  String get authLoginRequiredFields => 'أدخل رقم الهاتف أو البريد الإلكتروني وكلمة المرور.';
+  String get authLoginRequiredFields =>
+      'أدخل رقم الهاتف أو البريد الإلكتروني وكلمة المرور.';
 
   @override
-  String get authForgotIdentifierRequired => 'أدخل رقم الهاتف أو البريد الإلكتروني المسجل.';
+  String get authForgotIdentifierRequired =>
+      'أدخل رقم الهاتف أو البريد الإلكتروني المسجل.';
 
   @override
   String get authOtpInvalid => 'أدخل رمز التحقق المكوّن من 6 أرقام.';
@@ -93,19 +104,38 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authPasswordMismatch => 'كلمتا المرور غير متطابقتين.';
 
   @override
-  String get authRegisterFieldsRequired => 'أكمل جميع الحقول المطلوبة ووافق على الشروط.';
+  String get authRegisterFieldsRequired =>
+      'أكمل جميع الحقول المطلوبة ووافق على الشروط.';
 
   @override
   String get authOtpResent => 'تم إرسال رمز تحقق جديد.';
 
   @override
-  String get authPasswordResetSuccess => 'تمت إعادة تعيين كلمة المرور. يمكنك تسجيل الدخول الآن.';
+  String get authPasswordResetSuccess =>
+      'تمت إعادة تعيين كلمة المرور. يمكنك تسجيل الدخول الآن.';
 
   @override
   String get roleSelectionNotApproved => 'هذا الدور غير معتمد لحسابك.';
 
   @override
-  String get pendingApprovalNote => 'الأدوار التشغيلية تحتاج موافقة المشغل';
+  String get pendingApprovalNote =>
+      'حسابك قيد المراجعة. يتحقق فريقنا من بيانات موظفيك لضمان أفضل خدمة لضيوفنا.';
+
+  @override
+  String get pendingApprovalTimelineTitle => 'مسار الموافقة';
+
+  @override
+  String get pendingApprovalStepSubmitted => 'تم إرسال التسجيل';
+
+  @override
+  String get pendingApprovalStepReview => 'مراجعة مدير التطبيق';
+
+  @override
+  String get pendingApprovalStepActivated => 'تفعيل الحساب';
+
+  @override
+  String get pendingApprovalContactSupport =>
+      'لديك أسئلة؟ تواصل مع الدعم من شاشة تسجيل الدخول.';
 
   @override
   String get currencyJod => 'د.أ';
@@ -164,7 +194,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get checkoutAppreciationSubtitle => 'لطفك يدعم فريق المطبخ لدينا.';
 
   @override
-  String get checkoutFairWageNote => 'يتم توزيع 100٪ من البقشيش بالتساوي بين فريق المطبخ والتوصيل ضمن التزامنا بالأجر العادل.';
+  String get checkoutFairWageNote =>
+      'يتم توزيع 100٪ من البقشيش بالتساوي بين فريق المطبخ والتوصيل ضمن التزامنا بالأجر العادل.';
 
   @override
   String get checkoutOrderSummary => 'ملخص الطلب';
@@ -223,6 +254,415 @@ class AppLocalizationsAr extends AppLocalizations {
   String get roleOwner => 'مالك';
 
   @override
+  String get roleAdmin => 'مدير التطبيق';
+
+  @override
+  String get roleSupport => 'الدعم';
+
+  @override
+  String get roleMarketing => 'التسويق';
+
+  @override
+  String get hubAppAdmin => 'إدارة التطبيق';
+
+  @override
+  String get hubOperator => 'عمليات المطعم';
+
+  @override
+  String get hubOwner => 'بوابة المالك';
+
+  @override
+  String get hubSupportDesk => 'مكتب الدعم';
+
+  @override
+  String get hubMarketing => 'مركز التسويق';
+
+  @override
+  String get rolePermissionsTitle => 'الأدوار والقواعد';
+
+  @override
+  String get rolePermissionsSubtitle => 'حزم الصلاحيات الافتراضية لكل دور';
+
+  @override
+  String get userPermissionsTitle => 'المستخدمون والصلاحيات';
+
+  @override
+  String get userPermissionsSubtitle =>
+      'الأدوار المعينة، القواعد الموروثة، والاستثناءات';
+
+  @override
+  String get switchRoleTitle => 'الدور النشط';
+
+  @override
+  String get switchRoleSubtitle => 'تظهر فقط عندما يكون لحسابك أكثر من دور';
+
+  @override
+  String get settingsDarkMode => 'الوضع الداكن';
+
+  @override
+  String get settingsDarkModeOff => 'إيقاف';
+
+  @override
+  String get settingsDarkModeOn => 'تشغيل';
+
+  @override
+  String get settingsNotificationsSummary => 'إشعارات، بريد';
+
+  @override
+  String get inheritedRulesTitle => 'القواعد الموروثة';
+
+  @override
+  String get userOverridesTitle => 'استثناءات المستخدم';
+
+  @override
+  String get effectivePermissionsTitle => 'الصلاحيات الفعلية';
+
+  @override
+  String get ownershipPercentageLabel => 'نسبة الملكية';
+
+  @override
+  String pendingApprovalRequestedRoles(String roles) {
+    return 'الوصول المطلوب: $roles. سيراجع مدير التطبيق حسابك.';
+  }
+
+  @override
+  String get supportChatQueueTitle => 'طابور المحادثة المباشرة';
+
+  @override
+  String get supportChatQueueSubtitle => 'قبول محادثات العملاء المنتظرة.';
+
+  @override
+  String get supportOrderLookupTitle => 'البحث عن الطلبات';
+
+  @override
+  String get supportOrderLookupSubtitle =>
+      'ابحث برقم الطلب أو اسم العميل لسياق التذكرة.';
+
+  @override
+  String get supportFaqEditorTitle => 'محرر الأسئلة الشائعة';
+
+  @override
+  String get supportFaqAddTitle => 'إضافة سؤال';
+
+  @override
+  String get supportFaqAddAction => 'إضافة';
+
+  @override
+  String get supportFaqPublished => 'منشور';
+
+  @override
+  String get supportFaqDraft => 'مسودة';
+
+  @override
+  String get supportFaqPublish => 'نشر';
+
+  @override
+  String get supportFaqUnpublish => 'إلغاء النشر';
+
+  @override
+  String get supportFaqSavedMock => 'تم حفظ السؤال الشائع';
+
+  @override
+  String get supportFaqValidation =>
+      'أدخل عنواناً ونصاً بالإنجليزية على الأقل.';
+
+  @override
+  String get supportFaqBodyLabelEn => 'النص (إنجليزي)';
+
+  @override
+  String get supportFaqBodyLabelAr => 'النص (عربي)';
+
+  @override
+  String get hubOwnerPerformanceSummary => 'ملخص الأداء';
+
+  @override
+  String get hubOwnerShare => 'حصة المالك';
+
+  @override
+  String hubOwnerSharePercent(String percent) {
+    return 'حصة $percent%';
+  }
+
+  @override
+  String get hubNetRevenue => 'صافي الإيراد';
+
+  @override
+  String get hubTodayRevenue => 'إيرادات اليوم';
+
+  @override
+  String hubTodayOrders(String count) {
+    return '$count طلب';
+  }
+
+  @override
+  String get hubSupportSummary => 'ملخص الدعم';
+
+  @override
+  String get hubOpenTickets => 'تذاكر مفتوحة';
+
+  @override
+  String get hubChatQueue => 'طابور المحادثة';
+
+  @override
+  String get hubPendingReviews => 'تقييمات معلقة';
+
+  @override
+  String get hubAvgWait => 'متوسط الانتظار';
+
+  @override
+  String hubAvgWaitMinutes(String minutes) {
+    return '$minutes د';
+  }
+
+  @override
+  String hubAvgWaitMinutesAr(String minutes) {
+    return '$minutes د';
+  }
+
+  @override
+  String get marketingCampaignSummary => 'ملخص الحملات';
+
+  @override
+  String get marketingActiveOffers => 'عروض نشطة';
+
+  @override
+  String get marketingCombosPromos => 'كومبو / عروض';
+
+  @override
+  String get marketingLoyaltyMembers => 'أعضاء الولاء';
+
+  @override
+  String get marketingRedemptionRate => 'معدل الاستبدال';
+
+  @override
+  String get marketingVisualCatalog => 'معرض الصور';
+
+  @override
+  String get marketingCampaignCalendar => 'جدول الحملات';
+
+  @override
+  String get marketingSocialIntegrations => 'وسائل التواصل';
+
+  @override
+  String get marketingBlogTitle => 'المدونة والمحتوى';
+
+  @override
+  String get marketingBlogAddPost => 'منشور جديد';
+
+  @override
+  String get marketingBlogPublished => 'منشور';
+
+  @override
+  String get marketingBlogDraft => 'مسودة';
+
+  @override
+  String get marketingBlogDraftAdded => 'تمت إضافة المسودة';
+
+  @override
+  String get marketingBlogStatusToggled => 'تم تحديث حالة النشر';
+
+  @override
+  String get marketingBlogNewDraftAr => 'مسودة جديدة';
+
+  @override
+  String get marketingBlogNewDraftEn => 'New draft';
+
+  @override
+  String get marketingTabOffers => 'عروض';
+
+  @override
+  String get marketingTabCombos => 'كومبو';
+
+  @override
+  String get marketingTabDiscounts => 'خصومات';
+
+  @override
+  String get marketingTabSubscriptions => 'اشتراكات';
+
+  @override
+  String get marketingTabCampaign => 'حملات';
+
+  @override
+  String get marketingTabLoyalty => 'ولاء';
+
+  @override
+  String get marketingTabSocial => 'تواصل';
+
+  @override
+  String get marketingTabBlog => 'مدونة';
+
+  @override
+  String get marketingPushCampaignsTitle => 'حملات الإشعارات';
+
+  @override
+  String get marketingPushCampaignsSubtitle =>
+      'إعداد مسودات وجدولة إشعارات العملاء.';
+
+  @override
+  String get marketingPushAddDraft => 'مسودة إشعار';
+
+  @override
+  String get marketingPushDraft => 'مسودة';
+
+  @override
+  String get marketingPushScheduledStatus => 'مجدول';
+
+  @override
+  String get marketingPushSent => 'مُرسل';
+
+  @override
+  String get marketingPushScheduled => 'مجدول في';
+
+  @override
+  String get marketingPushScheduleAction => 'جدولة الإرسال';
+
+  @override
+  String get marketingPushScheduledMock => 'تمت جدولة الحملة';
+
+  @override
+  String get marketingPushDraftAdded => 'تمت إضافة المسودة';
+
+  @override
+  String get marketingPushNewDraftAr => 'إشعار جديد';
+
+  @override
+  String get marketingPushNewDraftEn => 'New notification';
+
+  @override
+  String get marketingPushFieldTitleAr => 'العنوان (عربي)';
+
+  @override
+  String get marketingPushFieldTitleEn => 'العنوان (إنجليزي)';
+
+  @override
+  String get marketingPushFieldBodyAr => 'النص (عربي)';
+
+  @override
+  String get marketingPushFieldBodyEn => 'النص (إنجليزي)';
+
+  @override
+  String get marketingPushNoSchedule => 'لا يوجد موعد بعد';
+
+  @override
+  String get opsInboxTitle => 'صندوق الورديات';
+
+  @override
+  String get opsInboxSubtitle =>
+      'تنبيهات تشغيلية لدورك. إشعارات التسويق تبقى في صندوق العميل.';
+
+  @override
+  String get opsInboxShiftAlertTitle => 'تذكير الوردية';
+
+  @override
+  String get opsInboxShiftAlertBody =>
+      'أكد الحضور وحالة الإكراميات قبل إغلاق ورديتك.';
+
+  @override
+  String get opsInboxOrderAlertTitle => 'طلبات تحتاج متابعة';
+
+  @override
+  String get opsInboxOrderAlertBody => 'افتح لوحة دورك لمراجعة العمل المعلق.';
+
+  @override
+  String get opsInboxOpenHub => 'فتح اللوحة';
+
+  @override
+  String get platedReturnPickupScheduled => 'تم جدولة الاستلام';
+
+  @override
+  String get platedReturnSelfReturnLogged => 'تم تسجيل الإرجاع الذاتي';
+
+  @override
+  String get marketingCalendarNoEvents => 'لا حملات مجدولة في هذا اليوم';
+
+  @override
+  String get marketingCalendarScheduleAction => 'جدولة حملة';
+
+  @override
+  String get marketingCalendarMockSave => 'تم حفظ الحملة';
+
+  @override
+  String get marketingCalendarPlanningOnlyNotice =>
+      'تقويم تخطيط داخلي فقط — المواعيد لا تنشر عروضاً أو مقالات أو إشعارات للعملاء. استخدم العروض أو المدونة أو حملات الإشعارات للنشر.';
+
+  @override
+  String marketingCalendarCampaignsOn(String date) {
+    return 'حملات $date';
+  }
+
+  @override
+  String get marketingSocialConnectTitle => 'ربط الحسابات';
+
+  @override
+  String get marketingSocialConnectSubtitle =>
+      'اربط حساباتك على وسائل التواصل لنشر التحديثات.';
+
+  @override
+  String get marketingSocialConnected => 'متصل';
+
+  @override
+  String get marketingSocialNotConnected => 'غير متصل';
+
+  @override
+  String get marketingSocialDisconnect => 'فصل الحساب';
+
+  @override
+  String get marketingSocialConnectOAuth => 'ربط عبر OAuth';
+
+  @override
+  String get marketingSocialConnectedMock => 'تم الربط';
+
+  @override
+  String get marketingSocialDisconnectedMock => 'تم فصل الحساب';
+
+  @override
+  String marketingSocialConnectedSince(String date) {
+    return 'متصل منذ $date';
+  }
+
+  @override
+  String get marketingKindOffer => 'عرض';
+
+  @override
+  String get marketingKindPromo => 'ترويج';
+
+  @override
+  String get marketingKindSocial => 'تواصل';
+
+  @override
+  String get marketingKindLoyalty => 'ولاء';
+
+  @override
+  String get ticketPriorityLow => 'منخفض';
+
+  @override
+  String get ticketPriorityNormal => 'عادي';
+
+  @override
+  String get ticketPriorityHigh => 'عاجل';
+
+  @override
+  String get ticketSlaOnTrack => 'SLA: ضمن الوقت';
+
+  @override
+  String get ticketSlaAtRisk => 'SLA: خطر';
+
+  @override
+  String get ticketSlaBreached => 'SLA: متأخر';
+
+  @override
+  String get ownerViewConfigApplied => 'تم تطبيق ملف رؤية المالك';
+
+  @override
+  String get filterAll => 'الكل';
+
+  @override
+  String get filterByStatus => 'تصفية حسب الحالة';
+
+  @override
+  String get filterByPriority => 'تصفية حسب الأولوية';
+
+  @override
   String get screenCustomizationModal => 'تخصيص الصنف';
 
   @override
@@ -241,7 +681,31 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeCategoriesTitle => 'الأقسام';
 
   @override
-  String get homeFeaturedTitle => 'مميز';
+  String get categoryEmptyMessage => 'لا توجد أصناف في هذه الفئة حالياً.';
+
+  @override
+  String get homeExploreMenuTitle => 'استكشف القائمة';
+
+  @override
+  String get homeFeaturedTitle => 'عروض مميزة';
+
+  @override
+  String get homeStatusLabel => 'الحالة';
+
+  @override
+  String get homePointsLabel => 'نقاط';
+
+  @override
+  String get homeCategoryAll => 'الكل';
+
+  @override
+  String get homeFeaturedBadge => 'مميز';
+
+  @override
+  String get homeAddToOrder => 'أضف إلى الطلب';
+
+  @override
+  String get homeSeeAll => 'عرض الكل';
 
   @override
   String get categoryEyebrow => 'القسم';
@@ -250,13 +714,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get categoryMezzeTitle => 'مقبلات باردة ومشاوي خفيفة';
 
   @override
-  String get categoryMezzeDescription => 'اكتشف تشكيلة من المقبلات الشامية المحضّرة يومياً بمكونات طازجة ونكهات أردنية أصيلة.';
+  String get categoryMezzeDescription =>
+      'اكتشف تشكيلة من المقبلات الشامية المحضّرة يومياً بمكونات طازجة ونكهات أردنية أصيلة.';
 
   @override
   String get categoryShawarmaHeroTitle => 'شاورما لحم أسطورية';
 
   @override
-  String get categoryShawarmaHeroDescription => 'لحم فاخر مشوي ببطء بتتبيلة بهارات تقليدية ويقدم مع صوص الثومية الخاص.';
+  String get categoryShawarmaHeroDescription =>
+      'لحم فاخر مشوي ببطء بتتبيلة بهارات تقليدية ويقدم مع صوص الثومية الخاص.';
 
   @override
   String get actionAddToOrder => 'أضف إلى الطلب';
@@ -358,10 +824,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get deliveryWork => 'العمل';
 
   @override
-  String get deliveryHomeAddress => 'فيلا ٤٢، شارع الريم، الصويفية، عمّان، الأردن';
+  String get deliveryHomeAddress =>
+      'فيلا ٤٢، شارع الريم، الصويفية، عمّان، الأردن';
 
   @override
-  String get deliveryWorkAddress => 'مجمع الأعمال، مبنى ٥، الطابق الثالث، مجمع الملك حسين للأعمال، عمّان';
+  String get deliveryWorkAddress =>
+      'مجمع الأعمال، مبنى ٥، الطابق الثالث، مجمع الملك حسين للأعمال، عمّان';
 
   @override
   String get deliveryEdit => 'تعديل';
@@ -385,7 +853,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get deliveryStandardAvailable => 'التوصيل القياسي متاح';
 
   @override
-  String get deliveryExpressZoneNote => 'العنوان المحدد ضمن نطاق التوصيل السريع خلال ١٥ دقيقة.';
+  String get deliveryExpressZoneNote =>
+      'العنوان المحدد ضمن نطاق التوصيل السريع خلال ١٥ دقيقة.';
 
   @override
   String get deliveryStandardFee => 'رسوم التوصيل القياسي';
@@ -561,7 +1030,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get deliveryReturnsTitle => 'سجل إرجاع الصواني';
 
   @override
-  String get deliveryReturnsSubtitle => 'راجع كل عمليات جمع الصواني المكتملة والتسويات المالية.';
+  String get deliveryReturnsSubtitle =>
+      'راجع كل عمليات جمع الصواني المكتملة والتسويات المالية.';
 
   @override
   String get deliveryReturnsContext => 'اللوجستيات / الإرجاع';
@@ -658,7 +1128,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get screenNotReady => 'جاري تحميل الشاشة…';
 
   @override
-  String get platedReturnReminderBody => 'يرجى تجهيز الصينية للاستلام بعد الوجبة.';
+  String get platedReturnReminderBody =>
+      'يرجى تجهيز الصينية للاستلام بعد الوجبة.';
 
   @override
   String get redemptionConfirmBody => 'استبدال النقاط بهذه المكافأة؟';
@@ -685,7 +1156,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get depositTrayConfiguration => 'إعدادات الصواني';
 
   @override
-  String get depositConfigurationSubtitle => 'إدارة أسعار العربون العامة وسياسات الإرجاع الآلية.';
+  String get depositConfigurationSubtitle =>
+      'إدارة أسعار العربون العامة وسياسات الإرجاع الآلية.';
 
   @override
   String get depositGlobalTitle => 'العربون العام';
@@ -694,10 +1166,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get depositGlobalAmountLabel => 'قيمة العربون العامة (د.أ)';
 
   @override
-  String get depositGlobalHelp => 'يضاف هذا المبلغ تلقائياً إلى كل طلبات السفري والتوصيل التي تحتوي على صواني.';
+  String get depositGlobalHelp =>
+      'يضاف هذا المبلغ تلقائياً إلى كل طلبات السفري والتوصيل التي تحتوي على صواني.';
 
   @override
-  String get depositWarning => 'زيادة قيمة العربون ستحدّث كل الطلبات الجديدة فوراً. الطلبات المعلقة الحالية ستحتفظ بقيمة العربون الأصلية.';
+  String get depositWarning =>
+      'زيادة قيمة العربون ستحدّث كل الطلبات الجديدة فوراً. الطلبات المعلقة الحالية ستحتفظ بقيمة العربون الأصلية.';
 
   @override
   String get depositReturnWindow => 'نافذة الإرجاع';
@@ -804,6 +1278,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get screenOrderHistory => 'سجل الطلبات';
 
   @override
+  String get drawerOrders => 'الطلبات';
+
+  @override
+  String get drawerBlog => 'المدونة';
+
+  @override
   String get screenWallet => 'المحفظة';
 
   @override
@@ -814,6 +1294,10 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get screenRewardsHistory => 'سجل المكافآت';
+
+  @override
+  String get rewardsHistoryEmpty =>
+      'لا توجد حركات نقاط بعد. اطلب أو استبدل مكافأة.';
 
   @override
   String get screenPaymentHistory => 'سجل الدفع';
@@ -831,7 +1315,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get drawerSectionMore => 'المزيد';
 
   @override
-  String get demoActionTag => 'تجريبي';
+  String get demoActionTag => '';
 
   @override
   String get screenAddresses => 'العناوين';
@@ -945,6 +1429,200 @@ class AppLocalizationsAr extends AppLocalizations {
   String get screenOffersManagement => 'إدارة العروض';
 
   @override
+  String get screenDiscountsManagement => 'إدارة الخصومات';
+
+  @override
+  String get marketingDiscountLabelAr => 'التسمية عربي';
+
+  @override
+  String get marketingDiscountLabelEn => 'التسمية إنجليزي';
+
+  @override
+  String get marketingLinkedRewardTitle => 'مكافأة مرتبطة';
+
+  @override
+  String get marketingLinkedRewardNone => 'لا مكافأة مرتبطة';
+
+  @override
+  String get marketingCampaignAttachTitle => 'اربط العروض والكومبو';
+
+  @override
+  String get marketingCalendarCampaignAuthorityNotice =>
+      'الحملات تتحكم بظهور العروض للعملاء. تظهر العروض والكومبو والخصومات فقط أثناء نافذة الحملة النشطة.';
+
+  @override
+  String get screenAddonsManagement => 'الإضافات';
+
+  @override
+  String get menuCatalogTabProduct => 'المنتج';
+
+  @override
+  String get menuCatalogTabProducts => 'المنتجات';
+
+  @override
+  String get menuCatalogTabReward => 'مكافأة';
+
+  @override
+  String get menuCatalogTabRatings => 'التقييمات';
+
+  @override
+  String get menuCatalogPickProduct => 'اختر منتجاً';
+
+  @override
+  String get menuCatalogPickProductHint =>
+      'اختر منتجاً لإدارة الإضافات أو المنتجات المرتبطة.';
+
+  @override
+  String get menuCatalogRewardPointsLabel => 'نقاط المكافأة';
+
+  @override
+  String get menuCatalogEditRating => 'تعديل التقييم والملاحظات';
+
+  @override
+  String get menuCatalogRatingSaved => 'تم تحديث التقييم';
+
+  @override
+  String get menuCatalogManageProduct => 'إدارة';
+
+  @override
+  String get menuCatalogNoProducts => 'لا منتجات بعد';
+
+  @override
+  String get menuCatalogAttachAddonsHint =>
+      'اختر الإضافات المعتمدة لهذا المنتج. حدّد مجاناً أو سعراً مخصصاً.';
+
+  @override
+  String get menuCatalogAddonPriceOverride => 'سعر مخصص (د.أ)';
+
+  @override
+  String get menuCatalogRelatedMultiSelectHint =>
+      'اختر المنتجات المرتبطة من القائمة النشطة.';
+
+  @override
+  String get catalogCrudAddonKey => 'المفتاح';
+
+  @override
+  String get catalogCrudLabelEn => 'التسمية EN';
+
+  @override
+  String get catalogCrudLabelAr => 'التسمية AR';
+
+  @override
+  String get catalogCrudSortOrder => 'ترتيب العرض';
+
+  @override
+  String get catalogCrudDescriptionEn => 'الوصف EN';
+
+  @override
+  String get catalogCrudDescriptionAr => 'الوصف AR';
+
+  @override
+  String get catalogCrudMealType => 'نوع الوجبة';
+
+  @override
+  String get catalogCrudMealMain => 'رئيسي';
+
+  @override
+  String get catalogCrudMealSide => 'جانب';
+
+  @override
+  String get catalogCrudMealDrink => 'مشروب';
+
+  @override
+  String get catalogCrudMealDessert => 'حلوى';
+
+  @override
+  String get loyaltyOccasionsTitle => 'مكافآت المناسبات';
+
+  @override
+  String get loyaltyOccasionsSubtitle =>
+      'المناسبات النشطة تُطبَّق على جميع العملاء.';
+
+  @override
+  String get loyaltyOccasionAddCustom => 'إضافة مناسبة مخصصة';
+
+  @override
+  String get loyaltyOccasionRewardEn => 'عنوان المكافأة EN';
+
+  @override
+  String get loyaltyOccasionRewardAr => 'عنوان المكافأة AR';
+
+  @override
+  String get loyaltyOccasionPoints => 'نقاط إضافية';
+
+  @override
+  String get rewardsAdminTiersHint =>
+      'معدلات الكسب والاستبدال حسب شريحة رصيد النقاط.';
+
+  @override
+  String rewardsAdminTierRange(String min, String max) {
+    return '$min–$max نقطة';
+  }
+
+  @override
+  String rewardsAdminTierRates(String earn, String redeem) {
+    return 'كسب $earn/د.أ · استبدال ×$redeem';
+  }
+
+  @override
+  String get rewardsAdminTierMin => 'الحد الأدنى للنقاط';
+
+  @override
+  String get rewardsAdminTierMax => 'الحد الأعلى (فارغ = مفتوح)';
+
+  @override
+  String get rewardsAdminTierEarn => 'الكسب لكل دينار';
+
+  @override
+  String get rewardsAdminTierRedeem => 'معامل الاستبدال';
+
+  @override
+  String get marketingCampaignScheduleTitle => 'جدولة الحملة';
+
+  @override
+  String get marketingCampaignScheduleHint =>
+      'اختر أو أنشئ نافذة حملة. التفعيل يتطلب جدولة جديدة في كل مرة.';
+
+  @override
+  String get marketingCampaignNew => 'حملة جديدة';
+
+  @override
+  String get marketingCampaignNone => 'بدون حملة';
+
+  @override
+  String get marketingCampaignPickExisting => 'حملة موجودة';
+
+  @override
+  String get marketingCampaignInvalidWindow =>
+      'يجب أن يكون الانتهاء بعد البداية';
+
+  @override
+  String marketingScheduleStart(String when) {
+    return 'البداية: $when';
+  }
+
+  @override
+  String marketingScheduleEnd(String when) {
+    return 'النهاية: $when';
+  }
+
+  @override
+  String get marketingRewardPointsLabel => 'نقاط المكافأة';
+
+  @override
+  String get marketingVisibilityNeedsSchedule =>
+      'جدّل حملة قبل إظهار هذا العنصر';
+
+  @override
+  String get marketingCampaignAdjust => 'تعديل الحملة';
+
+  @override
+  String get marketingBadgeEn => 'الشارة EN';
+
+  @override
+  String get marketingBadgeAr => 'الشارة AR';
+
+  @override
   String get screenLoyaltyConfig => 'إعداد الولاء';
 
   @override
@@ -960,7 +1638,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get screenAppIntegrations => 'تكاملات التطبيق';
 
   @override
-  String get integrationsSecurityNote => 'أدخل بيانات الاعتماد التي زوّدك بها المزود. في الإنتاج تُخزَّن الأسرار بأمان (Supabase Vault) — وليس في الكود.';
+  String get integrationsSecurityNote =>
+      'أدخل بيانات الاعتماد التي زوّدك بها المزود. في الإنتاج تُخزَّن الأسرار بأمان (Supabase Vault) — وليس في الكود.';
 
   @override
   String get integrationsSaveAll => 'حفظ كل التكاملات';
@@ -972,10 +1651,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get integrationsTestConnection => 'اختبار الاتصال';
 
   @override
-  String get integrationsTestSuccess => 'نجح اختبار الاتصال (تجريبي).';
+  String get integrationsTestSuccess => 'نجح اختبار الاتصال';
 
   @override
-  String get integrationsTestIncomplete => 'أكمل الحقول المطلوبة لهذا القسم أولاً.';
+  String get integrationsTestIncomplete =>
+      'أكمل الحقول المطلوبة لهذا القسم أولاً.';
 
   @override
   String get integrationsStatusConfigured => 'مُعدّ';
@@ -992,7 +1672,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get integrationsSupabaseTitle => 'Supabase';
 
   @override
-  String get integrationsSupabaseSubtitle => 'قاعدة البيانات، المصادقة، Realtime، وEdge Functions.';
+  String get integrationsSupabaseSubtitle =>
+      'قاعدة البيانات، المصادقة، Realtime، وEdge Functions.';
 
   @override
   String get integrationsSupabaseUrl => 'رابط المشروع';
@@ -1004,13 +1685,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get integrationsSupabaseAnonKey => 'المفتاح العام (Anon)';
 
   @override
-  String get integrationsSupabaseAnonKeyHint => 'eyJhbGciOiJIUzI1NiIsInR5cCI6...';
+  String get integrationsSupabaseAnonKeyHint =>
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6...';
 
   @override
-  String get integrationsSupabaseServiceRoleKey => 'مفتاح Service Role (خادم فقط)';
+  String get integrationsSupabaseServiceRoleKey =>
+      'مفتاح Service Role (خادم فقط)';
 
   @override
-  String get integrationsSupabaseServiceRoleKeyHint => 'لـ Edge Functions / نشر الخادم';
+  String get integrationsSupabaseServiceRoleKeyHint =>
+      'لـ Edge Functions / نشر الخادم';
 
   @override
   String get integrationsSupabaseProjectRef => 'معرّف المشروع';
@@ -1022,7 +1706,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get integrationsSmsTitle => 'مزود SMS';
 
   @override
-  String get integrationsSmsSubtitle => 'رموز OTP ورسائل إرجاع الصواني (Unifonic، Twilio، إلخ).';
+  String get integrationsSmsSubtitle =>
+      'رموز OTP ورسائل إرجاع الصواني (Unifonic، Twilio، إلخ).';
 
   @override
   String get integrationsSmsProvider => 'اسم المزود';
@@ -1052,7 +1737,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get integrationsWhatsappTitle => 'WhatsApp Business';
 
   @override
-  String get integrationsWhatsappSubtitle => 'تذكيرات الإرجاع وتحديثات العملاء.';
+  String get integrationsWhatsappSubtitle =>
+      'تذكيرات الإرجاع وتحديثات العملاء.';
 
   @override
   String get integrationsWhatsappBusinessAccountId => 'معرّف حساب الأعمال';
@@ -1064,25 +1750,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get integrationsWhatsappPhoneNumberId => 'معرّف رقم الهاتف';
 
   @override
-  String get integrationsWhatsappPhoneNumberIdHint => 'معرّف WhatsApp Cloud API';
+  String get integrationsWhatsappPhoneNumberIdHint =>
+      'معرّف WhatsApp Cloud API';
 
   @override
   String get integrationsWhatsappAccessToken => 'توكن الوصول الدائم';
 
   @override
-  String get integrationsWhatsappAccessTokenHint => 'توكن مستخدم النظام من Meta';
+  String get integrationsWhatsappAccessTokenHint =>
+      'توكن مستخدم النظام من Meta';
 
   @override
   String get integrationsWhatsappWebhookVerifyToken => 'توكن التحقق من Webhook';
 
   @override
-  String get integrationsWhatsappWebhookVerifyTokenHint => 'سلسلة عشوائية للتحقق';
+  String get integrationsWhatsappWebhookVerifyTokenHint =>
+      'سلسلة عشوائية للتحقق';
 
   @override
   String get integrationsTelephonyTitle => 'الهاتف وOTP';
 
   @override
-  String get integrationsTelephonySubtitle => 'خط الدعم، رمز الدولة، ورقم مرسل OTP.';
+  String get integrationsTelephonySubtitle =>
+      'خط الدعم، رمز الدولة، ورقم مرسل OTP.';
 
   @override
   String get integrationsSupportPhoneNumber => 'رقم دعم العملاء';
@@ -1106,19 +1796,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get integrationsPaymentsTitle => 'بوابات الدفع';
 
   @override
-  String get integrationsPaymentsSubtitle => 'Stripe، Google Pay، Apple Pay، بوابات إقليمية، والمحفظة المرخّصة.';
+  String get integrationsPaymentsSubtitle =>
+      'Stripe، Google Pay، Apple Pay، بوابات إقليمية، والمحفظة المرخّصة.';
 
   @override
   String get integrationsPaymentGatewayProvider => 'البوابة الأساسية';
 
   @override
-  String get integrationsPaymentGatewayProviderHint => 'Stripe / MyFatoorah / HyperPay / Checkout.com';
+  String get integrationsPaymentGatewayProviderHint =>
+      'Stripe / MyFatoorah / HyperPay / Checkout.com';
 
   @override
   String get integrationsStripePublishableKey => 'Stripe publishable key';
 
   @override
-  String get integrationsStripePublishableKeyHint => 'pk_live_... أو pk_test_...';
+  String get integrationsStripePublishableKeyHint =>
+      'pk_live_... أو pk_test_...';
 
   @override
   String get integrationsStripeSecretKey => 'Stripe secret key';
@@ -1148,25 +1841,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get integrationsApplePayMerchantId => 'Apple Pay merchant ID';
 
   @override
-  String get integrationsApplePayMerchantIdHint => 'merchant.com.ayletna.restaurant';
+  String get integrationsApplePayMerchantIdHint =>
+      'merchant.com.ayletna.restaurant';
 
   @override
   String get integrationsPaymentGatewayApiKey => 'مفتاح البوابة الإقليمية';
 
   @override
-  String get integrationsPaymentGatewayApiKeyHint => 'MyFatoorah / HyperPay API key';
+  String get integrationsPaymentGatewayApiKeyHint =>
+      'MyFatoorah / HyperPay API key';
 
   @override
   String get integrationsPaymentGatewayMerchantId => 'معرّف التاجر الإقليمي';
 
   @override
-  String get integrationsPaymentGatewayMerchantIdHint => 'معرّف التاجر أو الطرفية';
+  String get integrationsPaymentGatewayMerchantIdHint =>
+      'معرّف التاجر أو الطرفية';
 
   @override
   String get integrationsPaymentGatewayWebhookUrl => 'رابط webhook للدفع';
 
   @override
-  String get integrationsPaymentGatewayWebhookUrlHint => 'https://your-project.supabase.co/functions/v1/payment-webhook';
+  String get integrationsPaymentGatewayWebhookUrlHint =>
+      'https://your-project.supabase.co/functions/v1/payment-webhook';
 
   @override
   String get integrationsWalletSectionTitle => 'المحفظة المرخّصة (الأردن)';
@@ -1187,19 +1884,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get integrationsWalletDeepLinkScheme => 'مخطط Deep link';
 
   @override
-  String get integrationsWalletDeepLinkSchemeHint => 'ayletna://payment/callback';
+  String get integrationsWalletDeepLinkSchemeHint =>
+      'ayletna://payment/callback';
 
   @override
   String get integrationsWalletWebhookSecret => 'سر webhook المحفظة';
 
   @override
-  String get integrationsWalletWebhookSecretHint => 'سر مشترك لاستدعاءات المحفظة';
+  String get integrationsWalletWebhookSecretHint =>
+      'سر مشترك لاستدعاءات المحفظة';
 
   @override
   String get integrationsAiTitle => 'وكيل الذكاء الاصطناعي';
 
   @override
-  String get integrationsAiSubtitle => 'دردشة الدعم ومساعد المشغل (ChatGPT، Qwen، إلخ).';
+  String get integrationsAiSubtitle =>
+      'دردشة الدعم ومساعد المشغل (ChatGPT، Qwen، إلخ).';
 
   @override
   String get integrationsAiProvider => 'مزود AI';
@@ -1217,7 +1917,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get integrationsAiModelName => 'اسم النموذج';
 
   @override
-  String get integrationsAiModelNameHint => 'gpt-4o / qwen-max / claude-3-5-sonnet';
+  String get integrationsAiModelNameHint =>
+      'gpt-4o / qwen-max / claude-3-5-sonnet';
 
   @override
   String get integrationsAiBaseUrl => 'رابط API (اختياري)';
@@ -1226,16 +1927,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get integrationsAiBaseUrlHint => 'https://api.openai.com/v1';
 
   @override
-  String get integrationsAiSupportChatEnabled => 'تفعيل دردشة الدعم بالذكاء الاصطناعي';
+  String get integrationsAiSupportChatEnabled =>
+      'تفعيل دردشة الدعم بالذكاء الاصطناعي';
 
   @override
-  String get integrationsAiSupportChatEnabledHint => 'توجيه دردشة العملاء عبر الوكيل المُعد';
+  String get integrationsAiSupportChatEnabledHint =>
+      'توجيه دردشة العملاء عبر الوكيل المُعد';
 
   @override
   String get integrationsOtherTitle => 'خدمات أخرى';
 
   @override
-  String get integrationsOtherSubtitle => 'الخرائط، الإشعارات، البريد، والمراقبة.';
+  String get integrationsOtherSubtitle =>
+      'الخرائط، الإشعارات، البريد، والمراقبة.';
 
   @override
   String get integrationsGoogleMapsApiKey => 'مفتاح Google Maps API';
@@ -1277,7 +1981,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get integrationsAttendanceWifiTitle => 'WiFi المطعم (الحضور)';
 
   @override
-  String get integrationsAttendanceWifiSubtitle => 'تسجيل الحضور والانصراف يعمل فقط على WiFi المطعم — وليس بيانات الجوال أو شبكات خارجية.';
+  String get integrationsAttendanceWifiSubtitle =>
+      'تسجيل الحضور والانصراف يعمل فقط على WiFi المطعم — وليس بيانات الجوال أو شبكات خارجية.';
 
   @override
   String get integrationsRestaurantWifiSsid => 'اسم شبكة WiFi (SSID)';
@@ -1316,13 +2021,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get attendanceWifiChecking => 'جاري التحقق من WiFi المطعم…';
 
   @override
-  String get attendanceWifiCheckFailed => 'تعذّر قراءة حالة WiFi. حاول مرة أخرى.';
+  String get attendanceWifiCheckFailed =>
+      'تعذّر قراءة حالة WiFi. حاول مرة أخرى.';
 
   @override
-  String get attendanceWifiNotConfigured => 'لم يسجّل المدير WiFi المطعم بعد. اطلب من المشغل إعداده في تكاملات التطبيق.';
+  String get attendanceWifiNotConfigured =>
+      'لم يسجّل المدير WiFi المطعم بعد. اطلب من المشغل إعداده في تكاملات التطبيق.';
 
   @override
-  String get attendanceWifiRequired => 'اتصل بـ WiFi المطعم لتسجيل الحضور. بيانات الجوال والشبكات الخارجية مرفوضة.';
+  String get attendanceWifiRequired =>
+      'اتصل بـ WiFi المطعم لتسجيل الحضور. بيانات الجوال والشبكات الخارجية مرفوضة.';
 
   @override
   String attendanceWifiConnected(String ssid) {
@@ -1331,11 +2039,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String attendanceWifiDemoMatched(String ssid) {
-    return 'وضع تجريبي: يُعامل كـ WiFi المطعم ($ssid)';
+    return 'متصل بشبكة WiFi المطعم ($ssid)';
   }
 
   @override
-  String get attendanceWifiWebDemoNote => 'النموذج على الويب يحاكي مطابقة WiFi عند تفعيل الوضع التجريبي. الإنتاج يستخدم تطبيق الجوال على WiFi المطعم.';
+  String get attendanceWifiWebDemoNote =>
+      'يستخدم تسجيل الحضور شبكة WiFi المطعم.';
 
   @override
   String attendanceWifiWrongNetwork(String current, String expected) {
@@ -1354,10 +2063,12 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get attendanceFingerprintComingHint => 'المس بصمة الإصبع لتأكيد وقت الحضور';
+  String get attendanceFingerprintComingHint =>
+      'المس بصمة الإصبع لتأكيد وقت الحضور';
 
   @override
-  String get attendanceFingerprintLeavingHint => 'المس بصمة الإصبع لتأكيد وقت الانصراف';
+  String get attendanceFingerprintLeavingHint =>
+      'المس بصمة الإصبع لتأكيد وقت الانصراف';
 
   @override
   String get attendanceBiometricTitle => 'موافقة بصمة الإصبع';
@@ -1372,7 +2083,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get attendanceBiometricCheckOutReason => 'أكّد مغادرتك من المطعم';
 
   @override
-  String get attendanceBiometricUnavailable => 'المصادقة البيومترية غير متاحة على هذا الجهاز.';
+  String get attendanceBiometricUnavailable =>
+      'المصادقة البيومترية غير متاحة على هذا الجهاز.';
 
   @override
   String get attendanceBiometricFailed => 'فشل التحقق بالبصمة. حاول مرة أخرى.';
@@ -1591,7 +2303,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get screenStaffHoursReportDesc => 'شاشة ساعات الموظفين.';
 
   @override
-  String get otpVerificationSubtitle => 'أدخل رمز التحقق المكوّن من 6 أرقام المرسل إلى هاتفك.';
+  String get otpVerificationSubtitle =>
+      'أدخل رمز التحقق المكوّن من 6 أرقام المرسل إلى هاتفك.';
 
   @override
   String get screenPaymentSubtitle => 'اختر طريقة الدفع لهذا الطلب.';
@@ -1722,7 +2435,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cashierSplitPayment => 'تقسيم الدفع';
 
   @override
-  String get cashierSplitTotalMismatch => 'يجب أن يساوي مجموع التقسيم المبلغ المستحق.';
+  String get cashierSplitTotalMismatch =>
+      'يجب أن يساوي مجموع التقسيم المبلغ المستحق.';
 
   @override
   String get cashierPaymentDetails => 'تفاصيل الدفع';
@@ -1794,7 +2508,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cashierSendElectronicTicket => 'إرسال QR / تذكرة إلكترونية';
 
   @override
-  String get cashierElectronicTicketSent => 'تم إرسال التذكرة الإلكترونية إلى هاتف العميل عبر واتساب';
+  String get cashierElectronicTicketSent =>
+      'تم إرسال التذكرة الإلكترونية إلى هاتف العميل عبر واتساب';
 
   @override
   String get cashierSendOrderPreparation => 'إرسال الطلب للتحضير';
@@ -1922,10 +2637,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminModulesSection => 'الوحدات';
 
   @override
-  String get financialTotalsMismatch => 'المجاميع لا تطابق الدفتر — أعد الحساب قبل الإغلاق.';
+  String get financialTotalsMismatch =>
+      'المجاميع لا تطابق الدفتر — أعد الحساب قبل الإغلاق.';
 
   @override
-  String get screenFinancialCalculationSubtitle => 'إجمالي الإيرادات والإكراميات والودائع اليومية.';
+  String get screenFinancialCalculationSubtitle =>
+      'إجمالي الإيرادات والإكراميات والودائع اليومية.';
 
   @override
   String platedBreakageCost(String amount) {
@@ -1933,7 +2650,8 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get screenPlatedReturnProcessSubtitle => 'عدّ الصحون المرتجعة وسجّل أي نقص.';
+  String get screenPlatedReturnProcessSubtitle =>
+      'عدّ الصحون المرتجعة وسجّل أي نقص.';
 
   @override
   String get profileAccountSection => 'الحساب';
@@ -1942,13 +2660,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileOrdersSection => 'الطلبات والمكافآت';
 
   @override
-  String get platedDeliveryDepositNote => 'يُطبَّق وديعة قابلة للاسترداد على طلبات التوصيل بالصحون.';
+  String get platedDeliveryDepositNote =>
+      'يُطبَّق وديعة قابلة للاسترداد على طلبات التوصيل بالصحون.';
 
   @override
   String get adminInventoryLowTitle => 'نقص مخزون: ستيك ريب آي';
 
   @override
-  String get adminInventoryLowBody => 'تبقى ١٤ وحدة فقط. متوقع النفاد خلال ساعتين.';
+  String get adminInventoryLowBody =>
+      'تبقى ١٤ وحدة فقط. متوقع النفاد خلال ساعتين.';
 
   @override
   String get adminRestockAction => 'إعادة تزويد';
@@ -2094,7 +2814,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminMarketInsight => 'مؤشر السوق';
 
   @override
-  String get adminMarketInsightBody => 'الطلب على أطباق الصواني أعلى ٢٢٪ هذا المساء مقارنة بالجمعة الماضية. يُنصح بزيادة تجهيز المقبلات.';
+  String get adminMarketInsightBody =>
+      'الطلب على أطباق الصواني أعلى ٢٢٪ هذا المساء مقارنة بالجمعة الماضية. يُنصح بزيادة تجهيز المقبلات.';
 
   @override
   String get adminNavOrders => 'طلبات';
@@ -2214,7 +2935,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get financialWhyMathMatters => 'لماذا هذه الحسابات مهمة.';
 
   @override
-  String get financialWhyBody => 'يضمن محرك توزيع الأرباح احتساب كل دينار عبر فصل الإيراد الإجمالي عن الربح القابل للتوزيع، واستثناء بقشيش الموظفين، وإبقاء العربونات المستردة خارج تقسيم المالك والمشغل.';
+  String get financialWhyBody =>
+      'يضمن محرك توزيع الأرباح احتساب كل دينار عبر فصل الإيراد الإجمالي عن الربح القابل للتوزيع، واستثناء بقشيش الموظفين، وإبقاء العربونات المستردة خارج تقسيم المالك والمشغل.';
 
   @override
   String get financialPdfReport => 'تنزيل تقرير PDF';
@@ -2238,7 +2960,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get forgotPasswordTitle => 'نسيت كلمة المرور';
 
   @override
-  String get forgotPasswordSubtitle => 'أدخل رقم الهاتف أو البريد المسجل لاستلام رمز إعادة التعيين';
+  String get forgotPasswordSubtitle =>
+      'أدخل رقم الهاتف أو البريد المسجل لاستلام رمز إعادة التعيين';
 
   @override
   String get forgotEmailPhoneLabel => 'البريد الإلكتروني أو رقم الهاتف';
@@ -2274,13 +2997,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get guestRoyalMansafTitle => 'تجربة المنسف الملكي';
 
   @override
-  String get guestRoyalMansafSubtitle => 'جميد كرك أصيل ولحم محلي طري. خصم ١٥٪ للضيوف الجدد.';
+  String get guestRoyalMansafSubtitle =>
+      'جميد كرك أصيل ولحم محلي طري. خصم ١٥٪ للضيوف الجدد.';
 
   @override
   String get guestWeekendFeast => 'وليمة نهاية الأسبوع';
 
   @override
-  String get guestWeekendFeastSubtitle => 'اطلب أي مقبلات وطبق رئيسي واحصل على شراب جلاب مجاناً.';
+  String get guestWeekendFeastSubtitle =>
+      'اطلب أي مقبلات وطبق رئيسي واحصل على شراب جلاب مجاناً.';
 
   @override
   String get guestClaimOffer => 'احصل على العرض';
@@ -2312,7 +3037,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get guestSageTea => 'شاي ميرمية';
 
   @override
-  String get homeSearchHint => 'ابحث عن منسف أو شاورما أو المزيد...';
+  String get homeSearchHint => 'ابحث عن الأطباق أو الأقسام...';
 
   @override
   String get screenSearch => 'البحث';
@@ -2321,13 +3046,35 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchTitle => 'ابحث عن وجبتك التالية';
 
   @override
-  String get searchSubtitle => 'ابحث في قائمة عيلتنا باسم الطبق أو التصنيف أو وصف النكهة.';
+  String get searchSubtitle =>
+      'ابحث في قائمة عيلتنا باسم الطبق أو التصنيف أو وصف النكهة.';
+
+  @override
+  String get searchMenuHint => 'ابحث في القائمة أو الأطباق أو المكونات...';
+
+  @override
+  String get searchRecentTitle => 'عمليات البحث الأخيرة';
+
+  @override
+  String get searchClearAll => 'مسح الكل';
+
+  @override
+  String get searchTopResults => 'أفضل النتائج';
+
+  @override
+  String searchItemsFound(int count) {
+    return 'تم العثور على $count عنصر';
+  }
+
+  @override
+  String get searchAddShort => 'أضف';
 
   @override
   String get searchStartTitle => 'اكتب اسم الطبق';
 
   @override
-  String get searchStartBody => 'جرّب شاورما، حمص، بيتزا، فلافل، برغر، أو أي طلب من القائمة.';
+  String get searchStartBody =>
+      'جرّب شاورما، حمص، بيتزا، فلافل، برغر، أو أي طلب من القائمة.';
 
   @override
   String get searchEmptyTitle => 'لم نجد أطباقاً';
@@ -2353,7 +3100,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeZeroWasteTitle => 'طعم تقليدي،\nبدون هدر.';
 
   @override
-  String get homeZeroWasteSubtitle => 'استمتع بوليمتك على صواني فخارية أصيلة. عربون ٥ د.أ مسترد لكل صينية.';
+  String get homeZeroWasteSubtitle =>
+      'استمتع بوليمتك على صواني فخارية أصيلة. عربون ٥ د.أ مسترد لكل صينية.';
 
   @override
   String get homeOrderNow => 'اطلب الآن';
@@ -2389,7 +3137,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeSustainabilityDeposit => 'عربون الاستدامة';
 
   @override
-  String get homeSustainabilityBody => 'اختر خيار الصواني لتجربة صديقة للبيئة. يضاف عربون بسيط لأوانينا الفاخرة ويسترد بالكامل عند جمع الصواني بعد وجبتك.';
+  String get homeSustainabilityBody =>
+      'اختر خيار الصواني لتجربة صديقة للبيئة. يضاف عربون بسيط لأوانينا الفاخرة ويسترد بالكامل عند جمع الصواني بعد وجبتك.';
 
   @override
   String get homeLearnHowItWorks => 'اعرف كيف يعمل';
@@ -2599,7 +3348,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get inventoryThresholdConfig => 'إعداد حد الأمان';
 
   @override
-  String get inventoryLowStockTrigger => 'يفعّل تنبيه انخفاض المخزون عند هذا المستوى.';
+  String get inventoryLowStockTrigger =>
+      'يفعّل تنبيه انخفاض المخزون عند هذا المستوى.';
 
   @override
   String get inventoryUpdateInventory => 'تحديث المخزون';
@@ -2771,7 +3521,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get prepKitchenNotes => 'ملاحظات المطبخ';
 
   @override
-  String get prepKitchenNoteBody => 'احتفال عيد ميلاد على طاولة ١٤. يرجى خروج كل أطباق الصواني معاً. الضيف في المقعد ٢ لديه حساسية شديدة من البصل؛ اتبع بروتوكول منع التلوث المتبادل لبرغر واجيو.';
+  String get prepKitchenNoteBody =>
+      'احتفال عيد ميلاد على طاولة ١٤. يرجى خروج كل أطباق الصواني معاً. الضيف في المقعد ٢ لديه حساسية شديدة من البصل؛ اتبع بروتوكول منع التلوث المتبادل لبرغر واجيو.';
 
   @override
   String get prepServer => 'المضيف: ديفيد ك.';
@@ -2924,10 +3675,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get kitchenHandoverCourier => 'تسليم للمندوب';
 
   @override
-  String get languageWelcomeTitle => 'أهلاً وسهلاً';
+  String get languageWelcomeTitle => 'اختر لغتك';
 
   @override
-  String get languageWelcomeSubtitle => 'اختر لغتك المفضلة للمتابعة';
+  String get languageWelcomeSubtitle =>
+      'مرحبًا بك في أيلتنا. اختر لغتك المفضلة للمتابعة.';
 
   @override
   String get languageEnglishSubtitle => 'الواجهة الغربية';
@@ -2942,7 +3694,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loginWelcomeBack => 'أهلاً بعودتك';
 
   @override
-  String get loginOperationalSubtitle => 'اطلب وجباتك المفضلة، وتابع وليمتك، وعد بسرعة لما تحبه.';
+  String get loginOperationalSubtitle => 'مرحبًا بعودتك إلى أيلتنا';
 
   @override
   String get loginPhoneOrEmail => 'الهاتف أو البريد الإلكتروني';
@@ -2955,6 +3707,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get loginOr => 'أو';
+
+  @override
+  String get loginDemoHubTitle => 'مراكز الموظفين';
+
+  @override
+  String get loginDemoHubSubtitle => 'سجّل الدخول بدور إدارة أو متخصص.';
 
   @override
   String get loginContinueGuest => 'المتابعة كضيف';
@@ -3035,19 +3793,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loyaltyRedeem => 'استبدال';
 
   @override
+  String get loyaltyNoRewardsInFilter =>
+      'لا توجد مكافآت في هذا التصنيف حالياً.';
+
+  @override
   String get loyaltyLocked => 'مغلق';
 
   @override
   String get loyaltySignaturePlatter => 'طبق مشاوي فاخر';
 
   @override
-  String get loyaltySignaturePlatterDesc => 'استبدله بطبق مشاوي كامل مع ثلاثة أطباق جانبية.';
+  String get loyaltySignaturePlatterDesc =>
+      'استبدله بطبق مشاوي كامل مع ثلاثة أطباق جانبية.';
 
   @override
   String get loyaltyLargePizza => 'أي فطيرة كبيرة';
 
   @override
-  String get loyaltyLargePizzaDesc => 'اختر أي فطيرة كبيرة من قائمة فرن العائلة.';
+  String get loyaltyLargePizzaDesc =>
+      'اختر أي فطيرة كبيرة من قائمة فرن العائلة.';
 
   @override
   String get loyaltyFreeDessert => 'حلوى مجانية';
@@ -3059,7 +3823,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loyaltyChefTasting => 'تجربة الشيف لشخصين';
 
   @override
-  String get loyaltyChefTastingDesc => 'تجربة تذوق خاصة من إعداد الشيف التنفيذي.';
+  String get loyaltyChefTastingDesc =>
+      'تجربة تذوق خاصة من إعداد الشيف التنفيذي.';
 
   @override
   String loyaltyPointsShort(String points) {
@@ -3070,13 +3835,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loyaltyDine => 'تناول';
 
   @override
-  String get loyaltyDineDesc => 'اكسب 10 نقاط مقابل كل 1 دينار في أي فرع من عيلتنا.';
+  String get loyaltyDineDesc =>
+      'اكسب 10 نقاط مقابل كل 1 دينار في أي فرع من عيلتنا.';
 
   @override
   String get loyaltyCollect => 'اجمع';
 
   @override
-  String get loyaltyCollectDesc => 'راقب نقاطك وهي تزيد وافتح مزايا المستويات المميزة.';
+  String get loyaltyCollectDesc =>
+      'راقب نقاطك وهي تزيد وافتح مزايا المستويات المميزة.';
 
   @override
   String get loyaltyEnjoy => 'استمتع';
@@ -3118,7 +3885,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get menuManagementTitle => 'إدارة المنيو';
 
   @override
-  String get menuManagementSubtitle => 'إدارة أصناف المنيو الرقمية والأسعار والتوفر المباشر.';
+  String get menuManagementSubtitle =>
+      'إدارة أصناف المنيو الرقمية والأسعار والتوفر المباشر.';
 
   @override
   String get menuAddNewItem => 'إضافة صنف جديد';
@@ -3234,6 +4002,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cartPromoHint => 'أدخل الرمز';
 
   @override
+  String get cartYourCartTitle => 'سلتك';
+
+  @override
+  String get cartReviewSubtitle => 'راجع أصنافك قبل إتمام الطلب.';
+
+  @override
   String get cartOrderSummary => 'ملخص الطلب';
 
   @override
@@ -3273,7 +4047,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cartProceedCheckout => 'المتابعة للدفع';
 
   @override
-  String get cartGuestSignInPrompt => 'سجّل الدخول لإتمام الطلب ومتابعة التوصيل مباشرة.';
+  String get cartGuestSignInPrompt =>
+      'سجّل الدخول لإتمام الطلب ومتابعة التوصيل مباشرة.';
 
   @override
   String get cartCheckoutStepBasket => 'السلة';
@@ -3288,7 +4063,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cartCheckoutStepReview => 'المراجعة';
 
   @override
-  String get demoModeBanner => 'وضع تجريبي — الإجراءات تستخدم بيانات وهمية ولا تُحفظ.';
+  String get demoModeBanner => 'تم إكمال الإجراء.';
 
   @override
   String get cartTermsNotice => 'بالضغط، أنت توافق على شروط الخدمة.';
@@ -3300,13 +4075,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cartFulfillmentTitle => 'طريقة استلام الطلب';
 
   @override
-  String get cartFulfillmentSubtitle => 'اختر طريقة الخدمة الآن داخل السلة بدون الانتقال لشاشة منفصلة.';
+  String get cartFulfillmentSubtitle =>
+      'اختر طريقة الخدمة الآن داخل السلة بدون الانتقال لشاشة منفصلة.';
 
   @override
   String get cartGroupDeliveryTitle => 'توصيل جماعي';
 
   @override
-  String get cartGroupDeliveryBody => 'انتظر طلباً قريباً من نفس المنطقة لتقليل تكلفة التوصيل وتحسين مسار الرحلة.';
+  String get cartGroupDeliveryBody =>
+      'انتظر طلباً قريباً من نفس المنطقة لتقليل تكلفة التوصيل وتحسين مسار الرحلة.';
 
   @override
   String get cartTermsAndConditions => 'الشروط والأحكام';
@@ -3315,7 +4092,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cartSelectedAddress => 'العنوان المختار';
 
   @override
-  String get cartAddressRequired => 'اختر عنوان توصيل افتراضي قبل المتابعة للدفع.';
+  String get cartAddressRequired =>
+      'اختر عنوان توصيل افتراضي قبل المتابعة للدفع.';
 
   @override
   String get cartChooseAddress => 'اختر العنوان';
@@ -3342,7 +4120,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportHeroTitle => 'كيف يمكننا مساعدتك؟';
 
   @override
-  String get supportHeroBody => 'اختر أسرع قناة دعم تجريبية لأسئلة الطلب أو تحديثات التوصيل أو المساعدة في الدفع.';
+  String get supportHeroBody =>
+      'اختر أسرع قناة دعم لأسئلة الطلب أو تحديثات التوصيل أو المساعدة في الدفع.';
 
   @override
   String get supportLiveChatTitle => 'محادثة مباشرة';
@@ -3354,19 +4133,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportCallTitle => 'الاتصال بالمطعم';
 
   @override
-  String get supportCallBody => 'تحدث مع الاستقبال بخصوص التعديلات العاجلة على الطلب.';
+  String get supportCallBody =>
+      'تحدث مع الاستقبال بخصوص التعديلات العاجلة على الطلب.';
 
   @override
   String get supportWhatsappTitle => 'دعم واتساب';
 
   @override
-  String get supportWhatsappBody => 'أرسل رسالة مع تفاصيل طلبك ووقت التواصل المناسب.';
+  String get supportWhatsappBody =>
+      'أرسل رسالة مع تفاصيل طلبك ووقت التواصل المناسب.';
 
   @override
   String get supportOrderHelpTitle => 'مساعدة الطلب';
 
   @override
-  String get supportOrderHelpBody => 'استخدم هذه الصفحة لأسئلة السلة والتوصيل والدفع وإرجاع الصواني.';
+  String get supportOrderHelpBody =>
+      'استخدم هذه الصفحة لأسئلة السلة والتوصيل والدفع وإرجاع الصواني.';
 
   @override
   String get supportFaqTitle => 'الأسئلة الشائعة';
@@ -3375,10 +4157,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportFaqBody => 'تصفح إجابات التوصيل والدفع وإرجاع الصواني.';
 
   @override
-  String get supportTicketsTitle => 'تذاكر الدعم';
-
-  @override
-  String get supportTicketsSubtitle => 'تابع طلبات الدعم التجريبية المفتوحة والمغلقة.';
+  String get supportTicketsSubtitle => 'تابع طلبات الدعم المفتوحة والمغلقة.';
 
   @override
   String get supportTicketRequestFollowUp => 'طلب متابعة';
@@ -3411,7 +4190,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportNewTicketTitle => 'تذكرة محادثة مباشرة';
 
   @override
-  String get supportNewTicketBody => 'تم فتح جلسة محادثة جديدة مع فريق خدمة العملاء.';
+  String get supportNewTicketBody =>
+      'تم فتح جلسة محادثة جديدة مع فريق خدمة العملاء.';
 
   @override
   String get supportTicketOpened => 'تم فتح تذكرة دعم جديدة.';
@@ -3420,7 +4200,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportChatHeroTitle => 'محادثة دعم مباشرة';
 
   @override
-  String get supportChatHeroBody => 'يبدأ الموظف بالمحادثة ويفتح تذكرة فقط إذا كانت المتابعة مطلوبة.';
+  String get supportChatHeroBody =>
+      'يبدأ الموظف بالمحادثة ويفتح تذكرة فقط إذا كانت المتابعة مطلوبة.';
 
   @override
   String get supportChatActiveSession => 'جلسة محادثة نشطة';
@@ -3429,13 +4210,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportChatNoTicketYet => 'لا توجد تذكرة حتى الآن';
 
   @override
-  String get supportChatAgentGreeting => 'أهلاً بك في دعم عيلتنا. أخبرني بما حدث وسأقرر إذا كان الموضوع يحتاج تذكرة.';
+  String get supportChatAgentGreeting =>
+      'أهلاً بك في دعم عيلتنا. أخبرني بما حدث وسأقرر إذا كان الموضوع يحتاج تذكرة.';
 
   @override
   String get supportChatCustomerSample => 'أحتاج مساعدة في طلبي النشط.';
 
   @override
-  String get supportChatAgentDecision => 'يمكنني مساعدتك هنا أولاً. إذا احتاج الموضوع متابعة من المطعم سأفتح تذكرة وتبقى ظاهرة في الدعم.';
+  String get supportChatAgentDecision =>
+      'يمكنني مساعدتك هنا أولاً. إذا احتاج الموضوع متابعة من المطعم سأفتح تذكرة وتبقى ظاهرة في الدعم.';
 
   @override
   String get supportChatAgentName => 'موظف عيلتنا';
@@ -3444,7 +4227,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportChatCustomerName => 'أنت';
 
   @override
-  String get supportChatAgentTicketNote => 'موظف الدعم فقط يمكنه فتح تذكرة متابعة بعد مراجعة المحادثة.';
+  String get supportChatAgentTicketNote =>
+      'موظف الدعم فقط يمكنه فتح تذكرة متابعة بعد مراجعة المحادثة.';
 
   @override
   String get supportChatMessageLabel => 'الرسالة';
@@ -3459,10 +4243,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportChatOpenTicket => 'فتح تذكرة عند الحاجة';
 
   @override
-  String get supportAdminSetupNote => 'أرقام هاتف المطعم وواتساب مجهزة مسبقاً للموك أب ويمكن تعديلها لاحقاً من إعدادات الإدارة.';
+  String get supportAdminSetupNote =>
+      'يمكن تعديل أرقام هاتف المطعم وواتساب من إعدادات الإدارة.';
 
   @override
-  String get supportExternalActionFallback => 'تعذر فتح هذا الإجراء. استخدم بيانات التواصل المعروضة.';
+  String get supportExternalActionFallback =>
+      'تعذر فتح هذا الإجراء. استخدم بيانات التواصل المعروضة.';
 
   @override
   String get screenFaq => 'الأسئلة الشائعة';
@@ -3477,19 +4263,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get faqDeliveryTitle => 'كيف تعمل تحديثات التوصيل؟';
 
   @override
-  String get faqDeliveryBody => 'الطلبات النشطة تعرض خطاً زمنياً. عندما يصبح الطلب في الطريق يظهر زر التواصل مع السائق.';
+  String get faqDeliveryBody =>
+      'الطلبات النشطة تعرض خطاً زمنياً. عندما يصبح الطلب في الطريق يظهر زر التواصل مع السائق.';
 
   @override
   String get faqPaymentTitle => 'ما طرق الدفع المدعومة؟';
 
   @override
-  String get faqPaymentBody => 'الدفع التجريبي يعرض حالياً البطاقة والنقد، مع إبقاء شاشات المحفظة/الدفع للتهيئة لاحقاً.';
+  String get faqPaymentBody => 'يدعم الدفع بالبطاقة والنقد.';
 
   @override
   String get faqPlatedTitle => 'كيف يعمل توصيل الصواني؟';
 
   @override
-  String get faqPlatedBody => 'الصواني القابلة للإرجاع تشمل عربوناً مسترداً وتتبع تدفق تذكير إرجاع الصواني.';
+  String get faqPlatedBody =>
+      'الصواني القابلة للإرجاع تشمل عربوناً مسترداً وتتبع تدفق تذكير إرجاع الصواني.';
 
   @override
   String get cartMargheritaPremium => 'مارغريتا بريميوم';
@@ -3537,7 +4325,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get orderHistoryWeekendSpecial => 'عرض نهاية الأسبوع';
 
   @override
-  String get orderHistoryWeekendSubtitle => 'احصل على خصم 15٪ عند إعادة الطلب القادمة.';
+  String get orderHistoryWeekendSubtitle =>
+      'احصل على خصم 15٪ عند إعادة الطلب القادمة.';
 
   @override
   String get orderHistoryActive => 'نشط';
@@ -3569,7 +4358,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get orderHistoryDriverContactTitle => 'تواصل مع السائق';
 
   @override
-  String get orderHistoryDriverContactBody => 'طلبك في الطريق. اتصل بالسائق إذا كنت بحاجة لتنسيق التوصيل.';
+  String get orderHistoryDriverContactBody =>
+      'طلبك في الطريق. اتصل بالسائق إذا كنت بحاجة لتنسيق التوصيل.';
 
   @override
   String get orderHistoryCallDriver => 'اتصل بالسائق';
@@ -3659,6 +4449,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profilePhotoUpdated => 'تم تحديث صورة الملف';
 
   @override
+  String get profileChoosePhoto => 'اختر صورة';
+
+  @override
+  String get profileRemovePhoto => 'إزالة الصورة';
+
+  @override
   String get profileEpicureanTier => 'فئة الذواقة';
 
   @override
@@ -3671,7 +4467,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profilePointsValue => '4,850';
 
   @override
-  String get profileTierProgress => 'تبقى 1,150 نقطة للوصول إلى مزايا البلاتيني.';
+  String get profileTierProgress =>
+      'تبقى 1,150 نقطة للوصول إلى مزايا البلاتيني.';
 
   @override
   String get profileRewardsCatalog => 'كتالوج المكافآت';
@@ -3680,7 +4477,14 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profilePointsHistory => 'نشاط النقاط';
 
   @override
-  String get profilePointsHistorySubtitle => 'آخر نقاط المكافآت المكتسبة والمستبدلة.';
+  String get profileNoPointsActivity => 'لا توجد حركات نقاط بعد.';
+
+  @override
+  String get profilePointsActivityLabel => 'حركة نقاط';
+
+  @override
+  String get profilePointsHistorySubtitle =>
+      'آخر نقاط المكافآت المكتسبة والمستبدلة.';
 
   @override
   String get profileViewAllPointsHistory => 'عرض كل السجل';
@@ -3689,7 +4493,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profilePaymentHistory => 'سجل الدفع';
 
   @override
-  String get profilePaymentHistorySubtitle => 'آخر عمليات الدفع الناجحة للعميل.';
+  String get profilePaymentHistorySubtitle =>
+      'آخر عمليات الدفع الناجحة للعميل.';
 
   @override
   String get profileViewAllPaymentHistory => 'عرض سجل الدفع';
@@ -3737,7 +4542,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileDeleteAddressTitle => 'حذف العنوان؟';
 
   @override
-  String get profileDeleteAddressBody => 'هذا إجراء تجريبي يزيل العنوان المحفوظ من عرض ملفك.';
+  String get profileDeleteAddressBody => 'سيُزال العنوان المحفوظ من ملفك.';
 
   @override
   String get profileHomeAddressTitle => 'المنزل';
@@ -3770,7 +4575,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileMarketingOffers => 'التسويق والعروض';
 
   @override
-  String get profileMarketingSubtitle => 'خصومات حصرية وإعلانات المنيو الموسمية';
+  String get profileMarketingSubtitle =>
+      'خصومات حصرية وإعلانات المنيو الموسمية';
 
   @override
   String get profileLogout => 'تسجيل الخروج';
@@ -3779,7 +4585,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileDeactivateAccount => 'تعطيل الحساب';
 
   @override
-  String get settingsPersonalSubtitle => 'اعرض صورتك الشخصية واسمك وبيانات التواصل وتفضيلات الإشعارات.';
+  String get settingsPersonalSubtitle =>
+      'اعرض صورتك الشخصية واسمك وبيانات التواصل وتفضيلات الإشعارات.';
 
   @override
   String get settingsEmployeeSince => 'عضو في الفريق منذ يونيو 2022';
@@ -3797,19 +4604,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsStaffShiftAlerts => 'تنبيهات الوردية والمهام';
 
   @override
-  String get settingsStaffShiftAlertsSubtitle => 'تذكيرات المطبخ والتوصيل والمخزون والحضور.';
+  String get settingsStaffShiftAlertsSubtitle =>
+      'تذكيرات المطبخ والتوصيل والمخزون والحضور.';
 
   @override
-  String get settingsStaffOrderAlertsSubtitle => 'تحديثات الطلبات المرتبطة بمحطتك أو مسارك.';
+  String get settingsStaffOrderAlertsSubtitle =>
+      'تحديثات الطلبات المرتبطة بمحطتك أو مسارك.';
 
   @override
-  String get settingsBusinessSettingsHint => 'عمليات المطعم والأدوار والضرائب والإيصالات وتنبيهات النظام.';
+  String get settingsBusinessSettingsHint =>
+      'عمليات المطعم والأدوار والضرائب والإيصالات وتنبيهات النظام.';
+
+  @override
+  String get drawerBusinessSettings => 'إعدادات العمل';
 
   @override
   String get addressesTitle => 'العناوين المحفوظة';
 
   @override
   String get addressesAddNew => 'إضافة عنوان جديد';
+
+  @override
+  String get addressesEmptyMessage =>
+      'لا توجد عناوين محفوظة بعد. أضف عنواناً لتسريع إتمام طلب التوصيل.';
 
   @override
   String get addressesDelete => 'حذف';
@@ -3827,7 +4644,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addressesOfficeTitle => 'المكتب';
 
   @override
-  String get addressesOfficeBody => 'مقر عيلتنا، 888 طريق الابتكار، جناح 200، عمّان';
+  String get addressesOfficeBody =>
+      'مقر عيلتنا، 888 طريق الابتكار، جناح 200، عمّان';
 
   @override
   String get addressesGymTitle => 'النادي';
@@ -3836,7 +4654,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addressesGymBody => 'مركز آيرون بيك، 45 شارع القوة، عمّان';
 
   @override
-  String get addressesHelper => 'أدر أماكن التوصيل المتكررة بسهولة لتسريع الدفع.';
+  String get addressesHelper =>
+      'أدر أماكن التوصيل المتكررة بسهولة لتسريع الدفع.';
 
   @override
   String get mapAddressTitle => 'حفظ العنوان باسم';
@@ -3860,13 +4679,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get mapSaveAddress => 'حفظ العنوان';
 
   @override
-  String get mapRequiredFields => 'اختر الموقع من الخريطة واكتب العنوان قبل الحفظ.';
+  String get mapRequiredFields =>
+      'اختر الموقع من الخريطة واكتب العنوان قبل الحفظ.';
 
   @override
   String get notificationsTitle => 'الإشعارات';
 
   @override
-  String get notificationsSubtitle => 'ابقَ مطلعاً على آخر أنشطة المطبخ والتوصيل.';
+  String get notificationsSubtitle =>
+      'ابقَ مطلعاً على آخر أنشطة المطبخ والتوصيل.';
 
   @override
   String get notificationsClearAll => 'مسح الكل';
@@ -3893,7 +4714,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notificationsWeeklyReport => 'التقرير الأسبوعي';
 
   @override
-  String get notificationsWeeklySubtitle => 'وصلت أهداف الاستدامة إلى 92٪ هذا الأسبوع!';
+  String get notificationsWeeklySubtitle =>
+      'وصلت أهداف الاستدامة إلى 92٪ هذا الأسبوع!';
 
   @override
   String get notificationsViewDetails => 'عرض التفاصيل';
@@ -3908,7 +4730,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notificationsDeliveryTitle => 'الطلب #8829 خرج للتوصيل';
 
   @override
-  String get notificationsDeliveryBody => 'استلم السائق أحمد الطلب وهو في الطريق إلى الوجهة.';
+  String get notificationsDeliveryBody =>
+      'استلم السائق أحمد الطلب وهو في الطريق إلى الوجهة.';
 
   @override
   String get notificationsTwoMins => 'قبل دقيقتين';
@@ -3923,7 +4746,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notificationsTipTitle => 'توزيع البقشيش جاهز';
 
   @override
-  String get notificationsTipBody => 'تم حساب صندوق بقشيش وردية الصباح وهو جاهز للتوزيع.';
+  String get notificationsTipBody =>
+      'تم حساب صندوق بقشيش وردية الصباح وهو جاهز للتوزيع.';
 
   @override
   String get notificationsFifteenMins => 'قبل 15 دقيقة';
@@ -3938,7 +4762,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notificationsTrayTitle => 'تذكير جمع الصواني';
 
   @override
-  String get notificationsTrayBody => 'تنبيه استدامة: هناك 12 صينية قابلة لإعادة الاستخدام لم تُعد بعد في نقاط جمع بلوك ب.';
+  String get notificationsTrayBody =>
+      'تنبيه استدامة: هناك 12 صينية قابلة لإعادة الاستخدام لم تُعد بعد في نقاط جمع بلوك ب.';
 
   @override
   String get notificationsFortyFiveMins => 'قبل 45 دقيقة';
@@ -3950,7 +4775,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notificationsStockTitle => 'تنبيه مخزون: حبوب إسبريسو فاخرة';
 
   @override
-  String get notificationsStockBody => 'انخفض مستوى المخزون دون حد 15٪. ننصح بإعادة التخزين قريباً لتجنب تعطل الخدمة.';
+  String get notificationsStockBody =>
+      'انخفض مستوى المخزون دون حد 15٪. ننصح بإعادة التخزين قريباً لتجنب تعطل الخدمة.';
 
   @override
   String get notificationsOneHour => 'قبل ساعة';
@@ -3977,7 +4803,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notificationsPolicyTitle => 'تحديث سياسة جديد';
 
   @override
-  String get notificationsPolicyBody => 'تم تحديث إرشادات التعقيم. يرجى مراجعة القائمة الجديدة في بوابة الموظفين.';
+  String get notificationsPolicyBody =>
+      'تم تحديث إرشادات التعقيم. يرجى مراجعة القائمة الجديدة في بوابة الموظفين.';
 
   @override
   String get notificationsTwentyFourHours => 'قبل 24 ساعة';
@@ -4022,7 +4849,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get orderConfirmedHome => 'العودة للرئيسية';
 
   @override
-  String get orderConfirmedEmailSent => 'تم إرسال رسالة تأكيد إلى بريدك الإلكتروني.';
+  String get orderConfirmedEmailSent =>
+      'تم إرسال رسالة تأكيد إلى بريدك الإلكتروني.';
 
   @override
   String get otpTitle => 'التحقق بالرمز';
@@ -4047,16 +4875,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get otpResendCode => 'إعادة إرسال الرمز';
 
   @override
-  String get otpResendLimitReached => 'وصلت إلى حد إعادة الإرسال. يرجى المحاولة لاحقاً.';
+  String get otpResendLimitReached =>
+      'وصلت إلى حد إعادة الإرسال. يرجى المحاولة لاحقاً.';
 
   @override
-  String get otpSecurityNote => 'تستخدم عيلتنا تشفيراً بمستوى مصرفي لحماية أمان حسابك.';
+  String get otpSecurityNote =>
+      'تستخدم عيلتنا تشفيراً بمستوى مصرفي لحماية أمان حسابك.';
 
   @override
   String get ownerDashboardTitle => 'الأداء التنفيذي';
 
   @override
-  String get ownerDashboardSubtitle => 'الصحة المالية وتحليل الأرباح لحظياً لشهر يونيو 2024.';
+  String get ownerDashboardSubtitle =>
+      'الصحة المالية وتحليل الأرباح لحظياً لشهر يونيو 2024.';
 
   @override
   String get ownerLast30Days => 'آخر 30 يوم';
@@ -4101,7 +4932,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get ownerProfitAllocation => 'توزيع الربح';
 
   @override
-  String get ownerProfitAllocationBody => 'محسوب بناءً على اتفاقية المالك والمشغل 50/50.';
+  String get ownerProfitAllocationBody =>
+      'محسوب بناءً على اتفاقية المالك والمشغل 50/50.';
 
   @override
   String get ownerSplitRatio => 'نسبة التقسيم';
@@ -4110,7 +4942,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get ownerOperatorShare => 'حصة المشغل';
 
   @override
-  String get ownerExpensesBody => 'إجمالي المصاريف الشهرية بما يشمل تكلفة البضاعة والمرافق والعمالة. تفاصيل الوصفات والتكاليف الداخلية مقيدة للخصوصية.';
+  String get ownerExpensesBody =>
+      'إجمالي المصاريف الشهرية بما يشمل تكلفة البضاعة والمرافق والعمالة. تفاصيل الوصفات والتكاليف الداخلية مقيدة للخصوصية.';
 
   @override
   String get ownerConsolidatedTotal => 'الإجمالي الموحد';
@@ -4170,7 +5003,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get ownerPrivacyHeader => 'صلاحيات عرض المالك';
 
   @override
-  String get ownerPrivacyBody => 'اضبط بدقة المعلومات التي يستطيع مالك العقار رؤيتها في لوحة التحكم مع الحفاظ على خصوصية التشغيل والشفافية في مؤشرات الأعمال الأساسية.';
+  String get ownerPrivacyBody =>
+      'اضبط بدقة المعلومات التي يستطيع مالك العقار رؤيتها في لوحة التحكم مع الحفاظ على خصوصية التشغيل والشفافية في مؤشرات الأعمال الأساسية.';
 
   @override
   String get ownerPrivacyHero => 'ضوابط أمان مؤسسية';
@@ -4179,19 +5013,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get ownerHideRawCosts => 'إخفاء تكلفة المواد الخام';
 
   @override
-  String get ownerHideRawCostsBody => 'إخفاء تكلفة كل صنف في تقارير المخزون والمشتريات. سيرى المالك الإجماليات المجمعة فقط.';
+  String get ownerHideRawCostsBody =>
+      'إخفاء تكلفة كل صنف في تقارير المخزون والمشتريات. سيرى المالك الإجماليات المجمعة فقط.';
 
   @override
   String get ownerHideStaffSalaries => 'إخفاء رواتب الموظفين التفصيلية';
 
   @override
-  String get ownerHideStaffSalariesBody => 'تقييد عرض بيانات الرواتب التفصيلية. سيتم إخفاء تفاصيل راتب كل موظف عن عرض المالك.';
+  String get ownerHideStaffSalariesBody =>
+      'تقييد عرض بيانات الرواتب التفصيلية. سيتم إخفاء تفاصيل راتب كل موظف عن عرض المالك.';
 
   @override
   String get ownerShowOnlyNetProfit => 'إظهار صافي الربح فقط';
 
   @override
-  String get ownerShowOnlyNetProfitBody => 'عند التفعيل، ستخفي لوحة المالك إجمالي الإيرادات وتفاصيل المصاريف التشغيلية وتعرض صافي الربح النهائي للفترة فقط.';
+  String get ownerShowOnlyNetProfitBody =>
+      'عند التفعيل، ستخفي لوحة المالك إجمالي الإيرادات وتفاصيل المصاريف التشغيلية وتعرض صافي الربح النهائي للفترة فقط.';
 
   @override
   String get ownerLivePreview => 'معاينة مباشرة: منظور المالك';
@@ -4206,7 +5043,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get ownerNetProfitLabel => 'صافي الربح';
 
   @override
-  String get ownerPreviewNote => 'تعكس البيانات أعلاه إعدادات الظهور الحالية المطبقة على لوحة المالك.';
+  String get ownerPreviewNote =>
+      'تعكس البيانات أعلاه إعدادات الظهور الحالية المطبقة على لوحة المالك.';
 
   @override
   String get ownerDiscardChanges => 'تجاهل التغييرات';
@@ -4227,7 +5065,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get paymentCheckoutTitle => 'الدفع';
 
   @override
-  String get paymentCheckoutSubtitle => 'اختر طريقة الدفع المفضلة لإكمال الطلب.';
+  String get paymentCheckoutSubtitle =>
+      'اختر طريقة الدفع المفضلة لإكمال الطلب.';
 
   @override
   String get paymentTotalAmountDue => 'إجمالي المبلغ المستحق';
@@ -4288,7 +5127,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get platedHowTitle => 'ضيافة مستدامة بتجربة أرقى.';
 
   @override
-  String get platedHowSubtitle => 'استمتع بوجباتك المفضلة على أطباق فخارية حقيقية تصل إلى بابك ونجمعها عند الانتهاء.';
+  String get platedHowSubtitle =>
+      'استمتع بوجباتك المفضلة على أطباق فخارية حقيقية تصل إلى بابك ونجمعها عند الانتهاء.';
 
   @override
   String get platedHowItWorks => 'كيف تعمل الخدمة';
@@ -4297,25 +5137,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get platedStepOrderTitle => '١. اختر الصواني';
 
   @override
-  String get platedStepOrderBody => 'اختر خيار الصواني عند الدفع من المطاعم المحلية المشاركة.';
+  String get platedStepOrderBody =>
+      'اختر خيار الصواني عند الدفع من المطاعم المحلية المشاركة.';
 
   @override
   String get platedStepEnjoyTitle => '٢. استمتع بوجبتك';
 
   @override
-  String get platedStepEnjoyBody => 'لا علب ورقية رطبة. اختبر طعم وجبتك الحقيقي على فخار عالي الجودة.';
+  String get platedStepEnjoyBody =>
+      'لا علب ورقية رطبة. اختبر طعم وجبتك الحقيقي على فخار عالي الجودة.';
 
   @override
   String get platedStepPickupTitle => '٣. نعود للاستلام';
 
   @override
-  String get platedStepPickupBody => 'اترك الصينية عند بابك. سنجمعها ونعقمها باحتراف ونعيد استخدامها.';
+  String get platedStepPickupBody =>
+      'اترك الصينية عند بابك. سنجمعها ونعقمها باحتراف ونعيد استخدامها.';
 
   @override
   String get platedBondTitle => 'العربون المستدام';
 
   @override
-  String get platedBondBody => 'للحفاظ على مكتبة الصواني الفخارية عالية الجودة، يطلب عربون مسترد لكل طلب صواني ليبقى النظام مغلقاً ومستداماً.';
+  String get platedBondBody =>
+      'للحفاظ على مكتبة الصواني الفخارية عالية الجودة، يطلب عربون مسترد لكل طلب صواني ليبقى النظام مغلقاً ومستداماً.';
 
   @override
   String get platedDepositAmount => '٥ د.أ';
@@ -4396,7 +5240,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get platedSustainableReturns => 'إرجاع مستدام';
 
   @override
-  String get platedWasteReduced => 'عملك يقلل النفايات بمقدار ٤.٢ كغم لكل جولة جمع اليوم.';
+  String get platedWasteReduced =>
+      'عملك يقلل النفايات بمقدار ٤.٢ كغم لكل جولة جمع اليوم.';
 
   @override
   String get platedCustomerEleanor => 'إليانور شيلستروب';
@@ -4447,9 +5292,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get platesCatalogTitle => 'كتالوج الصواني الفخارية';
 
   @override
-  String get platesCatalogSubtitle => 'إدارة مستويات المخزون والتداول وتكاليف الكسر.';
-
-  @override
   String get platesNewComponent => 'مكون جديد';
 
   @override
@@ -4477,12 +5319,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get platesPerUnit => 'لكل وحدة';
 
   @override
-  String get platesInStock => 'في المخزون';
-
-  @override
-  String get platesCirculating => 'قيد التداول';
-
-  @override
   String platesReplacementCost(Object amount) {
     return 'تكلفة الاستبدال: $amount';
   }
@@ -4497,7 +5333,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get platesBowlBreakage => 'وعاء فخاري - ٤ وحدات مكسورة';
 
   @override
-  String get platesBowlBreakageMeta => 'المحطة: منطقة غسيل الأطباق • أبلغت عنها سارة م.';
+  String get platesBowlBreakageMeta =>
+      'المحطة: منطقة غسيل الأطباق • أبلغت عنها سارة م.';
 
   @override
   String get platesMezzeBreakage => 'طبق مزات - وحدتان مكسورتان';
@@ -4518,7 +5355,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get platesRestockAlert => 'تنبيه إعادة التوريد';
 
   @override
-  String get platesRestockBody => 'صواني التقديم الكبيرة أقل حالياً من حد الأمان (٥٠ وحدة).';
+  String get platesRestockBody =>
+      'صواني التقديم الكبيرة أقل حالياً من حد الأمان (٥٠ وحدة).';
 
   @override
   String get platesAutoRestockLevel => 'مستوى إعادة التوريد التلقائي';
@@ -4538,7 +5376,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get productMansafTitle => 'منسف لحم تقليدي';
 
   @override
-  String get productMansafDescription => 'الطبق الوطني في الأردن. قطع لحم بلدي طرية مطهية بصلصة جميد غنية وحامضة، تقدم فوق أرز كركمي عطري وخبز شراك رقيق. تزين بالمكسرات المقلية والبقدونس الطازج لقوام ونكهة متوازنين.';
+  String get productMansafDescription =>
+      'الطبق الوطني في الأردن. قطع لحم بلدي طرية مطهية بصلصة جميد غنية وحامضة، تقدم فوق أرز كركمي عطري وخبز شراك رقيق. تزين بالمكسرات المقلية والبقدونس الطازج لقوام ونكهة متوازنين.';
 
   @override
   String get productRating => '٤.٩ (١٢٠+ تقييم)';
@@ -4551,6 +5390,15 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get productBestSeller => 'الأكثر مبيعاً';
+
+  @override
+  String get productLoyaltyOrderAddon => 'إضافة للطلب';
+
+  @override
+  String get productChooseYourSide => 'اختر طبقك الجانبي';
+
+  @override
+  String get productAddExtras => 'إضافات اختيارية';
 
   @override
   String get productSizePortion => 'حجم الحصة';
@@ -4583,7 +5431,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get productSpecialInstructions => 'تعليمات خاصة';
 
   @override
-  String get productInstructionsHint => 'مثلاً: يرجى تقديم الجميد ساخناً.';
+  String get productInstructionsHint => 'أي حساسية أو طلبات خاصة؟';
 
   @override
   String productAddToCartAmount(Object amount) {
@@ -4600,7 +5448,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get previewTaxIncluded => 'شامل الضريبة';
 
   @override
-  String get previewProductBody => 'تشكيلة منتقاة من مكونات طازجة تشمل بيضاً عضوياً مسلوقاً وخبز ساوردو محضراً يدوياً وأفوكادو وخس جرجير بري. مثالي لطاقة تشغيلية عالية التركيز.';
+  String get previewProductBody =>
+      'تشكيلة منتقاة من مكونات طازجة تشمل بيضاً عضوياً مسلوقاً وخبز ساوردو محضراً يدوياً وأفوكادو وخس جرجير بري. مثالي لطاقة تشغيلية عالية التركيز.';
 
   @override
   String get previewPreferredBase => 'القاعدة المفضلة';
@@ -4630,7 +5479,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get previewDietaryNotes => 'ملاحظات غذائية';
 
   @override
-  String get previewDietaryMessage => 'يرجى تسجيل الدخول لتحديد الحساسية أو طلبات التحضير الخاصة.';
+  String get previewDietaryMessage =>
+      'يرجى تسجيل الدخول لتحديد الحساسية أو طلبات التحضير الخاصة.';
 
   @override
   String get previewLoginAddCart => 'تسجيل الدخول للإضافة للسلة';
@@ -4645,7 +5495,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get registerJoinTitle => 'انضم إلى عيلتنا';
 
   @override
-  String get registerJoinSubtitle => 'أنشئ حسابك وابدأ بإدارة تجربتك مع عيلتنا.';
+  String get registerJoinSubtitle =>
+      'أنشئ حسابك وابدأ بإدارة تجربتك مع عيلتنا.';
 
   @override
   String get registerFullName => 'الاسم الكامل';
@@ -4722,7 +5573,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get registerPreferencesTitle => 'تفضيلاتك الغذائية';
 
   @override
-  String get registerPreferencesSubtitle => 'أخبرنا بما تحبه حتى تقترح عيلتنا وجبات تشبه ذوقك.';
+  String get registerPreferencesSubtitle =>
+      'أخبرنا بما تحبه حتى تقترح عيلتنا وجبات تشبه ذوقك.';
 
   @override
   String get registerPrimaryRole => 'تجربتك في عيلتنا';
@@ -4731,19 +5583,36 @@ class AppLocalizationsAr extends AppLocalizations {
   String get registerRoleCustomer => 'عميل';
 
   @override
-  String get registerRoleCustomerBody => 'اطلب وجبات شهية، وتابع التوصيل، وأدر مفضلاتك.';
+  String get registerRoleCustomerBody =>
+      'اطلب وجبات شهية، وتابع التوصيل، وأدر مفضلاتك.';
 
   @override
   String get registerRoleStaff => 'فريق المطعم';
 
   @override
-  String get registerRoleStaffBody => 'ادخل إلى شاشة المطبخ، وأدر المخزون، وعالج الطلبات النشطة.';
+  String get registerRoleStaffBody =>
+      'ادخل إلى شاشة المطبخ، وأدر المخزون، وعالج الطلبات النشطة.';
+
+  @override
+  String get registerRoleOperator => 'مشغّل المطعم';
+
+  @override
+  String get registerRoleOperatorBody =>
+      'إدارة العمليات اليومية — الطلبات، القائمة، الموظفين، والإغلاق المالي. يتطلب موافقة مدير التطبيق.';
+
+  @override
+  String get registerRoleOwner => 'مالك المطعم';
+
+  @override
+  String get registerRoleOwnerBody =>
+      'عرض الإيرادات، حصة الأرباح، وملخصات التدقيق. يتطلب موافقة مدير التطبيق.';
 
   @override
   String get registerRoleAdminOwner => 'مدير / مالك';
 
   @override
-  String get registerRoleAdminOwnerBody => 'اطلع على تحليلات عميقة، وأدر الموظفين، وحسن استدامة المتجر.';
+  String get registerRoleAdminOwnerBody =>
+      'اطلع على تحليلات عميقة، وأدر الموظفين، وحسن استدامة المتجر.';
 
   @override
   String get registerDietaryPreferences => 'التفضيلات الغذائية';
@@ -4773,7 +5642,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reportsCenterTitle => 'التقارير والتحليلات';
 
   @override
-  String get reportsCenterSubtitle => 'راجع أداءك اليومي ونزّل الوثائق التفصيلية.';
+  String get reportsCenterSubtitle =>
+      'راجع أداءك اليومي ونزّل الوثائق التفصيلية.';
 
   @override
   String get reportsDaily => 'يومي';
@@ -4818,25 +5688,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reportsSalesRevenue => 'المبيعات والإيرادات';
 
   @override
-  String get reportsSalesRevenueBody => 'تفصيل كامل للمعاملات والضريبة وأنواع الدفع.';
+  String get reportsSalesRevenueBody =>
+      'تفصيل كامل للمعاملات والضريبة وأنواع الدفع.';
 
   @override
   String get reportsStaffTips => 'ساعات الموظفين والبقشيش';
 
   @override
-  String get reportsStaffTipsBody => 'سجلات الدوام، تنبيهات الإضافي، وتوزيع البقشيش.';
+  String get reportsStaffTipsBody =>
+      'سجلات الدوام، تنبيهات الإضافي، وتوزيع البقشيش.';
 
   @override
   String get reportsInventoryWastage => 'المخزون والهدر';
 
   @override
-  String get reportsInventoryWastageBody => 'مستويات المخزون، تقارير النقص، وتحليل هدر الطعام.';
+  String get reportsInventoryWastageBody =>
+      'مستويات المخزون، تقارير النقص، وتحليل هدر الطعام.';
 
   @override
   String get reportsSustainability => 'الاستدامة (إرجاع الصواني)';
 
   @override
-  String get reportsSustainabilityBody => 'معدلات إرجاع الصواني، تتبع الأدوات القابلة لإعادة الاستخدام، والمبادرات الخضراء.';
+  String get reportsSustainabilityBody =>
+      'معدلات إرجاع الصواني، تتبع الأدوات القابلة لإعادة الاستخدام، والمبادرات الخضراء.';
 
   @override
   String get reportsDownloadPdf => 'تنزيل PDF';
@@ -4878,7 +5752,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get rewardsMemberSince => 'عضو منذ 2023';
 
   @override
-  String get guestRewardsPreviewBody => 'تصفّح المكافآت الآن. أنشئ حساباً قبل الدفع حتى تحفظ كل نقطة تكسبها.';
+  String get guestRewardsPreviewBody =>
+      'تصفّح المكافآت الآن. أنشئ حساباً قبل الدفع حتى تحفظ كل نقطة تكسبها.';
 
   @override
   String get guestRewardsPreviewAction => 'أنشئ حساباً لكسب النقاط';
@@ -4947,19 +5822,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get rewardsAdminNav => 'الإدارة';
 
   @override
-  String get roleSelectionMockTitle => 'اختيار الدور التجريبي';
+  String get roleSelectionMockTitle => 'اختر دورك';
 
   @override
-  String get roleSelectionWelcome => 'اختر دوراً لمراجعة التطبيق';
+  String get roleSelectionWelcome => 'اختر بوابتك';
 
   @override
-  String get roleSelectionSubtitle => 'في الإنتاج يتم تعيين الأدوار من لوحة الإدارة. في هذا النموذج اختر أي دور لاختبار الشاشات والتصميم.';
+  String get roleSelectionSubtitle =>
+      'اختر دورك للوصول إلى الأدوات والخدمات المتخصصة.';
 
   @override
   String get roleSelectionCustomerTitle => 'العميل';
 
   @override
-  String get roleSelectionCustomerBody => 'تصفح قائمتنا، وقدّم طلبات السفري أو داخل المطعم، وتابع مكافآت الولاء مباشرة.';
+  String get roleSelectionCustomerBody =>
+      'تصفح قائمتنا، وقدّم طلبات السفري أو داخل المطعم، وتابع مكافآت الولاء مباشرة.';
 
   @override
   String get roleSelectionMockCustomerMetric => 'واجهة العميل';
@@ -4974,7 +5851,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get roleSelectionOwnerTitle => 'المالك';
 
   @override
-  String get roleSelectionOwnerBody => 'نظرة استراتيجية على الإيرادات، وتحليلات الهدر، ومؤشرات نمو الفروع.';
+  String get roleSelectionOwnerBody =>
+      'نظرة استراتيجية على الإيرادات، وتحليلات الهدر، ومؤشرات نمو الفروع.';
 
   @override
   String get roleSelectionOwnerMetric => 'إيراد اليوم: +12%';
@@ -4983,7 +5861,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get roleSelectionCashierTitle => 'الكاشير';
 
   @override
-  String get roleSelectionCashierBody => 'عمليات الواجهة الأمامية، دفع سريع، وإدارة طاولات الضيوف.';
+  String get roleSelectionCashierBody =>
+      'عمليات الواجهة الأمامية، دفع سريع، وإدارة طاولات الضيوف.';
 
   @override
   String get roleSelectionOpenRegister => 'فتح الصندوق';
@@ -4992,7 +5871,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get roleSelectionKitchenTitle => 'فريق المطبخ';
 
   @override
-  String get roleSelectionKitchenBody => 'إدارة شاشة المطبخ، أولوية الطلبات، وتنبيهات مخزون المكونات.';
+  String get roleSelectionKitchenBody =>
+      'إدارة شاشة المطبخ، أولوية الطلبات، وتنبيهات مخزون المكونات.';
+
+  @override
+  String get roleSelectionAdminMetric => 'صحة النظام: 100%';
+
+  @override
+  String get roleSelectionOperatorMetric => '8 طلبات نشطة';
+
+  @override
+  String get roleSelectionSupportMetric => 'تذكرتان معلقتان';
+
+  @override
+  String get roleSelectionMarketingMetric => '3 عروض نشطة';
 
   @override
   String get roleSelectionKitchenMetric => '12 طلباً نشطاً';
@@ -5001,7 +5893,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get roleSelectionAdminTitle => 'المدير / المشغل';
 
   @override
-  String get roleSelectionAdminBody => 'إدارة صلاحيات الموظفين، مشتريات المخزون، وإعدادات النظام.';
+  String get roleSelectionAdminBody =>
+      'إدارة صلاحيات الموظفين، مشتريات المخزون، وإعدادات النظام.';
 
   @override
   String get roleSelectionSystemOnline => 'حالة النظام: متصل';
@@ -5010,7 +5903,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get roleSelectionInventoryTitle => 'المخزون';
 
   @override
-  String get roleSelectionInventoryBody => 'راجع مستويات المخزون، سجلات الهدر، تفاصيل المكونات، وشاشات التسوية.';
+  String get roleSelectionInventoryBody =>
+      'راجع مستويات المخزون، سجلات الهدر، تفاصيل المكونات، وشاشات التسوية.';
 
   @override
   String get roleSelectionOpenInventory => 'فتح المخزون';
@@ -5019,7 +5913,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get roleSelectionStaffTitle => 'الموظف';
 
   @override
-  String get roleSelectionStaffBody => 'راجع شاشات الحضور، بقشيش اليوم، وسجل بقشيش الموظفين.';
+  String get roleSelectionStaffBody =>
+      'راجع شاشات الحضور، بقشيش اليوم، وسجل بقشيش الموظفين.';
 
   @override
   String get roleSelectionOpenAttendance => 'فتح الحضور';
@@ -5028,28 +5923,33 @@ class AppLocalizationsAr extends AppLocalizations {
   String get roleSelectionDeliveryTitle => 'مندوب التوصيل';
 
   @override
-  String get roleSelectionDeliveryBody => 'تحسين المسارات، تأكيد استلام الطلبات، وإثبات التسليم الرقمي.';
+  String get roleSelectionDeliveryBody =>
+      'تحسين المسارات، تأكيد استلام الطلبات، وإثبات التسليم الرقمي.';
 
   @override
   String get roleSelectionStartShift => 'بدء الوردية';
 
   @override
-  String get roleSelectionFooter => 'تبديل الأدوار هنا مخصص للنموذج فقط. لاحقاً ستستبدله صلاحيات يعينها المدير.';
+  String get roleSelectionFooter =>
+      'اختر مساحة العمل للمتابعة. يحدد المدير الصلاحيات.';
 
   @override
   String get orderTypeTitle => 'كيف ترغب بتجربتك؟';
 
   @override
-  String get orderTypeSubtitle => 'اختر تجربة الطعام المناسبة لعرض القائمة المناسبة.';
+  String get orderTypeSubtitle =>
+      'اختر تجربة الطعام المناسبة لعرض القائمة المناسبة.';
 
   @override
-  String get orderTypeDineInBody => 'احجز مكانك واستمتع بأجواء المطعم الكاملة مع خدمة الطاولة.';
+  String get orderTypeDineInBody =>
+      'احجز مكانك واستمتع بأجواء المطعم الكاملة مع خدمة الطاولة.';
 
   @override
   String get orderTypeDineInAction => 'اختيار الطاولة';
 
   @override
-  String get orderTypeTakeawayBody => 'اطلب مسبقاً واستلم وجبتك من الكاونتر المخصص بسرعة وسهولة.';
+  String get orderTypeTakeawayBody =>
+      'اطلب مسبقاً واستلم وجبتك من الكاونتر المخصص بسرعة وسهولة.';
 
   @override
   String get orderTypeTakeawayAction => 'اختيار الاستلام';
@@ -5058,7 +5958,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get orderTypeDeliveryTitle => 'توصيل عادي';
 
   @override
-  String get orderTypeDeliveryBody => 'توصيل موثوق إلى بابك. وجبات ساخنة وطازجة خلال 30-45 دقيقة.';
+  String get orderTypeDeliveryBody =>
+      'توصيل موثوق إلى بابك. وجبات ساخنة وطازجة خلال 30-45 دقيقة.';
 
   @override
   String get orderTypeDeliveryAction => 'تحديد العنوان';
@@ -5070,7 +5971,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get orderTypePlatedBadge => 'استدامة';
 
   @override
-  String get orderTypePlatedBody => 'تجربة فاخرة باستخدام صواني فخارية قابلة لإعادة الاستخدام. نجمع الأطباق لاحقاً.';
+  String get orderTypePlatedBody =>
+      'تجربة فاخرة باستخدام صواني فخارية قابلة لإعادة الاستخدام. نجمع الأطباق لاحقاً.';
 
   @override
   String get orderTypePlatedAction => 'اختيار المميز';
@@ -5088,25 +5990,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get termsHeroTitle => 'شروط وأحكام الطلب';
 
   @override
-  String get termsHeroSubtitle => 'هذه نسخة واجهة تجريبية توضّح القواعد الأساسية قبل إكمال الطلب.';
+  String get termsHeroSubtitle => 'راجع قواعد الدفع قبل إتمام الطلب.';
 
   @override
   String get termsPaymentTitle => 'الدفع والتأكيد';
 
   @override
-  String get termsPaymentBody => 'سيتم تأكيد الطلب بعد اختيار طريقة الخدمة وإكمال خطوات الدفع. قد تختلف الرسوم حسب نوع الخدمة والعنوان.';
+  String get termsPaymentBody =>
+      'سيتم تأكيد الطلب بعد اختيار طريقة الخدمة وإكمال خطوات الدفع. قد تختلف الرسوم حسب نوع الخدمة والعنوان.';
 
   @override
   String get termsGroupDeliveryTitle => 'التوصيل الجماعي';
 
   @override
-  String get termsGroupDeliveryBody => 'عند اختيار التوصيل الجماعي، يمكن انتظار طلب آخر قريب من نفس المنطقة لتقليل تكلفة التوصيل ورفع كفاءة الرحلة.';
+  String get termsGroupDeliveryBody =>
+      'عند اختيار التوصيل الجماعي، يمكن انتظار طلب آخر قريب من نفس المنطقة لتقليل تكلفة التوصيل ورفع كفاءة الرحلة.';
 
   @override
   String get termsChangesTitle => 'التعديلات والإلغاء';
 
   @override
-  String get termsChangesBody => 'يمكن تعديل الطلب قبل بدء التحضير. بعد بدء التحضير، قد لا تكون بعض التغييرات أو الإلغاء متاحة.';
+  String get termsChangesBody =>
+      'يمكن تعديل الطلب قبل بدء التحضير. بعد بدء التحضير، قد لا تكون بعض التغييرات أو الإلغاء متاحة.';
 
   @override
   String get orderTypeNavHome => 'الرئيسية';
@@ -5337,7 +6242,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get splashTagline => 'طعم تقليدي، بدون هدر';
 
   @override
-  String get splashInitializing => 'تهيئة منطق عيلتنا';
+  String get splashHeadline => 'مطبخ ليفانتي فاخر';
+
+  @override
+  String get splashMotto => 'تذوّق. انتمِ. استدامة.';
+
+  @override
+  String get splashInitializing => 'مرحبًا بكم على مائدتنا';
 
   @override
   String get staffShiftInProgress => 'الوردية قيد العمل';
@@ -5448,10 +6359,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get staffManagerNotes => 'ملاحظات المدير';
 
   @override
-  String get staffChefSpecialNote => 'طبق الشيف: سي باس مشوي\nاقترحه كأولوية عالية للعشاء.';
+  String get staffChefSpecialNote =>
+      'طبق الشيف: سي باس مشوي\nاقترحه كأولوية عالية للعشاء.';
 
   @override
-  String get staffVipReservationNote => 'حجز VIP الساعة 07:30 مساءً\nالطاولة 4 جاهزة للسيد السيد.';
+  String get staffVipReservationNote =>
+      'حجز VIP الساعة 07:30 مساءً\nالطاولة 4 جاهزة للسيد السيد.';
 
   @override
   String get staffAttendanceTitle => 'الحضور';
@@ -5529,7 +6442,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get staffMainKitchen => 'المطبخ الرئيسي';
 
   @override
-  String get staffGpsCheckInNote => 'سيتم تسجيل موقع GPS والطابع الزمني عند تسجيل الدخول.';
+  String get staffGpsCheckInNote =>
+      'سيتم تسجيل موقع GPS والطابع الزمني عند تسجيل الدخول.';
 
   @override
   String get staffNavInventory => 'المخزون';
@@ -5589,7 +6503,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get staffEarningsPolicy => 'سياسة الأرباح';
 
   @override
-  String get staffEarningsPolicyBody => 'يرجى مراجعة إجمالياتك اليومية. عند الإقرار، تؤكد أن البقشيش المسجل يطابق سجلات ورديتك. تتم معالجة الدفعات كل يوم خميس.';
+  String get staffEarningsPolicyBody =>
+      'يرجى مراجعة إجمالياتك اليومية. عند الإقرار، تؤكد أن البقشيش المسجل يطابق سجلات ورديتك. تتم معالجة الدفعات كل يوم خميس.';
 
   @override
   String get staffCashTips => 'بقشيش نقدي';
@@ -5790,7 +6705,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sustainabilityAlertsTitle => 'تنبيهات الاستدامة';
 
   @override
-  String get sustainabilityAlertsSubtitle => 'رؤى تشغيلية ومؤشرات بيئية لمنظومة عيلتنا. راقب دورات الصواني ومؤشرات الاستدامة لحظياً.';
+  String get sustainabilityAlertsSubtitle =>
+      'رؤى تشغيلية ومؤشرات بيئية لمنظومة عيلتنا. راقب دورات الصواني ومؤشرات الاستدامة لحظياً.';
 
   @override
   String get sustainabilityActiveGoal => 'هدف نشط';
@@ -5799,7 +6715,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sustainabilityGoalReached => 'هدف الاستدامة: تحقق 92%';
 
   @override
-  String get sustainabilityGoalBody => 'هدف هذا الأسبوع: إدارة صواني خالية من البلاستيك بنسبة 95%.';
+  String get sustainabilityGoalBody =>
+      'هدف هذا الأسبوع: إدارة صواني خالية من البلاستيك بنسبة 95%.';
 
   @override
   String get sustainabilityCurrentProgress => 'التقدم الحالي';
@@ -5814,7 +6731,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sustainabilityReminderTitle => 'تذكير:\n4 صواني\nبانتظار\nالجمع';
 
   @override
-  String get sustainabilityStationB => 'تحتاج محطة B إلى تنظيف فوري للحفاظ على تدفق التعقيم.';
+  String get sustainabilityStationB =>
+      'تحتاج محطة B إلى تنظيف فوري للحفاظ على تدفق التعقيم.';
 
   @override
   String get sustainabilityDispatch => 'إرسال';
@@ -5823,7 +6741,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sustainabilityPolicyUpdate => 'تحديث جديد لسياسة التعقيم';
 
   @override
-  String get sustainabilityPolicyBody => 'تم تطبيق بروتوكولات محدثة لتعقيم الصواني القابلة للتحلل للربع الثالث.';
+  String get sustainabilityPolicyBody =>
+      'تم تطبيق بروتوكولات محدثة لتعقيم الصواني القابلة للتحلل للربع الثالث.';
 
   @override
   String get sustainabilityViewDocument => 'عرض المستند';
@@ -5934,7 +6853,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tipSupportTeamTitle => 'ادعم فريق الطهي';
 
   @override
-  String get tipAppreciationQuote => '\"تقديرك يصل مباشرة إلى قلب المطبخ. كل بقشيش يدعم شغف فريقنا في ابتكار نكهات لا تُنسى لك.\"';
+  String get tipAppreciationQuote =>
+      '\"تقديرك يصل مباشرة إلى قلب المطبخ. كل بقشيش يدعم شغف فريقنا في ابتكار نكهات لا تُنسى لك.\"';
 
   @override
   String get tipAddAppreciation => 'إضافة تقدير';
@@ -6006,7 +6926,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get trackingOnWayBody => 'السائق: ماركوس (يبعد 5 دقائق)';
 
   @override
-  String get trackingCallMarcus => 'اتصل بماركوس';
+  String get trackingCallMarcus => 'اتصل بالسائق';
 
   @override
   String get trackingDelivered => 'تم التوصيل';
@@ -6279,7 +7199,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get refundStep2Header => 'تقييم التلف';
 
   @override
-  String get refundStep2Body => 'افحص العناصر المرتجعة بحثاً عن أي تلف هيكلي. اختيار «تالف» يتيح إدخال خصم من العربون الأصلي.';
+  String get refundStep2Body =>
+      'افحص العناصر المرتجعة بحثاً عن أي تلف هيكلي. اختيار «تالف» يتيح إدخال خصم من العربون الأصلي.';
 
   @override
   String get refundCeramicPlate => 'طبق مزّة خزفي';
@@ -6315,7 +7236,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get refundDepositAmount => '15.00';
 
   @override
-  String get refundEstimateBody => 'سيتحدث مبلغ الاسترداد تلقائياً بناءً على خصومات التلف المدخلة أعلاه.';
+  String get refundEstimateBody =>
+      'سيتحدث مبلغ الاسترداد تلقائياً بناءً على خصومات التلف المدخلة أعلاه.';
 
   @override
   String get refundCancelFlow => 'إلغاء العملية';
@@ -6363,7 +7285,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get refundTotalSettlement => 'إجمالي التسوية';
 
   @override
-  String get refundImmediateNotice => 'سيتم تنفيذ الاسترداد فوراً إلى محفظة عيلتنا. سيتم إرسال إيصال رقمي برسالة إلى +962 *** *** 44.';
+  String get refundImmediateNotice =>
+      'سيتم تنفيذ الاسترداد فوراً إلى محفظة عيلتنا. سيتم إرسال إيصال رقمي برسالة إلى +962 *** *** 44.';
 
   @override
   String get refundCustomerInfo => 'معلومات العميل';
@@ -6447,7 +7370,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get returnMissing => 'مفقود';
 
   @override
-  String get returnMissingWarning => 'سيتم تحويل العناصر المفقودة لمراجعة المدير وقد تفرض رسوم استبدال على العميل.';
+  String get returnMissingWarning =>
+      'سيتم تحويل العناصر المفقودة لمراجعة المدير وقد تفرض رسوم استبدال على العميل.';
 
   @override
   String get returnContinueStep2 => 'المتابعة إلى الخطوة 2';
@@ -6510,7 +7434,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get returnFinalizeReturn => 'إنهاء الإرجاع';
 
   @override
-  String get returnFinalizeDisclaimer => 'بالضغط على إنهاء الإرجاع، تؤكد أن كل العناصر تم فحصها وأن مبلغ الاسترداد صحيح.';
+  String get returnFinalizeDisclaimer =>
+      'بالضغط على إنهاء الإرجاع، تؤكد أن كل العناصر تم فحصها وأن مبلغ الاسترداد صحيح.';
 
   @override
   String get platedReturnBadge => 'تجربة الأطباق';
@@ -6519,13 +7444,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get platedReturnReadyTitle => 'جاهز للإرجاع؟';
 
   @override
-  String get platedReturnReadyBody => 'نتمنى أنك استمتعت بوجبتك! أخبرنا كيف تفضل إرجاع مجموعة الأطباق الخزفية.';
+  String get platedReturnReadyBody =>
+      'نتمنى أنك استمتعت بوجبتك! أخبرنا كيف تفضل إرجاع مجموعة الأطباق الخزفية.';
 
   @override
   String get platedReturnDepositTitle => 'عربون قابل للاسترداد';
 
   @override
-  String get platedReturnDepositBody => 'سيتم إرجاع عربونك بقيمة 5 د.أ إلى محفظتك فور استلام العناصر.';
+  String get platedReturnDepositBody =>
+      'سيتم إرجاع عربونك بقيمة 5 د.أ إلى محفظتك فور استلام العناصر.';
 
   @override
   String get platedReturnSchedulePickup => 'جدولة الاستلام';
@@ -6543,7 +7470,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get ratingHeroTitle => 'كيف كانت وجبة عيلتنا؟';
 
   @override
-  String get ratingHeroSubtitle => 'ملاحظتك تساعد المطبخ على الحفاظ على كل طبق دافئاً وطازجاً وكريماً.';
+  String get ratingHeroSubtitle =>
+      'ملاحظتك تساعد المطبخ على الحفاظ على كل طبق دافئاً وطازجاً وكريماً.';
 
   @override
   String get ratingOrderLabel => 'تجربة الطلب';
@@ -6576,7 +7504,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get ratingReviewLater => 'التقييم لاحقاً';
 
   @override
-  String get reportFilterIntro => 'اختر نطاق التحليل قبل مراجعة قرارات المبيعات، المخزون، البقشيش، والصواني.';
+  String get reportFilterIntro =>
+      'اختر نطاق التحليل قبل مراجعة قرارات المبيعات، المخزون، البقشيش، والصواني.';
 
   @override
   String get reportFilterPeriod => 'الفترة';
@@ -6632,7 +7561,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminGrowthHubBadge => 'مركز الإدارة والنمو';
 
   @override
-  String get adminGrowthHubHero => 'مكان واحد لإدارة ساعات الفريق، خصوصية المالك، الولاء، والعروض بدل صفحات منفصلة ضعيفة.';
+  String get adminGrowthHubHero =>
+      'مكان واحد لإدارة ساعات الفريق، خصوصية المالك، الولاء، والعروض بدل صفحات منفصلة ضعيفة.';
 
   @override
   String get adminGrowthHubTodayHours => 'ساعات اليوم';
@@ -6647,7 +7577,8 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminGrowthStaffTitle => 'ساعات الفريق والورديات';
 
   @override
-  String get adminGrowthStaffSubtitle => 'تتبع التغطية، الساعات، والبقشيش لكل دور داخل المطعم.';
+  String get adminGrowthStaffSubtitle =>
+      'تتبع التغطية، الساعات، والبقشيش لكل دور داخل المطعم.';
 
   @override
   String get adminGrowthKitchen => 'المطبخ';
@@ -6674,19 +7605,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminGrowthTipsDetail => 'جاهز للتوزيع بعد اعتماد الساعات';
 
   @override
-  String get adminGrowthPrivacySubtitle => 'سياسات عرض المالك والتقارير المالية.';
+  String get adminGrowthPrivacySubtitle =>
+      'سياسات عرض المالك والتقارير المالية.';
 
   @override
-  String get adminGrowthLoyaltySubtitle => 'حوّل الولاء إلى زيارات متكررة وطلبات طعام واضحة.';
+  String get adminGrowthLoyaltySubtitle =>
+      'حوّل الولاء إلى زيارات متكررة وطلبات طعام واضحة.';
 
   @override
   String get adminGrowthPointsRule => 'النقاط';
 
   @override
-  String get adminGrowthEnableLunchMultiplier => 'تفعيل مضاعفة الغداء';
+  String get adminGrowthEnableLunchMultiplier => 'مضاعفة نقاط الولاء';
 
   @override
-  String get adminGrowthLunchMultiplierBody => 'من ١٢ إلى ٤ مساءً للأصناف الأعلى مبيعاً.';
+  String get adminGrowthLunchMultiplierBody =>
+      'عند التفعيل، يكسب العملاء ضعف النقاط عند الإضافة من تفاصيل المنتج.';
 
   @override
   String get adminGrowthBirthdayDessertBody => 'تظهر في عيد ميلاد العميل فقط.';
@@ -6698,13 +7632,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminGrowthTargetBody => 'زيارة ثانية خلال ١٤ يوم';
 
   @override
-  String get adminGrowthOffersSubtitle => 'العروض مرتبطة بالمخزون والهوامش، وليست بطاقات تسويق عامة.';
+  String get adminGrowthOffersSubtitle =>
+      'العروض مرتبطة بالمخزون والهوامش، وليست بطاقات تسويق عامة.';
 
   @override
   String get adminGrowthShawarmaOffer => 'عرض وجبة الشاورما';
 
   @override
-  String get adminGrowthShawarmaOfferBody => 'يرتبط بذروة الغداء والتحضير المسبق.';
+  String get adminGrowthShawarmaOfferBody =>
+      'يرتبط بذروة الغداء والتحضير المسبق.';
 
   @override
   String get adminGrowthFamilyTrayOffer => 'عرض صواني العائلة';
@@ -6716,25 +7652,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminGrowthHomeOffers => 'عروض الواجهة';
 
   @override
-  String get adminGrowthHomeOffersBody => 'تظهر في قسم العروض إذا كانت القائمة غير فارغة.';
+  String get adminGrowthHomeOffersBody =>
+      'تظهر في قسم العروض إذا كانت القائمة غير فارغة.';
 
   @override
   String get adminGrowthCombos => 'الكومبو';
 
   @override
-  String get adminGrowthCombosBody => 'تظهر في قسم الكومبو على الرئيسية والضيف.';
+  String get adminGrowthCombosBody =>
+      'تظهر في قسم الكومبو على الرئيسية والضيف.';
 
   @override
   String get adminGrowthDiscountedItems => 'أصناف الخصم';
 
   @override
-  String get adminGrowthDiscountedItemsBody => 'تختفي تلقائياً إذا لم توجد أصناف عليها خصم.';
+  String get adminGrowthDiscountedItemsBody =>
+      'تختفي تلقائياً إذا لم توجد أصناف عليها خصم.';
 
   @override
   String get adminGrowthSubscriptionItems => 'أصناف الاشتراك';
 
   @override
-  String get adminGrowthSubscriptionItemsBody => 'تدعم اشتراكات شهرية أو سنوية في الموك.';
+  String get adminGrowthSubscriptionItemsBody =>
+      'تدعم عروض اشتراك شهرية أو سنوية.';
 
   @override
   String get adminGrowthTargetMargin => 'هامش مستهدف';
@@ -6743,16 +7683,20 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminGrowthTargetMarginBody => 'لا تنشر العرض إذا انخفض الهامش.';
 
   @override
-  String get adminGrowthDecisionStaff => 'اعتمد ساعات الإغلاق قبل توزيع البقشيش.';
+  String get adminGrowthDecisionStaff =>
+      'اعتمد ساعات الإغلاق قبل توزيع البقشيش.';
 
   @override
-  String get adminGrowthDecisionPrivacy => 'اعرض صافي الربح للمالك عند مراجعة الأداء.';
+  String get adminGrowthDecisionPrivacy =>
+      'اعرض صافي الربح للمالك عند مراجعة الأداء.';
 
   @override
-  String get adminGrowthDecisionLoyalty => 'اربط مضاعفة النقاط بأوقات انخفاض الطلب.';
+  String get adminGrowthDecisionLoyalty =>
+      'اربط مضاعفة النقاط بأوقات انخفاض الطلب.';
 
   @override
-  String get adminGrowthDecisionOffers => 'اختبر عرض الشاورما قبل نشر عرض الصواني.';
+  String get adminGrowthDecisionOffers =>
+      'اختبر عرض الشاورما قبل نشر عرض الصواني.';
 
   @override
   String get adminGrowthSuggestedDecision => 'قرار مقترح';
@@ -6767,7 +7711,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get adminGrowthActionsTitle => 'إجراءات الإدارة';
 
   @override
-  String get adminGrowthActionsSubtitle => 'كل إجراء واجهة وهمية فقط.';
+  String get adminGrowthActionsSubtitle => 'إدارة حملات النمو والعروض.';
 
   @override
   String get adminGrowthSaveSettings => 'حفظ الإعدادات';
@@ -6777,4 +7721,2812 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get adminGrowthOpenAuditLog => 'فتح سجل التدقيق';
+
+  @override
+  String get languageEmblemArabic => 'ع';
+
+  @override
+  String get languageEmblemEnglish => 'EN';
+
+  @override
+  String get authLoginInvalidCredentials =>
+      'رقم الهاتف أو البريد أو كلمة المرور غير صحيحة.';
+
+  @override
+  String get settingsProfileRefreshed => 'تم تحديث الملف الشخصي.';
+
+  @override
+  String ownershipShareValue(String share) {
+    return '$share٪';
+  }
+
+  @override
+  String get pendingApprovalRefreshed => 'تم التحقق من حالة الموافقة.';
+
+  @override
+  String get roleSelectionOpsSection => 'العمليات والعملاء';
+
+  @override
+  String get supportCreateTicketTitle => 'فتح تذكرة دعم';
+
+  @override
+  String get supportFieldTitleEn => 'العنوان (EN)';
+
+  @override
+  String get supportFieldTitleAr => 'العنوان (AR)';
+
+  @override
+  String get supportFieldDescriptionEn => 'الوصف (EN)';
+
+  @override
+  String get supportFieldDescriptionAr => 'الوصف (AR)';
+
+  @override
+  String get supportSubmitTicket => 'إرسال التذكرة';
+
+  @override
+  String get supportValidationTitleBody => 'أدخل العنوان والوصف';
+
+  @override
+  String get supportTicketsEmpty =>
+      'لا توجد تذاكر بعد. أنشئ تذكرة جديدة أعلاه.';
+
+  @override
+  String get supportMessageStaffPrefix => 'الدعم: ';
+
+  @override
+  String get supportYourRating => 'تقييمك';
+
+  @override
+  String get supportYourReply => 'ردك';
+
+  @override
+  String get supportSendReply => 'إرسال الرد';
+
+  @override
+  String get supportRateAfterResolved => 'لا يمكن التقييم حتى يتم حل التذكرة';
+
+  @override
+  String timeAgoMinutes(int count) {
+    return 'منذ $count د';
+  }
+
+  @override
+  String timeAgoHours(int count) {
+    return 'منذ $count س';
+  }
+
+  @override
+  String timeAgoDays(int count) {
+    return 'منذ $count ي';
+  }
+
+  @override
+  String get promoDetailOfferDetails => 'تفاصيل العرض';
+
+  @override
+  String get promoDetailIncludes => 'يشمل';
+
+  @override
+  String get promoDetailDescription => 'الوصف';
+
+  @override
+  String get promoDetailDiscount => 'الخصم';
+
+  @override
+  String get promoDetailLoyaltyPoints => 'نقاط الولاء';
+
+  @override
+  String get promoDetailValidFor => 'الصلاحية';
+
+  @override
+  String get promoDetailThisWeek => 'هذا الأسبوع';
+
+  @override
+  String get promoDetailLimitedOfferDesc =>
+      'عرض محدود متاح لفترة قصيرة. اطلب الآن قبل انتهاء الصلاحية.';
+
+  @override
+  String get promoDetailComboDesc =>
+      'وجبة كومبو بسعر مخفض تجمع أطباقنا المميزة في طلب واحد.';
+
+  @override
+  String get promoDetailBundleSavings => 'خصم الحزمة';
+
+  @override
+  String get promoDetailItemsCount => 'عدد الأصناف';
+
+  @override
+  String get promoDetailBillingCycle => 'دورة الفوترة';
+
+  @override
+  String get promoDetailWeekly => 'أسبوعي';
+
+  @override
+  String get promoDetailMonthly => 'شهري';
+
+  @override
+  String get promoDetailSubscriptionDesc => 'وجبة اشتراك أسبوعية أو شهرية.';
+
+  @override
+  String get promoDetailViewMeal => 'عرض الوجبة';
+
+  @override
+  String promoPercentOff(String percent) {
+    return 'خصم $percent٪';
+  }
+
+  @override
+  String get cartInvalidPromoCode => 'رمز غير صالح — جرّب AYLETNA10 أو WELCOME';
+
+  @override
+  String get homeOfferAddedToCart => 'تمت إضافة العرض للسلة';
+
+  @override
+  String get homeComboAddedToCart => 'تمت إضافة الكومبو للسلة';
+
+  @override
+  String get productAddedToCart => 'تمت الإضافة للسلة';
+
+  @override
+  String get productContinueShopping => 'متابعة التسوق';
+
+  @override
+  String get productCheckout => 'الدفع';
+
+  @override
+  String get productRelatedProducts => 'منتجات ذات صلة';
+
+  @override
+  String get productCustomerReviews => 'آراء العملاء';
+
+  @override
+  String get productMoreReviews => 'المزيد من التقييمات';
+
+  @override
+  String productRewardCoins(int count) {
+    return '$count عملات';
+  }
+
+  @override
+  String get searchRefreshed => 'تم تحديث البحث في القائمة';
+
+  @override
+  String get productNoReviewsYet => 'لا توجد تقييمات معتمدة بعد.';
+
+  @override
+  String get prepMockTimerDisplay => '12:49';
+
+  @override
+  String get platedConfirmCollectionBody => 'بدء جمع الصواني لهذه المحطة؟';
+
+  @override
+  String get productReviewsTitle => 'تقييمات المنتج';
+
+  @override
+  String get productReviewsApprovedTitle => 'تقييمات معتمدة';
+
+  @override
+  String productReviewsCountFor(int count, String title) {
+    return '$count تقييم لـ $title';
+  }
+
+  @override
+  String get productReviewsEmptyPrompt =>
+      'لا توجد تقييمات معتمدة بعد. قيّم طلبك بعد التوصيل.';
+
+  @override
+  String get productRewardEarnBefore => 'أنت على وشك كسب ';
+
+  @override
+  String get productRewardEarnAfter =>
+      ' مع هذا الطلب. استمر بتجميع المكافآت واستبدلها لاحقاً بخصومات وهدايا من عيلتنا.';
+
+  @override
+  String get orderReorderFailed =>
+      'تعذر إعادة بناء هذا الطلب. قد لا تكون بعض الأصناف متاحة.';
+
+  @override
+  String get orderTrackingLoadError =>
+      'تعذر تحميل تتبع الطلب. اسحب للتحديث أو حاول لاحقاً.';
+
+  @override
+  String get ratingOrderLoadError => 'تعذر تحميل تفاصيل الطلب للتقييم.';
+
+  @override
+  String get paymentHistoryEmpty => 'لا توجد مدفوعات مسجلة بعد.';
+
+  @override
+  String get redemptionNoRewardSelected => 'لا توجد مكافأة محددة';
+
+  @override
+  String get redemptionInsufficientPoints => 'نقاط غير كافية';
+
+  @override
+  String get redemptionPointsBalanceTitle => 'رصيد النقاط';
+
+  @override
+  String redemptionPointsBalanceValue(int balance) {
+    return '$balance نقطة';
+  }
+
+  @override
+  String redemptionCostLabel(int cost) {
+    return 'تكلفة الاستبدال: $cost';
+  }
+
+  @override
+  String get supportChatYou => 'أنت';
+
+  @override
+  String supportChatLinkedTicket(String ticketId) {
+    return 'تذكرة مرتبطة: $ticketId';
+  }
+
+  @override
+  String get supportChatTicketFromLiveChat => 'طلب مساعدة من الدردشة المباشرة';
+
+  @override
+  String get supportChatTicketTitle => 'دردشة مباشرة';
+
+  @override
+  String get cartCompleteOrderTitle => 'أكمل طلبك';
+
+  @override
+  String get cartPopularAddonsSubtitle => 'إضافات شائعة مع طلبك';
+
+  @override
+  String get cashierConfirmLogTip => 'تسجيل هذا المبلغ كبقشيش في وردية اليوم؟';
+
+  @override
+  String get checkoutPaymentSummaryTitle => 'ملخص الدفع';
+
+  @override
+  String get addressesDeleteFailed => 'تعذر حذف هذا العنوان. حاول مرة أخرى.';
+
+  @override
+  String get deliveryOrder8845Title => 'طلب #8845';
+
+  @override
+  String get inventoryBatchLotLabel => 'الدفعة / اللوت';
+
+  @override
+  String get inventoryBatchLotHint => 'LOT-SAL-042';
+
+  @override
+  String get inventoryExpiryDateLabel => 'تاريخ الانتهاء';
+
+  @override
+  String get inventoryExpiryDateHint => '2026-06-20';
+
+  @override
+  String get inventoryEvidenceTitle => 'إيصال / دليل مصور';
+
+  @override
+  String get inventoryAttachSupplierReceipt => 'إرفاق إيصال المورد';
+
+  @override
+  String get inventoryAddShelfPhoto => 'إضافة صورة للرف';
+
+  @override
+  String get mapDefaultAddressTitle => 'المنزل';
+
+  @override
+  String get mapDefaultAddressText => '123 شارع Gastronomy، المركز، عمان';
+
+  @override
+  String comboDiscountOff(String percent) {
+    return 'خصم $percent%';
+  }
+
+  @override
+  String get billingPeriodWeekly => 'أسبوعي';
+
+  @override
+  String get billingPeriodMonthly => 'شهري';
+
+  @override
+  String get catalogBrowseEmpty => 'ستظهر العناصر الجديدة هنا عند توفرها.';
+
+  @override
+  String get guestOfferCartUnavailable =>
+      'لا يمكن إضافة هذا العرض إلى السلة بعد.';
+
+  @override
+  String get profileRefreshed => 'تم تحديث الملف الشخصي.';
+
+  @override
+  String get profileDeactivateNotAvailable =>
+      'إلغاء تفعيل الحساب غير متاح مؤقتاً. تواصل مع الدعم.';
+
+  @override
+  String get profileDeactivateConfirmBody =>
+      'سينهي هذا جلسة العرض ويعيدك لتسجيل الدخول. حذف الحساب الحقيقي سيتطلب الدعم بعد ربط الخادم.';
+
+  @override
+  String get profileDeactivatedMock => 'تم تسجيل الخروج من حساب العرض.';
+
+  @override
+  String get addressSavedSuccess => 'تم حفظ العنوان';
+
+  @override
+  String get addressSaveFailed => 'تعذر حفظ العنوان';
+
+  @override
+  String get cashierAttachAddressTitle => 'ربط العنوان بحساب';
+
+  @override
+  String get cashierMobileNumber => 'رقم الجوال';
+
+  @override
+  String get cashierAccountIdOptional => 'معرف الحساب (اختياري)';
+
+  @override
+  String get cashierSaveAndAttach => 'حفظ وربط';
+
+  @override
+  String get cashierEnterAddressFirst => 'أدخل العنوان أولاً';
+
+  @override
+  String get cashierDeliveryAddressLabel => 'عنوان التوصيل';
+
+  @override
+  String get cashierSavedAddressesTitle => 'عناوين محفوظة';
+
+  @override
+  String get cashierSearchAddressHint => 'بحث بالاسم أو الجوال';
+
+  @override
+  String get cashierNoMatchingAddresses => 'لا توجد عناوين مطابقة';
+
+  @override
+  String get cashierSaveAddressLabel => 'حفظ العنوان';
+
+  @override
+  String get cashierAttachToAccountLabel => 'ربط برقم / حساب';
+
+  @override
+  String get cashierOfferAddedToCart => 'تمت إضافة العرض للسلة';
+
+  @override
+  String get settingsToggleSaved => 'تم حفظ الإعداد';
+
+  @override
+  String get deliveryReturnProcessRefreshed => 'تم تحديث عملية الإرجاع.';
+
+  @override
+  String get adminCommandCenterBadge => 'مركز القيادة المباشر';
+
+  @override
+  String get adminCommandCenterHeadline =>
+      'الأولوية الآن: الطلبات المتأخرة، نفاد المواد، إغلاق الكاش، وتأخير السائقين.';
+
+  @override
+  String get adminCommandCenterBody =>
+      'لوحة مصممة لصاحب المطعم: قرارات سريعة، تشغيل واضح، وروابط مباشرة لكل منطقة.';
+
+  @override
+  String get adminActiveOrdersMetric => 'طلبات نشطة';
+
+  @override
+  String get adminUrgentAlertsMetric => 'تنبيهات عاجلة';
+
+  @override
+  String get adminOpenOrdersBoard => 'افتح لوحة الطلبات';
+
+  @override
+  String get adminCashCloseAction => 'إغلاق الكاش';
+
+  @override
+  String get adminNeedsAttentionTitle => 'يحتاج تدخلك الآن';
+
+  @override
+  String get adminNeedsAttentionSubtitle =>
+      'مرتبة حسب تأثيرها على تجربة الضيف والوردية.';
+
+  @override
+  String adminLateTicketsLabel(int count) {
+    return '$count طلبات تأخرت عن وقت التحضير';
+  }
+
+  @override
+  String get adminLateTicketsDetail =>
+      'محطة الشاورما والمقالي تحتاج متابعة خلال ٤ دقائق.';
+
+  @override
+  String get adminOpenOrdersAction => 'افتح الطلبات';
+
+  @override
+  String adminBelowThresholdDetail(int count) {
+    return '$count مواد تحت الحد الأدنى.';
+  }
+
+  @override
+  String get adminDriverDelayedLabel => 'مندوب متأخر عن تسليم صواني';
+
+  @override
+  String adminDriverDelayedDetail(String orderId, String customer) {
+    return 'طلب #$orderId في الطريق — $customer.';
+  }
+
+  @override
+  String get adminDeliveryRouteAction => 'مسار التوصيل';
+
+  @override
+  String get adminNoUrgentAlerts => 'لا توجد تنبيهات عاجلة — الوضع مستقر.';
+
+  @override
+  String get adminLiveOrdersSubtitle =>
+      'كل قناة طلب تظهر مع حالة التحضير والتحصيل.';
+
+  @override
+  String get adminCashCloseTitle => 'إغلاق الكاش';
+
+  @override
+  String get adminCashCloseSubtitle => 'تحقق من المبيعات، البقشيش، والمرتجعات.';
+
+  @override
+  String get adminReviewShiftClose => 'راجع إغلاق الوردية';
+
+  @override
+  String get adminStockoutImpactTitle => 'نفاد يؤثر على المنيو';
+
+  @override
+  String get adminStockoutImpactSubtitle =>
+      'اربط المواد الناقصة بالأطباق قبل الذروة.';
+
+  @override
+  String get adminInventoryAction => 'المخزون';
+
+  @override
+  String get adminNoCriticalStock => 'لا توجد مواد حرجة حالياً.';
+
+  @override
+  String get adminDriversReturnsTitle => 'السائقون والإرجاع';
+
+  @override
+  String get adminDriversReturnsSubtitle =>
+      'توصيل الطعام وإرجاع الصواني في نفس النظرة.';
+
+  @override
+  String get adminNoActiveDelivery => 'لا مهام توصيل نشطة.';
+
+  @override
+  String adminOrderLabel(String id) {
+    return 'طلب #$id';
+  }
+
+  @override
+  String adminTrayReturnLabel(String id) {
+    return 'إرجاع صواني #$id';
+  }
+
+  @override
+  String get adminReturnBadge => 'إرجاع';
+
+  @override
+  String get adminOpenDeliveryTasks => 'افتح مهام التوصيل';
+
+  @override
+  String get adminTeamSnapshotSubtitle => 'الطاقم الحالي حسب المحطة.';
+
+  @override
+  String get adminQuickControlsTitle => 'تحكم سريع';
+
+  @override
+  String get adminQuickControlsSubtitle => 'روابط إدارية بدون شريط سفلي.';
+
+  @override
+  String get platesOpsBadge => 'إدارة الصواني والعربون';
+
+  @override
+  String get platesOpsHeadline =>
+      'تابع الصواني، الأوعية، الكسر، العربون، والإرجاع من مكان واحد.';
+
+  @override
+  String get platesInStock => 'في المخزون';
+
+  @override
+  String get platesCirculating => 'متداول';
+
+  @override
+  String get platesAssetValue => 'قيمة الأصول';
+
+  @override
+  String get platesCatalogSubtitle =>
+      'أصول فعلية لها كود، قيمة، مخزون، وتداول.';
+
+  @override
+  String get platesReturnWindowValue => '٤٨ ساعة';
+
+  @override
+  String get platesReturnReminders => 'رسائل تذكير';
+
+  @override
+  String get platesBreakageTrackSubtitle => 'تتبع الكسر والنقص قبل التسوية.';
+
+  @override
+  String get platesBreakageDefault => 'كسر صحن';
+
+  @override
+  String get platesBreakageDescription => 'الوصف';
+
+  @override
+  String get platesBreakageLossJod => 'الخسارة (د.أ)';
+
+  @override
+  String platesStockNowUnits(int count) {
+    return 'المخزون الآن $count وحدة';
+  }
+
+  @override
+  String get supportTicketsTitle => 'تذاكر الدعم';
+
+  @override
+  String get supportTicketsHero => 'مركز دعم العملاء';
+
+  @override
+  String get supportTicketNotFound => 'التذكرة غير موجودة';
+
+  @override
+  String get supportTicketStatusLabel => 'الحالة';
+
+  @override
+  String get supportTicketStatusUpdated => 'تم تحديث الحالة';
+
+  @override
+  String get supportTicketConversation => 'المحادثة';
+
+  @override
+  String get supportTicketReplyArabic => 'الرد بالعربية';
+
+  @override
+  String get supportTicketReplyEnglish => 'الرد بالإنجليزية';
+
+  @override
+  String get supportTicketSendReply => 'إرسال الرد';
+
+  @override
+  String get supportTicketReplyFailed => 'تعذر إرسال الرد';
+
+  @override
+  String get supportTicketReplySent => 'تم إرسال الرد';
+
+  @override
+  String get supportTicketCustomerFeedback => 'ملاحظات العميل';
+
+  @override
+  String get hrAttendancePayrollTitle => 'تقرير الحضور والرواتب';
+
+  @override
+  String get hrStaffAttendanceTooltip => 'حضور الموظفين';
+
+  @override
+  String get hrPeriodDaily => 'يومي';
+
+  @override
+  String get hrPeriodMonthly => 'شهري';
+
+  @override
+  String get hrTotalPayable => 'إجمالي المستحق';
+
+  @override
+  String get hrExportCsv => 'تصدير CSV';
+
+  @override
+  String get hrExportCsvSuccess => 'تم تصدير ملف الرواتب CSV.';
+
+  @override
+  String get hrPayrollRulesTitle => 'قواعد الرواتب';
+
+  @override
+  String hrPayrollDelayRule(int minutes, String fee, String currency) {
+    return 'تأخير > $minutes د → خصم $fee $currency';
+  }
+
+  @override
+  String get hrDelayLabel => 'التأخير';
+
+  @override
+  String get hrOvertimeLabel => 'إضافي';
+
+  @override
+  String get hrPercentLabel => 'النسبة';
+
+  @override
+  String get hrPayableLabel => 'المستحق';
+
+  @override
+  String get hrMinutesShort => 'د';
+
+  @override
+  String get hrHoursShort => 'س';
+
+  @override
+  String get hrOutcomeFullPay => 'كامل';
+
+  @override
+  String get hrOutcomeDelayFee => 'خصم تأخير';
+
+  @override
+  String get hrOutcomeDelayFeeDouble => 'خصم ×2';
+
+  @override
+  String get hrOutcomeAbsence => 'غياب';
+
+  @override
+  String get hrOutcomeOvertime => 'إضافي';
+
+  @override
+  String get productEditorAddMenuItem => 'إضافة عنصر منيو';
+
+  @override
+  String get productEditorSaveFirst => 'احفظ العنصر أولاً';
+
+  @override
+  String get productEditorPreview => 'معاينة';
+
+  @override
+  String get productEditorBadge => 'محرر عنصر منيو';
+
+  @override
+  String get productEditorBadgeDesc =>
+      'عدّل السعر، الأحجام، الإضافات، الصور، ومحطة التحضير.';
+
+  @override
+  String get productEditorNameSection => 'الاسم والوصف';
+
+  @override
+  String get productEditorNameSectionDesc =>
+      'نص ثنائي اللغة يظهر في بطاقات المنيو.';
+
+  @override
+  String get productEditorArabicName => 'الاسم بالعربية';
+
+  @override
+  String get productEditorEnglishName => 'الاسم بالإنجليزية';
+
+  @override
+  String get productEditorArabicDesc => 'الوصف بالعربية';
+
+  @override
+  String get productEditorEnglishDesc => 'الوصف بالإنجليزية';
+
+  @override
+  String get productEditorPricingSection => 'السعر والأحجام';
+
+  @override
+  String get productEditorPricingSectionDesc =>
+      'السعر الأساسي وفروقات الأحجام.';
+
+  @override
+  String get productEditorBasePrice => 'السعر الأساسي';
+
+  @override
+  String get productEditorAddVariant => 'إضافة حجم / نوع';
+
+  @override
+  String get productEditorAddPortionTitle => 'إضافة حجم';
+
+  @override
+  String get productEditorPortionKeyLabel => 'المفتاح (مثل super)';
+
+  @override
+  String get productEditorPortionPriceDelta => 'فرق السعر (د.أ)';
+
+  @override
+  String get productEditorEnterPortionKey => 'أدخل مفتاحاً للحجم';
+
+  @override
+  String get productEditorPortionAdded => 'تمت إضافة الحجم';
+
+  @override
+  String get productEditorPortionKeyExists => 'المفتاح موجود مسبقاً';
+
+  @override
+  String get productEditorModifiersSection => 'الإضافات والتعديلات';
+
+  @override
+  String get productEditorModifiersSectionDesc =>
+      'اربط إضافات الكatalog بهذا العنصر.';
+
+  @override
+  String get productEditorNoAddons => 'لا توجد إضافات بعد.';
+
+  @override
+  String get productEditorMediaSection => 'الصور والعرض';
+
+  @override
+  String get productEditorMediaSectionDesc => 'الصور وطريقة العرض في المنيو.';
+
+  @override
+  String get productEditorMediaFallback => 'لا صورة بعد — أضف من 1 إلى 5.';
+
+  @override
+  String get productEditorPrepStationSection => 'محطة التحضير';
+
+  @override
+  String get productEditorPrepStationSectionDesc =>
+      'وجّه التذاكر إلى الممر الصحيح.';
+
+  @override
+  String get productEditorAvailabilitySection => 'التوفر والقنوات';
+
+  @override
+  String get productEditorAvailabilitySectionDesc =>
+      'تحكم في ظهور العنصر حسب القناة.';
+
+  @override
+  String get productEditorAvailableNow => 'متاح للبيع الآن';
+
+  @override
+  String get productEditorFeatured => 'مميز في المنيو';
+
+  @override
+  String get productEditorSavePublishSection => 'حفظ ونشر';
+
+  @override
+  String get productEditorSavePublishCreateDesc =>
+      'أنشئ العنصر ثم انشره على المنيو.';
+
+  @override
+  String get productEditorSavePublishEditDesc =>
+      'يحفظ التعديلات على عناصر الكatalog والعناصر المخصصة.';
+
+  @override
+  String get productEditorAddMinImages => 'أضف صورة واحدة على الأقل (حتى 5)';
+
+  @override
+  String get productEditorCheckRequiredFields => 'تحقق من الحقول';
+
+  @override
+  String get productEditorMenuItemSaved => 'تم حفظ عنصر المنيو';
+
+  @override
+  String get productEditorPublishToMenu => 'نشر على المنيو';
+
+  @override
+  String get productEditorPublishTitle => 'نشر عنصر المنيو';
+
+  @override
+  String get productEditorPublishMessage =>
+      'سيظهر العنصر في قنوات البيع المحددة.';
+
+  @override
+  String get productEditorAddImageBeforePublish =>
+      'أضف صورة واحدة على الأقل قبل النشر';
+
+  @override
+  String get productEditorCheckNamePrice => 'تحقق من الاسم والسعر';
+
+  @override
+  String get productEditorPublished => 'تم النشر';
+
+  @override
+  String get productEditorBackToMenu => 'رجوع لإدارة المنيو';
+
+  @override
+  String get productEditorPrepStationShawarma => 'محطة الشاورما';
+
+  @override
+  String get productEditorPrepStationFryer => 'محطة المقالي';
+
+  @override
+  String get productEditorPrepStationColdPrep => 'تحضير بارد';
+
+  @override
+  String get productEditorPrepStationDrinks => 'المشروبات';
+
+  @override
+  String get auditLogTrueTrailBadge => 'سجل تدقيق حقيقي';
+
+  @override
+  String get auditLogHeroHeadline =>
+      'تتبع من غيّر ماذا، متى، ومن أي منطقة تشغيلية.';
+
+  @override
+  String get auditLogTodayEvents => 'أحداث اليوم';
+
+  @override
+  String get auditLogSensitiveChanges => 'تغييرات حساسة';
+
+  @override
+  String get auditLogNeedsReview => 'بحاجة مراجعة';
+
+  @override
+  String get auditLogRequestConfirmMessage =>
+      'سيتم تسجيل طلب تدقيق مفصل للمراجعة.';
+
+  @override
+  String get auditLogExportLog => 'تصدير السجل';
+
+  @override
+  String get auditLogExportDownloaded => 'تم تنزيل ملف التصدير';
+
+  @override
+  String get auditLogTimelineSubtitle => 'خط زمني للأحداث الإدارية والتشغيلية.';
+
+  @override
+  String get auditLogNoEventsInScope => 'لا أحداث في هذا النطاق.';
+
+  @override
+  String get auditLogDetailedAuditRequested => 'طلب تدقيق مفصل';
+
+  @override
+  String get auditLogAuditExported => 'تصدير سجل التدقيق';
+
+  @override
+  String get auditLogShiftCloseApproved => 'اعتماد إغلاق الوردية';
+
+  @override
+  String get auditLogUserActivated => 'تفعيل مستخدم';
+
+  @override
+  String get auditLogUserDeactivated => 'تعطيل مستخدم';
+
+  @override
+  String get auditLogDepositSettingsSaved => 'حفظ إعدادات العربون';
+
+  @override
+  String get auditLogTrayBreakageArea => 'كسر صواني';
+
+  @override
+  String get auditLogInventoryArea => 'المخزون';
+
+  @override
+  String get auditLogUserRoleChanged => 'تغيير صلاحية مستخدم';
+
+  @override
+  String get auditLogCashierShiftClosed => 'إغلاق وردية الكاشير';
+
+  @override
+  String get auditLogTrayDepositEdited => 'تعديل عربون الصواني';
+
+  @override
+  String get auditLogFiltersTitle => 'فلاتر التدقيق';
+
+  @override
+  String get auditLogFiltersSubtitle => 'اختر نطاق التدقيق بسرعة.';
+
+  @override
+  String get auditLogGovernanceTitle => 'حالة الحوكمة';
+
+  @override
+  String get auditLogGovernanceSubtitle =>
+      'وضع الأمان والصلاحيات لهذه الوردية.';
+
+  @override
+  String get auditLogFailedLogins => 'محاولات دخول فاشلة';
+
+  @override
+  String get auditLogPermissionChanges => 'تغييرات صلاحية';
+
+  @override
+  String get auditLogFinancialEdits => 'تعديلات مالية';
+
+  @override
+  String get auditLogInventorySubtitle => 'آخر تعديلات المخزون.';
+
+  @override
+  String get auditLogNoStockChanges => 'لا تغييرات مخزون بعد.';
+
+  @override
+  String get auditLogActorOwner => 'المالك';
+
+  @override
+  String get auditLogActorOperator => 'المشغل';
+
+  @override
+  String get auditLogActorFinance => 'المالية';
+
+  @override
+  String get auditLogActorLogistics => 'المخزون';
+
+  @override
+  String get auditLogActorSystem => 'النظام';
+
+  @override
+  String get auditLogAreaGovernance => 'الحوكمة';
+
+  @override
+  String get auditLogAreaReports => 'التقارير';
+
+  @override
+  String get auditLogAreaCashClose => 'إغلاق الكاش';
+
+  @override
+  String get auditLogAreaRolesPrivacy => 'الأدوار والخصوصية';
+
+  @override
+  String get auditLogAreaFinance => 'المالية';
+
+  @override
+  String get auditLogAreaAdminLog => 'سجل الإدارة';
+
+  @override
+  String get auditLogToday => 'اليوم';
+
+  @override
+  String get auditLogYesterday1820 => 'أمس 18:20';
+
+  @override
+  String get auditLogToday0942 => 'اليوم 09:42';
+
+  @override
+  String get auditLogToday0858 => 'اليوم 08:58';
+
+  @override
+  String get auditLogActorOperatorAhmad => 'المشغل أحمد';
+
+  @override
+  String get auditLogActorCashierLayla => 'الكاشير ليلى';
+
+  @override
+  String get auditLogAuditRequestDetail =>
+      'تم تسجيل الطلب للمراجعة قبل نهاية الوردية.';
+
+  @override
+  String get auditLogAuditExportDetail => 'تم تنزيل ملف CSV للسجل.';
+
+  @override
+  String get auditLogShiftCloseDetail =>
+      'تم اعتماد الإيراد والبقشيش والمرتجعات.';
+
+  @override
+  String auditLogDepositSavedDetail(String amount, String hours) {
+    return 'عربون $amount د.أ · $hours ساعة';
+  }
+
+  @override
+  String get auditLogRoleChangeDetail => 'تم نقل سارة من مطبخ إلى مشرفة محطة.';
+
+  @override
+  String get auditLogCashierCloseDetail =>
+      'تم اعتماد الإيراد، البقشيش، والمرتجعات.';
+
+  @override
+  String get auditLogTrayDepositEditDetail =>
+      'تم تحديث العربون العام ونافذة الإرجاع.';
+
+  @override
+  String get auditLogSystemEntryDetail => 'تم تسجيل حدث إداري تلقائي.';
+
+  @override
+  String get orderDetailAdminSendUpdate => 'إرسال تحديث';
+
+  @override
+  String get orderDetailAdminOrderTotal => 'إجمالي الطلب';
+
+  @override
+  String get orderDetailAdminDeposit => 'العربون';
+
+  @override
+  String get orderDetailAdminOnRoute => 'وقت في الطريق';
+
+  @override
+  String get orderDetailAdminOnRouteValue => '٢٨ دقيقة';
+
+  @override
+  String get orderDetailAdminSendGuestUpdateTitle => 'إرسال تحديث للضيف';
+
+  @override
+  String get orderDetailAdminUpdatePreparing => 'الطلب قيد التحضير';
+
+  @override
+  String get orderDetailAdminUpdateReady => 'الطلب جاهز';
+
+  @override
+  String get orderDetailAdminUpdateOnWay => 'المندوب في الطريق';
+
+  @override
+  String get orderDetailAdminUpdateDelay => 'تأخير — نعتذر';
+
+  @override
+  String get orderDetailAdminUpdateSent => 'تم إرسال التحديث';
+
+  @override
+  String get orderDetailAdminDelayNoticeSent => 'تم إرسال تنبيه التأخير';
+
+  @override
+  String get orderDetailAdminGuestPaymentTitle => 'الضيف والدفع';
+
+  @override
+  String get orderDetailAdminGuestPaymentSubtitle =>
+      'معلومات مختصرة للإغلاق والتواصل.';
+
+  @override
+  String get orderDetailAdminGuestLabel => 'العميل';
+
+  @override
+  String get orderDetailAdminChannelLabel => 'القناة';
+
+  @override
+  String get orderDetailAdminFoodTotal => 'المبلغ';
+
+  @override
+  String get orderDetailAdminTrayDeposit => 'عربون الصواني';
+
+  @override
+  String get orderDetailAdminKitchenTicketTitle => 'تذكرة المطبخ';
+
+  @override
+  String get orderDetailAdminKitchenTicketSubtitle => 'ملخص الأصناف والمحطة.';
+
+  @override
+  String get orderDetailAdminPrepStationNote => 'محطة التحضير';
+
+  @override
+  String get orderDetailAdminOpenKitchen => 'افتح المطبخ';
+
+  @override
+  String get orderDetailAdminActionsTitle => 'إجراءات الإدارة';
+
+  @override
+  String get orderDetailAdminContactGuest => 'اتصل بالعميل';
+
+  @override
+  String get orderDetailAdminChangeStatus => 'تعديل حالة الطلب';
+
+  @override
+  String get orderDetailAdminChangeStatusTitle => 'تعديل الحالة';
+
+  @override
+  String get orderDetailAdminBackToBoard => 'رجوع للوحة الطلبات';
+
+  @override
+  String get orderDetailAdminPosReceived => 'استلام الكاشير';
+
+  @override
+  String get orderDetailAdminKitchenPrep => 'تحضير المطبخ';
+
+  @override
+  String get orderDetailAdminCloseSettle => 'إغلاق وتسوية';
+
+  @override
+  String get orderDetailAdminTimelineNext => 'قادم';
+
+  @override
+  String get orderDetailAdminTimelineTitle => 'خط زمني للطلب';
+
+  @override
+  String get orderDetailAdminTimelineSubtitle => 'من التسجيل إلى التسوية.';
+
+  @override
+  String get orderDetailAdminRisksTitle => 'مخاطر وملاحظات';
+
+  @override
+  String get orderDetailAdminDeliveryTiming => 'وقت التوصيل';
+
+  @override
+  String get orderDetailAdminNoDeposit => 'لا يوجد عربون';
+
+  @override
+  String get orderDetailAdminOperationalNote => 'ملاحظة تشغيلية';
+
+  @override
+  String get productEditorHeroHeadline =>
+      'حرر الاسم العربي والإنجليزي، السعر، الأحجام، الإضافات، ومحطة التحضير.';
+
+  @override
+  String get productEditorIdentitySubtitle =>
+      'النصوص التي تظهر للعميل في المنيو.';
+
+  @override
+  String get productEditorMediaGalleryHint =>
+      'من 1 إلى 5 صور — صورة طعام دافئة لكل زاوية.';
+
+  @override
+  String get productEditorMediaUsage =>
+      'معرض المنتج • بطاقة المنيو • نقطة البيع';
+
+  @override
+  String get productEditorStationSubtitle => 'تحدد أين تظهر التذكرة في المطبخ.';
+
+  @override
+  String get orderDetailAdminContactPhone => '+962 7 9000 0000';
+
+  @override
+  String get commonOpen => 'فتح';
+
+  @override
+  String get settingsOpsBadge => 'إعدادات التشغيل';
+
+  @override
+  String get settingsOpsHeroHeadline =>
+      'تحكم بساعات العمل، المحطات، قواعد الطلبات، مناطق التوصيل، الضرائب، الإيصالات، والتنبيهات.';
+
+  @override
+  String get settingsAppAdminHeroHeadline =>
+      'إعدادات النظام، التكاملات، وصلاحيات المنصة.';
+
+  @override
+  String get settingsHeroNineSections => '٩ أقسام';
+
+  @override
+  String get settingsHeroUiOnly => 'الإعدادات';
+
+  @override
+  String get settingsHeroDrawerNav => 'درج تنقل';
+
+  @override
+  String get settingsBusinessHoursTitle => 'ساعات العمل وقواعد الطلب';
+
+  @override
+  String get settingsBusinessHoursSubtitle =>
+      'حدد حالة الاستقبال والتحضير والطلبات المسبقة.';
+
+  @override
+  String get settingsAcceptingOrders => 'استقبال الطلبات مفتوح';
+
+  @override
+  String get settingsDeliveryEnabled => 'التوصيل متاح الآن';
+
+  @override
+  String get settingsTodayHours => 'ساعات اليوم';
+
+  @override
+  String get settingsTodayHoursValue => '٨:٠٠ صباحاً - ١٢:٠٠ ليلاً';
+
+  @override
+  String get settingsPreOrdersLabel => 'الطلبات المسبقة';
+
+  @override
+  String get settingsPreOrdersDetail => 'حتى ٣ أيام مقدماً';
+
+  @override
+  String get settingsStationsTitle => 'المحطات وقواعد التشغيل';
+
+  @override
+  String get settingsStationsSubtitle => 'اربط المنيو بمحطات المطبخ والتحضير.';
+
+  @override
+  String get settingsShawarmaStation => 'محطة الشاورما';
+
+  @override
+  String get settingsShawarmaPrepDetail => 'متوسط التحضير ٨ دقائق';
+
+  @override
+  String get settingsFryerStation => 'محطة المقالي';
+
+  @override
+  String get settingsFryerLoadDetail => 'حد ضغط ١٢ تذكرة';
+
+  @override
+  String get settingsLateTicketThreshold => 'حد قبول الطلب المتأخر';
+
+  @override
+  String get settingsLateTicketDetail => '١٥ دقيقة قبل التصعيد';
+
+  @override
+  String get settingsSystemPlatformTitle => 'النظام والمنصة';
+
+  @override
+  String get settingsSystemPlatformSubtitle =>
+      'تكاملات، مستخدمون، أدوار، وتدقيق.';
+
+  @override
+  String get settingsIntegrationsDetail => 'Supabase، SMS، الدفع';
+
+  @override
+  String get settingsAuditTrailDetail => 'سجل كامل للمنصة';
+
+  @override
+  String get settingsStaffTitle => 'الطاقم والحضور';
+
+  @override
+  String get settingsStaffSubtitle => 'الورديات والحضور والموافقات.';
+
+  @override
+  String get settingsStaffHoursDetail => 'ورديات وحضور وساعات';
+
+  @override
+  String get settingsAttendanceHrLabel => 'الحضور والموارد البشرية';
+
+  @override
+  String get settingsAttendanceHrDetail => 'سجل الحضور والموافقات';
+
+  @override
+  String get settingsFeesTaxesTitle => 'الرسوم والضرائب';
+
+  @override
+  String get settingsFeesTaxesSubtitle =>
+      'رسوم التوصيل وعرض الضريبة وتخطيط الإيصال.';
+
+  @override
+  String get settingsDeliveryFeesLabel => 'رسوم التوصيل';
+
+  @override
+  String get settingsDeliveryFeesDetail => 'قواعد رسوم التوصيل حسب المنطقة';
+
+  @override
+  String get settingsReceiptTemplateLabel => 'نموذج الإيصال';
+
+  @override
+  String get settingsReceiptTemplateDetail => 'الشعار والتذييل وسطر الضريبة';
+
+  @override
+  String get settingsNotificationsTitle => 'الإشعارات والتنبيهات';
+
+  @override
+  String get settingsNotificationsSubtitle =>
+      'تنبيهات المطبخ والمخزون وإرجاع الصواني.';
+
+  @override
+  String get settingsKitchenAlertsDetail => 'تأخير التحضير وضغط المحطة';
+
+  @override
+  String get settingsLowStockAlert => 'إشعار نقص المخزون';
+
+  @override
+  String get settingsLowStockDetail => 'عند أقل من ١٥٪';
+
+  @override
+  String get settingsTrayReturnReminders => 'تذكير إرجاع الصواني';
+
+  @override
+  String get settingsTrayReturnDetail => 'بعد ٦٠ دقيقة من التسليم';
+
+  @override
+  String get settingsAppAdminShortcuts => 'اختصارات مدير التطبيق';
+
+  @override
+  String get settingsOpsShortcuts => 'اختصارات التشغيل';
+
+  @override
+  String get settingsShortcutsSubtitle => 'انتقل بسرعة إلى الشاشات الإدارية.';
+
+  @override
+  String get settingsAttendancePayrollShortcut => 'الحضور والرواتب';
+
+  @override
+  String get settingsPreOrdersShortcut => 'الطلبات المسبقة';
+
+  @override
+  String get ordersMgmtFilterTitle => 'فلترة لوحة الطلبات';
+
+  @override
+  String get ordersMgmtFilterMessage =>
+      'فلترة حسب القناة، المحطة، أو حالة التأخير.';
+
+  @override
+  String get ordersMgmtFilterTooltip => 'فلترة';
+
+  @override
+  String get ordersMgmtLaneNeedsDecision => 'بانتظار القرار';
+
+  @override
+  String get ordersMgmtLaneNeedsDecisionSub => 'تأخير أو نقص أو تصعيد';
+
+  @override
+  String get ordersMgmtLanePreparing => 'في التحضير';
+
+  @override
+  String get ordersMgmtLanePreparingSub => 'تحت متابعة المطبخ';
+
+  @override
+  String get ordersMgmtLaneReadyRoute => 'جاهز / في الطريق';
+
+  @override
+  String get ordersMgmtLaneReadyRouteSub => 'جاهز للتسليم أو خرج';
+
+  @override
+  String get ordersMgmtHeroBadge => 'لوحة الطلبات الحية';
+
+  @override
+  String get ordersMgmtOpenOrders => 'طلبات مفتوحة';
+
+  @override
+  String get ordersMgmtActiveValue => 'قيمة نشطة';
+
+  @override
+  String get ordersMgmtPlatedOrders => 'طلبات صواني';
+
+  @override
+  String get ordersMgmtEmptyLane => 'لا توجد طلبات هنا';
+
+  @override
+  String get ordersMgmtOpenDetail => 'افتح التفاصيل';
+
+  @override
+  String get ordersMgmtEscalate => 'تصعيد';
+
+  @override
+  String get ordersMgmtEscalationLogged => 'تم تسجيل التصعيد';
+
+  @override
+  String get ordersMgmtRecentlyClosed => 'أغلقت مؤخراً';
+
+  @override
+  String get ordersMgmtHistory => 'السجل';
+
+  @override
+  String get ordersMgmtDeliveredStatus => 'تم التسليم';
+
+  @override
+  String get financialCloseBadge => 'إغلاق كاش وتقسيم أرباح';
+
+  @override
+  String get financialCloseHeroHeadline =>
+      'راجع الوردية، النقد، البطاقات، العربون، البقشيش، ثم اعتمد صافي الربح.';
+
+  @override
+  String get financialCloseShiftRevenue => 'إيراد الوردية';
+
+  @override
+  String get financialCloseOrdersCount => 'طلبات';
+
+  @override
+  String get financialCloseDistributableNet => 'صافي قابل للتوزيع';
+
+  @override
+  String get financialCloseSummaryTitle => 'ملخص إغلاق الوردية';
+
+  @override
+  String get financialCloseSummarySubtitle =>
+      'القراءة العملية قبل اعتماد الإغلاق.';
+
+  @override
+  String get financialCloseStatusLabel => 'الحالة';
+
+  @override
+  String get financialCloseStatusReady => 'جاهز للإغلاق';
+
+  @override
+  String get financialCloseTenderTitle => 'مطابقة طرق الدفع';
+
+  @override
+  String get financialCloseTenderSubtitle =>
+      'النقد والبطاقات والمحفظة يجب أن تطابق سجل الكاشير.';
+
+  @override
+  String get financialCloseCash => 'نقد';
+
+  @override
+  String get financialCloseCards => 'بطاقات';
+
+  @override
+  String get financialCloseWallet => 'محفظة';
+
+  @override
+  String get financialCloseDepositsTitle => 'العربون والمرتجعات';
+
+  @override
+  String get financialCloseDepositsSubtitle =>
+      'عربون الصواني والاستردادات ومخاطر الكسر.';
+
+  @override
+  String get financialCloseRefundsToday => 'استردادات اليوم';
+
+  @override
+  String get financialCloseBreakageFees => 'رسوم كسر محتملة';
+
+  @override
+  String get financialCloseReviewTrayReturns => 'راجع إرجاع الصواني';
+
+  @override
+  String get financialCloseTipsTitle => 'البقشيش والفروقات';
+
+  @override
+  String get financialCloseTipsSubtitle => 'بقشيش الوردية وفروقات المطابقة.';
+
+  @override
+  String get financialCloseCurrentTips => 'بقشيش الوردية الحالية';
+
+  @override
+  String get financialCloseVariance => 'فرق المطابقة';
+
+  @override
+  String get financialCloseSplitTitle => 'تقسيم صافي الربح';
+
+  @override
+  String get financialCloseSplitSubtitle =>
+      'حصص المالك والمشغل بعد التكاليف والبقشيش.';
+
+  @override
+  String get financialCloseApproveTitle => 'اعتماد الإغلاق';
+
+  @override
+  String get financialCloseOwnerViewOnly => 'عرض للمالك فقط';
+
+  @override
+  String get financialCloseApprovedReadOnly => 'الإغلاق معتمد (قراءة فقط)';
+
+  @override
+  String get financialCloseAwaitingApproval => 'بانتظار اعتماد المشغل';
+
+  @override
+  String get financialCloseApproveSubtitle =>
+      'قفل الوردية بعد اكتمال المطابقة.';
+
+  @override
+  String get financialCloseApproveShift => 'اعتماد إغلاق الوردية';
+
+  @override
+  String get financialCloseApproveConfirmTitle => 'اعتماد الإغلاق';
+
+  @override
+  String get financialCloseApproveConfirmMessage =>
+      'سيتم قفل إجماليات الوردية للتدقيق.';
+
+  @override
+  String get financialCloseApprovedSuccess => 'تم اعتماد الإغلاق';
+
+  @override
+  String get settingsStaffCardSubtitle => 'ساعات الموظفين والحضور.';
+
+  @override
+  String get settingsFeesTaxesCardSubtitle =>
+      'ضريبة المبيعات، التوصيل، العربون، والإيصالات.';
+
+  @override
+  String get settingsDeliveryFeesZoneMinimum => 'حسب المنطقة والحد الأدنى';
+
+  @override
+  String get settingsReceiptTemplateTerms => 'الشعار، الضريبة، شروط الإرجاع';
+
+  @override
+  String get settingsNotificationsCardSubtitle =>
+      'تنبيهات المطبخ، السائقين، المخزون، والإرجاع.';
+
+  @override
+  String get settingsLateKitchenTicketAlerts => 'تنبيه تذاكر المطبخ المتأخرة';
+
+  @override
+  String get settingsShortcutsJumpSubtitle =>
+      'انتقل للإعدادات المتخصصة بدون شريط سفلي.';
+
+  @override
+  String get ordersMgmtHeroHeadline =>
+      'تابع كل طلب من الكاشير إلى المطبخ ثم التسليم.';
+
+  @override
+  String get ordersMgmtRecentlyClosedSub =>
+      'طلبات مكتملة أو مسلمة للتدقيق السريع.';
+
+  @override
+  String get ordersMgmtOpPending => 'بانتظار تأكيد المطبخ أو توفر المادة.';
+
+  @override
+  String get ordersMgmtOpReady => 'جاهز للتسليم، تحقق من التغليف.';
+
+  @override
+  String get ordersMgmtOpOnWay => 'خرج للتوصيل، راقب وقت الوصول.';
+
+  @override
+  String get ordersMgmtOpPreparing => 'قيد التحضير، راقب وقت المحطة.';
+
+  @override
+  String get financialCloseDepositsExcludedSubtitle =>
+      'العربون أموال مشروطة، لا تدخل تقسيم الربح.';
+
+  @override
+  String get financialCloseTipsSeparateSubtitle =>
+      'البقشيش منفصل عن الإيراد ويذهب للطاقم.';
+
+  @override
+  String get financialCloseSplitAfterCostsSubtitle =>
+      'بعد استثناء البقشيش والعربون والمصاريف.';
+
+  @override
+  String get financialCloseApproveUiOnlySubtitle =>
+      'راجع الإجماليات قبل اعتماد إغلاق الوردية.';
+
+  @override
+  String get financialCloseApproveMockMessage =>
+      'سيُسجَّل اعتماد إغلاق الوردية للتدقيق.';
+
+  @override
+  String get financialCloseReportDownloaded =>
+      'تم تنزيل التقرير — اطبع كـ PDF من المتصفح';
+
+  @override
+  String get financialCloseVarianceLabel => 'الفرق';
+
+  @override
+  String get actionAdd => 'إضافة';
+
+  @override
+  String get catalogCrudAdded => 'تمت الإضافة';
+
+  @override
+  String get catalogCrudCheckFields => 'تحقق من الحقول';
+
+  @override
+  String get catalogCrudUpdated => 'تم التحديث';
+
+  @override
+  String get catalogCrudUpdateFailed => 'تعذر التحديث';
+
+  @override
+  String get catalogCrudDeleted => 'تم الحذف';
+
+  @override
+  String get catalogCrudNameEn => 'الاسم EN';
+
+  @override
+  String get catalogCrudNameAr => 'الاسم AR';
+
+  @override
+  String get catalogCrudIconKey => 'مفتاح الأيقونة';
+
+  @override
+  String get catalogCrudPrice => 'السعر';
+
+  @override
+  String get catalogCrudMinOneImage => 'أضف صورة واحدة على الأقل';
+
+  @override
+  String get menuCatalogTitle => 'فهرس المنيو';
+
+  @override
+  String get menuCatalogTabCategories => 'الفئات';
+
+  @override
+  String get menuCatalogTabAddons => 'الإضافات';
+
+  @override
+  String get menuCatalogTabRelated => 'منتجات مرتبطة';
+
+  @override
+  String get menuCatalogAddCategory => 'إضافة فئة';
+
+  @override
+  String get menuCatalogAddAddon => 'إضافة addon';
+
+  @override
+  String get menuCatalogAddonImageRequired => 'أضف صورة للإضافة';
+
+  @override
+  String get menuCatalogLinkRelated => 'ربط منتجات';
+
+  @override
+  String menuCatalogLinkRelatedSubtitle(String sampleIds) {
+    return 'مثال IDs: $sampleIds';
+  }
+
+  @override
+  String get menuCatalogProductId => 'معرف المنتج';
+
+  @override
+  String get menuCatalogRelatedIds => 'معرفات مرتبطة (فاصلة)';
+
+  @override
+  String get menuCatalogSaveLink => 'حفظ الربط';
+
+  @override
+  String get menuCatalogSaved => 'تم الحفظ';
+
+  @override
+  String get menuCatalogEnterProductId => 'أدخل معرف المنتج';
+
+  @override
+  String get promoMgmtTabDiscounts => 'خصومات';
+
+  @override
+  String get promoMgmtTabOffers => 'عروض';
+
+  @override
+  String get promoMgmtCreateCombo => 'إنشاء كومبو';
+
+  @override
+  String get promoMgmtDiscountPercent => 'خصم %';
+
+  @override
+  String get promoMgmtDiscountProduct => 'خصم على منتج';
+
+  @override
+  String get promoMgmtMenuItemId => 'معرف المنتج';
+
+  @override
+  String get promoMgmtNewOffer => 'عرض جديد';
+
+  @override
+  String get promoMgmtSubscriptionMeal => 'وجبة اشتراك';
+
+  @override
+  String orderDetailAdminHeroTitle(String orderId) {
+    return 'طلب #$orderId يحتاج متابعة من الإدارة';
+  }
+
+  @override
+  String orderDetailAdminHeroBody(String customer) {
+    return '$customer • تحقق من وقت التسليم والعربون والملاحظات قبل الإغلاق.';
+  }
+
+  @override
+  String get orderDetailAdminActionsSubtitle =>
+      'حدّث الحالة والملاحظات والتصعيد لهذا الطلب.';
+
+  @override
+  String get orderDetailAdminChangeStatusMessage =>
+      'اختر الحالة التالية لهذا الطلب.';
+
+  @override
+  String get orderDetailAdminTimelinePosDetail => 'تم تسجيل الطلب ودفع المبلغ.';
+
+  @override
+  String get orderDetailAdminTimelinePrepDetail =>
+      'تجهيز الأصناف الأساسية والتغليف.';
+
+  @override
+  String get orderDetailAdminTimelineOnWayDetail =>
+      'المندوب في الطريق إلى العميل.';
+
+  @override
+  String get orderDetailAdminTimelineWaitingDetail => 'بانتظار الخطوة التالية.';
+
+  @override
+  String get orderDetailAdminTimelineCloseDetail =>
+      'تأكيد التسليم، العربون، وأي رسوم كسر.';
+
+  @override
+  String get orderDetailAdminRisksSubtitle =>
+      'ما يحتاج صاحب المطعم معرفته قبل إغلاق الطلب.';
+
+  @override
+  String get orderDetailAdminRiskTimingDetail =>
+      'تجاوز متوسط المسار بثماني دقائق.';
+
+  @override
+  String get orderDetailAdminRiskTrayDetail =>
+      'تحقق من إعادة الصواني عند التسليم.';
+
+  @override
+  String hrPayrollOnTimeRule(int minutes) {
+    return 'في الوقت (≤ $minutes د) → 100% من الراتب';
+  }
+
+  @override
+  String hrPayrollDelayDoubleRule(int minutes) {
+    return 'تأخير > $minutes د → خصم ×2';
+  }
+
+  @override
+  String hrPayrollAbsenceRule(int minutes) {
+    return 'تأخير > $minutes د → غياب (0% حتى مع الحضور)';
+  }
+
+  @override
+  String hrPayrollOvertimeRule(int minutes, String multiplier) {
+    return 'عمل > $minutes د إضافية → $multiplier× للساعات الإضافية';
+  }
+
+  @override
+  String supportTicketsHeroBody(int count) {
+    return '$count تذكرة نشطة — حدّث الحالة، رد على العملاء، وتابع التقييمات.';
+  }
+
+  @override
+  String get supportTicketStatusOpen => 'مفتوحة';
+
+  @override
+  String get supportTicketStatusInProgress => 'قيد المتابعة';
+
+  @override
+  String get supportTicketStatusWaiting => 'بانتظار رد';
+
+  @override
+  String get supportTicketStatusResolved => 'تم الحل';
+
+  @override
+  String get supportTicketStatusClosed => 'مغلقة';
+
+  @override
+  String get reportsHubBadge => 'مركز تحليلات المطعم';
+
+  @override
+  String get reportsHubHeadline =>
+      'اربط المبيعات، القنوات، البقشيش، الهدر، والصواني بقرارات تشغيل واضحة.';
+
+  @override
+  String get reportsOpsScorecardsTitle => 'مؤشرات تشغيلية';
+
+  @override
+  String get reportsOpsScorecardsSubtitle =>
+      'أرقام تقود قرارات اليوم، لا ملفات تصدير فقط.';
+
+  @override
+  String get reportsAvgOrderLabel => 'متوسط الطلب';
+
+  @override
+  String get reportsTrayReturnSuccess => 'إرجاع الصواني';
+
+  @override
+  String get reportsWasteBreakageCost => 'تكلفة الهدر والكسر';
+
+  @override
+  String get reportsTrendSubtitle => 'اتجاه الطلبات خلال آخر ساعات الخدمة.';
+
+  @override
+  String get reportsTodayPeakLabel => 'ذروة اليوم';
+
+  @override
+  String get reportsTodayPeakValue => 'الغداء والتوصيل المسائي';
+
+  @override
+  String get reportsDecisionsTitle => 'قرارات مقترحة';
+
+  @override
+  String get reportsDecisionsSubtitle => 'تحليلات مرتبطة بتشغيل المطعم.';
+
+  @override
+  String get reportsInsightShawarmaLabel => 'زِد تحضير الشاورما قبل الغداء';
+
+  @override
+  String get reportsInsightShawarmaDetail =>
+      'مبيعات القناة أعلى من المتوسط بـ ١٢٪.';
+
+  @override
+  String get reportsReviewFryerLabel => 'راجع هدر المقالي';
+
+  @override
+  String get reportsApproveTipsLabel => 'اعتمد توزيع البقشيش';
+
+  @override
+  String get reportsModulesTitle => 'وحدات التحليل';
+
+  @override
+  String get reportsPlatesDepositsTitle => 'الصواني والعربون';
+
+  @override
+  String get reportsExportTitle => 'تصدير ومشاركة';
+
+  @override
+  String get reportsExportSubtitle =>
+      'التصدير أصبح نتيجة ثانوية، وليس مركز الشاشة.';
+
+  @override
+  String get reportsExportOperatorOnly => 'التصدير متاح للمشغل فقط.';
+
+  @override
+  String get preOrderOpsBadge => 'لوحة الطلبات المسبقة';
+
+  @override
+  String get preOrderOpsHeadline =>
+      'راجع طلبات الغد، الطاقة التحضيرية، الصواني، ومواعيد الاستلام قبل قبول أي طلب مسبق.';
+
+  @override
+  String get preOrderOpsNeedDecision => 'بانتظار القرار';
+
+  @override
+  String get preOrderOpsPickupWindows => 'نوافذ الاستلام';
+
+  @override
+  String get preOrderOpsReservedTrays => 'صواني محجوزة';
+
+  @override
+  String get preOrderOpsEmptyMessage => 'لا توجد طلبات مسبقة';
+
+  @override
+  String get preOrderOpsReviewQueue => 'قائمة المراجعة';
+
+  @override
+  String get preOrderOpsReviewQueueSub =>
+      'كل طلب مسبق يحتاج قراراً واضحاً قبل التحضير.';
+
+  @override
+  String get preOrderOpsAccept => 'قبول';
+
+  @override
+  String get preOrderOpsAccepted => 'تم قبول الطلب المسبق';
+
+  @override
+  String get preOrderOpsAdjustTime => 'تعديل الوقت';
+
+  @override
+  String get preOrderOpsPickupUpdated => 'تم تحديث وقت الاستلام';
+
+  @override
+  String get preOrderOpsPrepCapacity => 'طاقة التحضير';
+
+  @override
+  String get preOrderOpsPrepCapacitySub =>
+      'اضبط قبول الطلبات حسب المحطات المتاحة.';
+
+  @override
+  String get preOrderOpsStationShawarma => 'الشاورما';
+
+  @override
+  String get preOrderOpsStationPizza => 'البيتزا';
+
+  @override
+  String get preOrderOpsStationPlated => 'الصواني';
+
+  @override
+  String get preOrderOpsRulesTitle => 'قواعد الطلب المسبق';
+
+  @override
+  String get preOrderOpsRulesSubtitle => 'اضبط قواعد الطلب المسبق والتوفر.';
+
+  @override
+  String get preOrderOpsRuleCutoff => 'آخر وقت قبول: ٩ مساءً';
+
+  @override
+  String get preOrderOpsRuleMinPrep => 'الحد الأدنى للتحضير: ساعتان';
+
+  @override
+  String get preOrderOpsRuleTraysBeforePay => 'تأكيد الصواني قبل الدفع';
+
+  @override
+  String get rewardsAdminSetupTitle => 'إعداد المكافآت';
+
+  @override
+  String get rewardsAdminPointsRules => 'قواعد النقاط';
+
+  @override
+  String rewardsAdminPointsPerJod(String points) {
+    return '$points نقطة لكل دينار';
+  }
+
+  @override
+  String get rewardsAdminAddReward => 'إضافة مكافأة';
+
+  @override
+  String get rewardsAdminPointsRequired => 'النقاط المطلوبة';
+
+  @override
+  String get rewardsAdminCategory => 'الفئة';
+
+  @override
+  String get rewardsAdminAddToCatalog => 'إضافة للكتalog';
+
+  @override
+  String get rewardsAdminActiveRewards => 'المكافآت النشطة';
+
+  @override
+  String get rewardsAdminRewardAdded => 'تمت إضافة المكافأة';
+
+  @override
+  String get rewardsAdminCategoryDrinks => 'مشروبات';
+
+  @override
+  String get rewardsAdminCategorySides => 'مقبلات';
+
+  @override
+  String get rewardsAdminCategoryMain => 'أطباق رئيسية';
+
+  @override
+  String get rewardsAdminArtIcon => 'أيقونة الفن';
+
+  @override
+  String get rewardsAdminColorAccent => 'لون التمييز';
+
+  @override
+  String get rewardsAdminBadgeAr => 'شارة عربي';
+
+  @override
+  String get rewardsAdminBadgeEn => 'شارة إنجليزي';
+
+  @override
+  String get rewardsAdminArtGeneric => 'عام';
+
+  @override
+  String get rewardsAdminArtBurger => 'برغر';
+
+  @override
+  String get rewardsAdminArtDrink => 'مشروب';
+
+  @override
+  String get rewardsAdminArtFries => 'بطاطس';
+
+  @override
+  String get rewardsAdminArtBowl => 'وعاء';
+
+  @override
+  String get rewardsAdminArtDonut => 'دونات';
+
+  @override
+  String get rewardsAdminColorGold => 'ذهبي';
+
+  @override
+  String get rewardsAdminColorOrange => 'برتقالي';
+
+  @override
+  String get rewardsAdminColorOlive => 'زيتوني';
+
+  @override
+  String get rewardsAdminColorDelivery => 'توصيل';
+
+  @override
+  String get rewardsAdminColorDineIn => 'داخل المطعم';
+
+  @override
+  String get rewardsAdminColorSecondary => 'ثانوي';
+
+  @override
+  String get rewardsAdminColorTertiary => 'ثالثي';
+
+  @override
+  String get rewardsAdminColorOutline => 'إطار';
+
+  @override
+  String get rewardsAdminSoldOut => 'نفد المخزون';
+
+  @override
+  String get rewardsAdminTitleAr => 'العنوان عربي';
+
+  @override
+  String get rewardsAdminTitleEn => 'العنوان إنجليزي';
+
+  @override
+  String get rewardsAdminDescriptionAr => 'الوصف عربي';
+
+  @override
+  String get rewardsAdminDescriptionEn => 'الوصف إنجليزي';
+
+  @override
+  String get rewardsAdminPointsLabel => 'النقاط';
+
+  @override
+  String rewardsAdminRewardMeta(int points, String category) {
+    return '$points نقطة · $category';
+  }
+
+  @override
+  String get quantityIncrease => 'زيادة الكمية';
+
+  @override
+  String get quantityDecrease => 'إنقاص الكمية';
+
+  @override
+  String get menuMgmtPublished => 'منشور';
+
+  @override
+  String get menuMgmtDraft => 'مسودة';
+
+  @override
+  String get menuMgmtPublish => 'نشر';
+
+  @override
+  String get menuMgmtUnpublish => 'إلغاء النشر';
+
+  @override
+  String get menuMgmtPublishSuccess => 'تم النشر';
+
+  @override
+  String get menuMgmtHiddenFromMenu => 'تم إخفاء العنصر من المنيو';
+
+  @override
+  String get filterByRole => 'تصفية حسب الدور';
+
+  @override
+  String get rbacUserNotFound => 'المستخدم غير موجود';
+
+  @override
+  String get rbacAccountActions => 'إجراءات الحساب';
+
+  @override
+  String get rbacApprove => 'موافقة';
+
+  @override
+  String get rbacReject => 'رفض';
+
+  @override
+  String get rbacSuspend => 'إيقاف';
+
+  @override
+  String get rbacActivate => 'تفعيل';
+
+  @override
+  String get rbacInvite => 'دعوة';
+
+  @override
+  String get rbacInviteMockMessage => 'تم إرسال الدعوة';
+
+  @override
+  String get rbacApprovedMessage => 'تمت الموافقة';
+
+  @override
+  String get rbacRejectedMessage => 'تم الرفض';
+
+  @override
+  String get rbacSuspendedMessage => 'تم الإيقاف';
+
+  @override
+  String get rbacActivatedMessage => 'تم التفعيل';
+
+  @override
+  String get rbacAssignedRoles => 'الأدوار المعينة';
+
+  @override
+  String get rbacStatusActive => 'نشط';
+
+  @override
+  String get rbacStatusPendingApproval => 'بانتظار الموافقة';
+
+  @override
+  String get rbacStatusSuspended => 'موقوف';
+
+  @override
+  String get rbacOwnershipPercent => 'نسبة الملكية';
+
+  @override
+  String get rbacOwnershipHint => 'مثال: 35';
+
+  @override
+  String get reviewModerationTitle => 'مراجعة التقييمات';
+
+  @override
+  String reviewModerationHeroBody(int count) {
+    return '$count تقييم بانتظار المراجعة — وافق لعرضها للعملاء أو ارفض/علّم للمتابعة.';
+  }
+
+  @override
+  String get reviewModerationReject => 'رفض';
+
+  @override
+  String get reviewModerationFlag => 'تعليم';
+
+  @override
+  String get reviewModerationUpdated => 'تم تحديث التقييم';
+
+  @override
+  String get reviewModerationStatusPending => 'معلق';
+
+  @override
+  String get reviewModerationStatusApproved => 'معتمد';
+
+  @override
+  String get reviewModerationStatusRejected => 'مرفوض';
+
+  @override
+  String get reviewModerationStatusFlagged => 'مُعلّم';
+
+  @override
+  String get plateEditorBadge => 'محرر أصل وعربون';
+
+  @override
+  String get plateEditorHeadline =>
+      'حدد قيمة الأصل، مخزونه، عربونه، ورسوم الكسر.';
+
+  @override
+  String get plateEditorAssetIdentityTitle => 'بيانات الأصل';
+
+  @override
+  String get plateEditorAssetIdentitySubtitle =>
+      'معلومات تستخدم في المخزون والإرجاع.';
+
+  @override
+  String get plateEditorAssetNameAr => 'الاسم بالعربية';
+
+  @override
+  String get plateEditorAssetNameEn => 'الاسم بالإنجليزية';
+
+  @override
+  String get plateEditorAssetSku => 'كود الأصل / SKU';
+
+  @override
+  String get plateEditorReplacementValue => 'قيمة الاستبدال';
+
+  @override
+  String get plateEditorStockTitle => 'المخزون والتداول';
+
+  @override
+  String get plateEditorStockSubtitle => 'الأرقام الأساسية للعمليات اليومية.';
+
+  @override
+  String get plateEditorRequiresDeposit => 'يتطلب عربون عند التوصيل';
+
+  @override
+  String get plateEditorAvailableDelivery => 'متاح لطلبات التوصيل';
+
+  @override
+  String get plateEditorDepositRulesSubtitle =>
+      'قواعد العربون لهذا النوع من الصواني.';
+
+  @override
+  String get plateEditorConditionFeesTitle => 'الحالة ورسوم الكسر';
+
+  @override
+  String get plateEditorConditionFeesSubtitle => 'تظهر في عملية إرجاع الصواني.';
+
+  @override
+  String get plateEditorFeeFullBreakage => 'رسوم كسر كاملة';
+
+  @override
+  String get plateEditorFeeScratch => 'خدش / تلف بسيط';
+
+  @override
+  String get plateEditorFeeMissing => 'مفقود عند الإرجاع';
+
+  @override
+  String get plateEditorSaveTitle => 'حفظ الأصل';
+
+  @override
+  String get plateEditorSaveSubtitle => 'احفظ إعدادات الصحن للمنيو.';
+
+  @override
+  String get plateEditorSavedSuccess => 'تم حفظ إعدادات الأصل';
+
+  @override
+  String get plateEditorBackToPlates => 'رجوع لإدارة الصواني';
+
+  @override
+  String get adminShowLess => 'عرض أقل';
+
+  @override
+  String adminTipRowSubtitle(String orderId, String hours) {
+    return 'ID: $orderId · $hours ساعة';
+  }
+
+  @override
+  String get rbacRoleDefaultsSaved => 'تم حفظ القواعد الافتراضية';
+
+  @override
+  String get rbacNoPendingChanges => 'لا توجد تغييرات صلاحيات معلّقة للحفظ';
+
+  @override
+  String get rbacResetDefaults => 'إعادة ضبط';
+
+  @override
+  String get rbacResetDefaultsSuccess => 'تمت إعادة الضبط';
+
+  @override
+  String rbacUsersWithRoleLink(int count) {
+    return '$count مستخدم بهذا الدور — عرض القائمة';
+  }
+
+  @override
+  String get reportFilterPageSubtitle =>
+      'نفس الفلتر المستخدم داخل مركز التقارير، متاح كصفحة كاملة للمدير.';
+
+  @override
+  String get reviewModerationAlreadyProcessed =>
+      'تمت معالجة هذا التقييم مسبقاً.';
+
+  @override
+  String get reviewModerationRejectConfirmTitle => 'رفض التقييم؟';
+
+  @override
+  String get reviewModerationRejectConfirmMessage =>
+      'لن يظهر التقييم في قائمة المنتجات للعملاء.';
+
+  @override
+  String get reviewModerationFlagConfirmTitle => 'وضع علامة على التقييم؟';
+
+  @override
+  String get reviewModerationFlagConfirmMessage =>
+      'سيُعلّم التقييم للمتابعة من فريق الدعم.';
+
+  @override
+  String get supportFaqDeleteConfirmTitle => 'حذف سؤال شائع؟';
+
+  @override
+  String get supportFaqDeleteConfirmMessage =>
+      'سيُزال هذا السؤال من قائمة الأسئلة الشائعة.';
+
+  @override
+  String get supportFaqDeleteBlocked =>
+      'يجب الإبقاء على سؤال شائع واحد على الأقل.';
+
+  @override
+  String get supportFaqDeleted => 'تم حذف السؤال الشائع';
+
+  @override
+  String get rbacResetConfirmTitle => 'إعادة ضبط قواعد الدور؟';
+
+  @override
+  String get rbacResetConfirmMessage =>
+      'ستعود جميع صلاحيات هذا الدور إلى الإعدادات الافتراضية.';
+
+  @override
+  String get rbacAllPermissionsDenied =>
+      'يجب السماح بصلاحية واحدة على الأقل قبل الحفظ.';
+
+  @override
+  String get adminTipPoolEmpty =>
+      'يجب أن تكون مجموعة الإكراميات أكبر من صفر قبل الموافقة.';
+
+  @override
+  String get reportFilterAtLeastOneModule => 'اختر وحدة تقرير واحدة على الأقل.';
+
+  @override
+  String get marketingBlogUnpublishConfirmTitle => 'نقل المنشور إلى مسودة؟';
+
+  @override
+  String get marketingBlogUnpublishConfirmMessage =>
+      'لن تظهر المنشورات المنشورة في المدونة.';
+
+  @override
+  String get marketingBlogDeleteConfirmTitle => 'حذف منشور المدونة؟';
+
+  @override
+  String get marketingBlogDeleteConfirmMessage =>
+      'سيُزال المنشور من التسويق ومن مدونة العميل.';
+
+  @override
+  String get marketingBlogDraftNeedsTitle => 'أضف عنواناً قبل نشر هذه المسودة.';
+
+  @override
+  String get opsKitchenBoardRefreshed => 'تم تحديث لوحة المطبخ.';
+
+  @override
+  String get opsInventoryItemRefreshed => 'تم تحديث عنصر المخزون.';
+
+  @override
+  String get inventoryItemSelectTitle => 'اختر عنصر مخزون';
+
+  @override
+  String get inventoryItemSelectBody =>
+      'افتح تنبيهاً من لوحة المخزون لمراجعة الرصيد والمورد وسجل التعديلات.';
+
+  @override
+  String get inventoryItemOpenDashboard => 'فتح لوحة المخزون';
+
+  @override
+  String get opsStaffTipsRefreshed => 'تم تحديث الإكراميات اليومية.';
+
+  @override
+  String get opsCashierHistoryRefreshed => 'تم تحديث سجل المعاملات.';
+
+  @override
+  String get supportChatPriorityHigh => 'عاجل';
+
+  @override
+  String get supportChatPriorityNormal => 'عادي';
+
+  @override
+  String supportChatWaitingMinutes(int minutes, String id) {
+    return 'انتظار $minutes د · $id';
+  }
+
+  @override
+  String get supportChatAcceptAction => 'قبول المحادثة';
+
+  @override
+  String get supportChatAccepted => 'تم قبول المحادثة';
+
+  @override
+  String supportChatAcceptBodyAr(String customer, String id) {
+    return 'محادثة مباشرة مع $customer ($id)';
+  }
+
+  @override
+  String supportChatAcceptBodyEn(String customer, String id) {
+    return 'Live chat with $customer ($id)';
+  }
+
+  @override
+  String get supportChatAcceptReplyAr => 'تم قبول المحادثة من قائمة الانتظار.';
+
+  @override
+  String get supportChatAcceptReplyEn => 'Chat accepted from the queue.';
+
+  @override
+  String get supportChatAcceptFailed => 'المحادثة لم تعد في قائمة الانتظار.';
+
+  @override
+  String get supportOrderLookupReadOnlyBanner =>
+      'بحث للقراءة فقط — لا تعديل على الطلبات';
+
+  @override
+  String get supportOrderLookupSearchLabel => 'رقم الطلب أو العميل';
+
+  @override
+  String get supportOrderLookupSearchHint => 'مثال: 4821';
+
+  @override
+  String get supportOrderLookupNoResults => 'لا توجد نتائج';
+
+  @override
+  String get staffTipHistoryNoData =>
+      'لا توجد صفوف إكراميات للتصدير في هذا النطاق.';
+
+  @override
+  String get marketingCalendarSelectDay => 'اختر يوماً من التقويم أولاً.';
+
+  @override
+  String get marketingCalendarScheduleConfirmTitle => 'جدولة حملة؟';
+
+  @override
+  String get marketingCalendarScheduleConfirmMessage =>
+      'يضيف موعد تخطيط داخلي فقط — لا ينشر للعملاء.';
+
+  @override
+  String get marketingCalendarScheduledSuccess => 'تمت جدولة موعد الحملة';
+
+  @override
+  String get marketingPushScheduleConfirmTitle => 'جدولة إرسال الإشعار؟';
+
+  @override
+  String get marketingPushScheduleConfirmMessage =>
+      'يجدول إشعاراً داخل التطبيق للعميل.';
+
+  @override
+  String get marketingPushDeleteConfirmTitle => 'حذف حملة الإشعار؟';
+
+  @override
+  String get marketingPushDeleteConfirmMessage =>
+      'سيُزال المسودة أو الحملة المجدولة من قائمة التسويق.';
+
+  @override
+  String get marketingPushBodyRequired => 'أضف نص الإشعار قبل الجدولة.';
+
+  @override
+  String get marketingPushScheduleFailed => 'تعذرت جدولة مسودة الحملة.';
+
+  @override
+  String get opsDeliveryOrderRefreshed => 'تم تحديث طلب التوصيل.';
+
+  @override
+  String get marketingSocialMetaBusiness => 'Meta Business';
+
+  @override
+  String get marketingSocialInstagramPlatform => 'Instagram';
+
+  @override
+  String get marketingSocialMetaSubtitle => 'صفحة فيسبوك للمطعم';
+
+  @override
+  String get marketingSocialInstagramSubtitle => 'منشورات وريels';
+
+  @override
+  String get permissionMatrixEmpty => 'لا توجد صلاحيات لهذا الدور.';
+
+  @override
+  String get permissionAccessFull => 'كامل';
+
+  @override
+  String get permissionAccessRead => 'قراءة';
+
+  @override
+  String get permissionAccessDenied => 'ممنوع';
+
+  @override
+  String get permissionAccessPostponed => 'مؤجل';
+
+  @override
+  String rbacPostponedUntil(String date) {
+    return 'مؤجل حتى $date';
+  }
+
+  @override
+  String get rbacSelectPostponeDate => 'اختر تاريخ التأجيل';
+
+  @override
+  String get rbacPostponeDateRequired => 'اختر تاريخاً عند تأجيل الصلاحية.';
+
+  @override
+  String get rbacOpenRoleDefaults => 'فتح افتراضيات الدور في الشاشة أ';
+
+  @override
+  String get loginDemoModeNotice =>
+      'استخدم اختصارات المراكز لفتح مساحة عمل الدور.';
+
+  @override
+  String get loginDemoSignedIn => 'تم تسجيل الدخول بنجاح.';
+
+  @override
+  String get roleSelectionNoApprovedRoles =>
+      'لا توجد أدوار معتمدة بعد. تواصل مع مدير التطبيق.';
+
+  @override
+  String get registerViewTerms => 'عرض الشروط';
+
+  @override
+  String get rbacRoleGroupManagement => 'الإدارة';
+
+  @override
+  String get rbacRoleGroupSpecialist => 'متخصصون';
+
+  @override
+  String get rbacRoleGroupOperations => 'العمليات';
+
+  @override
+  String get rbacRoleGroupManagementSpecialist => 'الإدارة والمتخصصون';
+
+  @override
+  String get customerDiscountsEmptyTitle => 'لا توجد خصومات نشطة';
+
+  @override
+  String get customerDiscountsEmptyBody =>
+      'عد لاحقاً أو تصفّح القائمة للعروض الحالية.';
+
+  @override
+  String get customerPromoNotFoundTitle => 'العرض غير موجود';
+
+  @override
+  String get customerPromoNotFoundBody => 'ربما انتهى هذا العرض أو أُزيل.';
+
+  @override
+  String get promoApplyUnavailable =>
+      'لا يمكن تطبيق هذا العرض على السلة حالياً.';
+
+  @override
+  String get permSupportRefunds => 'استرداد وإلغاء الطلبات';
+
+  @override
+  String get permSupportSla => 'SLA وتسليم الوردية';
+
+  @override
+  String get permMarketingMenuPricing => 'نشر أسعار القائمة';
+
+  @override
+  String get permMarketingPublish => 'نشر الحملات';
+
+  @override
+  String get permOperatorCampaignApprove => 'اعتماد مشترك للحملات';
+
+  @override
+  String get supportSlaAtRisk => 'SLA معرض للخطر';
+
+  @override
+  String get supportSlaBreached => 'SLA متجاوز';
+
+  @override
+  String get supportResolvedToday => 'تم الحل (24 س)';
+
+  @override
+  String get supportAvgResponseTime => 'متوسط الاستجابة';
+
+  @override
+  String supportAvgResponseMinutes(int minutes) {
+    return '$minutes د';
+  }
+
+  @override
+  String get supportShiftHandoverTitle => 'تسليم الوردية';
+
+  @override
+  String get supportShiftHandoverHint =>
+      'التذاكر المفتوحة والعوائق وملاحظات للوكيل التالي…';
+
+  @override
+  String get supportShiftHandoverSaved => 'تم حفظ ملاحظات التسليم';
+
+  @override
+  String supportShiftHandoverLast(String when) {
+    return 'آخر تسليم: $when';
+  }
+
+  @override
+  String get supportAgentPerformanceTitle => 'أداء الوكيل (اليوم)';
+
+  @override
+  String get supportTicketCustomerPhone => 'هاتف العميل';
+
+  @override
+  String get supportTicketCustomerAddress => 'عنوان العميل';
+
+  @override
+  String get supportTicketEscalateOperator => 'تصعيد للمشغل';
+
+  @override
+  String get supportTicketEscalateCashier => 'تصعيد للكاشير';
+
+  @override
+  String supportTicketEscalated(String target) {
+    return 'تم التصعيد إلى $target';
+  }
+
+  @override
+  String get supportOrderLookupActionsBanner =>
+      'يمكن للدعم إصدار استرداد وإلغاء الطلبات.';
+
+  @override
+  String get supportOrderRefundAction => 'إصدار استرداد';
+
+  @override
+  String get supportOrderCancelAction => 'إلغاء الطلب';
+
+  @override
+  String get supportOrderRefundConfirmTitle => 'إصدار استرداد؟';
+
+  @override
+  String get supportOrderRefundConfirmMessage => 'سيُسجَّل الاسترداد للتدقيق.';
+
+  @override
+  String get supportOrderCancelConfirmTitle => 'إلغاء الطلب؟';
+
+  @override
+  String get supportOrderCancelConfirmMessage =>
+      'سيُعلّم الطلب ملغى ويُسجّل في التدقيق.';
+
+  @override
+  String get supportOrderRefunded => 'تم تسجيل الاسترداد';
+
+  @override
+  String get supportOrderCancelled => 'تم إلغاء الطلب';
+
+  @override
+  String get supportOrderAlreadyCancelled => 'الطلب ملغى مسبقاً';
+
+  @override
+  String get marketingPublishSubmit => 'إرسال لاعتماد المشغل';
+
+  @override
+  String get marketingPublishSubmitted => 'أُرسل للمشغل للاعتماد المشترك';
+
+  @override
+  String get marketingPublishPendingTitle => 'بانتظار اعتماد المشغل';
+
+  @override
+  String get marketingOfferActiveToggle => 'ظاهر للعميل';
+
+  @override
+  String get marketingOfferActiveOn => 'مباشر';
+
+  @override
+  String get marketingOfferActiveOff => 'مخفي';
+
+  @override
+  String get marketingPublishApprove => 'اعتماد ونشر';
+
+  @override
+  String get marketingPublishReject => 'رفض';
+
+  @override
+  String get marketingPublishApproved => 'تم نشر الحملة';
+
+  @override
+  String get marketingPublishRejected => 'تم رفض الحملة';
+
+  @override
+  String get marketingSubscriptionContentOnly =>
+      'إدارة محتوى الاشتراك وخيارات الفوترة.';
+
+  @override
+  String get marketingSubscriptionValue => 'قيمة الاشتراك';
+
+  @override
+  String marketingSubscriptionMealsTotal(int count) {
+    return '$count وجبات';
+  }
+
+  @override
+  String marketingSubscriptionRegularSum(String amount) {
+    return 'المجموع العادي: $amount';
+  }
+
+  @override
+  String marketingSubscriptionSaving(String amount) {
+    return 'توفيرك: $amount';
+  }
+
+  @override
+  String get marketingSubscriptionCoverage => 'وجبات لكل يوم';
+
+  @override
+  String marketingSubscriptionUncovered(int count) {
+    return '$count أيام بدون وجبات';
+  }
+
+  @override
+  String marketingSubscriptionDayMeals(int day, int count) {
+    return 'اليوم $day: $count وجبات';
+  }
+
+  @override
+  String get marketingSubscriptionFreeDelivery => 'توصيل مجاني';
+
+  @override
+  String marketingSubscriptionEditDay(int day) {
+    return 'اليوم $day';
+  }
+
+  @override
+  String get marketingSubscriptionPickMeals => 'اختر وجبات هذا اليوم';
+
+  @override
+  String get auditEventRefund => 'استرداد';
+
+  @override
+  String get auditEventOrderCancel => 'إلغاء طلب';
+
+  @override
+  String get auditEventPriceChange => 'تغيير سعر';
+
+  @override
+  String get auditEventOfferPublished => 'نشر عرض';
+
+  @override
+  String get marketingMenuPricePublishTitle => 'نشر أسعار القائمة';
+
+  @override
+  String get marketingMenuPricePublishBanner =>
+      'يمكن للتسويق تحديث أسعار القائمة الأساسية. يُسجّل كل تغيير للمراجعة قبل النشر.';
+
+  @override
+  String get operatorEscalationsInboxTitle => 'تصعيدات الدعم';
+
+  @override
+  String get operatorEscalationsInboxSubtitle =>
+      'تذاكر مُصعّدة من الدعم — استرداد أو إلغاء أو طلبات سياسة';
+
+  @override
+  String get operatorEscalationAcknowledge => 'إقرار';
+
+  @override
+  String get operatorEscalationAcknowledged => 'تم الإقرار بالتصعيد';
+
+  @override
+  String get operatorEscalationOpenTicket => 'فتح التذكرة';
+
+  @override
+  String operatorEscalationTarget(String target) {
+    return 'مُصعّد إلى $target';
+  }
+
+  @override
+  String get marketingHomeOpsTitle => 'نبض التسويق اليوم';
+
+  @override
+  String get marketingVisitorsToday => 'زوار اليوم';
+
+  @override
+  String get marketingPurchasesToday => 'مشتريات اليوم';
+
+  @override
+  String get marketingActiveCampaigns => 'حملات نشطة';
+
+  @override
+  String get marketingTopSellers => 'أفضل ١٠ منتجات مبيعاً';
+
+  @override
+  String get marketingTopRatings => 'أعلى التقييمات';
+
+  @override
+  String marketingPendingApprovals(int count) {
+    return '$count بانتظار الموافقة';
+  }
+
+  @override
+  String get marketingSocialInteractions => 'تفاعلات التواصل';
+
+  @override
+  String get marketingInsightFilterAll => 'الكل';
+
+  @override
+  String get marketingInsightFilterPending => 'بانتظار الموافقة';
+
+  @override
+  String get marketingInsightFilterApproved => 'معتمد';
+
+  @override
+  String get marketingInsightOpenEdit => 'فتح التعديل';
+
+  @override
+  String get marketingInsightPurchasesHint =>
+      'صفِّ حسب الفترة — اضغط صفاً للمنتج المرتبط';
+
+  @override
+  String get marketingInsightVisitorsHint =>
+      'حجم الزوار حسب الشريحة — اضغط للحملة المرتبطة';
+
+  @override
+  String get marketingProductSearchHint => 'ابحث عن منتج بالاسم';
+
+  @override
+  String get marketingDiscountProductPoints => 'نقاط المنتج (ثابتة)';
+
+  @override
+  String get marketingProductCreate => 'إنشاء منتج';
+
+  @override
+  String get marketingProductPreviewTab => 'معاينة';
+
+  @override
+  String get marketingProductDetailsTitle => 'تفاصيل المنتج';
+
+  @override
+  String get marketingLoyaltyCreateSheetTitle => 'مناسبة ولاء جديدة';
+
+  @override
+  String get marketingSocialMonitorTitle => 'مراقبة التواصل';
+
+  @override
+  String get marketingSocialUsers => 'المستخدمون';
+
+  @override
+  String get marketingSocialBlogs => 'المدونات';
+
+  @override
+  String get marketingSocialActionsToday => 'إجراءات اليوم';
+
+  @override
+  String get marketingSocialActionsWeek => 'إجراءات الأسبوع';
+
+  @override
+  String get marketingSocialNoIntegration =>
+      'مراقبة فقط — تكامل التطبيق يُدار من مكان آخر.';
+
+  @override
+  String get marketingPromoCodesTitle => 'أكواد ترويجية';
+
+  @override
+  String get marketingPromoCodeCreate => 'إنشاء كود ترويجي';
+
+  @override
+  String get marketingPromoCodeValue => 'الكود';
+
+  @override
+  String get marketingPromoCodeCategory => 'التصنيف';
+
+  @override
+  String get marketingPromoCategoryDiscount => 'خصم';
+
+  @override
+  String get marketingPromoCategoryAddPoints => 'إضافة نقاط';
+
+  @override
+  String get marketingPromoCategoryFreeMeal => 'وجبة مجانية';
+
+  @override
+  String get marketingPromoCategoryInviteFriends => 'دعوة أصدقاء';
+
+  @override
+  String get marketingBlogPlatforms => 'نُشر على';
+
+  @override
+  String get marketingBlogPickPlatforms => 'منصات التواصل';
+
+  @override
+  String get brandingSettingsTitle => 'هوية التطبيق';
+
+  @override
+  String get brandingSettingsSubtitle =>
+      'الاسم والشعار والشعار النصي في شاشة البداية وتسجيل الدخول (عربي وإنجليزي).';
+
+  @override
+  String get brandingNameEn => 'اسم التطبيق (إنجليزي)';
+
+  @override
+  String get brandingNameAr => 'اسم التطبيق (عربي)';
+
+  @override
+  String get brandingSloganEn => 'الشعار النصي (إنجليزي)';
+
+  @override
+  String get brandingSloganAr => 'الشعار النصي (عربي)';
+
+  @override
+  String get brandingLogoUrl => 'رابط صورة الشعار';
+
+  @override
+  String get brandingLogoUrlHint => 'اتركه فارغاً للشعار الافتراضي';
+
+  @override
+  String get brandingSave => 'حفظ الهوية';
+
+  @override
+  String get brandingReset => 'إعادة الافتراضي';
+
+  @override
+  String get brandingSaved => 'تم تحديث الهوية';
+
+  @override
+  String get drawerGroupHub => 'الرئيسية';
+
+  @override
+  String get drawerGroupOrders => 'الطلبات';
+
+  @override
+  String get drawerGroupMenu => 'القائمة';
+
+  @override
+  String get drawerGroupPeople => 'الفريق';
+
+  @override
+  String get drawerGroupMoney => 'المال';
+
+  @override
+  String get drawerGroupSettings => 'الإعدادات';
+
+  @override
+  String get drawerGroupPromotions => 'العروض';
+
+  @override
+  String get drawerGroupCatalog => 'الكتالوج';
+
+  @override
+  String get drawerGroupLoyalty => 'الولاء';
+
+  @override
+  String get drawerGroupContent => 'المحتوى';
+
+  @override
+  String get cartMoreFulfillmentOptions => 'خيارات توصيل إضافية';
+
+  @override
+  String get cartHideFulfillmentOptions => 'إخفاء الخيارات الإضافية';
 }

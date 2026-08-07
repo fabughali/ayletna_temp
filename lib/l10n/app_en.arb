@@ -1,12 +1,15 @@
 {
   "@@locale": "en",
   "appTitle": "Ayletna Restaurant",
+  "brandName": "Ayletna",
   "brandNameAr": "مطعم عيلتنا",
   "comingSoon": "Soon قريباً",
   "loading": "Loading",
   "actionContinue": "Continue",
   "actionCancel": "Cancel",
   "actionSave": "Save",
+  "favoritesSaved": "Saved to favorites",
+  "favoritesRemoved": "Removed from favorites",
   "actionAddToCart": "Add to Cart",
   "actionSignIn": "Sign in",
   "actionRegister": "Register",
@@ -32,7 +35,12 @@
   "authOtpResent": "A new verification code was sent.",
   "authPasswordResetSuccess": "Password reset. You can sign in now.",
   "roleSelectionNotApproved": "This role is not approved for your account.",
-  "pendingApprovalNote": "Operational roles require operator approval",
+  "pendingApprovalNote": "Your account is under review. Our team is verifying your staff credentials to ensure the best service for our guests.",
+  "pendingApprovalTimelineTitle": "Approval progress",
+  "pendingApprovalStepSubmitted": "Submitted",
+  "pendingApprovalStepReview": "Reviewing",
+  "pendingApprovalStepActivated": "Activated",
+  "pendingApprovalContactSupport": "Contact Support",
   "currencyJod": "JOD",
   "orderTypeDineIn": "Dine-in",
   "orderTypeTakeaway": "Takeaway",
@@ -84,13 +92,199 @@
   "roleStaff": "Staff",
   "roleOperator": "Operator",
   "roleOwner": "Owner",
+  "roleAdmin": "App Admin",
+  "roleSupport": "Support",
+  "roleMarketing": "Marketing",
+  "hubAppAdmin": "App Administration",
+  "hubOperator": "Restaurant Operations",
+  "hubOwner": "Owner Portal",
+  "hubSupportDesk": "Support Desk",
+  "hubMarketing": "Marketing Hub",
+  "rolePermissionsTitle": "Roles & Rules",
+  "rolePermissionsSubtitle": "Default permission bundles per role",
+  "userPermissionsTitle": "Users & Permissions",
+  "userPermissionsSubtitle": "Assigned roles, inherited rules, and overrides",
+  "switchRoleTitle": "Active Role",
+  "switchRoleSubtitle": "Only shown when your account has multiple roles",
+  "settingsDarkMode": "Dark Mode",
+  "settingsDarkModeOff": "Off",
+  "settingsDarkModeOn": "On",
+  "settingsNotificationsSummary": "Push, Email",
+  "inheritedRulesTitle": "Inherited rules",
+  "userOverridesTitle": "User overrides",
+  "effectivePermissionsTitle": "Effective permissions",
+  "ownershipPercentageLabel": "Ownership %",
+  "pendingApprovalRequestedRoles": "Requested access: {roles}. An app administrator will review your account.",
+  "@pendingApprovalRequestedRoles": {
+    "placeholders": {
+      "roles": {
+        "type": "String"
+      }
+    }
+  },
+  "supportChatQueueTitle": "Live chat queue",
+  "supportChatQueueSubtitle": "Accept waiting customer conversations.",
+  "supportOrderLookupTitle": "Order lookup",
+  "supportOrderLookupSubtitle": "Search orders by number or customer name for ticket context.",
+  "supportFaqEditorTitle": "FAQ editor",
+  "supportFaqAddTitle": "Add FAQ entry",
+  "supportFaqAddAction": "Add entry",
+  "supportFaqPublished": "Published",
+  "supportFaqDraft": "Draft",
+  "supportFaqPublish": "Publish",
+  "supportFaqUnpublish": "Unpublish",
+  "supportFaqSavedMock": "FAQ saved",
+  "supportFaqValidation": "Enter at least English title and body.",
+  "supportFaqBodyLabelEn": "Body (EN)",
+  "supportFaqBodyLabelAr": "Body (AR)",
+  "hubOwnerPerformanceSummary": "Performance summary",
+  "hubOwnerShare": "Owner share",
+  "hubOwnerSharePercent": "{percent}% stake",
+  "@hubOwnerSharePercent": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "hubNetRevenue": "Net revenue",
+  "hubTodayRevenue": "Today revenue",
+  "hubTodayOrders": "{count} orders",
+  "@hubTodayOrders": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "hubSupportSummary": "Support summary",
+  "hubOpenTickets": "Open tickets",
+  "hubChatQueue": "Chat queue",
+  "hubPendingReviews": "Pending reviews",
+  "hubAvgWait": "Avg wait",
+  "hubAvgWaitMinutes": "{minutes}m",
+  "@hubAvgWaitMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "hubAvgWaitMinutesAr": "{minutes} د",
+  "@hubAvgWaitMinutesAr": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "marketingCampaignSummary": "Campaign summary",
+  "marketingActiveOffers": "Active offers",
+  "marketingCombosPromos": "Combos / promos",
+  "marketingLoyaltyMembers": "Loyalty members",
+  "marketingRedemptionRate": "Redemption rate",
+  "marketingVisualCatalog": "Visual catalog",
+  "marketingCampaignCalendar": "Campaign calendar",
+  "marketingSocialIntegrations": "Social integrations",
+  "marketingBlogTitle": "Blog & content",
+  "marketingBlogAddPost": "New blog post",
+  "marketingBlogPublished": "Published",
+  "marketingBlogDraft": "Draft",
+  "marketingBlogDraftAdded": "Draft added",
+  "marketingBlogStatusToggled": "Publication status updated",
+  "marketingBlogNewDraftAr": "مسودة جديدة",
+  "marketingBlogNewDraftEn": "New draft",
+  "marketingTabOffers": "Offers",
+  "marketingTabCombos": "Combos",
+  "marketingTabDiscounts": "Discounts",
+  "marketingTabSubscriptions": "Subscriptions",
+  "marketingTabCampaign": "Campaign",
+  "marketingTabLoyalty": "Loyalty",
+  "marketingTabSocial": "Social",
+  "marketingTabBlog": "Blog",
+  "marketingPushCampaignsTitle": "Push campaigns",
+  "marketingPushCampaignsSubtitle": "Draft and schedule customer push notifications.",
+  "marketingPushAddDraft": "New push draft",
+  "marketingPushDraft": "Draft",
+  "marketingPushScheduledStatus": "Scheduled",
+  "marketingPushSent": "Sent",
+  "marketingPushScheduled": "Scheduled for",
+  "marketingPushScheduleAction": "Schedule send",
+  "marketingPushScheduledMock": "Campaign scheduled",
+  "marketingPushDraftAdded": "Push draft added",
+  "marketingPushNewDraftAr": "إشعار جديد",
+  "marketingPushNewDraftEn": "New notification",
+  "marketingPushFieldTitleAr": "Title (Arabic)",
+  "marketingPushFieldTitleEn": "Title (English)",
+  "marketingPushFieldBodyAr": "Body (Arabic)",
+  "marketingPushFieldBodyEn": "Body (English)",
+  "marketingPushNoSchedule": "No schedule yet",
+  "opsInboxTitle": "Shift inbox",
+  "opsInboxSubtitle": "Operational alerts for your role. Customer marketing pushes stay on the customer inbox.",
+  "opsInboxShiftAlertTitle": "Shift reminder",
+  "opsInboxShiftAlertBody": "Confirm attendance and tip status before closing your shift.",
+  "opsInboxOrderAlertTitle": "Active orders need attention",
+  "opsInboxOrderAlertBody": "Open your hub dashboard to review queued work.",
+  "opsInboxOpenHub": "Open hub",
+  "platedReturnPickupScheduled": "Pickup scheduled",
+  "platedReturnSelfReturnLogged": "Self-return logged",
+  "marketingCalendarNoEvents": "No campaigns scheduled for this day",
+  "marketingCalendarScheduleAction": "Schedule campaign",
+  "marketingCalendarMockSave": "Campaign saved",
+  "marketingCalendarPlanningOnlyNotice": "Internal planning calendar only — slots do not publish offers, blog posts, or customer notifications. Use Offers, Blog, or Push campaigns to go live.",
+  "marketingCalendarCampaignsOn": "Campaigns on {date}",
+  "@marketingCalendarCampaignsOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "marketingSocialConnectTitle": "Connect accounts",
+  "marketingSocialConnectSubtitle": "Connect your social accounts to publish updates.",
+  "marketingSocialConnected": "Connected",
+  "marketingSocialNotConnected": "Not connected",
+  "marketingSocialDisconnect": "Disconnect account",
+  "marketingSocialConnectOAuth": "Connect with OAuth",
+  "marketingSocialConnectedMock": "Connected",
+  "marketingSocialDisconnectedMock": "Account disconnected",
+  "marketingSocialConnectedSince": "Connected since {date}",
+  "@marketingSocialConnectedSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "marketingKindOffer": "Offer",
+  "marketingKindPromo": "Promo",
+  "marketingKindSocial": "Social",
+  "marketingKindLoyalty": "Loyalty",
+  "ticketPriorityLow": "Low",
+  "ticketPriorityNormal": "Normal",
+  "ticketPriorityHigh": "High",
+  "ticketSlaOnTrack": "SLA: On track",
+  "ticketSlaAtRisk": "SLA: At risk",
+  "ticketSlaBreached": "SLA: Breached",
+  "ownerViewConfigApplied": "Owner visibility profile applied",
+  "filterAll": "All",
+  "filterByStatus": "Filter by status",
+  "filterByPriority": "Filter by priority",
   "screenCustomizationModal": "Customize item",
   "screenCustomizationModalDesc": "Choose size and add-ons",
   "hubNavigateHint": "Tap a destination to open the screen",
   "screenPendingApproval": "Pending approval",
   "actionSignOut": "Sign out",
   "homeCategoriesTitle": "Categories",
-  "homeFeaturedTitle": "Featured",
+  "categoryEmptyMessage": "No items in this category yet.",
+  "homeExploreMenuTitle": "Explore Menu",
+  "homeFeaturedTitle": "Featured Offers",
+  "homeStatusLabel": "STATUS",
+  "homePointsLabel": "Points",
+  "homeCategoryAll": "All",
+  "homeFeaturedBadge": "Featured",
+  "homeAddToOrder": "Add to Order",
+  "homeSeeAll": "See All",
   "categoryEyebrow": "Category",
   "categoryMezzeTitle": "Cold Mezze & Appetizers",
   "categoryMezzeDescription": "Discover our selection of traditional Levantine starters, prepared daily with fresh ingredients and authentic Jordanian flavors.",
@@ -322,16 +516,19 @@
   "screenOrderConfirmation": "Order confirmed",
   "screenOrderTracking": "Track order",
   "screenOrderHistory": "Order history",
+  "drawerOrders": "Orders",
+  "drawerBlog": "Blog",
   "screenWallet": "Wallet",
   "screenLoyalty": "Loyalty",
   "screenRewardsCatalog": "Rewards",
   "screenRewardsHistory": "Rewards history",
+  "rewardsHistoryEmpty": "No point activity yet. Order or redeem a reward.",
   "screenPaymentHistory": "Payment history",
   "screenRedemptionConfirm": "Confirm redemption",
   "screenProfile": "Profile",
   "screenAccountSettings": "Account settings",
   "drawerSectionMore": "More",
-  "demoActionTag": "Demo",
+  "demoActionTag": "",
   "screenAddresses": "Addresses",
   "screenMapPicker": "Map",
   "screenNotifications": "Notifications",
@@ -369,6 +566,99 @@
   "screenMenuManagement": "Menu",
   "screenProductEditor": "Edit product",
   "screenOffersManagement": "Offers management",
+  "screenDiscountsManagement": "Discounts management",
+  "marketingDiscountLabelAr": "Label AR",
+  "marketingDiscountLabelEn": "Label EN",
+  "marketingLinkedRewardTitle": "Linked reward",
+  "marketingLinkedRewardNone": "No linked reward",
+  "marketingCampaignAttachTitle": "Attach offers & combos",
+  "marketingCalendarCampaignAuthorityNotice": "Campaigns control customer visibility. Offers, combos, and discounts only appear while their campaign window is live.",
+  "screenAddonsManagement": "Add-ons",
+  "menuCatalogTabProduct": "Product",
+  "menuCatalogTabProducts": "Products",
+  "menuCatalogTabReward": "Reward",
+  "menuCatalogTabRatings": "Ratings",
+  "menuCatalogPickProduct": "Select a product",
+  "menuCatalogPickProductHint": "Choose a product to manage add-ons or related items.",
+  "menuCatalogRewardPointsLabel": "Reward points",
+  "menuCatalogEditRating": "Edit rating & remarks",
+  "menuCatalogRatingSaved": "Rating updated",
+  "menuCatalogManageProduct": "Manage",
+  "menuCatalogNoProducts": "No products yet",
+  "menuCatalogAttachAddonsHint": "Select approved add-ons for this product. Mark free or set a price override.",
+  "menuCatalogAddonPriceOverride": "Price override (JOD)",
+  "menuCatalogRelatedMultiSelectHint": "Select related products from the active menu.",
+  "catalogCrudAddonKey": "Key",
+  "catalogCrudLabelEn": "Label EN",
+  "catalogCrudLabelAr": "Label AR",
+  "catalogCrudSortOrder": "Sort order",
+  "catalogCrudDescriptionEn": "Description EN",
+  "catalogCrudDescriptionAr": "Description AR",
+  "catalogCrudMealType": "Meal type",
+  "catalogCrudMealMain": "Main",
+  "catalogCrudMealSide": "Side",
+  "catalogCrudMealDrink": "Drink",
+  "catalogCrudMealDessert": "Dessert",
+  "loyaltyOccasionsTitle": "Occasion rewards",
+  "loyaltyOccasionsSubtitle": "Active occasions apply to all customers.",
+  "loyaltyOccasionAddCustom": "Add custom occasion",
+  "loyaltyOccasionRewardEn": "Reward title EN",
+  "loyaltyOccasionRewardAr": "Reward title AR",
+  "loyaltyOccasionPoints": "Bonus points",
+  "rewardsAdminTiersHint": "Earn and redeem rates by points balance band.",
+  "rewardsAdminTierRange": "{min}–{max} pts",
+  "@rewardsAdminTierRange": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "rewardsAdminTierRates": "Earn {earn}/JOD · Redeem ×{redeem}",
+  "@rewardsAdminTierRates": {
+    "placeholders": {
+      "earn": {
+        "type": "String"
+      },
+      "redeem": {
+        "type": "String"
+      }
+    }
+  },
+  "rewardsAdminTierMin": "Min points",
+  "rewardsAdminTierMax": "Max points (blank = open)",
+  "rewardsAdminTierEarn": "Earn per JOD",
+  "rewardsAdminTierRedeem": "Redeem factor",
+  "marketingCampaignScheduleTitle": "Campaign schedule",
+  "marketingCampaignScheduleHint": "Pick or create a campaign window. Activating always requires a fresh schedule.",
+  "marketingCampaignNew": "New campaign",
+  "marketingCampaignNone": "No campaign",
+  "marketingCampaignPickExisting": "Existing campaign",
+  "marketingCampaignInvalidWindow": "End must be after start",
+  "marketingScheduleStart": "Start: {when}",
+  "@marketingScheduleStart": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "marketingScheduleEnd": "End: {when}",
+  "@marketingScheduleEnd": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "marketingRewardPointsLabel": "Reward points",
+  "marketingVisibilityNeedsSchedule": "Schedule a campaign before showing this item",
+  "marketingCampaignAdjust": "Adjust campaign",
+  "marketingBadgeEn": "Badge EN",
+  "marketingBadgeAr": "Badge AR",
   "screenLoyaltyConfig": "Loyalty config",
   "screenOwnerViewConfig": "Owner privacy",
   "screenPreOrder": "Pre-orders",
@@ -378,14 +668,16 @@
   "integrationsSaveAll": "Save all integrations",
   "integrationsSaveSuccess": "Integration settings saved.",
   "integrationsTestConnection": "Test connection",
-  "integrationsTestSuccess": "Connection test passed (mock).",
+  "integrationsTestSuccess": "Connection test passed",
   "integrationsTestIncomplete": "Complete the required fields for this section first.",
   "integrationsStatusConfigured": "Configured",
   "integrationsStatusIncomplete": "Incomplete",
   "integrationsLastSaved": "Last saved: {date}",
   "@integrationsLastSaved": {
     "placeholders": {
-      "date": {"type": "String"}
+      "date": {
+        "type": "String"
+      }
     }
   },
   "integrationsSupabaseTitle": "Supabase",
@@ -503,21 +795,29 @@
   "attendanceWifiConnected": "Connected to restaurant WiFi: {ssid}",
   "@attendanceWifiConnected": {
     "placeholders": {
-      "ssid": {"type": "String"}
+      "ssid": {
+        "type": "String"
+      }
     }
   },
-  "attendanceWifiDemoMatched": "Demo mode: treating as restaurant WiFi ({ssid})",
+  "attendanceWifiDemoMatched": "Connected to restaurant WiFi ({ssid})",
   "@attendanceWifiDemoMatched": {
     "placeholders": {
-      "ssid": {"type": "String"}
+      "ssid": {
+        "type": "String"
+      }
     }
   },
-  "attendanceWifiWebDemoNote": "Web prototype simulates WiFi match when demo mode is on. Production uses the mobile app on restaurant WiFi.",
+  "attendanceWifiWebDemoNote": "Attendance check-in uses the restaurant WiFi network.",
   "attendanceWifiWrongNetwork": "Wrong network ({current}). Required: {expected}",
   "@attendanceWifiWrongNetwork": {
     "placeholders": {
-      "current": {"type": "String"},
-      "expected": {"type": "String"}
+      "current": {
+        "type": "String"
+      },
+      "expected": {
+        "type": "String"
+      }
     }
   },
   "attendanceWifiUnknown": "Not on WiFi",
@@ -525,7 +825,9 @@
   "attendanceLastRecordedWifi": "Last recorded on WiFi: {ssid}",
   "@attendanceLastRecordedWifi": {
     "placeholders": {
-      "ssid": {"type": "String"}
+      "ssid": {
+        "type": "String"
+      }
     }
   },
   "attendanceFingerprintComingHint": "Tap fingerprint to confirm arrival time",
@@ -882,10 +1184,23 @@
   "guestArabicCoffee": "Arabic Coffee",
   "guestLocalWater": "Local Water",
   "guestSageTea": "Sage Tea",
-  "homeSearchHint": "Search for Mansaf, Shawarma or more...",
+  "homeSearchHint": "Search dishes, categories...",
   "screenSearch": "Search",
   "searchTitle": "Find your next meal",
   "searchSubtitle": "Search the Ayletna menu by dish, category, or ingredient-style description.",
+  "searchMenuHint": "Search menu, dishes, or ingredients...",
+  "searchRecentTitle": "Recent Searches",
+  "searchClearAll": "Clear All",
+  "searchTopResults": "Top Results",
+  "searchItemsFound": "{count} items found",
+  "@searchItemsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchAddShort": "Add",
   "searchStartTitle": "Type a dish name",
   "searchStartBody": "Try shawarma, hummus, pizza, falafel, burger, or any craving from the menu.",
   "searchEmptyTitle": "No dishes found",
@@ -1174,17 +1489,19 @@
   "kitchenHandoverNow": "Handover Now",
   "kitchenHandoverGuest": "Handover to Guest",
   "kitchenHandoverCourier": "Handover to Courier",
-  "languageWelcomeTitle": "Welcome",
-  "languageWelcomeSubtitle": "Choose your preferred language to continue",
+  "languageWelcomeTitle": "Choose Your Language",
+  "languageWelcomeSubtitle": "Welcome to Ayletna. Please select your preferred language to continue.",
   "languageEnglishSubtitle": "Western Interface",
   "languageArabicSubtitle": "Arabic Interface",
   "languageAccessGateway": "Universal Access Gateway",
   "loginWelcomeBack": "Welcome back",
-  "loginOperationalSubtitle": "Order your favorite meals, track your feast, and come back to what you love.",
+  "loginOperationalSubtitle": "Welcome back to Ayletna",
   "loginPhoneOrEmail": "Phone or Email",
   "loginEmailHint": "e.g. guest@ayletna.com",
-  "loginAction": "Login",
+  "loginAction": "Sign In",
   "loginOr": "or",
+  "loginDemoHubTitle": "Staff hubs",
+  "loginDemoHubSubtitle": "Sign in with a management or specialist role.",
   "loginContinueGuest": "Continue as Guest",
   "loginNoAccount": "Don't have an account?",
   "loginTrustSecure": "Secure",
@@ -1211,6 +1528,7 @@
   "loyaltySort": "Sort",
   "loyaltyPopular": "Popular",
   "loyaltyRedeem": "Redeem",
+  "loyaltyNoRewardsInFilter": "No rewards in this filter right now.",
   "loyaltyLocked": "Locked",
   "loyaltySignaturePlatter": "Signature BBQ Platter",
   "loyaltySignaturePlatterDesc": "Redeem for a full grill platter with three sides.",
@@ -1290,6 +1608,8 @@
   "cartClearAll": "Clear All",
   "cartPromoCode": "Promo Code",
   "cartPromoHint": "Enter code",
+  "cartYourCartTitle": "Your Cart",
+  "cartReviewSubtitle": "Review your items before placing the order.",
   "cartOrderSummary": "Order Summary",
   "cartFulfillment": "Fulfillment",
   "cartSubtotal": "Subtotal",
@@ -1308,7 +1628,7 @@
   "cartCheckoutStepFulfillment": "Fulfillment",
   "cartCheckoutStepPayment": "Payment",
   "cartCheckoutStepReview": "Review",
-  "demoModeBanner": "Demo mode — actions use mock data and are not saved.",
+  "demoModeBanner": "Action completed.",
   "cartTermsNotice": "By clicking, you agree to our Terms of Service.",
   "cartViewItems": "View items",
   "cartFulfillmentTitle": "Choose fulfillment",
@@ -1326,7 +1646,7 @@
   "cartHelpTitle": "Need help with your order?",
   "cartChatWithUs": "Chat with us",
   "supportHeroTitle": "How can we help?",
-  "supportHeroBody": "Choose the fastest mock support channel for order questions, delivery updates, or payment help.",
+  "supportHeroBody": "Choose the fastest support channel for order questions, delivery updates, or payment help.",
   "supportLiveChatTitle": "Live chat",
   "supportLiveChatBody": "Start a quick conversation with the service team.",
   "supportCallTitle": "Call restaurant",
@@ -1337,8 +1657,7 @@
   "supportOrderHelpBody": "Use this page for cart, delivery, payment, and plated-return questions.",
   "supportFaqTitle": "FAQ",
   "supportFaqBody": "Browse common delivery, payment, and plated-return answers.",
-  "supportTicketsTitle": "Support tickets",
-  "supportTicketsSubtitle": "Track open and resolved mock support requests.",
+  "supportTicketsSubtitle": "Track open and resolved support requests.",
   "supportTicketRequestFollowUp": "Request follow-up",
   "supportTicketCancel": "Cancel ticket",
   "supportTicketUrgent": "Mark urgent",
@@ -1365,7 +1684,7 @@
   "supportChatMessageHint": "Write your question or order note...",
   "supportChatSend": "Send message",
   "supportChatOpenTicket": "Open ticket if needed",
-  "supportAdminSetupNote": "Restaurant phone and WhatsApp numbers are preconfigured for mockup and can be edited later from admin settings.",
+  "supportAdminSetupNote": "Restaurant phone and WhatsApp numbers can be edited from admin settings.",
   "supportExternalActionFallback": "Could not open this action. Use the displayed contact details.",
   "screenFaq": "FAQ",
   "faqHeroTitle": "Frequently asked questions",
@@ -1373,7 +1692,7 @@
   "faqDeliveryTitle": "How do delivery updates work?",
   "faqDeliveryBody": "Active orders show a timeline. When the order is on the way, the driver contact button becomes available.",
   "faqPaymentTitle": "Which payment methods are supported?",
-  "faqPaymentBody": "The mock checkout currently shows card and cash flows, with wallet/payment screens kept for future configuration.",
+  "faqPaymentBody": "Checkout supports card and cash payment methods.",
   "faqPlatedTitle": "How does plated delivery work?",
   "faqPlatedBody": "Reusable trays include a refundable deposit and follow the plated-return reminder flow.",
   "cartMargheritaPremium": "Margherita Premium",
@@ -1441,6 +1760,8 @@
   "profileEditDetails": "Edit Profile Details",
   "profileChangePhoto": "Change profile image",
   "profilePhotoUpdated": "Profile image updated",
+  "profileChoosePhoto": "Choose a photo",
+  "profileRemovePhoto": "Remove photo",
   "profileEpicureanTier": "Epicurean Tier",
   "profileGoldStatus": "Gold Status",
   "profileSavorPoints": "Savor Points",
@@ -1448,6 +1769,8 @@
   "profileTierProgress": "1,150 points until Platinum Tier benefits.",
   "profileRewardsCatalog": "Rewards Catalog",
   "profilePointsHistory": "Points activity",
+  "profileNoPointsActivity": "No points activity yet.",
+  "profilePointsActivityLabel": "Points activity",
   "profilePointsHistorySubtitle": "Recent reward points earned and redeemed.",
   "profileViewAllPointsHistory": "View All History",
   "profilePaymentHistory": "Payment history",
@@ -1467,7 +1790,7 @@
   "profileSavedAddresses": "Saved Addresses",
   "profileAddNew": "Add New",
   "profileDeleteAddressTitle": "Delete address?",
-  "profileDeleteAddressBody": "This mock action removes the saved address from your profile view.",
+  "profileDeleteAddressBody": "This removes the saved address from your profile.",
   "profileHomeAddressTitle": "Home",
   "profileHomeAddress": "42 Al-Reem Street, Apt 4B\nAmman, Jordan",
   "profileOfficeAddressTitle": "Office",
@@ -1490,8 +1813,10 @@
   "settingsStaffShiftAlertsSubtitle": "Kitchen, delivery, inventory, and attendance reminders.",
   "settingsStaffOrderAlertsSubtitle": "Order updates relevant to your station or route.",
   "settingsBusinessSettingsHint": "Restaurant operations, roles, taxes, receipts, and system alerts.",
+  "drawerBusinessSettings": "Business settings",
   "addressesTitle": "Saved Addresses",
   "addressesAddNew": "Add New Address",
+  "addressesEmptyMessage": "No saved addresses yet. Add one for faster delivery checkout.",
   "addressesDelete": "Delete",
   "addressesDefault": "Default",
   "addressesHomeTitle": "Home",
@@ -1725,7 +2050,6 @@
   "platesItems": "Items",
   "platesOrderRestock": "Order Restock",
   "platesCatalogTitle": "Ceramic Tray Catalog",
-  "platesCatalogSubtitle": "Manage stock levels, circulation, and breakage costs.",
   "platesNewComponent": "New Component",
   "platesFilter": "Filter",
   "platesLargeTray": "Large Serving Tray",
@@ -1735,8 +2059,6 @@
   "platesMezzePlate": "Mezze Plate",
   "platesMezzePlateSku": "SKU: CRT-089-S",
   "platesPerUnit": "Per Unit",
-  "platesInStock": "In Stock",
-  "platesCirculating": "Circulating",
   "platesReplacementCost": "Repl. Cost: {amount}",
   "@platesReplacementCost": {
     "placeholders": {
@@ -1774,6 +2096,9 @@
   "productPrepTime": "Prep time: 45-60 mins",
   "productInclVat": "Incl. VAT",
   "productBestSeller": "Best Seller",
+  "productLoyaltyOrderAddon": "Order add-on",
+  "productChooseYourSide": "Choose Your Side",
+  "productAddExtras": "Add Extras",
   "productSizePortion": "Size Portion",
   "productRequired": "Required",
   "productSinglePlatter": "Single Platter",
@@ -1784,7 +2109,7 @@
   "productNoPineNuts": "No Pine Nuts (Allergy)",
   "productFree": "Free",
   "productSpecialInstructions": "Special Instructions",
-  "productInstructionsHint": "e.g., Please ensure the jameed is served hot.",
+  "productInstructionsHint": "Any allergies or specific requests?",
   "productAddToCartAmount": "Add to Cart | {amount}",
   "@productAddToCartAmount": {
     "placeholders": {
@@ -1847,6 +2172,10 @@
   "registerRoleCustomerBody": "Order delicious meals, track delivery, and manage your favorites.",
   "registerRoleStaff": "Restaurant Staff",
   "registerRoleStaffBody": "Access KDS, manage inventory, and process active orders.",
+  "registerRoleOperator": "Restaurant Operator",
+  "registerRoleOperatorBody": "Run daily operations — orders, menu, staff, and financial close. Requires app admin approval.",
+  "registerRoleOwner": "Restaurant Owner",
+  "registerRoleOwnerBody": "View revenue, profit share, and audit summaries. Requires app admin approval.",
   "registerRoleAdminOwner": "Admin / Owner",
   "registerRoleAdminOwnerBody": "View deep analytics, manage staff, and optimize store sustainability.",
   "registerDietaryPreferences": "Dietary Preferences",
@@ -1916,9 +2245,9 @@
   "rewardsRewardsNav": "Rewards",
   "rewardsDeliveryNav": "Delivery",
   "rewardsAdminNav": "Admin",
-  "roleSelectionMockTitle": "Mock role chooser",
-  "roleSelectionWelcome": "Choose a role to audit the app",
-  "roleSelectionSubtitle": "In production, roles are assigned by an admin. For this mockup, choose any role to test screens and design.",
+  "roleSelectionMockTitle": "Choose your role",
+  "roleSelectionWelcome": "Select Your Portal",
+  "roleSelectionSubtitle": "Choose your role to access specialized tools and services.",
   "roleSelectionCustomerTitle": "Customer",
   "roleSelectionCustomerBody": "Browse our menu, place orders for dine-in or takeaway, and track your loyalty rewards in real-time.",
   "roleSelectionMockCustomerMetric": "Customer storefront",
@@ -1932,6 +2261,10 @@
   "roleSelectionOpenRegister": "Open Register",
   "roleSelectionKitchenTitle": "Kitchen Staff",
   "roleSelectionKitchenBody": "KDS tile management, order prioritization, and ingredient stock alerts.",
+  "roleSelectionAdminMetric": "System Health: 100%",
+  "roleSelectionOperatorMetric": "8 Active Orders",
+  "roleSelectionSupportMetric": "2 Pending Tickets",
+  "roleSelectionMarketingMetric": "3 Active Promos",
   "roleSelectionKitchenMetric": "12 Active Orders",
   "roleSelectionAdminTitle": "Admin / Operator",
   "roleSelectionAdminBody": "Manage staff permissions, inventory procurement, and system configurations.",
@@ -1945,7 +2278,7 @@
   "roleSelectionDeliveryTitle": "Delivery Agent",
   "roleSelectionDeliveryBody": "Route optimization, order pickup confirmation, and digital proof-of-delivery.",
   "roleSelectionStartShift": "Start Shift",
-  "roleSelectionFooter": "Mockup-only role switching. Admin-assigned permissions will replace this chooser later.",
+  "roleSelectionFooter": "Select a workspace to continue. Permissions are assigned by your administrator.",
   "orderTypeTitle": "How would you like to savor?",
   "orderTypeSubtitle": "Choose your dining experience to view the appropriate menu.",
   "orderTypeDineInBody": "Reserve your spot and enjoy the full restaurant ambiance with table service.",
@@ -1963,7 +2296,7 @@
   "orderTypeGroupOrder": "Group Order",
   "orderTypeTerms": "Terms of Service",
   "termsHeroTitle": "Order Terms & Conditions",
-  "termsHeroSubtitle": "This mock screen explains the core checkout rules before placing an order.",
+  "termsHeroSubtitle": "Review the checkout rules before placing an order.",
   "termsPaymentTitle": "Payment and confirmation",
   "termsPaymentBody": "Orders are confirmed after choosing a fulfillment method and completing payment. Fees may vary by service type and address.",
   "termsGroupDeliveryTitle": "Group delivery",
@@ -2046,7 +2379,9 @@
   "returnAmount12_50": "$12.50",
   "returnRefundSummary": "Refund Summary",
   "splashTagline": "Traditional Taste, Zero Waste",
-  "splashInitializing": "INITIALIZING AYLETNA LOGIC",
+  "splashHeadline": "Premium Levantine Cuisine",
+  "splashMotto": "Taste. Belong. Sustain.",
+  "splashInitializing": "WELCOME TO OUR TABLE",
   "staffShiftInProgress": "Shift in Progress",
   "staffActiveNow": "ACTIVE NOW",
   "staffCurrentDuration": "Current Duration",
@@ -2269,7 +2604,7 @@
   "trackingPreparingBody": "Chef is finishing your meal",
   "trackingOnWayTitle": "On the Way",
   "trackingOnWayBody": "Driver: Marcus (5 mins away)",
-  "trackingCallMarcus": "Call Marcus",
+  "trackingCallMarcus": "Call driver",
   "trackingDelivered": "Delivered",
   "trackingDeliveredBody": "Estimated by 12:45 PM",
   "trackingOrderSummary": "Order Summary",
@@ -2501,8 +2836,8 @@
   "adminGrowthPrivacySubtitle": "Owner view and finance-report visibility rules.",
   "adminGrowthLoyaltySubtitle": "Turn loyalty into repeat visits and clear food orders.",
   "adminGrowthPointsRule": "Points rule",
-  "adminGrowthEnableLunchMultiplier": "Enable lunch multiplier",
-  "adminGrowthLunchMultiplierBody": "12 PM to 4 PM for best-selling menu items.",
+  "adminGrowthEnableLunchMultiplier": "Double loyalty points",
+  "adminGrowthLunchMultiplierBody": "When on, customers earn 2× points on add-to-cart from product detail.",
   "adminGrowthBirthdayDessertBody": "Visible only during the guest birthday window.",
   "adminGrowthTarget": "Target",
   "adminGrowthTargetBody": "Second visit within 14 days",
@@ -2518,7 +2853,7 @@
   "adminGrowthDiscountedItems": "Discounted items",
   "adminGrowthDiscountedItemsBody": "Hidden automatically when no discounted items exist.",
   "adminGrowthSubscriptionItems": "Subscription items",
-  "adminGrowthSubscriptionItemsBody": "Supports monthly or annual subscription mock offers.",
+  "adminGrowthSubscriptionItemsBody": "Supports monthly or annual subscription offers.",
   "adminGrowthTargetMargin": "Target margin",
   "adminGrowthTargetMarginBody": "Do not publish if margin drops below target.",
   "adminGrowthDecisionStaff": "Approve close-shift hours before tip payout.",
@@ -2529,8 +2864,1227 @@
   "adminGrowthExpectedImpact": "Expected impact",
   "adminGrowthExpectedImpactValue": "+8% repeat orders",
   "adminGrowthActionsTitle": "Admin Actions",
-  "adminGrowthActionsSubtitle": "All actions are UI-only mock actions.",
+  "adminGrowthActionsSubtitle": "Manage growth campaigns and offers.",
   "adminGrowthSaveSettings": "Save settings",
   "adminGrowthSettingsSaved": "Hub settings saved",
-  "adminGrowthOpenAuditLog": "Open audit log"
+  "adminGrowthOpenAuditLog": "Open audit log",
+  "languageEmblemArabic": "ع",
+  "languageEmblemEnglish": "EN",
+  "authLoginInvalidCredentials": "Invalid phone, email, or password.",
+  "settingsProfileRefreshed": "Profile refreshed.",
+  "ownershipShareValue": "{share}%",
+  "@ownershipShareValue": {
+    "placeholders": {
+      "share": {
+        "type": "String"
+      }
+    }
+  },
+  "pendingApprovalRefreshed": "Approval status checked.",
+  "roleSelectionOpsSection": "Operations & customer",
+  "supportCreateTicketTitle": "Open support ticket",
+  "supportFieldTitleEn": "Title (EN)",
+  "supportFieldTitleAr": "Title (AR)",
+  "supportFieldDescriptionEn": "Description (EN)",
+  "supportFieldDescriptionAr": "Description (AR)",
+  "supportSubmitTicket": "Submit ticket",
+  "supportValidationTitleBody": "Enter title and description",
+  "supportTicketsEmpty": "No tickets yet. Create one using the form above.",
+  "supportMessageStaffPrefix": "Support: ",
+  "supportYourRating": "Your rating",
+  "supportYourReply": "Your reply",
+  "supportSendReply": "Send reply",
+  "supportRateAfterResolved": "Rate only after ticket is resolved",
+  "timeAgoMinutes": "{count}m ago",
+  "@timeAgoMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeAgoHours": "{count}h ago",
+  "@timeAgoHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "timeAgoDays": "{count}d ago",
+  "@timeAgoDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "promoDetailOfferDetails": "Offer details",
+  "promoDetailIncludes": "Includes",
+  "promoDetailDescription": "Description",
+  "promoDetailDiscount": "Discount",
+  "promoDetailLoyaltyPoints": "Loyalty points",
+  "promoDetailValidFor": "Valid for",
+  "promoDetailThisWeek": "This week",
+  "promoDetailLimitedOfferDesc": "Limited-time offer. Order now before it expires.",
+  "promoDetailComboDesc": "A bundled combo that brings our best dishes together at a special price.",
+  "promoDetailBundleSavings": "Bundle savings",
+  "promoDetailItemsCount": "Items",
+  "promoDetailBillingCycle": "Billing cycle",
+  "promoDetailWeekly": "Weekly",
+  "promoDetailMonthly": "Monthly",
+  "promoDetailSubscriptionDesc": "Weekly or monthly meal subscription.",
+  "promoDetailViewMeal": "View meal",
+  "promoPercentOff": "{percent}% off",
+  "@promoPercentOff": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "cartInvalidPromoCode": "Invalid code — try AYLETNA10 or WELCOME",
+  "homeOfferAddedToCart": "Offer added to cart",
+  "homeComboAddedToCart": "Combo added to cart",
+  "productAddedToCart": "Added to cart",
+  "productContinueShopping": "Continue shopping",
+  "productCheckout": "Checkout",
+  "productRelatedProducts": "Related products",
+  "productCustomerReviews": "Customer reviews",
+  "productMoreReviews": "More reviews",
+  "productRewardCoins": "{count} coins",
+  "@productRewardCoins": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchRefreshed": "Menu search refreshed",
+  "productNoReviewsYet": "No approved reviews yet.",
+  "prepMockTimerDisplay": "12:49",
+  "platedConfirmCollectionBody": "Start the plated return collection for this stop?",
+  "productReviewsTitle": "Product reviews",
+  "productReviewsApprovedTitle": "Approved reviews",
+  "productReviewsCountFor": "{count} reviews for {title}",
+  "@productReviewsCountFor": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "productReviewsEmptyPrompt": "No approved reviews yet. Rate your order after delivery.",
+  "productRewardEarnBefore": "You are about to earn ",
+  "productRewardEarnAfter": " with this item. Keep collecting rewards and redeem them later for Ayletna discounts and treats.",
+  "orderReorderFailed": "Could not rebuild this order. Some items may no longer be available.",
+  "orderTrackingLoadError": "Unable to load order tracking. Pull to refresh or try again later.",
+  "ratingOrderLoadError": "Unable to load order details for rating.",
+  "paymentHistoryEmpty": "No payments recorded yet.",
+  "redemptionNoRewardSelected": "No reward selected",
+  "redemptionInsufficientPoints": "Insufficient points",
+  "redemptionPointsBalanceTitle": "Points balance",
+  "redemptionPointsBalanceValue": "{balance} pts",
+  "@redemptionPointsBalanceValue": {
+    "placeholders": {
+      "balance": {
+        "type": "int"
+      }
+    }
+  },
+  "redemptionCostLabel": "Redemption cost: {cost}",
+  "@redemptionCostLabel": {
+    "placeholders": {
+      "cost": {
+        "type": "int"
+      }
+    }
+  },
+  "supportChatYou": "You",
+  "supportChatLinkedTicket": "Linked ticket: {ticketId}",
+  "@supportChatLinkedTicket": {
+    "placeholders": {
+      "ticketId": {
+        "type": "String"
+      }
+    }
+  },
+  "supportChatTicketFromLiveChat": "Help request from live chat",
+  "supportChatTicketTitle": "Live chat",
+  "cartCompleteOrderTitle": "Complete your order",
+  "cartPopularAddonsSubtitle": "Popular add-ons for your basket",
+  "cashierConfirmLogTip": "Log this tip amount to the shift total?",
+  "checkoutPaymentSummaryTitle": "Payment summary",
+  "addressesDeleteFailed": "Could not delete this address. Try again.",
+  "deliveryOrder8845Title": "Order #8845",
+  "inventoryBatchLotLabel": "Batch / lot",
+  "inventoryBatchLotHint": "LOT-SAL-042",
+  "inventoryExpiryDateLabel": "Expiry date",
+  "inventoryExpiryDateHint": "2026-06-20",
+  "inventoryEvidenceTitle": "Receipt / photo evidence",
+  "inventoryAttachSupplierReceipt": "Attach supplier receipt",
+  "inventoryAddShelfPhoto": "Add shelf photo",
+  "mapDefaultAddressTitle": "Home",
+  "mapDefaultAddressText": "123 Gastronomy Lane, Central Hub, Amman",
+  "comboDiscountOff": "{percent}% off",
+  "@comboDiscountOff": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "billingPeriodWeekly": "Weekly",
+  "billingPeriodMonthly": "Monthly",
+  "catalogBrowseEmpty": "New items will appear here when available.",
+  "guestOfferCartUnavailable": "This offer cannot be added to your cart yet.",
+  "profileRefreshed": "Profile refreshed.",
+  "profileDeactivateNotAvailable": "Account deactivation is temporarily unavailable. Contact support.",
+  "profileDeactivateConfirmBody": "This ends the demo session and returns you to sign-in. Real account deletion will require support once the backend is live.",
+  "profileDeactivatedMock": "Demo account signed out.",
+  "addressSavedSuccess": "Address saved",
+  "addressSaveFailed": "Could not save address",
+  "cashierAttachAddressTitle": "Attach address to account",
+  "cashierMobileNumber": "Mobile number",
+  "cashierAccountIdOptional": "Account ID (optional)",
+  "cashierSaveAndAttach": "Save & attach",
+  "cashierEnterAddressFirst": "Enter an address first",
+  "cashierDeliveryAddressLabel": "Delivery address",
+  "cashierSavedAddressesTitle": "Saved addresses",
+  "cashierSearchAddressHint": "Search by name or mobile",
+  "cashierNoMatchingAddresses": "No matching saved addresses",
+  "cashierSaveAddressLabel": "Save address",
+  "cashierAttachToAccountLabel": "Attach to phone / account",
+  "cashierOfferAddedToCart": "Offer added to cart",
+  "settingsToggleSaved": "Setting saved",
+  "deliveryReturnProcessRefreshed": "Return process refreshed.",
+  "adminCommandCenterBadge": "Live Command Center",
+  "adminCommandCenterHeadline": "Priority now: late tickets, stockouts, cash close, and driver delays.",
+  "adminCommandCenterBody": "Built for the restaurant owner: fast decisions, clear operations, and direct links into every station.",
+  "adminActiveOrdersMetric": "Active orders",
+  "adminUrgentAlertsMetric": "Urgent alerts",
+  "adminOpenOrdersBoard": "Open Orders Board",
+  "adminCashCloseAction": "Cash Close",
+  "adminNeedsAttentionTitle": "Needs Your Attention",
+  "adminNeedsAttentionSubtitle": "Prioritized by guest impact and shift risk.",
+  "adminLateTicketsLabel": "{count} tickets running late",
+  "@adminLateTicketsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminLateTicketsDetail": "Shawarma and fryer station need attention within 4 minutes.",
+  "adminOpenOrdersAction": "Open orders",
+  "adminBelowThresholdDetail": "{count} ingredients below threshold.",
+  "@adminBelowThresholdDetail": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "adminDriverDelayedLabel": "Driver delayed on plated delivery",
+  "adminDriverDelayedDetail": "Order #{orderId} on the road — {customer}.",
+  "@adminDriverDelayedDetail": {
+    "placeholders": {
+      "orderId": {
+        "type": "String"
+      },
+      "customer": {
+        "type": "String"
+      }
+    }
+  },
+  "adminDeliveryRouteAction": "Delivery route",
+  "adminNoUrgentAlerts": "No urgent alerts — operations look stable.",
+  "adminLiveOrdersSubtitle": "Every order channel with prep and settlement context.",
+  "adminCashCloseTitle": "Cash Close",
+  "adminCashCloseSubtitle": "Verify sales, tips, and refunds.",
+  "adminReviewShiftClose": "Review Shift Close",
+  "adminStockoutImpactTitle": "Menu Stockout Impact",
+  "adminStockoutImpactSubtitle": "Connect low ingredients to dishes before peak.",
+  "adminInventoryAction": "Inventory",
+  "adminNoCriticalStock": "No critical stock alerts.",
+  "adminDriversReturnsTitle": "Drivers & Returns",
+  "adminDriversReturnsSubtitle": "Food delivery and plated returns in one view.",
+  "adminNoActiveDelivery": "No active delivery tasks.",
+  "adminOrderLabel": "Order #{id}",
+  "@adminOrderLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminTrayReturnLabel": "Tray return #{id}",
+  "@adminTrayReturnLabel": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "adminReturnBadge": "Return",
+  "adminOpenDeliveryTasks": "Open Delivery Tasks",
+  "adminTeamSnapshotSubtitle": "Current team by station.",
+  "adminQuickControlsTitle": "Quick Controls",
+  "adminQuickControlsSubtitle": "Admin links without bottom navigation.",
+  "platesOpsBadge": "Plate Asset & Deposit Ops",
+  "platesOpsHeadline": "Track trays, bowls, breakage, deposits, and returns from one board.",
+  "platesInStock": "In stock",
+  "platesCirculating": "Circulating",
+  "platesAssetValue": "Asset value",
+  "platesCatalogSubtitle": "Physical assets with SKU, value, stock, and circulation.",
+  "platesReturnWindowValue": "48 hours",
+  "platesReturnReminders": "Return reminders",
+  "platesBreakageTrackSubtitle": "Track breakage and missing items before settlement.",
+  "platesBreakageDefault": "Plate breakage",
+  "platesBreakageDescription": "Description",
+  "platesBreakageLossJod": "Loss (JOD)",
+  "platesStockNowUnits": "Stock now {count} units",
+  "@platesStockNowUnits": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "supportTicketsTitle": "Support Tickets",
+  "supportTicketsHero": "Customer Support Center",
+  "supportTicketNotFound": "Ticket not found",
+  "supportTicketStatusLabel": "Status",
+  "supportTicketStatusUpdated": "Status updated",
+  "supportTicketConversation": "Conversation",
+  "supportTicketReplyArabic": "Arabic reply",
+  "supportTicketReplyEnglish": "English reply",
+  "supportTicketSendReply": "Send reply",
+  "supportTicketReplyFailed": "Could not send reply",
+  "supportTicketReplySent": "Reply sent",
+  "supportTicketCustomerFeedback": "Customer feedback",
+  "hrAttendancePayrollTitle": "Attendance & Payroll",
+  "hrStaffAttendanceTooltip": "Staff attendance",
+  "hrPeriodDaily": "Daily",
+  "hrPeriodMonthly": "Monthly",
+  "hrTotalPayable": "Total payable",
+  "hrExportCsv": "Export CSV",
+  "hrExportCsvSuccess": "Payroll CSV exported.",
+  "hrPayrollRulesTitle": "Payroll rules",
+  "hrPayrollDelayRule": "Delay > {minutes} min → fee {fee} {currency}",
+  "@hrPayrollDelayRule": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "fee": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "hrDelayLabel": "Delay",
+  "hrOvertimeLabel": "Overtime",
+  "hrPercentLabel": "Percent",
+  "hrPayableLabel": "Payable",
+  "hrMinutesShort": "min",
+  "hrHoursShort": "h",
+  "hrOutcomeFullPay": "Full pay",
+  "hrOutcomeDelayFee": "Delay fee",
+  "hrOutcomeDelayFeeDouble": "Fee ×2",
+  "hrOutcomeAbsence": "Absence",
+  "hrOutcomeOvertime": "Overtime",
+  "productEditorAddMenuItem": "Add menu item",
+  "productEditorSaveFirst": "Save the item first",
+  "productEditorPreview": "Preview",
+  "productEditorBadge": "Menu Item Editor",
+  "productEditorBadgeDesc": "Edit pricing, variants, modifiers, media, and station routing.",
+  "productEditorNameSection": "Name & Description",
+  "productEditorNameSectionDesc": "Bilingual copy shown on customer menu cards.",
+  "productEditorArabicName": "Arabic name",
+  "productEditorEnglishName": "English name",
+  "productEditorArabicDesc": "Arabic description",
+  "productEditorEnglishDesc": "English description",
+  "productEditorPricingSection": "Pricing & Variants",
+  "productEditorPricingSectionDesc": "Base price and portion/variant deltas.",
+  "productEditorBasePrice": "Base price",
+  "productEditorAddVariant": "Add variant",
+  "productEditorAddPortionTitle": "Add portion size",
+  "productEditorPortionKeyLabel": "Key (e.g. super)",
+  "productEditorPortionPriceDelta": "Price delta (JOD)",
+  "productEditorEnterPortionKey": "Enter a portion key",
+  "productEditorPortionAdded": "Portion added",
+  "productEditorPortionKeyExists": "Key already exists",
+  "productEditorModifiersSection": "Modifiers",
+  "productEditorModifiersSectionDesc": "Attach catalog add-ons to this item.",
+  "productEditorNoAddons": "No catalog addons yet.",
+  "productEditorMediaSection": "Media & Display",
+  "productEditorMediaSectionDesc": "Images and menu presentation.",
+  "productEditorMediaFallback": "No image yet — add 1 to 5 photos.",
+  "productEditorPrepStationSection": "Prep Station",
+  "productEditorPrepStationSectionDesc": "Route tickets to the correct kitchen lane.",
+  "productEditorAvailabilitySection": "Availability & Channels",
+  "productEditorAvailabilitySectionDesc": "Control where this item is visible.",
+  "productEditorAvailableNow": "Available now",
+  "productEditorFeatured": "Featured in menu",
+  "productEditorSavePublishSection": "Save & Publish",
+  "productEditorSavePublishCreateDesc": "Create then publish to the menu.",
+  "productEditorSavePublishEditDesc": "Persists edits to catalog and custom menu items.",
+  "productEditorAddMinImages": "Add at least 1 image (up to 5)",
+  "productEditorCheckRequiredFields": "Check required fields",
+  "productEditorMenuItemSaved": "Menu item saved",
+  "productEditorPublishToMenu": "Publish to menu",
+  "productEditorPublishTitle": "Publish menu item",
+  "productEditorPublishMessage": "The item will appear in selected sales channels.",
+  "productEditorAddImageBeforePublish": "Add at least 1 image before publishing",
+  "productEditorCheckNamePrice": "Check name and price",
+  "productEditorPublished": "Published",
+  "productEditorBackToMenu": "Back to menu management",
+  "productEditorPrepStationShawarma": "Shawarma station",
+  "productEditorPrepStationFryer": "Fryer station",
+  "productEditorPrepStationColdPrep": "Cold prep",
+  "productEditorPrepStationDrinks": "Drinks",
+  "auditLogTrueTrailBadge": "True Audit Trail",
+  "auditLogHeroHeadline": "Track who changed what, when, and from which operational area.",
+  "auditLogTodayEvents": "Today events",
+  "auditLogSensitiveChanges": "Sensitive changes",
+  "auditLogNeedsReview": "Needs review",
+  "auditLogRequestConfirmMessage": "A detailed audit request will be logged for review.",
+  "auditLogExportLog": "Export log",
+  "auditLogExportDownloaded": "Export file downloaded",
+  "auditLogTimelineSubtitle": "Timeline of administrative and operational events.",
+  "auditLogNoEventsInScope": "No events in this scope.",
+  "auditLogDetailedAuditRequested": "Detailed audit requested",
+  "auditLogAuditExported": "Audit log exported",
+  "auditLogShiftCloseApproved": "Shift close approved",
+  "auditLogUserActivated": "User activated",
+  "auditLogUserDeactivated": "User deactivated",
+  "auditLogDepositSettingsSaved": "Deposit settings saved",
+  "auditLogTrayBreakageArea": "Tray breakage",
+  "auditLogInventoryArea": "Inventory",
+  "auditLogUserRoleChanged": "User role changed",
+  "auditLogCashierShiftClosed": "Cashier shift closed",
+  "auditLogTrayDepositEdited": "Tray deposit policy edited",
+  "auditLogFiltersTitle": "Audit Filters",
+  "auditLogFiltersSubtitle": "Scope the log quickly.",
+  "auditLogGovernanceTitle": "Governance Snapshot",
+  "auditLogGovernanceSubtitle": "Security and permission posture for this shift.",
+  "auditLogFailedLogins": "Failed login attempts",
+  "auditLogPermissionChanges": "Permission changes",
+  "auditLogFinancialEdits": "Financial edits",
+  "auditLogInventorySubtitle": "Recent stock adjustments from inventory.",
+  "auditLogNoStockChanges": "No stock changes yet.",
+  "auditLogActorOwner": "Owner",
+  "auditLogActorOperator": "Operator",
+  "auditLogActorFinance": "Finance",
+  "auditLogActorLogistics": "Logistics",
+  "auditLogActorSystem": "System",
+  "auditLogAreaGovernance": "Governance",
+  "auditLogAreaReports": "Reports",
+  "auditLogAreaCashClose": "Cash close",
+  "auditLogAreaRolesPrivacy": "Roles & Privacy",
+  "auditLogAreaFinance": "Finance",
+  "auditLogAreaAdminLog": "Admin log",
+  "auditLogToday": "Today",
+  "auditLogYesterday1820": "Yesterday 18:20",
+  "auditLogToday0942": "Today 09:42",
+  "auditLogToday0858": "Today 08:58",
+  "auditLogActorOperatorAhmad": "Operator Ahmad",
+  "auditLogActorCashierLayla": "Cashier Layla",
+  "auditLogAuditRequestDetail": "Request logged for review before shift close.",
+  "auditLogAuditExportDetail": "CSV audit file downloaded.",
+  "auditLogShiftCloseDetail": "Revenue, tips, and refunds approved.",
+  "auditLogDepositSavedDetail": "Deposit {amount} JOD · {hours}h window",
+  "@auditLogDepositSavedDetail": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "auditLogRoleChangeDetail": "Sara moved from Kitchen to Station Supervisor.",
+  "auditLogCashierCloseDetail": "Revenue, tips, and refunds were approved.",
+  "auditLogTrayDepositEditDetail": "Global deposit and return window updated.",
+  "auditLogSystemEntryDetail": "Automated admin event recorded.",
+  "orderDetailAdminSendUpdate": "Send update",
+  "orderDetailAdminOrderTotal": "Order total",
+  "orderDetailAdminDeposit": "Deposit",
+  "orderDetailAdminOnRoute": "On route",
+  "orderDetailAdminOnRouteValue": "28 min",
+  "orderDetailAdminSendGuestUpdateTitle": "Send guest update",
+  "orderDetailAdminUpdatePreparing": "Order is preparing",
+  "orderDetailAdminUpdateReady": "Order is ready",
+  "orderDetailAdminUpdateOnWay": "Driver is on the way",
+  "orderDetailAdminUpdateDelay": "Delay — we apologize",
+  "orderDetailAdminUpdateSent": "Update sent",
+  "orderDetailAdminDelayNoticeSent": "Delay notice sent",
+  "orderDetailAdminGuestPaymentTitle": "Guest & Payment",
+  "orderDetailAdminGuestPaymentSubtitle": "Key context for closing and contact.",
+  "orderDetailAdminGuestLabel": "Guest",
+  "orderDetailAdminChannelLabel": "Channel",
+  "orderDetailAdminFoodTotal": "Food total",
+  "orderDetailAdminTrayDeposit": "Tray deposit",
+  "orderDetailAdminKitchenTicketTitle": "Kitchen Ticket",
+  "orderDetailAdminKitchenTicketSubtitle": "Items and station summary.",
+  "orderDetailAdminPrepStationNote": "Prep station",
+  "orderDetailAdminOpenKitchen": "Open kitchen pass",
+  "orderDetailAdminActionsTitle": "Admin Actions",
+  "orderDetailAdminContactGuest": "Contact guest",
+  "orderDetailAdminChangeStatus": "Change order status",
+  "orderDetailAdminChangeStatusTitle": "Change status",
+  "orderDetailAdminBackToBoard": "Back to order board",
+  "orderDetailAdminPosReceived": "POS received",
+  "orderDetailAdminKitchenPrep": "Kitchen prep",
+  "orderDetailAdminCloseSettle": "Close & settle",
+  "orderDetailAdminTimelineNext": "Next",
+  "orderDetailAdminTimelineTitle": "Order Timeline",
+  "orderDetailAdminTimelineSubtitle": "From entry to settlement.",
+  "orderDetailAdminRisksTitle": "Risks & Notes",
+  "orderDetailAdminDeliveryTiming": "Delivery timing",
+  "orderDetailAdminNoDeposit": "No deposit",
+  "orderDetailAdminOperationalNote": "Operational note",
+  "productEditorHeroHeadline": "Edit bilingual naming, pricing, variants, modifiers, prep routing, and availability.",
+  "productEditorIdentitySubtitle": "Customer-facing copy shown in the menu.",
+  "productEditorMediaGalleryHint": "1–5 images — warm food media for each angle.",
+  "productEditorMediaUsage": "Product gallery • menu card • POS tile",
+  "productEditorStationSubtitle": "Controls where the kitchen ticket appears.",
+  "orderDetailAdminContactPhone": "+962 7 9000 0000",
+  "commonOpen": "Open",
+  "settingsOpsBadge": "Operations Settings",
+  "settingsOpsHeroHeadline": "Control hours, stations, order rules, delivery zones, taxes, receipts, and alerts.",
+  "settingsAppAdminHeroHeadline": "System configuration, integrations, and platform permissions.",
+  "settingsHeroNineSections": "9 sections",
+  "settingsHeroUiOnly": "Settings",
+  "settingsHeroDrawerNav": "Drawer navigation",
+  "settingsBusinessHoursTitle": "Business Hours & Order Rules",
+  "settingsBusinessHoursSubtitle": "Set service state, prep rules, and pre-order behavior.",
+  "settingsAcceptingOrders": "Accepting orders now",
+  "settingsDeliveryEnabled": "Delivery enabled now",
+  "settingsTodayHours": "Today hours",
+  "settingsTodayHoursValue": "8:00 AM - 12:00 AM",
+  "settingsPreOrdersLabel": "Pre-orders",
+  "settingsPreOrdersDetail": "Up to 3 days ahead",
+  "settingsStationsTitle": "Stations & Operating Rules",
+  "settingsStationsSubtitle": "Route menu items to kitchen stations and prep rules.",
+  "settingsShawarmaStation": "Shawarma station",
+  "settingsShawarmaPrepDetail": "8 min average prep",
+  "settingsFryerStation": "Fryer station",
+  "settingsFryerLoadDetail": "Load limit 12 tickets",
+  "settingsLateTicketThreshold": "Late-ticket threshold",
+  "settingsLateTicketDetail": "Escalate after 15 minutes",
+  "settingsSystemPlatformTitle": "System & platform",
+  "settingsSystemPlatformSubtitle": "Integrations, users, roles, and audit.",
+  "settingsIntegrationsDetail": "Supabase, SMS, payments",
+  "settingsAuditTrailDetail": "Full platform audit trail",
+  "settingsStaffTitle": "Staff & attendance",
+  "settingsStaffSubtitle": "Shift roster, attendance, and approvals.",
+  "settingsStaffHoursDetail": "Shifts, attendance, and hours",
+  "settingsAttendanceHrLabel": "Attendance & HR",
+  "settingsAttendanceHrDetail": "Attendance log and approvals",
+  "settingsFeesTaxesTitle": "Fees & Taxes",
+  "settingsFeesTaxesSubtitle": "Delivery fees, tax display, and receipt layout.",
+  "settingsDeliveryFeesLabel": "Delivery fees",
+  "settingsDeliveryFeesDetail": "Zone-based delivery charge rules",
+  "settingsReceiptTemplateLabel": "Receipt template",
+  "settingsReceiptTemplateDetail": "Logo, footer, and tax line layout",
+  "settingsNotificationsTitle": "Notifications & Alerts",
+  "settingsNotificationsSubtitle": "Kitchen, inventory, and tray-return alerts.",
+  "settingsKitchenAlertsDetail": "Prep delay and station overload",
+  "settingsLowStockAlert": "Low stock alert",
+  "settingsLowStockDetail": "Below 15% threshold",
+  "settingsTrayReturnReminders": "Tray return reminders",
+  "settingsTrayReturnDetail": "60 minutes after delivery",
+  "settingsAppAdminShortcuts": "App admin shortcuts",
+  "settingsOpsShortcuts": "Operations shortcuts",
+  "settingsShortcutsSubtitle": "Jump to high-traffic admin screens.",
+  "settingsAttendancePayrollShortcut": "Attendance & payroll",
+  "settingsPreOrdersShortcut": "Pre-orders",
+  "ordersMgmtFilterTitle": "Filter order board",
+  "ordersMgmtFilterMessage": "Filter by channel, station, or delay status.",
+  "ordersMgmtFilterTooltip": "Filter",
+  "ordersMgmtLaneNeedsDecision": "Needs Decision",
+  "ordersMgmtLaneNeedsDecisionSub": "Late, missing, or escalated",
+  "ordersMgmtLanePreparing": "Preparing",
+  "ordersMgmtLanePreparingSub": "Kitchen in progress",
+  "ordersMgmtLaneReadyRoute": "Ready / On Route",
+  "ordersMgmtLaneReadyRouteSub": "Ready to handoff or on the road",
+  "ordersMgmtHeroBadge": "Live Order Board",
+  "ordersMgmtOpenOrders": "Open orders",
+  "ordersMgmtActiveValue": "Active value",
+  "ordersMgmtPlatedOrders": "Plated orders",
+  "ordersMgmtEmptyLane": "No orders here",
+  "ordersMgmtOpenDetail": "Open detail",
+  "ordersMgmtEscalate": "Escalate",
+  "ordersMgmtEscalationLogged": "Escalation logged",
+  "ordersMgmtRecentlyClosed": "Recently Closed",
+  "ordersMgmtHistory": "History",
+  "ordersMgmtDeliveredStatus": "Delivered",
+  "financialCloseBadge": "Cash Close & Profit Split",
+  "financialCloseHeroHeadline": "Reconcile shift revenue, cash, cards, deposits, tips, then approve net profit.",
+  "financialCloseShiftRevenue": "Shift revenue",
+  "financialCloseOrdersCount": "Orders",
+  "financialCloseDistributableNet": "Distributable net",
+  "financialCloseSummaryTitle": "Shift Close Summary",
+  "financialCloseSummarySubtitle": "Operational numbers before approving the close.",
+  "financialCloseStatusLabel": "Status",
+  "financialCloseStatusReady": "Ready to close",
+  "financialCloseTenderTitle": "Tender Reconciliation",
+  "financialCloseTenderSubtitle": "Cash, card, and wallet must match the cashier ledger.",
+  "financialCloseCash": "Cash",
+  "financialCloseCards": "Cards",
+  "financialCloseWallet": "Wallet",
+  "financialCloseDepositsTitle": "Deposits & Refunds",
+  "financialCloseDepositsSubtitle": "Tray deposits, refunds, and breakage exposure.",
+  "financialCloseRefundsToday": "Refunds today",
+  "financialCloseBreakageFees": "Potential breakage fees",
+  "financialCloseReviewTrayReturns": "Review tray returns",
+  "financialCloseTipsTitle": "Tips & Variance",
+  "financialCloseTipsSubtitle": "Shift tip pool and reconciliation variance.",
+  "financialCloseCurrentTips": "Current shift tips",
+  "financialCloseVariance": "Reconciliation variance",
+  "financialCloseSplitTitle": "Net Profit Split",
+  "financialCloseSplitSubtitle": "Owner and operator shares after costs and tips.",
+  "financialCloseApproveTitle": "Approve Close",
+  "financialCloseOwnerViewOnly": "Owner view only",
+  "financialCloseApprovedReadOnly": "Close approved (read-only)",
+  "financialCloseAwaitingApproval": "Awaiting operator approval",
+  "financialCloseApproveSubtitle": "Lock the shift after reconciliation checks.",
+  "financialCloseApproveShift": "Approve shift close",
+  "financialCloseApproveConfirmTitle": "Approve close",
+  "financialCloseApproveConfirmMessage": "This will lock shift totals for audit.",
+  "financialCloseApprovedSuccess": "Shift close approved",
+  "settingsStaffCardSubtitle": "Staff hours and attendance.",
+  "settingsFeesTaxesCardSubtitle": "Sales tax, delivery fees, deposits, and receipts.",
+  "settingsDeliveryFeesZoneMinimum": "Zone-based fee and minimum order",
+  "settingsReceiptTemplateTerms": "Logo, tax, and return terms",
+  "settingsNotificationsCardSubtitle": "Kitchen, driver, inventory, and return alerts.",
+  "settingsLateKitchenTicketAlerts": "Late kitchen ticket alerts",
+  "settingsShortcutsJumpSubtitle": "Jump to specialized settings without bottom navigation.",
+  "ordersMgmtHeroHeadline": "Track every order from POS to kitchen to handoff.",
+  "ordersMgmtRecentlyClosedSub": "Completed or delivered orders for quick audit.",
+  "ordersMgmtOpPending": "Waiting for kitchen confirmation or item availability.",
+  "ordersMgmtOpReady": "Ready for handoff, verify packaging.",
+  "ordersMgmtOpOnWay": "On route, monitor arrival time.",
+  "ordersMgmtOpPreparing": "In preparation, watch station timing.",
+  "financialCloseDepositsExcludedSubtitle": "Deposits are conditional funds and excluded from profit split.",
+  "financialCloseTipsSeparateSubtitle": "Tips stay separate from revenue and go to staff.",
+  "financialCloseSplitAfterCostsSubtitle": "After excluding tips, deposits, and operating expenses.",
+  "financialCloseApproveUiOnlySubtitle": "Review totals before approving the shift close.",
+  "financialCloseApproveMockMessage": "Shift close approval will be logged for audit.",
+  "financialCloseReportDownloaded": "Report downloaded — print to PDF from browser",
+  "financialCloseVarianceLabel": "Variance",
+  "actionAdd": "Add",
+  "catalogCrudAdded": "Added",
+  "catalogCrudCheckFields": "Check required fields",
+  "catalogCrudUpdated": "Updated",
+  "catalogCrudUpdateFailed": "Update failed",
+  "catalogCrudDeleted": "Deleted",
+  "catalogCrudNameEn": "Name EN",
+  "catalogCrudNameAr": "Name AR",
+  "catalogCrudIconKey": "Icon key",
+  "catalogCrudPrice": "Price",
+  "catalogCrudMinOneImage": "Add at least 1 image",
+  "menuCatalogTitle": "Menu Catalog",
+  "menuCatalogTabCategories": "Categories",
+  "menuCatalogTabAddons": "Addons",
+  "menuCatalogTabRelated": "Related",
+  "menuCatalogAddCategory": "Add category",
+  "menuCatalogAddAddon": "Add addon",
+  "menuCatalogAddonImageRequired": "Add an image for the addon",
+  "menuCatalogLinkRelated": "Link related products",
+  "menuCatalogLinkRelatedSubtitle": "Example IDs: {sampleIds}",
+  "@menuCatalogLinkRelatedSubtitle": {
+    "placeholders": {
+      "sampleIds": {
+        "type": "String"
+      }
+    }
+  },
+  "menuCatalogProductId": "Product ID",
+  "menuCatalogRelatedIds": "Related IDs (comma-separated)",
+  "menuCatalogSaveLink": "Save link",
+  "menuCatalogSaved": "Saved",
+  "menuCatalogEnterProductId": "Enter a product ID",
+  "promoMgmtTabDiscounts": "Discounts",
+  "promoMgmtTabOffers": "Offers",
+  "promoMgmtCreateCombo": "Create combo",
+  "promoMgmtDiscountPercent": "Discount %",
+  "promoMgmtDiscountProduct": "Discount product",
+  "promoMgmtMenuItemId": "Menu item ID",
+  "promoMgmtNewOffer": "New offer",
+  "promoMgmtSubscriptionMeal": "Subscription meal",
+  "orderDetailAdminHeroTitle": "Order #{orderId} admin timeline",
+  "@orderDetailAdminHeroTitle": {
+    "placeholders": {
+      "orderId": {
+        "type": "String"
+      }
+    }
+  },
+  "orderDetailAdminHeroBody": "{customer} • Verify handoff timing, deposit, and notes before closing.",
+  "@orderDetailAdminHeroBody": {
+    "placeholders": {
+      "customer": {
+        "type": "String"
+      }
+    }
+  },
+  "orderDetailAdminActionsSubtitle": "Update status, notes, and escalations for this order.",
+  "orderDetailAdminChangeStatusMessage": "Choose the next status for this order.",
+  "orderDetailAdminTimelinePosDetail": "Order entered and payment captured.",
+  "orderDetailAdminTimelinePrepDetail": "Items prepared and packed.",
+  "orderDetailAdminTimelineOnWayDetail": "Courier is on the way to the guest.",
+  "orderDetailAdminTimelineWaitingDetail": "Waiting for the next operational step.",
+  "orderDetailAdminTimelineCloseDetail": "Confirm handoff, deposit, and any breakage fee.",
+  "orderDetailAdminRisksSubtitle": "What the owner should know before closing this order.",
+  "orderDetailAdminRiskTimingDetail": "Eight minutes above route average.",
+  "orderDetailAdminRiskTrayDetail": "Confirm tray return expectation at handoff.",
+  "hrPayrollOnTimeRule": "On time (≤ {minutes} min) → 100% salary",
+  "@hrPayrollOnTimeRule": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hrPayrollDelayDoubleRule": "Late > {minutes} min → fee ×2",
+  "@hrPayrollDelayDoubleRule": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hrPayrollAbsenceRule": "Late > {minutes} min → absence (0% even if present)",
+  "@hrPayrollAbsenceRule": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "hrPayrollOvertimeRule": "Work > {minutes} min beyond schedule → {multiplier}× extra hours pay",
+  "@hrPayrollOvertimeRule": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "multiplier": {
+        "type": "String"
+      }
+    }
+  },
+  "supportTicketsHeroBody": "{count} active tickets — update status, reply to customers, track feedback.",
+  "@supportTicketsHeroBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "supportTicketStatusOpen": "Open",
+  "supportTicketStatusInProgress": "In progress",
+  "supportTicketStatusWaiting": "Waiting",
+  "supportTicketStatusResolved": "Resolved",
+  "supportTicketStatusClosed": "Closed",
+  "reportsHubBadge": "Restaurant Analytics Hub",
+  "reportsHubHeadline": "Connect sales, channels, tips, waste, and trays to clear operating decisions.",
+  "reportsOpsScorecardsTitle": "Operating Scorecards",
+  "reportsOpsScorecardsSubtitle": "Numbers that drive today, not just export files.",
+  "reportsAvgOrderLabel": "Average order",
+  "reportsTrayReturnSuccess": "Tray return success",
+  "reportsWasteBreakageCost": "Waste & breakage cost",
+  "reportsTrendSubtitle": "Order trend across recent service hours.",
+  "reportsTodayPeakLabel": "Today peak",
+  "reportsTodayPeakValue": "Lunch and evening delivery",
+  "reportsDecisionsTitle": "Recommended Decisions",
+  "reportsDecisionsSubtitle": "Analytics connected to restaurant operations.",
+  "reportsInsightShawarmaLabel": "Increase shawarma prep before lunch",
+  "reportsInsightShawarmaDetail": "Channel sales are 12% above baseline.",
+  "reportsReviewFryerLabel": "Review fryer wastage",
+  "reportsApproveTipsLabel": "Approve tip distribution",
+  "reportsModulesTitle": "Analytics Modules",
+  "reportsPlatesDepositsTitle": "Plates & deposits",
+  "reportsExportTitle": "Export & Share",
+  "reportsExportSubtitle": "Exports are now an outcome, not the whole screen.",
+  "reportsExportOperatorOnly": "Export is available to the operator role only.",
+  "preOrderOpsBadge": "Pre-order Operations",
+  "preOrderOpsHeadline": "Review tomorrow orders, prep capacity, trays, and pickup windows before accepting pre-orders.",
+  "preOrderOpsNeedDecision": "Need decision",
+  "preOrderOpsPickupWindows": "Pickup windows",
+  "preOrderOpsReservedTrays": "Reserved trays",
+  "preOrderOpsEmptyMessage": "No pre-orders pending",
+  "preOrderOpsReviewQueue": "Review Queue",
+  "preOrderOpsReviewQueueSub": "Each pre-order needs a clear decision before prep.",
+  "preOrderOpsAccept": "Accept",
+  "preOrderOpsAccepted": "Pre-order accepted",
+  "preOrderOpsAdjustTime": "Adjust time",
+  "preOrderOpsPickupUpdated": "Pickup time updated",
+  "preOrderOpsPrepCapacity": "Prep Capacity",
+  "preOrderOpsPrepCapacitySub": "Accept orders based on available stations.",
+  "preOrderOpsStationShawarma": "Shawarma",
+  "preOrderOpsStationPizza": "Pizza",
+  "preOrderOpsStationPlated": "Plated trays",
+  "preOrderOpsRulesTitle": "Pre-order Rules",
+  "preOrderOpsRulesSubtitle": "Configure pre-order rules and availability.",
+  "preOrderOpsRuleCutoff": "Cutoff: 9 PM",
+  "preOrderOpsRuleMinPrep": "Minimum prep: 2 hours",
+  "preOrderOpsRuleTraysBeforePay": "Confirm trays before payment",
+  "rewardsAdminSetupTitle": "Rewards Setup",
+  "rewardsAdminPointsRules": "Points rules",
+  "rewardsAdminPointsPerJod": "{points} points per JOD spent",
+  "@rewardsAdminPointsPerJod": {
+    "placeholders": {
+      "points": {
+        "type": "String"
+      }
+    }
+  },
+  "rewardsAdminAddReward": "Add reward",
+  "rewardsAdminPointsRequired": "Points required",
+  "rewardsAdminCategory": "Category",
+  "rewardsAdminAddToCatalog": "Add to catalog",
+  "rewardsAdminActiveRewards": "Active rewards",
+  "rewardsAdminRewardAdded": "Reward added",
+  "rewardsAdminCategoryDrinks": "Drinks",
+  "rewardsAdminCategorySides": "Sides",
+  "rewardsAdminCategoryMain": "Main",
+  "rewardsAdminArtIcon": "Art icon",
+  "rewardsAdminColorAccent": "Color accent",
+  "rewardsAdminBadgeAr": "Badge AR",
+  "rewardsAdminBadgeEn": "Badge EN",
+  "rewardsAdminArtGeneric": "Generic",
+  "rewardsAdminArtBurger": "Burger",
+  "rewardsAdminArtDrink": "Drink",
+  "rewardsAdminArtFries": "Fries",
+  "rewardsAdminArtBowl": "Bowl",
+  "rewardsAdminArtDonut": "Donut",
+  "rewardsAdminColorGold": "Gold",
+  "rewardsAdminColorOrange": "Orange",
+  "rewardsAdminColorOlive": "Olive",
+  "rewardsAdminColorDelivery": "Delivery",
+  "rewardsAdminColorDineIn": "Dine in",
+  "rewardsAdminColorSecondary": "Secondary",
+  "rewardsAdminColorTertiary": "Tertiary",
+  "rewardsAdminColorOutline": "Outline",
+  "rewardsAdminSoldOut": "Sold out",
+  "rewardsAdminTitleAr": "Title AR",
+  "rewardsAdminTitleEn": "Title EN",
+  "rewardsAdminDescriptionAr": "Description AR",
+  "rewardsAdminDescriptionEn": "Description EN",
+  "rewardsAdminPointsLabel": "Points",
+  "rewardsAdminRewardMeta": "{points} pts · {category}",
+  "@rewardsAdminRewardMeta": {
+    "placeholders": {
+      "points": {"type": "int"},
+      "category": {"type": "String"}
+    }
+  },
+  "quantityIncrease": "Increase quantity",
+  "quantityDecrease": "Decrease quantity",
+  "menuMgmtPublished": "Published",
+  "menuMgmtDraft": "Draft",
+  "menuMgmtPublish": "Publish",
+  "menuMgmtUnpublish": "Unpublish",
+  "menuMgmtPublishSuccess": "Published",
+  "menuMgmtHiddenFromMenu": "Hidden from customer menu",
+  "filterByRole": "Filter by role",
+  "rbacUserNotFound": "User not found",
+  "rbacAccountActions": "Account actions",
+  "rbacApprove": "Approve",
+  "rbacReject": "Reject",
+  "rbacSuspend": "Suspend",
+  "rbacActivate": "Activate",
+  "rbacInvite": "Invite",
+  "rbacInviteMockMessage": "Invite sent",
+  "rbacApprovedMessage": "Approved",
+  "rbacRejectedMessage": "Rejected",
+  "rbacSuspendedMessage": "Suspended",
+  "rbacActivatedMessage": "Activated",
+  "rbacAssignedRoles": "Assigned roles",
+  "rbacStatusActive": "Active",
+  "rbacStatusPendingApproval": "Pending approval",
+  "rbacStatusSuspended": "Suspended",
+  "rbacOwnershipPercent": "Ownership %",
+  "rbacOwnershipHint": "e.g. 35",
+  "reviewModerationTitle": "Review Moderation",
+  "reviewModerationHeroBody": "{count} reviews awaiting moderation — approve to publish, reject or flag for follow-up.",
+  "@reviewModerationHeroBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewModerationReject": "Reject",
+  "reviewModerationFlag": "Flag",
+  "reviewModerationUpdated": "Review updated",
+  "reviewModerationStatusPending": "Pending",
+  "reviewModerationStatusApproved": "Approved",
+  "reviewModerationStatusRejected": "Rejected",
+  "reviewModerationStatusFlagged": "Flagged",
+  "plateEditorBadge": "Asset & Deposit Editor",
+  "plateEditorHeadline": "Set asset value, stock, deposit, and breakage fees.",
+  "plateEditorAssetIdentityTitle": "Asset Identity",
+  "plateEditorAssetIdentitySubtitle": "Used by inventory, delivery, and returns.",
+  "plateEditorAssetNameAr": "Arabic asset name",
+  "plateEditorAssetNameEn": "English asset name",
+  "plateEditorAssetSku": "Asset SKU",
+  "plateEditorReplacementValue": "Replacement value",
+  "plateEditorStockTitle": "Stock & Circulation",
+  "plateEditorStockSubtitle": "Operational counts used by the return flow.",
+  "plateEditorRequiresDeposit": "Requires deposit on delivery",
+  "plateEditorAvailableDelivery": "Available for delivery orders",
+  "plateEditorDepositRulesSubtitle": "Deposit rules for this asset type.",
+  "plateEditorConditionFeesTitle": "Condition & Fees",
+  "plateEditorConditionFeesSubtitle": "Used during plated return processing.",
+  "plateEditorFeeFullBreakage": "Full breakage fee",
+  "plateEditorFeeScratch": "Scratch / minor damage",
+  "plateEditorFeeMissing": "Missing on return",
+  "plateEditorSaveTitle": "Save Asset",
+  "plateEditorSaveSubtitle": "Save plate settings for the menu.",
+  "plateEditorSavedSuccess": "Asset settings saved",
+  "plateEditorBackToPlates": "Back to plates",
+  "adminShowLess": "Show less",
+  "adminTipRowSubtitle": "ID: {orderId} · {hours} hrs",
+  "@adminTipRowSubtitle": {
+    "placeholders": {
+      "orderId": {
+        "type": "String"
+      },
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "rbacRoleDefaultsSaved": "Role defaults saved",
+  "rbacNoPendingChanges": "No pending permission changes to save",
+  "rbacResetDefaults": "Reset defaults",
+  "rbacResetDefaultsSuccess": "Reset to factory defaults",
+  "rbacUsersWithRoleLink": "{count} users with this role — view list",
+  "@rbacUsersWithRoleLink": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportFilterPageSubtitle": "The same filter used inside the reports hub, available as a full admin page.",
+  "reviewModerationAlreadyProcessed": "This review was already moderated.",
+  "reviewModerationRejectConfirmTitle": "Reject review?",
+  "reviewModerationRejectConfirmMessage": "The review will be hidden from the public menu.",
+  "reviewModerationFlagConfirmTitle": "Flag review?",
+  "reviewModerationFlagConfirmMessage": "The review will be marked for support follow-up.",
+  "supportFaqDeleteConfirmTitle": "Delete FAQ entry?",
+  "supportFaqDeleteConfirmMessage": "This entry will be removed from the public FAQ list.",
+  "supportFaqDeleteBlocked": "Keep at least one FAQ entry in the editor.",
+  "supportFaqDeleted": "FAQ entry removed",
+  "rbacResetConfirmTitle": "Reset role defaults?",
+  "rbacResetConfirmMessage": "All permissions for this role will return to factory defaults.",
+  "rbacAllPermissionsDenied": "At least one permission must be allowed before saving.",
+  "adminTipPoolEmpty": "Tip pool must be greater than zero before approval.",
+  "reportFilterAtLeastOneModule": "Select at least one report module.",
+  "marketingBlogUnpublishConfirmTitle": "Move post to draft?",
+  "marketingBlogUnpublishConfirmMessage": "Published posts will no longer appear on the blog.",
+  "marketingBlogDeleteConfirmTitle": "Delete blog post?",
+  "marketingBlogDeleteConfirmMessage": "This removes the post from marketing and the customer blog.",
+  "marketingBlogDraftNeedsTitle": "Add a title before publishing this draft.",
+  "opsKitchenBoardRefreshed": "Kitchen pass refreshed.",
+  "opsInventoryItemRefreshed": "Inventory item refreshed.",
+  "inventoryItemSelectTitle": "Select an inventory item",
+  "inventoryItemSelectBody": "Open an alert from the inventory dashboard to review stock, supplier, and adjustment history.",
+  "inventoryItemOpenDashboard": "Open inventory dashboard",
+  "opsStaffTipsRefreshed": "Daily tips refreshed.",
+  "opsCashierHistoryRefreshed": "Transaction history refreshed.",
+  "supportChatPriorityHigh": "High",
+  "supportChatPriorityNormal": "Normal",
+  "supportChatWaitingMinutes": "Waiting {minutes} min · {id}",
+  "@supportChatWaitingMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "supportChatAcceptAction": "Accept chat",
+  "supportChatAccepted": "Chat accepted",
+  "supportChatAcceptBodyAr": "محادثة مباشرة مع {customer} ({id})",
+  "supportChatAcceptBodyEn": "Live chat with {customer} ({id})",
+  "@supportChatAcceptBodyAr": {
+    "placeholders": {
+      "customer": {"type": "String"},
+      "id": {"type": "String"}
+    }
+  },
+  "@supportChatAcceptBodyEn": {
+    "placeholders": {
+      "customer": {"type": "String"},
+      "id": {"type": "String"}
+    }
+  },
+  "supportChatAcceptReplyAr": "تم قبول المحادثة من قائمة الانتظار.",
+  "supportChatAcceptReplyEn": "Chat accepted from the queue.",
+  "supportChatAcceptFailed": "Chat is no longer in the queue.",
+  "supportOrderLookupReadOnlyBanner": "Read-only lookup — orders cannot be edited",
+  "supportOrderLookupSearchLabel": "Order # or customer",
+  "supportOrderLookupSearchHint": "e.g. 4821",
+  "supportOrderLookupNoResults": "No matching orders",
+  "staffTipHistoryNoData": "No tip history rows to export for this range.",
+  "marketingCalendarSelectDay": "Select a day on the calendar first.",
+  "marketingCalendarScheduleConfirmTitle": "Schedule campaign?",
+  "marketingCalendarScheduleConfirmMessage": "Adds an internal planning slot only — does not publish to customers.",
+  "marketingCalendarScheduledSuccess": "Campaign slot scheduled",
+  "marketingPushScheduleConfirmTitle": "Schedule push send?",
+  "marketingPushScheduleConfirmMessage": "Schedules an in-app customer notification.",
+  "marketingPushDeleteConfirmTitle": "Delete push campaign?",
+  "marketingPushDeleteConfirmMessage": "This removes the draft or scheduled campaign from the marketing list.",
+  "marketingPushBodyRequired": "Add notification body text before scheduling.",
+  "marketingPushScheduleFailed": "Campaign draft could not be scheduled.",
+  "opsDeliveryOrderRefreshed": "Delivery order refreshed.",
+  "marketingSocialMetaBusiness": "Meta Business",
+  "marketingSocialInstagramPlatform": "Instagram",
+  "marketingSocialMetaSubtitle": "Restaurant Facebook page",
+  "marketingSocialInstagramSubtitle": "Posts & reels publishing",
+  "permissionMatrixEmpty": "No capabilities apply to this role.",
+  "permissionAccessFull": "Full",
+  "permissionAccessRead": "Read",
+  "permissionAccessDenied": "Denied",
+  "permissionAccessPostponed": "Postponed",
+  "rbacPostponedUntil": "Postponed until {date}",
+  "@rbacPostponedUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "rbacSelectPostponeDate": "Select postpone date",
+  "rbacPostponeDateRequired": "Choose a date when postponing access.",
+  "rbacOpenRoleDefaults": "Open role defaults in Screen A",
+  "loginDemoModeNotice": "Use hub shortcuts to open a role workspace.",
+  "loginDemoSignedIn": "Signed in successfully.",
+  "roleSelectionNoApprovedRoles": "No approved roles yet. Contact your app administrator.",
+  "registerViewTerms": "View terms",
+  "rbacRoleGroupManagement": "Management",
+  "rbacRoleGroupSpecialist": "Specialist",
+  "rbacRoleGroupOperations": "Operations",
+  "rbacRoleGroupManagementSpecialist": "Management & specialist",
+  "customerDiscountsEmptyTitle": "No active discounts",
+  "customerDiscountsEmptyBody": "Check back soon or browse the menu for current offers.",
+  "customerPromoNotFoundTitle": "Promotion not found",
+  "customerPromoNotFoundBody": "This offer may have expired or been removed.",
+  "promoApplyUnavailable": "This promotion cannot be applied to your cart right now.",
+  "permSupportRefunds": "Order refunds & cancel",
+  "permSupportSla": "SLA & shift handover",
+  "permMarketingMenuPricing": "Menu price publish",
+  "permMarketingPublish": "Campaign publish",
+  "permOperatorCampaignApprove": "Campaign co-approval",
+  "supportSlaAtRisk": "SLA at risk",
+  "supportSlaBreached": "SLA breached",
+  "supportResolvedToday": "Resolved (24h)",
+  "supportAvgResponseTime": "Avg response",
+  "supportAvgResponseMinutes": "{minutes} min",
+  "@supportAvgResponseMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "supportShiftHandoverTitle": "Shift handover",
+  "supportShiftHandoverHint": "Open tickets, blockers, and notes for the next agent…",
+  "supportShiftHandoverSaved": "Handover notes saved",
+  "supportShiftHandoverLast": "Last handover: {when}",
+  "@supportShiftHandoverLast": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "supportAgentPerformanceTitle": "Agent performance (today)",
+  "supportTicketCustomerPhone": "Customer phone",
+  "supportTicketCustomerAddress": "Customer address",
+  "supportTicketEscalateOperator": "Escalate to Operator",
+  "supportTicketEscalateCashier": "Escalate to Cashier",
+  "supportTicketEscalated": "Ticket escalated to {target}",
+  "@supportTicketEscalated": {
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "supportOrderLookupActionsBanner": "Support can issue refunds and cancel orders.",
+  "supportOrderRefundAction": "Issue refund",
+  "supportOrderCancelAction": "Cancel order",
+  "supportOrderRefundConfirmTitle": "Issue refund?",
+  "supportOrderRefundConfirmMessage": "A refund will be logged for audit.",
+  "supportOrderCancelConfirmTitle": "Cancel order?",
+  "supportOrderCancelConfirmMessage": "This marks the order cancelled and logs audit.",
+  "supportOrderRefunded": "Refund recorded",
+  "supportOrderCancelled": "Order cancelled",
+  "supportOrderAlreadyCancelled": "Order is already cancelled",
+  "marketingPublishSubmit": "Submit for operator approval",
+  "marketingPublishSubmitted": "Sent to operator for co-approval",
+  "marketingPublishPendingTitle": "Pending operator approval",
+  "marketingOfferActiveToggle": "Customer visible",
+  "marketingOfferActiveOn": "Live",
+  "marketingOfferActiveOff": "Hidden",
+  "marketingPublishApprove": "Approve & publish",
+  "marketingPublishReject": "Reject",
+  "marketingPublishApproved": "Campaign published",
+  "marketingPublishRejected": "Campaign rejected",
+  "marketingSubscriptionContentOnly": "Manage subscription content and billing options.",
+  "marketingSubscriptionValue": "Subscription value",
+  "marketingSubscriptionMealsTotal": "{count} meals",
+  "@marketingSubscriptionMealsTotal": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marketingSubscriptionRegularSum": "Regular sum: {amount}",
+  "@marketingSubscriptionRegularSum": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "marketingSubscriptionSaving": "You save: {amount}",
+  "@marketingSubscriptionSaving": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "marketingSubscriptionCoverage": "Meals per day",
+  "marketingSubscriptionUncovered": "{count} days without meals",
+  "@marketingSubscriptionUncovered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marketingSubscriptionDayMeals": "Day {day}: {count} meals",
+  "@marketingSubscriptionDayMeals": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marketingSubscriptionFreeDelivery": "Free delivery",
+  "marketingSubscriptionEditDay": "Day {day}",
+  "@marketingSubscriptionEditDay": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "marketingSubscriptionPickMeals": "Pick meals for this day",
+  "auditEventRefund": "Refund",
+  "auditEventOrderCancel": "Order cancel",
+  "auditEventPriceChange": "Price change",
+  "auditEventOfferPublished": "Offer published",
+  "marketingMenuPricePublishTitle": "Menu price publish",
+  "marketingMenuPricePublishBanner": "Marketing can update base menu prices. Each change is logged for operator audit before publish.",
+  "operatorEscalationsInboxTitle": "Support escalations",
+  "operatorEscalationsInboxSubtitle": "Tickets escalated from Support — refund, cancel, or policy requests",
+  "operatorEscalationAcknowledge": "Acknowledge",
+  "operatorEscalationAcknowledged": "Escalation acknowledged",
+  "operatorEscalationOpenTicket": "Open ticket",
+  "operatorEscalationTarget": "Escalated to {target}",
+  "@operatorEscalationTarget": {
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "marketingHomeOpsTitle": "Today’s marketing pulse",
+  "marketingVisitorsToday": "Visitors today",
+  "marketingPurchasesToday": "Purchases today",
+  "marketingActiveCampaigns": "Active campaigns",
+  "marketingTopSellers": "Top 10 purchasing items",
+  "marketingTopRatings": "Top ratings",
+  "marketingPendingApprovals": "{count} need approval",
+  "@marketingPendingApprovals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "marketingSocialInteractions": "Social interactions",
+  "marketingInsightFilterAll": "All",
+  "marketingInsightFilterPending": "Pending approval",
+  "marketingInsightFilterApproved": "Approved",
+  "marketingInsightOpenEdit": "Open editor",
+  "marketingInsightPurchasesHint": "Filter by day range — tap a row for related product",
+  "marketingInsightVisitorsHint": "Visitor volume by segment — tap for related campaign",
+  "marketingProductSearchHint": "Search product by name",
+  "marketingDiscountProductPoints": "Product points (locked)",
+  "marketingProductCreate": "Create product",
+  "marketingProductPreviewTab": "Preview",
+  "marketingProductDetailsTitle": "Product details",
+  "marketingLoyaltyCreateSheetTitle": "New loyalty occasion",
+  "marketingSocialMonitorTitle": "Social monitoring",
+  "marketingSocialUsers": "Users",
+  "marketingSocialBlogs": "Blogs",
+  "marketingSocialActionsToday": "Actions today",
+  "marketingSocialActionsWeek": "Actions this week",
+  "marketingSocialNoIntegration": "Monitoring only — app integrations are managed elsewhere.",
+  "marketingPromoCodesTitle": "Promotion codes",
+  "marketingPromoCodeCreate": "Create promo code",
+  "marketingPromoCodeValue": "Code",
+  "marketingPromoCodeCategory": "Category",
+  "marketingPromoCategoryDiscount": "Discount",
+  "marketingPromoCategoryAddPoints": "Add points",
+  "marketingPromoCategoryFreeMeal": "Free meal",
+  "marketingPromoCategoryInviteFriends": "Invite friends",
+  "marketingBlogPlatforms": "Posted to",
+  "marketingBlogPickPlatforms": "Social platforms",
+  "brandingSettingsTitle": "App branding",
+  "brandingSettingsSubtitle": "Name, slogan, and logo shown on splash and login (EN + AR).",
+  "brandingNameEn": "App name (English)",
+  "brandingNameAr": "App name (Arabic)",
+  "brandingSloganEn": "Slogan (English)",
+  "brandingSloganAr": "Slogan (Arabic)",
+  "brandingLogoUrl": "Logo image URL",
+  "brandingLogoUrlHint": "Leave empty for default logo",
+  "brandingSave": "Save branding",
+  "brandingReset": "Reset to defaults",
+  "brandingSaved": "Branding updated",
+  "drawerGroupHub": "Hub",
+  "drawerGroupOrders": "Orders",
+  "drawerGroupMenu": "Menu",
+  "drawerGroupPeople": "People",
+  "drawerGroupMoney": "Money",
+  "drawerGroupSettings": "Settings",
+  "drawerGroupPromotions": "Promotions",
+  "drawerGroupCatalog": "Catalog",
+  "drawerGroupLoyalty": "Loyalty",
+  "drawerGroupContent": "Content",
+  "cartMoreFulfillmentOptions": "More delivery options",
+  "cartHideFulfillmentOptions": "Show fewer options"
 }

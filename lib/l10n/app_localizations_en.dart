@@ -12,6 +12,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Ayletna Restaurant';
 
   @override
+  String get brandName => 'Ayletna';
+
+  @override
   String get brandNameAr => 'مطعم عيلتنا';
 
   @override
@@ -28,6 +31,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get actionSave => 'Save';
+
+  @override
+  String get favoritesSaved => 'Saved to favorites';
+
+  @override
+  String get favoritesRemoved => 'Removed from favorites';
 
   @override
   String get actionAddToCart => 'Add to Cart';
@@ -81,10 +90,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerAsStaff => 'Request staff role (pending approval)';
 
   @override
-  String get authLoginRequiredFields => 'Enter your phone or email and password.';
+  String get authLoginRequiredFields =>
+      'Enter your phone or email and password.';
 
   @override
-  String get authForgotIdentifierRequired => 'Enter your registered phone or email.';
+  String get authForgotIdentifierRequired =>
+      'Enter your registered phone or email.';
 
   @override
   String get authOtpInvalid => 'Enter the 6-digit code sent to your phone.';
@@ -93,7 +104,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authPasswordMismatch => 'Passwords do not match.';
 
   @override
-  String get authRegisterFieldsRequired => 'Fill in all required fields and accept the terms.';
+  String get authRegisterFieldsRequired =>
+      'Fill in all required fields and accept the terms.';
 
   @override
   String get authOtpResent => 'A new verification code was sent.';
@@ -102,10 +114,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String get authPasswordResetSuccess => 'Password reset. You can sign in now.';
 
   @override
-  String get roleSelectionNotApproved => 'This role is not approved for your account.';
+  String get roleSelectionNotApproved =>
+      'This role is not approved for your account.';
 
   @override
-  String get pendingApprovalNote => 'Operational roles require operator approval';
+  String get pendingApprovalNote =>
+      'Your account is under review. Our team is verifying your staff credentials to ensure the best service for our guests.';
+
+  @override
+  String get pendingApprovalTimelineTitle => 'Approval progress';
+
+  @override
+  String get pendingApprovalStepSubmitted => 'Submitted';
+
+  @override
+  String get pendingApprovalStepReview => 'Reviewing';
+
+  @override
+  String get pendingApprovalStepActivated => 'Activated';
+
+  @override
+  String get pendingApprovalContactSupport => 'Contact Support';
 
   @override
   String get currencyJod => 'JOD';
@@ -161,10 +190,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get checkoutAppreciationTitle => 'Show your appreciation';
 
   @override
-  String get checkoutAppreciationSubtitle => 'Your kindness fuels our culinary team.';
+  String get checkoutAppreciationSubtitle =>
+      'Your kindness fuels our culinary team.';
 
   @override
-  String get checkoutFairWageNote => '100% of your tips are shared equally among our kitchen and delivery staff as part of our fair-wage commitment.';
+  String get checkoutFairWageNote =>
+      '100% of your tips are shared equally among our kitchen and delivery staff as part of our fair-wage commitment.';
 
   @override
   String get checkoutOrderSummary => 'Order Summary';
@@ -223,6 +254,417 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roleOwner => 'Owner';
 
   @override
+  String get roleAdmin => 'App Admin';
+
+  @override
+  String get roleSupport => 'Support';
+
+  @override
+  String get roleMarketing => 'Marketing';
+
+  @override
+  String get hubAppAdmin => 'App Administration';
+
+  @override
+  String get hubOperator => 'Restaurant Operations';
+
+  @override
+  String get hubOwner => 'Owner Portal';
+
+  @override
+  String get hubSupportDesk => 'Support Desk';
+
+  @override
+  String get hubMarketing => 'Marketing Hub';
+
+  @override
+  String get rolePermissionsTitle => 'Roles & Rules';
+
+  @override
+  String get rolePermissionsSubtitle => 'Default permission bundles per role';
+
+  @override
+  String get userPermissionsTitle => 'Users & Permissions';
+
+  @override
+  String get userPermissionsSubtitle =>
+      'Assigned roles, inherited rules, and overrides';
+
+  @override
+  String get switchRoleTitle => 'Active Role';
+
+  @override
+  String get switchRoleSubtitle =>
+      'Only shown when your account has multiple roles';
+
+  @override
+  String get settingsDarkMode => 'Dark Mode';
+
+  @override
+  String get settingsDarkModeOff => 'Off';
+
+  @override
+  String get settingsDarkModeOn => 'On';
+
+  @override
+  String get settingsNotificationsSummary => 'Push, Email';
+
+  @override
+  String get inheritedRulesTitle => 'Inherited rules';
+
+  @override
+  String get userOverridesTitle => 'User overrides';
+
+  @override
+  String get effectivePermissionsTitle => 'Effective permissions';
+
+  @override
+  String get ownershipPercentageLabel => 'Ownership %';
+
+  @override
+  String pendingApprovalRequestedRoles(String roles) {
+    return 'Requested access: $roles. An app administrator will review your account.';
+  }
+
+  @override
+  String get supportChatQueueTitle => 'Live chat queue';
+
+  @override
+  String get supportChatQueueSubtitle =>
+      'Accept waiting customer conversations.';
+
+  @override
+  String get supportOrderLookupTitle => 'Order lookup';
+
+  @override
+  String get supportOrderLookupSubtitle =>
+      'Search orders by number or customer name for ticket context.';
+
+  @override
+  String get supportFaqEditorTitle => 'FAQ editor';
+
+  @override
+  String get supportFaqAddTitle => 'Add FAQ entry';
+
+  @override
+  String get supportFaqAddAction => 'Add entry';
+
+  @override
+  String get supportFaqPublished => 'Published';
+
+  @override
+  String get supportFaqDraft => 'Draft';
+
+  @override
+  String get supportFaqPublish => 'Publish';
+
+  @override
+  String get supportFaqUnpublish => 'Unpublish';
+
+  @override
+  String get supportFaqSavedMock => 'FAQ saved';
+
+  @override
+  String get supportFaqValidation => 'Enter at least English title and body.';
+
+  @override
+  String get supportFaqBodyLabelEn => 'Body (EN)';
+
+  @override
+  String get supportFaqBodyLabelAr => 'Body (AR)';
+
+  @override
+  String get hubOwnerPerformanceSummary => 'Performance summary';
+
+  @override
+  String get hubOwnerShare => 'Owner share';
+
+  @override
+  String hubOwnerSharePercent(String percent) {
+    return '$percent% stake';
+  }
+
+  @override
+  String get hubNetRevenue => 'Net revenue';
+
+  @override
+  String get hubTodayRevenue => 'Today revenue';
+
+  @override
+  String hubTodayOrders(String count) {
+    return '$count orders';
+  }
+
+  @override
+  String get hubSupportSummary => 'Support summary';
+
+  @override
+  String get hubOpenTickets => 'Open tickets';
+
+  @override
+  String get hubChatQueue => 'Chat queue';
+
+  @override
+  String get hubPendingReviews => 'Pending reviews';
+
+  @override
+  String get hubAvgWait => 'Avg wait';
+
+  @override
+  String hubAvgWaitMinutes(String minutes) {
+    return '${minutes}m';
+  }
+
+  @override
+  String hubAvgWaitMinutesAr(String minutes) {
+    return '$minutes د';
+  }
+
+  @override
+  String get marketingCampaignSummary => 'Campaign summary';
+
+  @override
+  String get marketingActiveOffers => 'Active offers';
+
+  @override
+  String get marketingCombosPromos => 'Combos / promos';
+
+  @override
+  String get marketingLoyaltyMembers => 'Loyalty members';
+
+  @override
+  String get marketingRedemptionRate => 'Redemption rate';
+
+  @override
+  String get marketingVisualCatalog => 'Visual catalog';
+
+  @override
+  String get marketingCampaignCalendar => 'Campaign calendar';
+
+  @override
+  String get marketingSocialIntegrations => 'Social integrations';
+
+  @override
+  String get marketingBlogTitle => 'Blog & content';
+
+  @override
+  String get marketingBlogAddPost => 'New blog post';
+
+  @override
+  String get marketingBlogPublished => 'Published';
+
+  @override
+  String get marketingBlogDraft => 'Draft';
+
+  @override
+  String get marketingBlogDraftAdded => 'Draft added';
+
+  @override
+  String get marketingBlogStatusToggled => 'Publication status updated';
+
+  @override
+  String get marketingBlogNewDraftAr => 'مسودة جديدة';
+
+  @override
+  String get marketingBlogNewDraftEn => 'New draft';
+
+  @override
+  String get marketingTabOffers => 'Offers';
+
+  @override
+  String get marketingTabCombos => 'Combos';
+
+  @override
+  String get marketingTabDiscounts => 'Discounts';
+
+  @override
+  String get marketingTabSubscriptions => 'Subscriptions';
+
+  @override
+  String get marketingTabCampaign => 'Campaign';
+
+  @override
+  String get marketingTabLoyalty => 'Loyalty';
+
+  @override
+  String get marketingTabSocial => 'Social';
+
+  @override
+  String get marketingTabBlog => 'Blog';
+
+  @override
+  String get marketingPushCampaignsTitle => 'Push campaigns';
+
+  @override
+  String get marketingPushCampaignsSubtitle =>
+      'Draft and schedule customer push notifications.';
+
+  @override
+  String get marketingPushAddDraft => 'New push draft';
+
+  @override
+  String get marketingPushDraft => 'Draft';
+
+  @override
+  String get marketingPushScheduledStatus => 'Scheduled';
+
+  @override
+  String get marketingPushSent => 'Sent';
+
+  @override
+  String get marketingPushScheduled => 'Scheduled for';
+
+  @override
+  String get marketingPushScheduleAction => 'Schedule send';
+
+  @override
+  String get marketingPushScheduledMock => 'Campaign scheduled';
+
+  @override
+  String get marketingPushDraftAdded => 'Push draft added';
+
+  @override
+  String get marketingPushNewDraftAr => 'إشعار جديد';
+
+  @override
+  String get marketingPushNewDraftEn => 'New notification';
+
+  @override
+  String get marketingPushFieldTitleAr => 'Title (Arabic)';
+
+  @override
+  String get marketingPushFieldTitleEn => 'Title (English)';
+
+  @override
+  String get marketingPushFieldBodyAr => 'Body (Arabic)';
+
+  @override
+  String get marketingPushFieldBodyEn => 'Body (English)';
+
+  @override
+  String get marketingPushNoSchedule => 'No schedule yet';
+
+  @override
+  String get opsInboxTitle => 'Shift inbox';
+
+  @override
+  String get opsInboxSubtitle =>
+      'Operational alerts for your role. Customer marketing pushes stay on the customer inbox.';
+
+  @override
+  String get opsInboxShiftAlertTitle => 'Shift reminder';
+
+  @override
+  String get opsInboxShiftAlertBody =>
+      'Confirm attendance and tip status before closing your shift.';
+
+  @override
+  String get opsInboxOrderAlertTitle => 'Active orders need attention';
+
+  @override
+  String get opsInboxOrderAlertBody =>
+      'Open your hub dashboard to review queued work.';
+
+  @override
+  String get opsInboxOpenHub => 'Open hub';
+
+  @override
+  String get platedReturnPickupScheduled => 'Pickup scheduled';
+
+  @override
+  String get platedReturnSelfReturnLogged => 'Self-return logged';
+
+  @override
+  String get marketingCalendarNoEvents => 'No campaigns scheduled for this day';
+
+  @override
+  String get marketingCalendarScheduleAction => 'Schedule campaign';
+
+  @override
+  String get marketingCalendarMockSave => 'Campaign saved';
+
+  @override
+  String get marketingCalendarPlanningOnlyNotice =>
+      'Internal planning calendar only — slots do not publish offers, blog posts, or customer notifications. Use Offers, Blog, or Push campaigns to go live.';
+
+  @override
+  String marketingCalendarCampaignsOn(String date) {
+    return 'Campaigns on $date';
+  }
+
+  @override
+  String get marketingSocialConnectTitle => 'Connect accounts';
+
+  @override
+  String get marketingSocialConnectSubtitle =>
+      'Connect your social accounts to publish updates.';
+
+  @override
+  String get marketingSocialConnected => 'Connected';
+
+  @override
+  String get marketingSocialNotConnected => 'Not connected';
+
+  @override
+  String get marketingSocialDisconnect => 'Disconnect account';
+
+  @override
+  String get marketingSocialConnectOAuth => 'Connect with OAuth';
+
+  @override
+  String get marketingSocialConnectedMock => 'Connected';
+
+  @override
+  String get marketingSocialDisconnectedMock => 'Account disconnected';
+
+  @override
+  String marketingSocialConnectedSince(String date) {
+    return 'Connected since $date';
+  }
+
+  @override
+  String get marketingKindOffer => 'Offer';
+
+  @override
+  String get marketingKindPromo => 'Promo';
+
+  @override
+  String get marketingKindSocial => 'Social';
+
+  @override
+  String get marketingKindLoyalty => 'Loyalty';
+
+  @override
+  String get ticketPriorityLow => 'Low';
+
+  @override
+  String get ticketPriorityNormal => 'Normal';
+
+  @override
+  String get ticketPriorityHigh => 'High';
+
+  @override
+  String get ticketSlaOnTrack => 'SLA: On track';
+
+  @override
+  String get ticketSlaAtRisk => 'SLA: At risk';
+
+  @override
+  String get ticketSlaBreached => 'SLA: Breached';
+
+  @override
+  String get ownerViewConfigApplied => 'Owner visibility profile applied';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterByStatus => 'Filter by status';
+
+  @override
+  String get filterByPriority => 'Filter by priority';
+
+  @override
   String get screenCustomizationModal => 'Customize item';
 
   @override
@@ -241,7 +683,31 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeCategoriesTitle => 'Categories';
 
   @override
-  String get homeFeaturedTitle => 'Featured';
+  String get categoryEmptyMessage => 'No items in this category yet.';
+
+  @override
+  String get homeExploreMenuTitle => 'Explore Menu';
+
+  @override
+  String get homeFeaturedTitle => 'Featured Offers';
+
+  @override
+  String get homeStatusLabel => 'STATUS';
+
+  @override
+  String get homePointsLabel => 'Points';
+
+  @override
+  String get homeCategoryAll => 'All';
+
+  @override
+  String get homeFeaturedBadge => 'Featured';
+
+  @override
+  String get homeAddToOrder => 'Add to Order';
+
+  @override
+  String get homeSeeAll => 'See All';
 
   @override
   String get categoryEyebrow => 'Category';
@@ -250,13 +716,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categoryMezzeTitle => 'Cold Mezze & Appetizers';
 
   @override
-  String get categoryMezzeDescription => 'Discover our selection of traditional Levantine starters, prepared daily with fresh ingredients and authentic Jordanian flavors.';
+  String get categoryMezzeDescription =>
+      'Discover our selection of traditional Levantine starters, prepared daily with fresh ingredients and authentic Jordanian flavors.';
 
   @override
   String get categoryShawarmaHeroTitle => 'Legendary Beef Shawarma';
 
   @override
-  String get categoryShawarmaHeroDescription => 'Slow-roasted premium beef marinated in traditional spices, served with our signature garlic whip.';
+  String get categoryShawarmaHeroDescription =>
+      'Slow-roasted premium beef marinated in traditional spices, served with our signature garlic whip.';
 
   @override
   String get actionAddToOrder => 'Add to Order';
@@ -358,10 +826,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deliveryWork => 'Work';
 
   @override
-  String get deliveryHomeAddress => 'Villa 42, Al-Reem Street, Sweifieh, Amman, Jordan';
+  String get deliveryHomeAddress =>
+      'Villa 42, Al-Reem Street, Sweifieh, Amman, Jordan';
 
   @override
-  String get deliveryWorkAddress => 'The Business Park, Building 5, 3rd Floor, King Hussein Business Park, Amman';
+  String get deliveryWorkAddress =>
+      'The Business Park, Building 5, 3rd Floor, King Hussein Business Park, Amman';
 
   @override
   String get deliveryEdit => 'Edit';
@@ -385,7 +855,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deliveryStandardAvailable => 'Standard Delivery Available';
 
   @override
-  String get deliveryExpressZoneNote => 'Your current selection is within our 15-minute express zone.';
+  String get deliveryExpressZoneNote =>
+      'Your current selection is within our 15-minute express zone.';
 
   @override
   String get deliveryStandardFee => 'Standard Delivery Fee';
@@ -561,7 +1032,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deliveryReturnsTitle => 'Delivery - Past Returns History';
 
   @override
-  String get deliveryReturnsSubtitle => 'Review all completed tray collections and financial settlements.';
+  String get deliveryReturnsSubtitle =>
+      'Review all completed tray collections and financial settlements.';
 
   @override
   String get deliveryReturnsContext => 'Logistics / Returns';
@@ -658,7 +1130,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get screenNotReady => 'Screen loading…';
 
   @override
-  String get platedReturnReminderBody => 'Please prepare the tray for pickup after your meal.';
+  String get platedReturnReminderBody =>
+      'Please prepare the tray for pickup after your meal.';
 
   @override
   String get redemptionConfirmBody => 'Redeem your points for this reward?';
@@ -685,7 +1158,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get depositTrayConfiguration => 'Tray Configuration';
 
   @override
-  String get depositConfigurationSubtitle => 'Manage global deposit rates and automated return policy enforcement.';
+  String get depositConfigurationSubtitle =>
+      'Manage global deposit rates and automated return policy enforcement.';
 
   @override
   String get depositGlobalTitle => 'Global Deposit';
@@ -694,10 +1168,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get depositGlobalAmountLabel => 'Global Deposit Amount (JOD)';
 
   @override
-  String get depositGlobalHelp => 'This amount is automatically added to all takeaway and delivery orders containing trays.';
+  String get depositGlobalHelp =>
+      'This amount is automatically added to all takeaway and delivery orders containing trays.';
 
   @override
-  String get depositWarning => 'Increasing the deposit amount will update all new orders instantly. Active pending orders will retain their original deposit value.';
+  String get depositWarning =>
+      'Increasing the deposit amount will update all new orders instantly. Active pending orders will retain their original deposit value.';
 
   @override
   String get depositReturnWindow => 'Return Window';
@@ -804,6 +1280,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get screenOrderHistory => 'Order history';
 
   @override
+  String get drawerOrders => 'Orders';
+
+  @override
+  String get drawerBlog => 'Blog';
+
+  @override
   String get screenWallet => 'Wallet';
 
   @override
@@ -814,6 +1296,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get screenRewardsHistory => 'Rewards history';
+
+  @override
+  String get rewardsHistoryEmpty =>
+      'No point activity yet. Order or redeem a reward.';
 
   @override
   String get screenPaymentHistory => 'Payment history';
@@ -831,7 +1317,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get drawerSectionMore => 'More';
 
   @override
-  String get demoActionTag => 'Demo';
+  String get demoActionTag => '';
 
   @override
   String get screenAddresses => 'Addresses';
@@ -945,6 +1431,199 @@ class AppLocalizationsEn extends AppLocalizations {
   String get screenOffersManagement => 'Offers management';
 
   @override
+  String get screenDiscountsManagement => 'Discounts management';
+
+  @override
+  String get marketingDiscountLabelAr => 'Label AR';
+
+  @override
+  String get marketingDiscountLabelEn => 'Label EN';
+
+  @override
+  String get marketingLinkedRewardTitle => 'Linked reward';
+
+  @override
+  String get marketingLinkedRewardNone => 'No linked reward';
+
+  @override
+  String get marketingCampaignAttachTitle => 'Attach offers & combos';
+
+  @override
+  String get marketingCalendarCampaignAuthorityNotice =>
+      'Campaigns control customer visibility. Offers, combos, and discounts only appear while their campaign window is live.';
+
+  @override
+  String get screenAddonsManagement => 'Add-ons';
+
+  @override
+  String get menuCatalogTabProduct => 'Product';
+
+  @override
+  String get menuCatalogTabProducts => 'Products';
+
+  @override
+  String get menuCatalogTabReward => 'Reward';
+
+  @override
+  String get menuCatalogTabRatings => 'Ratings';
+
+  @override
+  String get menuCatalogPickProduct => 'Select a product';
+
+  @override
+  String get menuCatalogPickProductHint =>
+      'Choose a product to manage add-ons or related items.';
+
+  @override
+  String get menuCatalogRewardPointsLabel => 'Reward points';
+
+  @override
+  String get menuCatalogEditRating => 'Edit rating & remarks';
+
+  @override
+  String get menuCatalogRatingSaved => 'Rating updated';
+
+  @override
+  String get menuCatalogManageProduct => 'Manage';
+
+  @override
+  String get menuCatalogNoProducts => 'No products yet';
+
+  @override
+  String get menuCatalogAttachAddonsHint =>
+      'Select approved add-ons for this product. Mark free or set a price override.';
+
+  @override
+  String get menuCatalogAddonPriceOverride => 'Price override (JOD)';
+
+  @override
+  String get menuCatalogRelatedMultiSelectHint =>
+      'Select related products from the active menu.';
+
+  @override
+  String get catalogCrudAddonKey => 'Key';
+
+  @override
+  String get catalogCrudLabelEn => 'Label EN';
+
+  @override
+  String get catalogCrudLabelAr => 'Label AR';
+
+  @override
+  String get catalogCrudSortOrder => 'Sort order';
+
+  @override
+  String get catalogCrudDescriptionEn => 'Description EN';
+
+  @override
+  String get catalogCrudDescriptionAr => 'Description AR';
+
+  @override
+  String get catalogCrudMealType => 'Meal type';
+
+  @override
+  String get catalogCrudMealMain => 'Main';
+
+  @override
+  String get catalogCrudMealSide => 'Side';
+
+  @override
+  String get catalogCrudMealDrink => 'Drink';
+
+  @override
+  String get catalogCrudMealDessert => 'Dessert';
+
+  @override
+  String get loyaltyOccasionsTitle => 'Occasion rewards';
+
+  @override
+  String get loyaltyOccasionsSubtitle =>
+      'Active occasions apply to all customers.';
+
+  @override
+  String get loyaltyOccasionAddCustom => 'Add custom occasion';
+
+  @override
+  String get loyaltyOccasionRewardEn => 'Reward title EN';
+
+  @override
+  String get loyaltyOccasionRewardAr => 'Reward title AR';
+
+  @override
+  String get loyaltyOccasionPoints => 'Bonus points';
+
+  @override
+  String get rewardsAdminTiersHint =>
+      'Earn and redeem rates by points balance band.';
+
+  @override
+  String rewardsAdminTierRange(String min, String max) {
+    return '$min–$max pts';
+  }
+
+  @override
+  String rewardsAdminTierRates(String earn, String redeem) {
+    return 'Earn $earn/JOD · Redeem ×$redeem';
+  }
+
+  @override
+  String get rewardsAdminTierMin => 'Min points';
+
+  @override
+  String get rewardsAdminTierMax => 'Max points (blank = open)';
+
+  @override
+  String get rewardsAdminTierEarn => 'Earn per JOD';
+
+  @override
+  String get rewardsAdminTierRedeem => 'Redeem factor';
+
+  @override
+  String get marketingCampaignScheduleTitle => 'Campaign schedule';
+
+  @override
+  String get marketingCampaignScheduleHint =>
+      'Pick or create a campaign window. Activating always requires a fresh schedule.';
+
+  @override
+  String get marketingCampaignNew => 'New campaign';
+
+  @override
+  String get marketingCampaignNone => 'No campaign';
+
+  @override
+  String get marketingCampaignPickExisting => 'Existing campaign';
+
+  @override
+  String get marketingCampaignInvalidWindow => 'End must be after start';
+
+  @override
+  String marketingScheduleStart(String when) {
+    return 'Start: $when';
+  }
+
+  @override
+  String marketingScheduleEnd(String when) {
+    return 'End: $when';
+  }
+
+  @override
+  String get marketingRewardPointsLabel => 'Reward points';
+
+  @override
+  String get marketingVisibilityNeedsSchedule =>
+      'Schedule a campaign before showing this item';
+
+  @override
+  String get marketingCampaignAdjust => 'Adjust campaign';
+
+  @override
+  String get marketingBadgeEn => 'Badge EN';
+
+  @override
+  String get marketingBadgeAr => 'Badge AR';
+
+  @override
   String get screenLoyaltyConfig => 'Loyalty config';
 
   @override
@@ -960,7 +1639,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get screenAppIntegrations => 'App Integrations';
 
   @override
-  String get integrationsSecurityNote => 'Fill the credentials your provider gave you. Secrets are stored securely in production (Supabase Vault) — never in app code.';
+  String get integrationsSecurityNote =>
+      'Fill the credentials your provider gave you. Secrets are stored securely in production (Supabase Vault) — never in app code.';
 
   @override
   String get integrationsSaveAll => 'Save all integrations';
@@ -972,10 +1652,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get integrationsTestConnection => 'Test connection';
 
   @override
-  String get integrationsTestSuccess => 'Connection test passed (mock).';
+  String get integrationsTestSuccess => 'Connection test passed';
 
   @override
-  String get integrationsTestIncomplete => 'Complete the required fields for this section first.';
+  String get integrationsTestIncomplete =>
+      'Complete the required fields for this section first.';
 
   @override
   String get integrationsStatusConfigured => 'Configured';
@@ -992,7 +1673,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get integrationsSupabaseTitle => 'Supabase';
 
   @override
-  String get integrationsSupabaseSubtitle => 'Database, auth, realtime, and edge functions.';
+  String get integrationsSupabaseSubtitle =>
+      'Database, auth, realtime, and edge functions.';
 
   @override
   String get integrationsSupabaseUrl => 'Project URL';
@@ -1004,13 +1686,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get integrationsSupabaseAnonKey => 'Anon (public) key';
 
   @override
-  String get integrationsSupabaseAnonKeyHint => 'eyJhbGciOiJIUzI1NiIsInR5cCI6...';
+  String get integrationsSupabaseAnonKeyHint =>
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6...';
 
   @override
-  String get integrationsSupabaseServiceRoleKey => 'Service role key (server only)';
+  String get integrationsSupabaseServiceRoleKey =>
+      'Service role key (server only)';
 
   @override
-  String get integrationsSupabaseServiceRoleKeyHint => 'For Edge Functions / backend deploy';
+  String get integrationsSupabaseServiceRoleKeyHint =>
+      'For Edge Functions / backend deploy';
 
   @override
   String get integrationsSupabaseProjectRef => 'Project reference ID';
@@ -1022,7 +1707,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get integrationsSmsTitle => 'SMS provider';
 
   @override
-  String get integrationsSmsSubtitle => 'OTP codes and plate return SMS (Unifonic, Twilio, etc.).';
+  String get integrationsSmsSubtitle =>
+      'OTP codes and plate return SMS (Unifonic, Twilio, etc.).';
 
   @override
   String get integrationsSmsProvider => 'Provider name';
@@ -1052,37 +1738,43 @@ class AppLocalizationsEn extends AppLocalizations {
   String get integrationsWhatsappTitle => 'WhatsApp Business';
 
   @override
-  String get integrationsWhatsappSubtitle => 'Friendly return reminders and customer updates.';
+  String get integrationsWhatsappSubtitle =>
+      'Friendly return reminders and customer updates.';
 
   @override
   String get integrationsWhatsappBusinessAccountId => 'Business account ID';
 
   @override
-  String get integrationsWhatsappBusinessAccountIdHint => 'Meta Business account ID';
+  String get integrationsWhatsappBusinessAccountIdHint =>
+      'Meta Business account ID';
 
   @override
   String get integrationsWhatsappPhoneNumberId => 'Phone number ID';
 
   @override
-  String get integrationsWhatsappPhoneNumberIdHint => 'WhatsApp Cloud API phone number ID';
+  String get integrationsWhatsappPhoneNumberIdHint =>
+      'WhatsApp Cloud API phone number ID';
 
   @override
   String get integrationsWhatsappAccessToken => 'Permanent access token';
 
   @override
-  String get integrationsWhatsappAccessTokenHint => 'System user token from Meta';
+  String get integrationsWhatsappAccessTokenHint =>
+      'System user token from Meta';
 
   @override
   String get integrationsWhatsappWebhookVerifyToken => 'Webhook verify token';
 
   @override
-  String get integrationsWhatsappWebhookVerifyTokenHint => 'Random string for webhook verification';
+  String get integrationsWhatsappWebhookVerifyTokenHint =>
+      'Random string for webhook verification';
 
   @override
   String get integrationsTelephonyTitle => 'Phone & OTP';
 
   @override
-  String get integrationsTelephonySubtitle => 'Support line, country code, and OTP sender number.';
+  String get integrationsTelephonySubtitle =>
+      'Support line, country code, and OTP sender number.';
 
   @override
   String get integrationsSupportPhoneNumber => 'Support phone number';
@@ -1100,25 +1792,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get integrationsOtpSenderNumber => 'OTP sender number';
 
   @override
-  String get integrationsOtpSenderNumberHint => 'Registered sender for verification SMS';
+  String get integrationsOtpSenderNumberHint =>
+      'Registered sender for verification SMS';
 
   @override
   String get integrationsPaymentsTitle => 'Payment gateways';
 
   @override
-  String get integrationsPaymentsSubtitle => 'Stripe, Google Pay, Apple Pay, regional gateways, and licensed wallet.';
+  String get integrationsPaymentsSubtitle =>
+      'Stripe, Google Pay, Apple Pay, regional gateways, and licensed wallet.';
 
   @override
   String get integrationsPaymentGatewayProvider => 'Primary gateway';
 
   @override
-  String get integrationsPaymentGatewayProviderHint => 'Stripe / MyFatoorah / HyperPay / Checkout.com';
+  String get integrationsPaymentGatewayProviderHint =>
+      'Stripe / MyFatoorah / HyperPay / Checkout.com';
 
   @override
   String get integrationsStripePublishableKey => 'Stripe publishable key';
 
   @override
-  String get integrationsStripePublishableKeyHint => 'pk_live_... or pk_test_...';
+  String get integrationsStripePublishableKeyHint =>
+      'pk_live_... or pk_test_...';
 
   @override
   String get integrationsStripeSecretKey => 'Stripe secret key';
@@ -1136,7 +1832,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get integrationsGooglePayMerchantId => 'Google Pay merchant ID';
 
   @override
-  String get integrationsGooglePayMerchantIdHint => 'Google Pay merchant identifier';
+  String get integrationsGooglePayMerchantIdHint =>
+      'Google Pay merchant identifier';
 
   @override
   String get integrationsGooglePayMerchantName => 'Google Pay merchant name';
@@ -1148,25 +1845,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get integrationsApplePayMerchantId => 'Apple Pay merchant ID';
 
   @override
-  String get integrationsApplePayMerchantIdHint => 'merchant.com.ayletna.restaurant';
+  String get integrationsApplePayMerchantIdHint =>
+      'merchant.com.ayletna.restaurant';
 
   @override
   String get integrationsPaymentGatewayApiKey => 'Regional gateway API key';
 
   @override
-  String get integrationsPaymentGatewayApiKeyHint => 'MyFatoorah / HyperPay API key';
+  String get integrationsPaymentGatewayApiKeyHint =>
+      'MyFatoorah / HyperPay API key';
 
   @override
   String get integrationsPaymentGatewayMerchantId => 'Regional merchant ID';
 
   @override
-  String get integrationsPaymentGatewayMerchantIdHint => 'Merchant or terminal ID';
+  String get integrationsPaymentGatewayMerchantIdHint =>
+      'Merchant or terminal ID';
 
   @override
   String get integrationsPaymentGatewayWebhookUrl => 'Payment webhook URL';
 
   @override
-  String get integrationsPaymentGatewayWebhookUrlHint => 'https://your-project.supabase.co/functions/v1/payment-webhook';
+  String get integrationsPaymentGatewayWebhookUrlHint =>
+      'https://your-project.supabase.co/functions/v1/payment-webhook';
 
   @override
   String get integrationsWalletSectionTitle => 'Licensed wallet (Jordan)';
@@ -1187,19 +1888,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get integrationsWalletDeepLinkScheme => 'Deep link scheme';
 
   @override
-  String get integrationsWalletDeepLinkSchemeHint => 'ayletna://payment/callback';
+  String get integrationsWalletDeepLinkSchemeHint =>
+      'ayletna://payment/callback';
 
   @override
   String get integrationsWalletWebhookSecret => 'Wallet webhook secret';
 
   @override
-  String get integrationsWalletWebhookSecretHint => 'Shared secret for wallet callbacks';
+  String get integrationsWalletWebhookSecretHint =>
+      'Shared secret for wallet callbacks';
 
   @override
   String get integrationsAiTitle => 'AI agent';
 
   @override
-  String get integrationsAiSubtitle => 'Support chat and operator assistants (ChatGPT, Qwen, etc.).';
+  String get integrationsAiSubtitle =>
+      'Support chat and operator assistants (ChatGPT, Qwen, etc.).';
 
   @override
   String get integrationsAiProvider => 'AI provider';
@@ -1217,7 +1921,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get integrationsAiModelName => 'Model name';
 
   @override
-  String get integrationsAiModelNameHint => 'gpt-4o / qwen-max / claude-3-5-sonnet';
+  String get integrationsAiModelNameHint =>
+      'gpt-4o / qwen-max / claude-3-5-sonnet';
 
   @override
   String get integrationsAiBaseUrl => 'API base URL (optional)';
@@ -1229,25 +1934,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get integrationsAiSupportChatEnabled => 'Enable AI support chat';
 
   @override
-  String get integrationsAiSupportChatEnabledHint => 'Route customer support chat through the configured agent';
+  String get integrationsAiSupportChatEnabledHint =>
+      'Route customer support chat through the configured agent';
 
   @override
   String get integrationsOtherTitle => 'Other services';
 
   @override
-  String get integrationsOtherSubtitle => 'Maps, push notifications, email, and monitoring.';
+  String get integrationsOtherSubtitle =>
+      'Maps, push notifications, email, and monitoring.';
 
   @override
   String get integrationsGoogleMapsApiKey => 'Google Maps API key';
 
   @override
-  String get integrationsGoogleMapsApiKeyHint => 'Restricted by bundle / referrer';
+  String get integrationsGoogleMapsApiKeyHint =>
+      'Restricted by bundle / referrer';
 
   @override
   String get integrationsFcmServerKey => 'FCM server key';
 
   @override
-  String get integrationsFcmServerKeyHint => 'Firebase Cloud Messaging server key';
+  String get integrationsFcmServerKeyHint =>
+      'Firebase Cloud Messaging server key';
 
   @override
   String get integrationsEmailProvider => 'Email provider';
@@ -1277,7 +1986,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get integrationsAttendanceWifiTitle => 'Restaurant WiFi (attendance)';
 
   @override
-  String get integrationsAttendanceWifiSubtitle => 'Staff check-in/out only works on this router WiFi — not mobile data or outside networks.';
+  String get integrationsAttendanceWifiSubtitle =>
+      'Staff check-in/out only works on this router WiFi — not mobile data or outside networks.';
 
   @override
   String get integrationsRestaurantWifiSsid => 'WiFi network name (SSID)';
@@ -1316,13 +2026,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attendanceWifiChecking => 'Checking restaurant WiFi…';
 
   @override
-  String get attendanceWifiCheckFailed => 'Could not read WiFi status. Try again.';
+  String get attendanceWifiCheckFailed =>
+      'Could not read WiFi status. Try again.';
 
   @override
-  String get attendanceWifiNotConfigured => 'Admin has not registered restaurant WiFi yet. Ask the operator to configure it in App Integrations.';
+  String get attendanceWifiNotConfigured =>
+      'Admin has not registered restaurant WiFi yet. Ask the operator to configure it in App Integrations.';
 
   @override
-  String get attendanceWifiRequired => 'Connect to the restaurant WiFi to record attendance. Mobile data and outside networks are blocked.';
+  String get attendanceWifiRequired =>
+      'Connect to the restaurant WiFi to record attendance. Mobile data and outside networks are blocked.';
 
   @override
   String attendanceWifiConnected(String ssid) {
@@ -1331,11 +2044,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String attendanceWifiDemoMatched(String ssid) {
-    return 'Demo mode: treating as restaurant WiFi ($ssid)';
+    return 'Connected to restaurant WiFi ($ssid)';
   }
 
   @override
-  String get attendanceWifiWebDemoNote => 'Web prototype simulates WiFi match when demo mode is on. Production uses the mobile app on restaurant WiFi.';
+  String get attendanceWifiWebDemoNote =>
+      'Attendance check-in uses the restaurant WiFi network.';
 
   @override
   String attendanceWifiWrongNetwork(String current, String expected) {
@@ -1354,10 +2068,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get attendanceFingerprintComingHint => 'Tap fingerprint to confirm arrival time';
+  String get attendanceFingerprintComingHint =>
+      'Tap fingerprint to confirm arrival time';
 
   @override
-  String get attendanceFingerprintLeavingHint => 'Tap fingerprint to confirm leaving time';
+  String get attendanceFingerprintLeavingHint =>
+      'Tap fingerprint to confirm leaving time';
 
   @override
   String get attendanceBiometricTitle => 'Fingerprint approval';
@@ -1366,16 +2082,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get attendanceBiometricConfirm => 'Approve with fingerprint';
 
   @override
-  String get attendanceBiometricCheckInReason => 'Confirm your arrival at the restaurant';
+  String get attendanceBiometricCheckInReason =>
+      'Confirm your arrival at the restaurant';
 
   @override
-  String get attendanceBiometricCheckOutReason => 'Confirm you are leaving the restaurant';
+  String get attendanceBiometricCheckOutReason =>
+      'Confirm you are leaving the restaurant';
 
   @override
-  String get attendanceBiometricUnavailable => 'Biometric authentication is not available on this device.';
+  String get attendanceBiometricUnavailable =>
+      'Biometric authentication is not available on this device.';
 
   @override
-  String get attendanceBiometricFailed => 'Fingerprint verification failed. Try again.';
+  String get attendanceBiometricFailed =>
+      'Fingerprint verification failed. Try again.';
 
   @override
   String get screenAuditLog => 'Audit log';
@@ -1591,10 +2311,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get screenStaffHoursReportDesc => 'Staff hours screen.';
 
   @override
-  String get otpVerificationSubtitle => 'Enter the 6-digit code we sent to your phone.';
+  String get otpVerificationSubtitle =>
+      'Enter the 6-digit code we sent to your phone.';
 
   @override
-  String get screenPaymentSubtitle => 'Choose how you want to pay for this order.';
+  String get screenPaymentSubtitle =>
+      'Choose how you want to pay for this order.';
 
   @override
   String get paymentMethodCash => 'Cash';
@@ -1686,10 +2408,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cashierLogTipEntry => 'Log Tip Entry';
 
   @override
-  String get cashierMenuSearchHint => 'Search menu item, offer, combo, or description...';
+  String get cashierMenuSearchHint =>
+      'Search menu item, offer, combo, or description...';
 
   @override
-  String get cashierPromotionsTitle => 'Offers, combos, discounts, subscriptions';
+  String get cashierPromotionsTitle =>
+      'Offers, combos, discounts, subscriptions';
 
   @override
   String get cashierLocationDetails => 'Location details';
@@ -1722,7 +2446,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cashierSplitPayment => 'Split payment';
 
   @override
-  String get cashierSplitTotalMismatch => 'Split amounts must equal the amount payable.';
+  String get cashierSplitTotalMismatch =>
+      'Split amounts must equal the amount payable.';
 
   @override
   String get cashierPaymentDetails => 'Payment details';
@@ -1794,7 +2519,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cashierSendElectronicTicket => 'Send QR / e-ticket';
 
   @override
-  String get cashierElectronicTicketSent => 'Electronic ticket sent to client phone via WhatsApp';
+  String get cashierElectronicTicketSent =>
+      'Electronic ticket sent to client phone via WhatsApp';
 
   @override
   String get cashierSendOrderPreparation => 'Send order for preparation';
@@ -1869,7 +2595,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cashierPostponeNote => 'Notes (optional)';
 
   @override
-  String get cashierPostponeSaved => 'Order postponed — resume from cashier history';
+  String get cashierPostponeSaved =>
+      'Order postponed — resume from cashier history';
 
   @override
   String get cashierPostponed => 'Postponed';
@@ -1922,10 +2649,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminModulesSection => 'Modules';
 
   @override
-  String get financialTotalsMismatch => 'Totals do not match ledger — recalculate before closing.';
+  String get financialTotalsMismatch =>
+      'Totals do not match ledger — recalculate before closing.';
 
   @override
-  String get screenFinancialCalculationSubtitle => 'Daily revenue, tips, and deposit totals.';
+  String get screenFinancialCalculationSubtitle =>
+      'Daily revenue, tips, and deposit totals.';
 
   @override
   String platedBreakageCost(String amount) {
@@ -1933,7 +2662,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get screenPlatedReturnProcessSubtitle => 'Count returned trays and note any missing items.';
+  String get screenPlatedReturnProcessSubtitle =>
+      'Count returned trays and note any missing items.';
 
   @override
   String get profileAccountSection => 'Account';
@@ -1942,13 +2672,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileOrdersSection => 'Orders & rewards';
 
   @override
-  String get platedDeliveryDepositNote => 'A refundable deposit applies to plated delivery orders.';
+  String get platedDeliveryDepositNote =>
+      'A refundable deposit applies to plated delivery orders.';
 
   @override
   String get adminInventoryLowTitle => 'Inventory Low: Ribeye Steak';
 
   @override
-  String get adminInventoryLowBody => 'Only 14 units remaining. Projected to run out in 2 hours.';
+  String get adminInventoryLowBody =>
+      'Only 14 units remaining. Projected to run out in 2 hours.';
 
   @override
   String get adminRestockAction => 'Restock';
@@ -1957,7 +2689,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminPendingTipTitle => 'Pending Tip Distribution';
 
   @override
-  String get adminPendingTipBody => '12 transactions awaiting shift closure for distribution.';
+  String get adminPendingTipBody =>
+      '12 transactions awaiting shift closure for distribution.';
 
   @override
   String get adminReviewAction => 'Review';
@@ -2094,7 +2827,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminMarketInsight => 'Market Insight';
 
   @override
-  String get adminMarketInsightBody => 'Demand for plated dishes is up 22% this evening compared to last Friday. Recommend boosting appetizer prep.';
+  String get adminMarketInsightBody =>
+      'Demand for plated dishes is up 22% this evening compared to last Friday. Recommend boosting appetizer prep.';
 
   @override
   String get adminNavOrders => 'Orders';
@@ -2214,7 +2948,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get financialWhyMathMatters => 'Why this math matters.';
 
   @override
-  String get financialWhyBody => 'Our profit distribution engine ensures every dinar is accounted for by separating gross revenue from distributable profit, excluding staff tips, and holding refundable deposits outside the owner/operator split.';
+  String get financialWhyBody =>
+      'Our profit distribution engine ensures every dinar is accounted for by separating gross revenue from distributable profit, excluding staff tips, and holding refundable deposits outside the owner/operator split.';
 
   @override
   String get financialPdfReport => 'Download PDF Report';
@@ -2238,7 +2973,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get forgotPasswordTitle => 'Forgot Password';
 
   @override
-  String get forgotPasswordSubtitle => 'Enter your registered phone or email to receive a reset code';
+  String get forgotPasswordSubtitle =>
+      'Enter your registered phone or email to receive a reset code';
 
   @override
   String get forgotEmailPhoneLabel => 'Email or Phone Number';
@@ -2274,13 +3010,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guestRoyalMansafTitle => 'The Royal Mansaf Experience';
 
   @override
-  String get guestRoyalMansafSubtitle => 'Authentic Karak jameed and tender local lamb. 15% off for first-time guests.';
+  String get guestRoyalMansafSubtitle =>
+      'Authentic Karak jameed and tender local lamb. 15% off for first-time guests.';
 
   @override
   String get guestWeekendFeast => 'Weekend Feast';
 
   @override
-  String get guestWeekendFeastSubtitle => 'Order any appetizer and main to get a free Jallab drink.';
+  String get guestWeekendFeastSubtitle =>
+      'Order any appetizer and main to get a free Jallab drink.';
 
   @override
   String get guestClaimOffer => 'Claim Offer';
@@ -2312,7 +3050,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guestSageTea => 'Sage Tea';
 
   @override
-  String get homeSearchHint => 'Search for Mansaf, Shawarma or more...';
+  String get homeSearchHint => 'Search dishes, categories...';
 
   @override
   String get screenSearch => 'Search';
@@ -2321,19 +3059,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchTitle => 'Find your next meal';
 
   @override
-  String get searchSubtitle => 'Search the Ayletna menu by dish, category, or ingredient-style description.';
+  String get searchSubtitle =>
+      'Search the Ayletna menu by dish, category, or ingredient-style description.';
+
+  @override
+  String get searchMenuHint => 'Search menu, dishes, or ingredients...';
+
+  @override
+  String get searchRecentTitle => 'Recent Searches';
+
+  @override
+  String get searchClearAll => 'Clear All';
+
+  @override
+  String get searchTopResults => 'Top Results';
+
+  @override
+  String searchItemsFound(int count) {
+    return '$count items found';
+  }
+
+  @override
+  String get searchAddShort => 'Add';
 
   @override
   String get searchStartTitle => 'Type a dish name';
 
   @override
-  String get searchStartBody => 'Try shawarma, hummus, pizza, falafel, burger, or any craving from the menu.';
+  String get searchStartBody =>
+      'Try shawarma, hummus, pizza, falafel, burger, or any craving from the menu.';
 
   @override
   String get searchEmptyTitle => 'No dishes found';
 
   @override
-  String get searchEmptyBody => 'Try a different dish name or browse the full menu categories.';
+  String get searchEmptyBody =>
+      'Try a different dish name or browse the full menu categories.';
 
   @override
   String searchResultsCount(int count) {
@@ -2353,7 +3114,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeZeroWasteTitle => 'Traditional Taste,\nZero Waste.';
 
   @override
-  String get homeZeroWasteSubtitle => 'Get your feast served on authentic clay plates. 5 JOD refundable deposit per plate.';
+  String get homeZeroWasteSubtitle =>
+      'Get your feast served on authentic clay plates. 5 JOD refundable deposit per plate.';
 
   @override
   String get homeOrderNow => 'Order Now';
@@ -2389,7 +3151,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeSustainabilityDeposit => 'Sustainability Deposit';
 
   @override
-  String get homeSustainabilityBody => 'Choose the Plated option for an eco-friendly experience. A small deposit for our premium clayware will be added and fully refunded when we collect the plates after your meal.';
+  String get homeSustainabilityBody =>
+      'Choose the Plated option for an eco-friendly experience. A small deposit for our premium clayware will be added and fully refunded when we collect the plates after your meal.';
 
   @override
   String get homeLearnHowItWorks => 'Learn how it works';
@@ -2599,7 +3362,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inventoryThresholdConfig => 'Safety Threshold Configuration';
 
   @override
-  String get inventoryLowStockTrigger => 'Triggers Low Stock alert at this level.';
+  String get inventoryLowStockTrigger =>
+      'Triggers Low Stock alert at this level.';
 
   @override
   String get inventoryUpdateInventory => 'Update Inventory';
@@ -2759,7 +3523,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prepTruffleFries => 'Truffle Fries';
 
   @override
-  String get prepFriesSpecs => 'Parmesan Dust • Rosemary Sprig • Truffle Aioli Side';
+  String get prepFriesSpecs =>
+      'Parmesan Dust • Rosemary Sprig • Truffle Aioli Side';
 
   @override
   String get prepHouseCaesar => 'House Caesar Salad';
@@ -2771,7 +3536,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get prepKitchenNotes => 'Kitchen Notes';
 
   @override
-  String get prepKitchenNoteBody => 'Birthday celebration at Table 14. Please ensure all plated dishes go out simultaneously. Guest in Seat 2 has a severe onion allergy; ensure strict cross-contamination protocol for the Wagyu Burgers.';
+  String get prepKitchenNoteBody =>
+      'Birthday celebration at Table 14. Please ensure all plated dishes go out simultaneously. Guest in Seat 2 has a severe onion allergy; ensure strict cross-contamination protocol for the Wagyu Burgers.';
 
   @override
   String get prepServer => 'Server: David K.';
@@ -2924,10 +3690,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get kitchenHandoverCourier => 'Handover to Courier';
 
   @override
-  String get languageWelcomeTitle => 'Welcome';
+  String get languageWelcomeTitle => 'Choose Your Language';
 
   @override
-  String get languageWelcomeSubtitle => 'Choose your preferred language to continue';
+  String get languageWelcomeSubtitle =>
+      'Welcome to Ayletna. Please select your preferred language to continue.';
 
   @override
   String get languageEnglishSubtitle => 'Western Interface';
@@ -2942,7 +3709,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginWelcomeBack => 'Welcome back';
 
   @override
-  String get loginOperationalSubtitle => 'Order your favorite meals, track your feast, and come back to what you love.';
+  String get loginOperationalSubtitle => 'Welcome back to Ayletna';
 
   @override
   String get loginPhoneOrEmail => 'Phone or Email';
@@ -2951,10 +3718,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loginEmailHint => 'e.g. guest@ayletna.com';
 
   @override
-  String get loginAction => 'Login';
+  String get loginAction => 'Sign In';
 
   @override
   String get loginOr => 'or';
+
+  @override
+  String get loginDemoHubTitle => 'Staff hubs';
+
+  @override
+  String get loginDemoHubSubtitle =>
+      'Sign in with a management or specialist role.';
 
   @override
   String get loginContinueGuest => 'Continue as Guest';
@@ -3035,31 +3809,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loyaltyRedeem => 'Redeem';
 
   @override
+  String get loyaltyNoRewardsInFilter => 'No rewards in this filter right now.';
+
+  @override
   String get loyaltyLocked => 'Locked';
 
   @override
   String get loyaltySignaturePlatter => 'Signature BBQ Platter';
 
   @override
-  String get loyaltySignaturePlatterDesc => 'Redeem for a full grill platter with three sides.';
+  String get loyaltySignaturePlatterDesc =>
+      'Redeem for a full grill platter with three sides.';
 
   @override
   String get loyaltyLargePizza => 'Any Large Pizza';
 
   @override
-  String get loyaltyLargePizzaDesc => 'Choose any large flatbread from our family oven menu.';
+  String get loyaltyLargePizzaDesc =>
+      'Choose any large flatbread from our family oven menu.';
 
   @override
   String get loyaltyFreeDessert => 'Free Dessert';
 
   @override
-  String get loyaltyFreeDessertDesc => 'A sweet treat from our pastry chef\'s daily selection.';
+  String get loyaltyFreeDessertDesc =>
+      'A sweet treat from our pastry chef\'s daily selection.';
 
   @override
   String get loyaltyChefTasting => 'Chef\'s Tasting for Two';
 
   @override
-  String get loyaltyChefTastingDesc => 'Private tasting experience curated by our executive chef.';
+  String get loyaltyChefTastingDesc =>
+      'Private tasting experience curated by our executive chef.';
 
   @override
   String loyaltyPointsShort(String points) {
@@ -3070,19 +3851,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loyaltyDine => 'Dine';
 
   @override
-  String get loyaltyDineDesc => 'Earn 10 points for every 1 JOD spent at any Ayletna branch.';
+  String get loyaltyDineDesc =>
+      'Earn 10 points for every 1 JOD spent at any Ayletna branch.';
 
   @override
   String get loyaltyCollect => 'Collect';
 
   @override
-  String get loyaltyCollectDesc => 'Watch your points grow and unlock premium tier benefits.';
+  String get loyaltyCollectDesc =>
+      'Watch your points grow and unlock premium tier benefits.';
 
   @override
   String get loyaltyEnjoy => 'Enjoy';
 
   @override
-  String get loyaltyEnjoyDesc => 'Redeem your hard-earned points for exclusive rewards.';
+  String get loyaltyEnjoyDesc =>
+      'Redeem your hard-earned points for exclusive rewards.';
 
   @override
   String get mapSearchHint => 'Search for your delivery address...';
@@ -3118,7 +3902,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get menuManagementTitle => 'Menu Management';
 
   @override
-  String get menuManagementSubtitle => 'Manage your digital menu items, pricing, and live availability.';
+  String get menuManagementSubtitle =>
+      'Manage your digital menu items, pricing, and live availability.';
 
   @override
   String get menuAddNewItem => 'Add New Item';
@@ -3234,6 +4019,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cartPromoHint => 'Enter code';
 
   @override
+  String get cartYourCartTitle => 'Your Cart';
+
+  @override
+  String get cartReviewSubtitle =>
+      'Review your items before placing the order.';
+
+  @override
   String get cartOrderSummary => 'Order Summary';
 
   @override
@@ -3273,7 +4065,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cartProceedCheckout => 'Proceed to Checkout';
 
   @override
-  String get cartGuestSignInPrompt => 'Sign in to place your order and track delivery in real time.';
+  String get cartGuestSignInPrompt =>
+      'Sign in to place your order and track delivery in real time.';
 
   @override
   String get cartCheckoutStepBasket => 'Basket';
@@ -3288,10 +4081,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cartCheckoutStepReview => 'Review';
 
   @override
-  String get demoModeBanner => 'Demo mode — actions use mock data and are not saved.';
+  String get demoModeBanner => 'Action completed.';
 
   @override
-  String get cartTermsNotice => 'By clicking, you agree to our Terms of Service.';
+  String get cartTermsNotice =>
+      'By clicking, you agree to our Terms of Service.';
 
   @override
   String get cartViewItems => 'View items';
@@ -3300,13 +4094,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cartFulfillmentTitle => 'Choose fulfillment';
 
   @override
-  String get cartFulfillmentSubtitle => 'Choose the service method directly in the cart without opening a separate screen.';
+  String get cartFulfillmentSubtitle =>
+      'Choose the service method directly in the cart without opening a separate screen.';
 
   @override
   String get cartGroupDeliveryTitle => 'Group delivery';
 
   @override
-  String get cartGroupDeliveryBody => 'Wait for a nearby order in the same area to reduce delivery cost and improve route efficiency.';
+  String get cartGroupDeliveryBody =>
+      'Wait for a nearby order in the same area to reduce delivery cost and improve route efficiency.';
 
   @override
   String get cartTermsAndConditions => 'Terms and conditions';
@@ -3315,7 +4111,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cartSelectedAddress => 'Selected address';
 
   @override
-  String get cartAddressRequired => 'Choose a default delivery address before checkout.';
+  String get cartAddressRequired =>
+      'Choose a default delivery address before checkout.';
 
   @override
   String get cartChooseAddress => 'Choose address';
@@ -3327,7 +4124,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cartTipTitle => 'Add a tip';
 
   @override
-  String get cartTipSubtitle => 'Optional appreciation for the kitchen and delivery team.';
+  String get cartTipSubtitle =>
+      'Optional appreciation for the kitchen and delivery team.';
 
   @override
   String get cartNoTip => 'No tip';
@@ -3342,43 +4140,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportHeroTitle => 'How can we help?';
 
   @override
-  String get supportHeroBody => 'Choose the fastest mock support channel for order questions, delivery updates, or payment help.';
+  String get supportHeroBody =>
+      'Choose the fastest support channel for order questions, delivery updates, or payment help.';
 
   @override
   String get supportLiveChatTitle => 'Live chat';
 
   @override
-  String get supportLiveChatBody => 'Start a quick conversation with the service team.';
+  String get supportLiveChatBody =>
+      'Start a quick conversation with the service team.';
 
   @override
   String get supportCallTitle => 'Call restaurant';
 
   @override
-  String get supportCallBody => 'Speak with the front desk about urgent order changes.';
+  String get supportCallBody =>
+      'Speak with the front desk about urgent order changes.';
 
   @override
   String get supportWhatsappTitle => 'WhatsApp support';
 
   @override
-  String get supportWhatsappBody => 'Send a message with your order details and preferred contact time.';
+  String get supportWhatsappBody =>
+      'Send a message with your order details and preferred contact time.';
 
   @override
   String get supportOrderHelpTitle => 'Order help';
 
   @override
-  String get supportOrderHelpBody => 'Use this page for cart, delivery, payment, and plated-return questions.';
+  String get supportOrderHelpBody =>
+      'Use this page for cart, delivery, payment, and plated-return questions.';
 
   @override
   String get supportFaqTitle => 'FAQ';
 
   @override
-  String get supportFaqBody => 'Browse common delivery, payment, and plated-return answers.';
+  String get supportFaqBody =>
+      'Browse common delivery, payment, and plated-return answers.';
 
   @override
-  String get supportTicketsTitle => 'Support tickets';
-
-  @override
-  String get supportTicketsSubtitle => 'Track open and resolved mock support requests.';
+  String get supportTicketsSubtitle =>
+      'Track open and resolved support requests.';
 
   @override
   String get supportTicketRequestFollowUp => 'Request follow-up';
@@ -3399,7 +4201,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportTicketRemarkLabel => 'Response remark';
 
   @override
-  String get supportTicketRemarkHint => 'Write a note about the support response...';
+  String get supportTicketRemarkHint =>
+      'Write a note about the support response...';
 
   @override
   String get supportTicketSubmitRating => 'Submit rating';
@@ -3411,7 +4214,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportNewTicketTitle => 'Live chat ticket';
 
   @override
-  String get supportNewTicketBody => 'A new chat session was opened with the customer care team.';
+  String get supportNewTicketBody =>
+      'A new chat session was opened with the customer care team.';
 
   @override
   String get supportTicketOpened => 'New support ticket opened.';
@@ -3420,7 +4224,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportChatHeroTitle => 'Live support chat';
 
   @override
-  String get supportChatHeroBody => 'The agent starts with chat and opens a ticket only when follow-up is needed.';
+  String get supportChatHeroBody =>
+      'The agent starts with chat and opens a ticket only when follow-up is needed.';
 
   @override
   String get supportChatActiveSession => 'Active chat session';
@@ -3429,13 +4234,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportChatNoTicketYet => 'No ticket opened yet';
 
   @override
-  String get supportChatAgentGreeting => 'Welcome to Ayletna support. Tell me what happened and I will check if this needs a ticket.';
+  String get supportChatAgentGreeting =>
+      'Welcome to Ayletna support. Tell me what happened and I will check if this needs a ticket.';
 
   @override
   String get supportChatCustomerSample => 'I need help with my active order.';
 
   @override
-  String get supportChatAgentDecision => 'I can help here first. If the issue needs restaurant follow-up, I will open a ticket and keep it visible in Support.';
+  String get supportChatAgentDecision =>
+      'I can help here first. If the issue needs restaurant follow-up, I will open a ticket and keep it visible in Support.';
 
   @override
   String get supportChatAgentName => 'Ayletna Agent';
@@ -3444,7 +4251,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportChatCustomerName => 'You';
 
   @override
-  String get supportChatAgentTicketNote => 'Only the support agent can open a follow-up ticket after reviewing the chat.';
+  String get supportChatAgentTicketNote =>
+      'Only the support agent can open a follow-up ticket after reviewing the chat.';
 
   @override
   String get supportChatMessageLabel => 'Message';
@@ -3459,10 +4267,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportChatOpenTicket => 'Open ticket if needed';
 
   @override
-  String get supportAdminSetupNote => 'Restaurant phone and WhatsApp numbers are preconfigured for mockup and can be edited later from admin settings.';
+  String get supportAdminSetupNote =>
+      'Restaurant phone and WhatsApp numbers can be edited from admin settings.';
 
   @override
-  String get supportExternalActionFallback => 'Could not open this action. Use the displayed contact details.';
+  String get supportExternalActionFallback =>
+      'Could not open this action. Use the displayed contact details.';
 
   @override
   String get screenFaq => 'FAQ';
@@ -3477,25 +4287,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get faqDeliveryTitle => 'How do delivery updates work?';
 
   @override
-  String get faqDeliveryBody => 'Active orders show a timeline. When the order is on the way, the driver contact button becomes available.';
+  String get faqDeliveryBody =>
+      'Active orders show a timeline. When the order is on the way, the driver contact button becomes available.';
 
   @override
   String get faqPaymentTitle => 'Which payment methods are supported?';
 
   @override
-  String get faqPaymentBody => 'The mock checkout currently shows card and cash flows, with wallet/payment screens kept for future configuration.';
+  String get faqPaymentBody =>
+      'Checkout supports card and cash payment methods.';
 
   @override
   String get faqPlatedTitle => 'How does plated delivery work?';
 
   @override
-  String get faqPlatedBody => 'Reusable trays include a refundable deposit and follow the plated-return reminder flow.';
+  String get faqPlatedBody =>
+      'Reusable trays include a refundable deposit and follow the plated-return reminder flow.';
 
   @override
   String get cartMargheritaPremium => 'Margherita Premium';
 
   @override
-  String get cartMargheritaPremiumDesc => 'Extra Buffalo Mozzarella, Fresh Basil';
+  String get cartMargheritaPremiumDesc =>
+      'Extra Buffalo Mozzarella, Fresh Basil';
 
   @override
   String get cartFreshOrangeJuice => 'Fresh Orange Juice';
@@ -3513,7 +4327,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get orderHistoryTitle => 'Order History';
 
   @override
-  String get orderHistorySubtitle => 'Manage your past dining experiences and re-order your favorites.';
+  String get orderHistorySubtitle =>
+      'Manage your past dining experiences and re-order your favorites.';
 
   @override
   String get orderHistoryFilter => 'Filter';
@@ -3537,7 +4352,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get orderHistoryWeekendSpecial => 'Weekend Special';
 
   @override
-  String get orderHistoryWeekendSubtitle => 'Get 15% off on your next re-order.';
+  String get orderHistoryWeekendSubtitle =>
+      'Get 15% off on your next re-order.';
 
   @override
   String get orderHistoryActive => 'Active';
@@ -3569,7 +4385,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get orderHistoryDriverContactTitle => 'Driver contact';
 
   @override
-  String get orderHistoryDriverContactBody => 'Your order is on the way. Call the driver if you need to coordinate delivery.';
+  String get orderHistoryDriverContactBody =>
+      'Your order is on the way. Call the driver if you need to coordinate delivery.';
 
   @override
   String get orderHistoryCallDriver => 'Call driver';
@@ -3659,6 +4476,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePhotoUpdated => 'Profile image updated';
 
   @override
+  String get profileChoosePhoto => 'Choose a photo';
+
+  @override
+  String get profileRemovePhoto => 'Remove photo';
+
+  @override
   String get profileEpicureanTier => 'Epicurean Tier';
 
   @override
@@ -3671,7 +4494,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePointsValue => '4,850';
 
   @override
-  String get profileTierProgress => '1,150 points until Platinum Tier benefits.';
+  String get profileTierProgress =>
+      '1,150 points until Platinum Tier benefits.';
 
   @override
   String get profileRewardsCatalog => 'Rewards Catalog';
@@ -3680,7 +4504,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePointsHistory => 'Points activity';
 
   @override
-  String get profilePointsHistorySubtitle => 'Recent reward points earned and redeemed.';
+  String get profileNoPointsActivity => 'No points activity yet.';
+
+  @override
+  String get profilePointsActivityLabel => 'Points activity';
+
+  @override
+  String get profilePointsHistorySubtitle =>
+      'Recent reward points earned and redeemed.';
 
   @override
   String get profileViewAllPointsHistory => 'View All History';
@@ -3689,7 +4520,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePaymentHistory => 'Payment history';
 
   @override
-  String get profilePaymentHistorySubtitle => 'Recent successful customer payments.';
+  String get profilePaymentHistorySubtitle =>
+      'Recent successful customer payments.';
 
   @override
   String get profileViewAllPaymentHistory => 'View Payment History';
@@ -3737,7 +4569,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileDeleteAddressTitle => 'Delete address?';
 
   @override
-  String get profileDeleteAddressBody => 'This mock action removes the saved address from your profile view.';
+  String get profileDeleteAddressBody =>
+      'This removes the saved address from your profile.';
 
   @override
   String get profileHomeAddressTitle => 'Home';
@@ -3758,19 +4591,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileOrderStatusUpdates => 'Order Status Updates';
 
   @override
-  String get profileOrderStatusSubtitle => 'Push notifications and SMS for your active orders';
+  String get profileOrderStatusSubtitle =>
+      'Push notifications and SMS for your active orders';
 
   @override
   String get profileLoyaltyRewards => 'Loyalty & Rewards';
 
   @override
-  String get profileLoyaltySubtitle => 'Monthly statement of points and tier bonuses';
+  String get profileLoyaltySubtitle =>
+      'Monthly statement of points and tier bonuses';
 
   @override
   String get profileMarketingOffers => 'Marketing & Offers';
 
   @override
-  String get profileMarketingSubtitle => 'Exclusive discounts and seasonal menu announcements';
+  String get profileMarketingSubtitle =>
+      'Exclusive discounts and seasonal menu announcements';
 
   @override
   String get profileLogout => 'Logout';
@@ -3779,7 +4615,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileDeactivateAccount => 'Deactivate Account';
 
   @override
-  String get settingsPersonalSubtitle => 'View your profile photo, name, contact details, and notification preferences.';
+  String get settingsPersonalSubtitle =>
+      'View your profile photo, name, contact details, and notification preferences.';
 
   @override
   String get settingsEmployeeSince => 'Team member since June 2022';
@@ -3797,19 +4634,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsStaffShiftAlerts => 'Shift & task alerts';
 
   @override
-  String get settingsStaffShiftAlertsSubtitle => 'Kitchen, delivery, inventory, and attendance reminders.';
+  String get settingsStaffShiftAlertsSubtitle =>
+      'Kitchen, delivery, inventory, and attendance reminders.';
 
   @override
-  String get settingsStaffOrderAlertsSubtitle => 'Order updates relevant to your station or route.';
+  String get settingsStaffOrderAlertsSubtitle =>
+      'Order updates relevant to your station or route.';
 
   @override
-  String get settingsBusinessSettingsHint => 'Restaurant operations, roles, taxes, receipts, and system alerts.';
+  String get settingsBusinessSettingsHint =>
+      'Restaurant operations, roles, taxes, receipts, and system alerts.';
+
+  @override
+  String get drawerBusinessSettings => 'Business settings';
 
   @override
   String get addressesTitle => 'Saved Addresses';
 
   @override
   String get addressesAddNew => 'Add New Address';
+
+  @override
+  String get addressesEmptyMessage =>
+      'No saved addresses yet. Add one for faster delivery checkout.';
 
   @override
   String get addressesDelete => 'Delete';
@@ -3821,22 +4668,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addressesHomeTitle => 'Home';
 
   @override
-  String get addressesHomeBody => '124 Maple Avenue, Apt 4B, Silver Springs, MD 20910';
+  String get addressesHomeBody =>
+      '124 Maple Avenue, Apt 4B, Silver Springs, MD 20910';
 
   @override
   String get addressesOfficeTitle => 'Office';
 
   @override
-  String get addressesOfficeBody => 'Ayletna HQ, 888 Innovation Way, Suite 200, Amman';
+  String get addressesOfficeBody =>
+      'Ayletna HQ, 888 Innovation Way, Suite 200, Amman';
 
   @override
   String get addressesGymTitle => 'Gym';
 
   @override
-  String get addressesGymBody => 'Iron Peak Fitness Center, 45 Strength Blvd, Amman';
+  String get addressesGymBody =>
+      'Iron Peak Fitness Center, 45 Strength Blvd, Amman';
 
   @override
-  String get addressesHelper => 'Easily manage your frequent delivery spots for faster checkout.';
+  String get addressesHelper =>
+      'Easily manage your frequent delivery spots for faster checkout.';
 
   @override
   String get mapAddressTitle => 'Save address as';
@@ -3848,7 +4699,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapAddressText => 'Written address';
 
   @override
-  String get mapAddressTextHint => 'Building, street, floor, nearby landmark...';
+  String get mapAddressTextHint =>
+      'Building, street, floor, nearby landmark...';
 
   @override
   String get mapSelectOnMap => 'Choose location from map';
@@ -3860,13 +4712,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get mapSaveAddress => 'Save address';
 
   @override
-  String get mapRequiredFields => 'Choose a map location and write the address before saving.';
+  String get mapRequiredFields =>
+      'Choose a map location and write the address before saving.';
 
   @override
   String get notificationsTitle => 'Notifications';
 
   @override
-  String get notificationsSubtitle => 'Stay updated with your latest kitchen and delivery activities.';
+  String get notificationsSubtitle =>
+      'Stay updated with your latest kitchen and delivery activities.';
 
   @override
   String get notificationsClearAll => 'Clear All';
@@ -3893,7 +4747,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationsWeeklyReport => 'Weekly Report';
 
   @override
-  String get notificationsWeeklySubtitle => 'Sustainability goals reached 92% this week!';
+  String get notificationsWeeklySubtitle =>
+      'Sustainability goals reached 92% this week!';
 
   @override
   String get notificationsViewDetails => 'View details';
@@ -3908,7 +4763,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationsDeliveryTitle => 'Order #8829 is out for delivery';
 
   @override
-  String get notificationsDeliveryBody => 'Driver Ahmad has picked up the order and is heading to the destination.';
+  String get notificationsDeliveryBody =>
+      'Driver Ahmad has picked up the order and is heading to the destination.';
 
   @override
   String get notificationsTwoMins => '2 mins ago';
@@ -3923,7 +4779,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationsTipTitle => 'Tip distribution ready';
 
   @override
-  String get notificationsTipBody => 'The tip pool for the morning shift has been calculated and is ready for distribution.';
+  String get notificationsTipBody =>
+      'The tip pool for the morning shift has been calculated and is ready for distribution.';
 
   @override
   String get notificationsFifteenMins => '15 mins ago';
@@ -3938,7 +4795,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationsTrayTitle => 'Tray collection reminder';
 
   @override
-  String get notificationsTrayBody => 'Sustainability alert: 12 reusable trays are currently unreturned at Block B collection points.';
+  String get notificationsTrayBody =>
+      'Sustainability alert: 12 reusable trays are currently unreturned at Block B collection points.';
 
   @override
   String get notificationsFortyFiveMins => '45 mins ago';
@@ -3950,7 +4808,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationsStockTitle => 'Stock alert: Premium Espresso Beans';
 
   @override
-  String get notificationsStockBody => 'Inventory level dropped below the 15% threshold. Consider restocking soon to avoid service interruption.';
+  String get notificationsStockBody =>
+      'Inventory level dropped below the 15% threshold. Consider restocking soon to avoid service interruption.';
 
   @override
   String get notificationsOneHour => '1 hour ago';
@@ -3965,7 +4824,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationsPickupTitle => 'Order #7741 is ready for pickup';
 
   @override
-  String get notificationsPickupBody => 'The plated meal is now on the heat rack at Station 3.';
+  String get notificationsPickupBody =>
+      'The plated meal is now on the heat rack at Station 3.';
 
   @override
   String get notificationsThreeHours => '3 hours ago';
@@ -3977,7 +4837,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notificationsPolicyTitle => 'New Policy Update';
 
   @override
-  String get notificationsPolicyBody => 'The sanitation guidelines have been updated. Please review the new checklist in the staff portal.';
+  String get notificationsPolicyBody =>
+      'The sanitation guidelines have been updated. Please review the new checklist in the staff portal.';
 
   @override
   String get notificationsTwentyFourHours => '24 hours ago';
@@ -3989,7 +4850,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get orderConfirmedThanks => 'Thank You';
 
   @override
-  String get orderConfirmedSuccess => 'Your order has been placed successfully.';
+  String get orderConfirmedSuccess =>
+      'Your order has been placed successfully.';
 
   @override
   String get orderConfirmedNumberLabel => 'Order Number';
@@ -4022,7 +4884,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get orderConfirmedHome => 'Back to Home';
 
   @override
-  String get orderConfirmedEmailSent => 'A confirmation email has been sent to your inbox.';
+  String get orderConfirmedEmailSent =>
+      'A confirmation email has been sent to your inbox.';
 
   @override
   String get otpTitle => 'OTP Verification';
@@ -4047,16 +4910,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get otpResendCode => 'Resend code';
 
   @override
-  String get otpResendLimitReached => 'Resend limit reached. Please try again later.';
+  String get otpResendLimitReached =>
+      'Resend limit reached. Please try again later.';
 
   @override
-  String get otpSecurityNote => 'Ayletna uses bank-grade encryption to protect your account security.';
+  String get otpSecurityNote =>
+      'Ayletna uses bank-grade encryption to protect your account security.';
 
   @override
   String get ownerDashboardTitle => 'Executive Performance';
 
   @override
-  String get ownerDashboardSubtitle => 'Real-time financial health and profit analysis for June 2024.';
+  String get ownerDashboardSubtitle =>
+      'Real-time financial health and profit analysis for June 2024.';
 
   @override
   String get ownerLast30Days => 'Last 30 Days';
@@ -4101,7 +4967,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ownerProfitAllocation => 'Profit Allocation';
 
   @override
-  String get ownerProfitAllocationBody => 'Calculated based on the 50/50 Owner-Operator agreement.';
+  String get ownerProfitAllocationBody =>
+      'Calculated based on the 50/50 Owner-Operator agreement.';
 
   @override
   String get ownerSplitRatio => 'Split Ratio';
@@ -4110,7 +4977,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ownerOperatorShare => 'Operator\'s Share';
 
   @override
-  String get ownerExpensesBody => 'Consolidated monthly overhead including COGS, utilities, and labor. Internal recipes and unit costs are restricted for privacy.';
+  String get ownerExpensesBody =>
+      'Consolidated monthly overhead including COGS, utilities, and labor. Internal recipes and unit costs are restricted for privacy.';
 
   @override
   String get ownerConsolidatedTotal => 'Consolidated Total';
@@ -4128,13 +4996,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ownerMonthlyRent => 'Monthly Rent Settlement';
 
   @override
-  String get ownerMonthlyRentMeta => 'June 05, 2024 • Transaction ID: #TXN-9021';
+  String get ownerMonthlyRentMeta =>
+      'June 05, 2024 • Transaction ID: #TXN-9021';
 
   @override
   String get ownerCateringEvent => 'Catering Event: Al-Mansour Corp';
 
   @override
-  String get ownerCateringEventMeta => 'June 02, 2024 • Transaction ID: #TXN-8842';
+  String get ownerCateringEventMeta =>
+      'June 02, 2024 • Transaction ID: #TXN-8842';
 
   @override
   String get ownerCompleted => 'Completed';
@@ -4170,7 +5040,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ownerPrivacyHeader => 'Owner View Permissions';
 
   @override
-  String get ownerPrivacyBody => 'Configure exactly what information the property owner can see in their dashboard. Maintain operational privacy while ensuring transparency on key business metrics.';
+  String get ownerPrivacyBody =>
+      'Configure exactly what information the property owner can see in their dashboard. Maintain operational privacy while ensuring transparency on key business metrics.';
 
   @override
   String get ownerPrivacyHero => 'Enterprise Security Controls';
@@ -4179,19 +5050,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ownerHideRawCosts => 'Hide Raw Material Costs';
 
   @override
-  String get ownerHideRawCostsBody => 'Mask individual item costs in the inventory and procurement reports. Owner will see aggregated totals only.';
+  String get ownerHideRawCostsBody =>
+      'Mask individual item costs in the inventory and procurement reports. Owner will see aggregated totals only.';
 
   @override
   String get ownerHideStaffSalaries => 'Hide Specific Staff Salaries';
 
   @override
-  String get ownerHideStaffSalariesBody => 'Restrict visibility of granular payroll data. Individual salary breakdowns will be hidden from the owner\'s view.';
+  String get ownerHideStaffSalariesBody =>
+      'Restrict visibility of granular payroll data. Individual salary breakdowns will be hidden from the owner\'s view.';
 
   @override
   String get ownerShowOnlyNetProfit => 'Show Only Net Profit';
 
   @override
-  String get ownerShowOnlyNetProfitBody => 'When enabled, the owner dashboard will suppress all gross revenue and operational expense breakdowns, presenting only the final Net Profit figure for the period.';
+  String get ownerShowOnlyNetProfitBody =>
+      'When enabled, the owner dashboard will suppress all gross revenue and operational expense breakdowns, presenting only the final Net Profit figure for the period.';
 
   @override
   String get ownerLivePreview => 'Live Preview: Owner Perspective';
@@ -4206,7 +5080,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ownerNetProfitLabel => 'Net Profit';
 
   @override
-  String get ownerPreviewNote => 'Data above reflects the current visibility settings applied to the Owner dashboard.';
+  String get ownerPreviewNote =>
+      'Data above reflects the current visibility settings applied to the Owner dashboard.';
 
   @override
   String get ownerDiscardChanges => 'Discard Changes';
@@ -4227,7 +5102,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentCheckoutTitle => 'Checkout';
 
   @override
-  String get paymentCheckoutSubtitle => 'Choose your preferred payment method to complete the order.';
+  String get paymentCheckoutSubtitle =>
+      'Choose your preferred payment method to complete the order.';
 
   @override
   String get paymentTotalAmountDue => 'Total Amount Due';
@@ -4288,7 +5164,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get platedHowTitle => 'Sustainable Dining, Redefined.';
 
   @override
-  String get platedHowSubtitle => 'Enjoy your favorite restaurant meals on real ceramic plates, delivered to your door and collected when you\'re done.';
+  String get platedHowSubtitle =>
+      'Enjoy your favorite restaurant meals on real ceramic plates, delivered to your door and collected when you\'re done.';
 
   @override
   String get platedHowItWorks => 'How It Works';
@@ -4297,25 +5174,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get platedStepOrderTitle => '1. Order Plated';
 
   @override
-  String get platedStepOrderBody => 'Select the Plated option at checkout for participating local restaurants.';
+  String get platedStepOrderBody =>
+      'Select the Plated option at checkout for participating local restaurants.';
 
   @override
   String get platedStepEnjoyTitle => '2. Enjoy Meal';
 
   @override
-  String get platedStepEnjoyBody => 'No soggy paper boxes. Experience the true taste of your meal on high-quality ceramic.';
+  String get platedStepEnjoyBody =>
+      'No soggy paper boxes. Experience the true taste of your meal on high-quality ceramic.';
 
   @override
   String get platedStepPickupTitle => '3. We Pick Up';
 
   @override
-  String get platedStepPickupBody => 'Leave the tray at your door. We\'ll collect, professionally sanitize, and reuse it.';
+  String get platedStepPickupBody =>
+      'Leave the tray at your door. We\'ll collect, professionally sanitize, and reuse it.';
 
   @override
   String get platedBondTitle => 'The Sustainable Bond';
 
   @override
-  String get platedBondBody => 'To maintain our high-quality ceramic tray library, a refundable deposit is required for every Plated order. This ensures the loop remains closed and sustainable.';
+  String get platedBondBody =>
+      'To maintain our high-quality ceramic tray library, a refundable deposit is required for every Plated order. This ensures the loop remains closed and sustainable.';
 
   @override
   String get platedDepositAmount => '5 JOD';
@@ -4357,7 +5238,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get platedChooseSustainable => 'Choose Sustainable';
 
   @override
-  String get platedLearnSanitation => 'Learn more about our sanitation standards';
+  String get platedLearnSanitation =>
+      'Learn more about our sanitation standards';
 
   @override
   String get platedPickupsTitle => 'Scheduled Pickups';
@@ -4396,7 +5278,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get platedSustainableReturns => 'Sustainable Returns';
 
   @override
-  String get platedWasteReduced => 'Your work reduces waste by 4.2kg per pickup today.';
+  String get platedWasteReduced =>
+      'Your work reduces waste by 4.2kg per pickup today.';
 
   @override
   String get platedCustomerEleanor => 'Eleanor Shellstrop';
@@ -4447,9 +5330,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get platesCatalogTitle => 'Ceramic Tray Catalog';
 
   @override
-  String get platesCatalogSubtitle => 'Manage stock levels, circulation, and breakage costs.';
-
-  @override
   String get platesNewComponent => 'New Component';
 
   @override
@@ -4477,12 +5357,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get platesPerUnit => 'Per Unit';
 
   @override
-  String get platesInStock => 'In Stock';
-
-  @override
-  String get platesCirculating => 'Circulating';
-
-  @override
   String platesReplacementCost(Object amount) {
     return 'Repl. Cost: $amount';
   }
@@ -4497,7 +5371,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get platesBowlBreakage => 'Ceramic Bowl - 4 Units Broken';
 
   @override
-  String get platesBowlBreakageMeta => 'Station: Dishwashing Area • Reported by Sarah M.';
+  String get platesBowlBreakageMeta =>
+      'Station: Dishwashing Area • Reported by Sarah M.';
 
   @override
   String get platesMezzeBreakage => 'Mezze Plate - 2 Units Broken';
@@ -4518,7 +5393,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get platesRestockAlert => 'Restock Alert';
 
   @override
-  String get platesRestockBody => 'Large Serving Trays are currently below the safety threshold (50 units).';
+  String get platesRestockBody =>
+      'Large Serving Trays are currently below the safety threshold (50 units).';
 
   @override
   String get platesAutoRestockLevel => 'Auto-Restock Level';
@@ -4538,7 +5414,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get productMansafTitle => 'Traditional Lamb Mansaf';
 
   @override
-  String get productMansafDescription => 'The national dish of Jordan. Tender chunks of local lamb cooked in a rich, tangy sauce of fermented dried yogurt (Jameed), served on a bed of aromatic turmeric rice and thin shrak bread. Garnished with golden fried nuts and fresh parsley for a perfect crunch and zest.';
+  String get productMansafDescription =>
+      'The national dish of Jordan. Tender chunks of local lamb cooked in a rich, tangy sauce of fermented dried yogurt (Jameed), served on a bed of aromatic turmeric rice and thin shrak bread. Garnished with golden fried nuts and fresh parsley for a perfect crunch and zest.';
 
   @override
   String get productRating => '4.9 (120+ reviews)';
@@ -4551,6 +5428,15 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get productBestSeller => 'Best Seller';
+
+  @override
+  String get productLoyaltyOrderAddon => 'Order add-on';
+
+  @override
+  String get productChooseYourSide => 'Choose Your Side';
+
+  @override
+  String get productAddExtras => 'Add Extras';
 
   @override
   String get productSizePortion => 'Size Portion';
@@ -4583,7 +5469,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get productSpecialInstructions => 'Special Instructions';
 
   @override
-  String get productInstructionsHint => 'e.g., Please ensure the jameed is served hot.';
+  String get productInstructionsHint => 'Any allergies or specific requests?';
 
   @override
   String productAddToCartAmount(Object amount) {
@@ -4600,7 +5486,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get previewTaxIncluded => 'Tax incl.';
 
   @override
-  String get previewProductBody => 'A curated selection of farm-to-table ingredients including organic poached eggs, hand-crafted sourdough, Hass avocado, and wild arugula. Perfect for high-focus operational fuel.';
+  String get previewProductBody =>
+      'A curated selection of farm-to-table ingredients including organic poached eggs, hand-crafted sourdough, Hass avocado, and wild arugula. Perfect for high-focus operational fuel.';
 
   @override
   String get previewPreferredBase => 'Preferred Base';
@@ -4630,7 +5517,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get previewDietaryNotes => 'Dietary Notes';
 
   @override
-  String get previewDietaryMessage => 'Please login to specify allergies or special preparation requests.';
+  String get previewDietaryMessage =>
+      'Please login to specify allergies or special preparation requests.';
 
   @override
   String get previewLoginAddCart => 'Login to Add to Cart';
@@ -4645,7 +5533,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerJoinTitle => 'Join Ayletna';
 
   @override
-  String get registerJoinSubtitle => 'Create your account to start managing your culinary experience.';
+  String get registerJoinSubtitle =>
+      'Create your account to start managing your culinary experience.';
 
   @override
   String get registerFullName => 'Full Name';
@@ -4722,7 +5611,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerPreferencesTitle => 'Your food preferences';
 
   @override
-  String get registerPreferencesSubtitle => 'Tell us what you enjoy so Ayletna can recommend meals that feel made for you.';
+  String get registerPreferencesSubtitle =>
+      'Tell us what you enjoy so Ayletna can recommend meals that feel made for you.';
 
   @override
   String get registerPrimaryRole => 'Your Ayletna experience';
@@ -4731,19 +5621,36 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registerRoleCustomer => 'Customer';
 
   @override
-  String get registerRoleCustomerBody => 'Order delicious meals, track delivery, and manage your favorites.';
+  String get registerRoleCustomerBody =>
+      'Order delicious meals, track delivery, and manage your favorites.';
 
   @override
   String get registerRoleStaff => 'Restaurant Staff';
 
   @override
-  String get registerRoleStaffBody => 'Access KDS, manage inventory, and process active orders.';
+  String get registerRoleStaffBody =>
+      'Access KDS, manage inventory, and process active orders.';
+
+  @override
+  String get registerRoleOperator => 'Restaurant Operator';
+
+  @override
+  String get registerRoleOperatorBody =>
+      'Run daily operations — orders, menu, staff, and financial close. Requires app admin approval.';
+
+  @override
+  String get registerRoleOwner => 'Restaurant Owner';
+
+  @override
+  String get registerRoleOwnerBody =>
+      'View revenue, profit share, and audit summaries. Requires app admin approval.';
 
   @override
   String get registerRoleAdminOwner => 'Admin / Owner';
 
   @override
-  String get registerRoleAdminOwnerBody => 'View deep analytics, manage staff, and optimize store sustainability.';
+  String get registerRoleAdminOwnerBody =>
+      'View deep analytics, manage staff, and optimize store sustainability.';
 
   @override
   String get registerDietaryPreferences => 'Dietary Preferences';
@@ -4773,7 +5680,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportsCenterTitle => 'Reports & Analytics';
 
   @override
-  String get reportsCenterSubtitle => 'Review your daily performance and download detailed documentation.';
+  String get reportsCenterSubtitle =>
+      'Review your daily performance and download detailed documentation.';
 
   @override
   String get reportsDaily => 'Daily';
@@ -4818,25 +5726,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportsSalesRevenue => 'Sales & Revenue';
 
   @override
-  String get reportsSalesRevenueBody => 'Complete breakdown of transactions, tax, and tender types.';
+  String get reportsSalesRevenueBody =>
+      'Complete breakdown of transactions, tax, and tender types.';
 
   @override
   String get reportsStaffTips => 'Staff Hours & Tips';
 
   @override
-  String get reportsStaffTipsBody => 'Timesheets, overtime alerts, and tip distribution logs.';
+  String get reportsStaffTipsBody =>
+      'Timesheets, overtime alerts, and tip distribution logs.';
 
   @override
   String get reportsInventoryWastage => 'Inventory & Wastage';
 
   @override
-  String get reportsInventoryWastageBody => 'Stock levels, shrinkage reports, and food waste analysis.';
+  String get reportsInventoryWastageBody =>
+      'Stock levels, shrinkage reports, and food waste analysis.';
 
   @override
   String get reportsSustainability => 'Sustainability (Tray Returns)';
 
   @override
-  String get reportsSustainabilityBody => 'Tray return rates, reusable utensil tracking, and green initiatives.';
+  String get reportsSustainabilityBody =>
+      'Tray return rates, reusable utensil tracking, and green initiatives.';
 
   @override
   String get reportsDownloadPdf => 'Download PDF';
@@ -4878,7 +5790,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rewardsMemberSince => 'Member Since 2023';
 
   @override
-  String get guestRewardsPreviewBody => 'Browse rewards now. Create an account before checkout to keep every point you earn.';
+  String get guestRewardsPreviewBody =>
+      'Browse rewards now. Create an account before checkout to keep every point you earn.';
 
   @override
   String get guestRewardsPreviewAction => 'Create account to earn points';
@@ -4905,7 +5818,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rewardsSignatureBurger => 'Signature Wagyu Burger';
 
   @override
-  String get rewardsSignatureBurgerBody => 'Redeem for a full dining experience';
+  String get rewardsSignatureBurgerBody =>
+      'Redeem for a full dining experience';
 
   @override
   String get rewardsPointsShort => 'PTS';
@@ -4947,19 +5861,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rewardsAdminNav => 'Admin';
 
   @override
-  String get roleSelectionMockTitle => 'Mock role chooser';
+  String get roleSelectionMockTitle => 'Choose your role';
 
   @override
-  String get roleSelectionWelcome => 'Choose a role to audit the app';
+  String get roleSelectionWelcome => 'Select Your Portal';
 
   @override
-  String get roleSelectionSubtitle => 'In production, roles are assigned by an admin. For this mockup, choose any role to test screens and design.';
+  String get roleSelectionSubtitle =>
+      'Choose your role to access specialized tools and services.';
 
   @override
   String get roleSelectionCustomerTitle => 'Customer';
 
   @override
-  String get roleSelectionCustomerBody => 'Browse our menu, place orders for dine-in or takeaway, and track your loyalty rewards in real-time.';
+  String get roleSelectionCustomerBody =>
+      'Browse our menu, place orders for dine-in or takeaway, and track your loyalty rewards in real-time.';
 
   @override
   String get roleSelectionMockCustomerMetric => 'Customer storefront';
@@ -4974,7 +5890,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roleSelectionOwnerTitle => 'Owner';
 
   @override
-  String get roleSelectionOwnerBody => 'Strategic overview of revenue, waste analytics, and multi-location growth metrics.';
+  String get roleSelectionOwnerBody =>
+      'Strategic overview of revenue, waste analytics, and multi-location growth metrics.';
 
   @override
   String get roleSelectionOwnerMetric => 'Daily Revenue: +12%';
@@ -4983,7 +5900,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roleSelectionCashierTitle => 'Cashier';
 
   @override
-  String get roleSelectionCashierBody => 'Front-of-house operations, rapid checkout, and guest table management.';
+  String get roleSelectionCashierBody =>
+      'Front-of-house operations, rapid checkout, and guest table management.';
 
   @override
   String get roleSelectionOpenRegister => 'Open Register';
@@ -4992,7 +5910,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roleSelectionKitchenTitle => 'Kitchen Staff';
 
   @override
-  String get roleSelectionKitchenBody => 'KDS tile management, order prioritization, and ingredient stock alerts.';
+  String get roleSelectionKitchenBody =>
+      'KDS tile management, order prioritization, and ingredient stock alerts.';
+
+  @override
+  String get roleSelectionAdminMetric => 'System Health: 100%';
+
+  @override
+  String get roleSelectionOperatorMetric => '8 Active Orders';
+
+  @override
+  String get roleSelectionSupportMetric => '2 Pending Tickets';
+
+  @override
+  String get roleSelectionMarketingMetric => '3 Active Promos';
 
   @override
   String get roleSelectionKitchenMetric => '12 Active Orders';
@@ -5001,7 +5932,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roleSelectionAdminTitle => 'Admin / Operator';
 
   @override
-  String get roleSelectionAdminBody => 'Manage staff permissions, inventory procurement, and system configurations.';
+  String get roleSelectionAdminBody =>
+      'Manage staff permissions, inventory procurement, and system configurations.';
 
   @override
   String get roleSelectionSystemOnline => 'SYSTEM STATUS: ONLINE';
@@ -5010,7 +5942,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roleSelectionInventoryTitle => 'Inventory';
 
   @override
-  String get roleSelectionInventoryBody => 'Review stock levels, wastage logs, ingredient details, and adjustment screens.';
+  String get roleSelectionInventoryBody =>
+      'Review stock levels, wastage logs, ingredient details, and adjustment screens.';
 
   @override
   String get roleSelectionOpenInventory => 'Open Inventory';
@@ -5019,7 +5952,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roleSelectionStaffTitle => 'Staff';
 
   @override
-  String get roleSelectionStaffBody => 'Audit attendance, daily tips, and staff tip history screens.';
+  String get roleSelectionStaffBody =>
+      'Audit attendance, daily tips, and staff tip history screens.';
 
   @override
   String get roleSelectionOpenAttendance => 'Open Attendance';
@@ -5028,28 +5962,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String get roleSelectionDeliveryTitle => 'Delivery Agent';
 
   @override
-  String get roleSelectionDeliveryBody => 'Route optimization, order pickup confirmation, and digital proof-of-delivery.';
+  String get roleSelectionDeliveryBody =>
+      'Route optimization, order pickup confirmation, and digital proof-of-delivery.';
 
   @override
   String get roleSelectionStartShift => 'Start Shift';
 
   @override
-  String get roleSelectionFooter => 'Mockup-only role switching. Admin-assigned permissions will replace this chooser later.';
+  String get roleSelectionFooter =>
+      'Select a workspace to continue. Permissions are assigned by your administrator.';
 
   @override
   String get orderTypeTitle => 'How would you like to savor?';
 
   @override
-  String get orderTypeSubtitle => 'Choose your dining experience to view the appropriate menu.';
+  String get orderTypeSubtitle =>
+      'Choose your dining experience to view the appropriate menu.';
 
   @override
-  String get orderTypeDineInBody => 'Reserve your spot and enjoy the full restaurant ambiance with table service.';
+  String get orderTypeDineInBody =>
+      'Reserve your spot and enjoy the full restaurant ambiance with table service.';
 
   @override
   String get orderTypeDineInAction => 'Select Table';
 
   @override
-  String get orderTypeTakeawayBody => 'Order ahead and pick up your meal at the designated counter. Fast & convenient.';
+  String get orderTypeTakeawayBody =>
+      'Order ahead and pick up your meal at the designated counter. Fast & convenient.';
 
   @override
   String get orderTypeTakeawayAction => 'Select Pickup';
@@ -5058,7 +5997,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get orderTypeDeliveryTitle => 'Standard Delivery';
 
   @override
-  String get orderTypeDeliveryBody => 'Reliable delivery to your doorstep. Hot and fresh meals within 30-45 minutes.';
+  String get orderTypeDeliveryBody =>
+      'Reliable delivery to your doorstep. Hot and fresh meals within 30-45 minutes.';
 
   @override
   String get orderTypeDeliveryAction => 'Set Address';
@@ -5070,7 +6010,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get orderTypePlatedBadge => 'Sustainability';
 
   @override
-  String get orderTypePlatedBody => 'Premium experience using reusable ceramic plating. We pick up the dishes later.';
+  String get orderTypePlatedBody =>
+      'Premium experience using reusable ceramic plating. We pick up the dishes later.';
 
   @override
   String get orderTypePlatedAction => 'Select Premium';
@@ -5088,25 +6029,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get termsHeroTitle => 'Order Terms & Conditions';
 
   @override
-  String get termsHeroSubtitle => 'This mock screen explains the core checkout rules before placing an order.';
+  String get termsHeroSubtitle =>
+      'Review the checkout rules before placing an order.';
 
   @override
   String get termsPaymentTitle => 'Payment and confirmation';
 
   @override
-  String get termsPaymentBody => 'Orders are confirmed after choosing a fulfillment method and completing payment. Fees may vary by service type and address.';
+  String get termsPaymentBody =>
+      'Orders are confirmed after choosing a fulfillment method and completing payment. Fees may vary by service type and address.';
 
   @override
   String get termsGroupDeliveryTitle => 'Group delivery';
 
   @override
-  String get termsGroupDeliveryBody => 'When group delivery is selected, the order may wait for another nearby order in the same area to reduce delivery cost and improve route efficiency.';
+  String get termsGroupDeliveryBody =>
+      'When group delivery is selected, the order may wait for another nearby order in the same area to reduce delivery cost and improve route efficiency.';
 
   @override
   String get termsChangesTitle => 'Changes and cancellation';
 
   @override
-  String get termsChangesBody => 'Orders can be changed before preparation starts. Once preparation begins, some changes or cancellation may no longer be available.';
+  String get termsChangesBody =>
+      'Orders can be changed before preparation starts. Once preparation begins, some changes or cancellation may no longer be available.';
 
   @override
   String get orderTypeNavHome => 'Home';
@@ -5205,7 +6150,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get returnPolicyTip => 'Policy Tip';
 
   @override
-  String get returnPolicyTipBody => 'Stains on linens are not charged as damage.';
+  String get returnPolicyTipBody =>
+      'Stains on linens are not charged as damage.';
 
   @override
   String get returnManagerOverride => 'Manager Override';
@@ -5337,7 +6283,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get splashTagline => 'Traditional Taste, Zero Waste';
 
   @override
-  String get splashInitializing => 'INITIALIZING AYLETNA LOGIC';
+  String get splashHeadline => 'Premium Levantine Cuisine';
+
+  @override
+  String get splashMotto => 'Taste. Belong. Sustain.';
+
+  @override
+  String get splashInitializing => 'WELCOME TO OUR TABLE';
 
   @override
   String get staffShiftInProgress => 'Shift in Progress';
@@ -5448,10 +6400,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get staffManagerNotes => 'Manager Notes';
 
   @override
-  String get staffChefSpecialNote => 'Chef\'s Special: Grilled Sea Bass\nSuggest as high priority for dinner.';
+  String get staffChefSpecialNote =>
+      'Chef\'s Special: Grilled Sea Bass\nSuggest as high priority for dinner.';
 
   @override
-  String get staffVipReservationNote => 'VIP Reservation at 07:30 PM\nTable 4 prepared for Mr. Al-Sayed.';
+  String get staffVipReservationNote =>
+      'VIP Reservation at 07:30 PM\nTable 4 prepared for Mr. Al-Sayed.';
 
   @override
   String get staffAttendanceTitle => 'Attendance';
@@ -5502,7 +6456,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get staffShiftDetails => 'Shift Details';
 
   @override
-  String get staffShiftDetailsBody => 'Review your scheduled session before starting.';
+  String get staffShiftDetailsBody =>
+      'Review your scheduled session before starting.';
 
   @override
   String get staffRole => 'Role';
@@ -5529,7 +6484,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get staffMainKitchen => 'Main Kitchen';
 
   @override
-  String get staffGpsCheckInNote => 'Checking in will record your GPS location and timestamp.';
+  String get staffGpsCheckInNote =>
+      'Checking in will record your GPS location and timestamp.';
 
   @override
   String get staffNavInventory => 'Inventory';
@@ -5589,7 +6545,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get staffEarningsPolicy => 'Earnings Policy';
 
   @override
-  String get staffEarningsPolicyBody => 'Please review your daily totals. By acknowledging, you confirm the recorded tips match your shift logs. Payouts are processed every Thursday.';
+  String get staffEarningsPolicyBody =>
+      'Please review your daily totals. By acknowledging, you confirm the recorded tips match your shift logs. Payouts are processed every Thursday.';
 
   @override
   String get staffCashTips => 'Cash Tips';
@@ -5613,7 +6570,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get staffAcknowledgeReceipt => 'Acknowledge Receipt';
 
   @override
-  String get staffAcknowledgeNote => 'Acknowledgment timestamp will be recorded for audit purposes.';
+  String get staffAcknowledgeNote =>
+      'Acknowledgment timestamp will be recorded for audit purposes.';
 
   @override
   String get staffTransactionHistory => 'Transaction History';
@@ -5790,7 +6748,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sustainabilityAlertsTitle => 'Sustainability Alerts';
 
   @override
-  String get sustainabilityAlertsSubtitle => 'Operational insights and ecological milestones for the Culinary Logic ecosystem. Monitor tray cycles and sustainability KPIs in real-time.';
+  String get sustainabilityAlertsSubtitle =>
+      'Operational insights and ecological milestones for the Culinary Logic ecosystem. Monitor tray cycles and sustainability KPIs in real-time.';
 
   @override
   String get sustainabilityActiveGoal => 'Active Goal';
@@ -5799,7 +6758,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sustainabilityGoalReached => 'Sustainability Goal: 92% reached';
 
   @override
-  String get sustainabilityGoalBody => 'Target for this week: 95% plastic-free tray management.';
+  String get sustainabilityGoalBody =>
+      'Target for this week: 95% plastic-free tray management.';
 
   @override
   String get sustainabilityCurrentProgress => 'Current Progress';
@@ -5811,10 +6771,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sustainabilityUrgentAction => 'Urgent Action';
 
   @override
-  String get sustainabilityReminderTitle => 'Reminder:\n4 trays\npending\ncollection';
+  String get sustainabilityReminderTitle =>
+      'Reminder:\n4 trays\npending\ncollection';
 
   @override
-  String get sustainabilityStationB => 'Station B requires immediate clearance to maintain sanitation flow.';
+  String get sustainabilityStationB =>
+      'Station B requires immediate clearance to maintain sanitation flow.';
 
   @override
   String get sustainabilityDispatch => 'Dispatch';
@@ -5823,7 +6785,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get sustainabilityPolicyUpdate => 'New Sanitation Policy Update';
 
   @override
-  String get sustainabilityPolicyBody => 'Updated protocols for compostable tray sanitization have been implemented for Q3.';
+  String get sustainabilityPolicyBody =>
+      'Updated protocols for compostable tray sanitization have been implemented for Q3.';
 
   @override
   String get sustainabilityViewDocument => 'View Document';
@@ -5862,7 +6825,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get takeawayChoosePickupDetails => 'Choose Pickup Details';
 
   @override
-  String get takeawayPickupSubtitle => 'Select a time that works for you in Amman, Jordan.';
+  String get takeawayPickupSubtitle =>
+      'Select a time that works for you in Amman, Jordan.';
 
   @override
   String get takeawayHubName => 'Ayletna Hub - Downtown';
@@ -5934,7 +6898,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tipSupportTeamTitle => 'Support Our Culinary Team';
 
   @override
-  String get tipAppreciationQuote => '\"Your appreciation goes directly to the heart of the kitchen. Every tip fuels our team\'s passion for creating unforgettable flavors for you.\"';
+  String get tipAppreciationQuote =>
+      '\"Your appreciation goes directly to the heart of the kitchen. Every tip fuels our team\'s passion for creating unforgettable flavors for you.\"';
 
   @override
   String get tipAddAppreciation => 'Add Appreciation';
@@ -5958,7 +6923,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tipCustomAmountValue => 'JOD 0.00';
 
   @override
-  String get tipCustomAmountBody => 'Enter any amount you wish to contribute to the team.';
+  String get tipCustomAmountBody =>
+      'Enter any amount you wish to contribute to the team.';
 
   @override
   String get tipConfirmAppreciation => 'Confirm Appreciation';
@@ -6006,7 +6972,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackingOnWayBody => 'Driver: Marcus (5 mins away)';
 
   @override
-  String get trackingCallMarcus => 'Call Marcus';
+  String get trackingCallMarcus => 'Call driver';
 
   @override
   String get trackingDelivered => 'Delivered';
@@ -6039,7 +7005,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get trackingNeedHelp => 'Need help?';
 
   @override
-  String get trackingHelpBody => 'Our support team is available 24/7 for any delivery concerns.';
+  String get trackingHelpBody =>
+      'Our support team is available 24/7 for any delivery concerns.';
 
   @override
   String get trackingContactSupport => 'Contact Support';
@@ -6066,7 +7033,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get userManagementTitle => 'Staff Management';
 
   @override
-  String get userManagementSubtitle => 'Oversee your kitchen and front-of-house team.';
+  String get userManagementSubtitle =>
+      'Oversee your kitchen and front-of-house team.';
 
   @override
   String get userAddNewStaff => 'Add New Staff';
@@ -6279,7 +7247,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refundStep2Header => 'Damage Assessment';
 
   @override
-  String get refundStep2Body => 'Inspect returned items for any structural damage. Selecting \'Damaged\' will allow you to enter a deduction from the initial deposit.';
+  String get refundStep2Body =>
+      'Inspect returned items for any structural damage. Selecting \'Damaged\' will allow you to enter a deduction from the initial deposit.';
 
   @override
   String get refundCeramicPlate => 'Ceramic Mezze Plate';
@@ -6315,7 +7284,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refundDepositAmount => '15.00';
 
   @override
-  String get refundEstimateBody => 'Estimated refund will update automatically based on damage deductions entered above.';
+  String get refundEstimateBody =>
+      'Estimated refund will update automatically based on damage deductions entered above.';
 
   @override
   String get refundCancelFlow => 'Cancel Flow';
@@ -6363,7 +7333,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refundTotalSettlement => 'Total Settlement';
 
   @override
-  String get refundImmediateNotice => 'The refund will be processed immediately to the user\'s Ayletna Wallet. A digital receipt will be sent via SMS to +962 *** *** 44.';
+  String get refundImmediateNotice =>
+      'The refund will be processed immediately to the user\'s Ayletna Wallet. A digital receipt will be sent via SMS to +962 *** *** 44.';
 
   @override
   String get refundCustomerInfo => 'Customer Info';
@@ -6447,7 +7418,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get returnMissing => 'Missing';
 
   @override
-  String get returnMissingWarning => 'Missing items will be flagged for manager review and may incur a replacement fee for the customer.';
+  String get returnMissingWarning =>
+      'Missing items will be flagged for manager review and may incur a replacement fee for the customer.';
 
   @override
   String get returnContinueStep2 => 'Continue to Step 2';
@@ -6462,7 +7434,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get returnVerificationComplete => 'Verification Complete';
 
   @override
-  String get returnVerificationBody => 'Deposit will be credited to wallet instantly.';
+  String get returnVerificationBody =>
+      'Deposit will be credited to wallet instantly.';
 
   @override
   String get returnBreakageFeeAmount => '- 2.500 JOD';
@@ -6510,7 +7483,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get returnFinalizeReturn => 'Finalize Return';
 
   @override
-  String get returnFinalizeDisclaimer => 'By clicking Finalize Return, you confirm that all items have been inspected and the refund amount is accurate.';
+  String get returnFinalizeDisclaimer =>
+      'By clicking Finalize Return, you confirm that all items have been inspected and the refund amount is accurate.';
 
   @override
   String get platedReturnBadge => 'Plated Experience';
@@ -6519,13 +7493,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get platedReturnReadyTitle => 'Ready to return?';
 
   @override
-  String get platedReturnReadyBody => 'We hope you enjoyed your meal! Please let us know how you\'d like to return your ceramic plate set.';
+  String get platedReturnReadyBody =>
+      'We hope you enjoyed your meal! Please let us know how you\'d like to return your ceramic plate set.';
 
   @override
   String get platedReturnDepositTitle => 'Refundable Deposit';
 
   @override
-  String get platedReturnDepositBody => 'Your 5 JOD deposit will be credited back to your wallet instantly upon receipt of the items.';
+  String get platedReturnDepositBody =>
+      'Your 5 JOD deposit will be credited back to your wallet instantly upon receipt of the items.';
 
   @override
   String get platedReturnSchedulePickup => 'Schedule Pickup';
@@ -6537,13 +7513,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get screenRatingReview => 'Rate your meal';
 
   @override
-  String get screenRatingReviewDesc => 'Post-delivery rating and review screen.';
+  String get screenRatingReviewDesc =>
+      'Post-delivery rating and review screen.';
 
   @override
   String get ratingHeroTitle => 'How was your Ayletna meal?';
 
   @override
-  String get ratingHeroSubtitle => 'Your note helps the kitchen keep every dish warm, fresh, and generous.';
+  String get ratingHeroSubtitle =>
+      'Your note helps the kitchen keep every dish warm, fresh, and generous.';
 
   @override
   String get ratingOrderLabel => 'Order experience';
@@ -6561,13 +7539,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ratingCommentLabel => 'Add a short note';
 
   @override
-  String get ratingCommentHint => 'Tell us what tasted great or what we should improve';
+  String get ratingCommentHint =>
+      'Tell us what tasted great or what we should improve';
 
   @override
   String get ratingSubmit => 'Send review';
 
   @override
-  String get ratingSuccess => 'Thanks. Your review was added to your rewards profile.';
+  String get ratingSuccess =>
+      'Thanks. Your review was added to your rewards profile.';
 
   @override
   String get ratingRewardLoop => '+50 Savor Points after review';
@@ -6576,7 +7556,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ratingReviewLater => 'Review later';
 
   @override
-  String get reportFilterIntro => 'Choose the analytics scope before reviewing sales, inventory, tips, and plate decisions.';
+  String get reportFilterIntro =>
+      'Choose the analytics scope before reviewing sales, inventory, tips, and plate decisions.';
 
   @override
   String get reportFilterPeriod => 'Period';
@@ -6632,7 +7613,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminGrowthHubBadge => 'Admin Team & Growth Hub';
 
   @override
-  String get adminGrowthHubHero => 'One place to manage team hours, owner privacy, loyalty, and offers instead of scattered weak pages.';
+  String get adminGrowthHubHero =>
+      'One place to manage team hours, owner privacy, loyalty, and offers instead of scattered weak pages.';
 
   @override
   String get adminGrowthHubTodayHours => 'Today hours';
@@ -6647,7 +7629,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminGrowthStaffTitle => 'Team Hours & Shifts';
 
   @override
-  String get adminGrowthStaffSubtitle => 'Track coverage, hours, and tips by restaurant role.';
+  String get adminGrowthStaffSubtitle =>
+      'Track coverage, hours, and tips by restaurant role.';
 
   @override
   String get adminGrowthKitchen => 'Kitchen';
@@ -6674,22 +7657,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminGrowthTipsDetail => 'Ready after hours approval';
 
   @override
-  String get adminGrowthPrivacySubtitle => 'Owner view and finance-report visibility rules.';
+  String get adminGrowthPrivacySubtitle =>
+      'Owner view and finance-report visibility rules.';
 
   @override
-  String get adminGrowthLoyaltySubtitle => 'Turn loyalty into repeat visits and clear food orders.';
+  String get adminGrowthLoyaltySubtitle =>
+      'Turn loyalty into repeat visits and clear food orders.';
 
   @override
   String get adminGrowthPointsRule => 'Points rule';
 
   @override
-  String get adminGrowthEnableLunchMultiplier => 'Enable lunch multiplier';
+  String get adminGrowthEnableLunchMultiplier => 'Double loyalty points';
 
   @override
-  String get adminGrowthLunchMultiplierBody => '12 PM to 4 PM for best-selling menu items.';
+  String get adminGrowthLunchMultiplierBody =>
+      'When on, customers earn 2× points on add-to-cart from product detail.';
 
   @override
-  String get adminGrowthBirthdayDessertBody => 'Visible only during the guest birthday window.';
+  String get adminGrowthBirthdayDessertBody =>
+      'Visible only during the guest birthday window.';
 
   @override
   String get adminGrowthTarget => 'Target';
@@ -6698,61 +7685,73 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminGrowthTargetBody => 'Second visit within 14 days';
 
   @override
-  String get adminGrowthOffersSubtitle => 'Offers connect to inventory and margins, not generic marketing cards.';
+  String get adminGrowthOffersSubtitle =>
+      'Offers connect to inventory and margins, not generic marketing cards.';
 
   @override
   String get adminGrowthShawarmaOffer => 'Shawarma meal lunch offer';
 
   @override
-  String get adminGrowthShawarmaOfferBody => 'Tied to lunch peak and prep capacity.';
+  String get adminGrowthShawarmaOfferBody =>
+      'Tied to lunch peak and prep capacity.';
 
   @override
   String get adminGrowthFamilyTrayOffer => 'Family plated bundle';
 
   @override
-  String get adminGrowthFamilyTrayOfferBody => 'Requires tray availability and clear deposit rule.';
+  String get adminGrowthFamilyTrayOfferBody =>
+      'Requires tray availability and clear deposit rule.';
 
   @override
   String get adminGrowthHomeOffers => 'Home offers';
 
   @override
-  String get adminGrowthHomeOffersBody => 'Shown in the offers section when the list is not empty.';
+  String get adminGrowthHomeOffersBody =>
+      'Shown in the offers section when the list is not empty.';
 
   @override
   String get adminGrowthCombos => 'Combos';
 
   @override
-  String get adminGrowthCombosBody => 'Shown in combo sections on customer and guest pages.';
+  String get adminGrowthCombosBody =>
+      'Shown in combo sections on customer and guest pages.';
 
   @override
   String get adminGrowthDiscountedItems => 'Discounted items';
 
   @override
-  String get adminGrowthDiscountedItemsBody => 'Hidden automatically when no discounted items exist.';
+  String get adminGrowthDiscountedItemsBody =>
+      'Hidden automatically when no discounted items exist.';
 
   @override
   String get adminGrowthSubscriptionItems => 'Subscription items';
 
   @override
-  String get adminGrowthSubscriptionItemsBody => 'Supports monthly or annual subscription mock offers.';
+  String get adminGrowthSubscriptionItemsBody =>
+      'Supports monthly or annual subscription offers.';
 
   @override
   String get adminGrowthTargetMargin => 'Target margin';
 
   @override
-  String get adminGrowthTargetMarginBody => 'Do not publish if margin drops below target.';
+  String get adminGrowthTargetMarginBody =>
+      'Do not publish if margin drops below target.';
 
   @override
-  String get adminGrowthDecisionStaff => 'Approve close-shift hours before tip payout.';
+  String get adminGrowthDecisionStaff =>
+      'Approve close-shift hours before tip payout.';
 
   @override
-  String get adminGrowthDecisionPrivacy => 'Show net profit only during owner performance review.';
+  String get adminGrowthDecisionPrivacy =>
+      'Show net profit only during owner performance review.';
 
   @override
-  String get adminGrowthDecisionLoyalty => 'Tie point multipliers to soft demand windows.';
+  String get adminGrowthDecisionLoyalty =>
+      'Tie point multipliers to soft demand windows.';
 
   @override
-  String get adminGrowthDecisionOffers => 'Test the shawarma offer before publishing plated bundles.';
+  String get adminGrowthDecisionOffers =>
+      'Test the shawarma offer before publishing plated bundles.';
 
   @override
   String get adminGrowthSuggestedDecision => 'Suggested Decision';
@@ -6767,7 +7766,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get adminGrowthActionsTitle => 'Admin Actions';
 
   @override
-  String get adminGrowthActionsSubtitle => 'All actions are UI-only mock actions.';
+  String get adminGrowthActionsSubtitle =>
+      'Manage growth campaigns and offers.';
 
   @override
   String get adminGrowthSaveSettings => 'Save settings';
@@ -6777,4 +7777,2843 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get adminGrowthOpenAuditLog => 'Open audit log';
+
+  @override
+  String get languageEmblemArabic => 'ع';
+
+  @override
+  String get languageEmblemEnglish => 'EN';
+
+  @override
+  String get authLoginInvalidCredentials =>
+      'Invalid phone, email, or password.';
+
+  @override
+  String get settingsProfileRefreshed => 'Profile refreshed.';
+
+  @override
+  String ownershipShareValue(String share) {
+    return '$share%';
+  }
+
+  @override
+  String get pendingApprovalRefreshed => 'Approval status checked.';
+
+  @override
+  String get roleSelectionOpsSection => 'Operations & customer';
+
+  @override
+  String get supportCreateTicketTitle => 'Open support ticket';
+
+  @override
+  String get supportFieldTitleEn => 'Title (EN)';
+
+  @override
+  String get supportFieldTitleAr => 'Title (AR)';
+
+  @override
+  String get supportFieldDescriptionEn => 'Description (EN)';
+
+  @override
+  String get supportFieldDescriptionAr => 'Description (AR)';
+
+  @override
+  String get supportSubmitTicket => 'Submit ticket';
+
+  @override
+  String get supportValidationTitleBody => 'Enter title and description';
+
+  @override
+  String get supportTicketsEmpty =>
+      'No tickets yet. Create one using the form above.';
+
+  @override
+  String get supportMessageStaffPrefix => 'Support: ';
+
+  @override
+  String get supportYourRating => 'Your rating';
+
+  @override
+  String get supportYourReply => 'Your reply';
+
+  @override
+  String get supportSendReply => 'Send reply';
+
+  @override
+  String get supportRateAfterResolved => 'Rate only after ticket is resolved';
+
+  @override
+  String timeAgoMinutes(int count) {
+    return '${count}m ago';
+  }
+
+  @override
+  String timeAgoHours(int count) {
+    return '${count}h ago';
+  }
+
+  @override
+  String timeAgoDays(int count) {
+    return '${count}d ago';
+  }
+
+  @override
+  String get promoDetailOfferDetails => 'Offer details';
+
+  @override
+  String get promoDetailIncludes => 'Includes';
+
+  @override
+  String get promoDetailDescription => 'Description';
+
+  @override
+  String get promoDetailDiscount => 'Discount';
+
+  @override
+  String get promoDetailLoyaltyPoints => 'Loyalty points';
+
+  @override
+  String get promoDetailValidFor => 'Valid for';
+
+  @override
+  String get promoDetailThisWeek => 'This week';
+
+  @override
+  String get promoDetailLimitedOfferDesc =>
+      'Limited-time offer. Order now before it expires.';
+
+  @override
+  String get promoDetailComboDesc =>
+      'A bundled combo that brings our best dishes together at a special price.';
+
+  @override
+  String get promoDetailBundleSavings => 'Bundle savings';
+
+  @override
+  String get promoDetailItemsCount => 'Items';
+
+  @override
+  String get promoDetailBillingCycle => 'Billing cycle';
+
+  @override
+  String get promoDetailWeekly => 'Weekly';
+
+  @override
+  String get promoDetailMonthly => 'Monthly';
+
+  @override
+  String get promoDetailSubscriptionDesc =>
+      'Weekly or monthly meal subscription.';
+
+  @override
+  String get promoDetailViewMeal => 'View meal';
+
+  @override
+  String promoPercentOff(String percent) {
+    return '$percent% off';
+  }
+
+  @override
+  String get cartInvalidPromoCode => 'Invalid code — try AYLETNA10 or WELCOME';
+
+  @override
+  String get homeOfferAddedToCart => 'Offer added to cart';
+
+  @override
+  String get homeComboAddedToCart => 'Combo added to cart';
+
+  @override
+  String get productAddedToCart => 'Added to cart';
+
+  @override
+  String get productContinueShopping => 'Continue shopping';
+
+  @override
+  String get productCheckout => 'Checkout';
+
+  @override
+  String get productRelatedProducts => 'Related products';
+
+  @override
+  String get productCustomerReviews => 'Customer reviews';
+
+  @override
+  String get productMoreReviews => 'More reviews';
+
+  @override
+  String productRewardCoins(int count) {
+    return '$count coins';
+  }
+
+  @override
+  String get searchRefreshed => 'Menu search refreshed';
+
+  @override
+  String get productNoReviewsYet => 'No approved reviews yet.';
+
+  @override
+  String get prepMockTimerDisplay => '12:49';
+
+  @override
+  String get platedConfirmCollectionBody =>
+      'Start the plated return collection for this stop?';
+
+  @override
+  String get productReviewsTitle => 'Product reviews';
+
+  @override
+  String get productReviewsApprovedTitle => 'Approved reviews';
+
+  @override
+  String productReviewsCountFor(int count, String title) {
+    return '$count reviews for $title';
+  }
+
+  @override
+  String get productReviewsEmptyPrompt =>
+      'No approved reviews yet. Rate your order after delivery.';
+
+  @override
+  String get productRewardEarnBefore => 'You are about to earn ';
+
+  @override
+  String get productRewardEarnAfter =>
+      ' with this item. Keep collecting rewards and redeem them later for Ayletna discounts and treats.';
+
+  @override
+  String get orderReorderFailed =>
+      'Could not rebuild this order. Some items may no longer be available.';
+
+  @override
+  String get orderTrackingLoadError =>
+      'Unable to load order tracking. Pull to refresh or try again later.';
+
+  @override
+  String get ratingOrderLoadError => 'Unable to load order details for rating.';
+
+  @override
+  String get paymentHistoryEmpty => 'No payments recorded yet.';
+
+  @override
+  String get redemptionNoRewardSelected => 'No reward selected';
+
+  @override
+  String get redemptionInsufficientPoints => 'Insufficient points';
+
+  @override
+  String get redemptionPointsBalanceTitle => 'Points balance';
+
+  @override
+  String redemptionPointsBalanceValue(int balance) {
+    return '$balance pts';
+  }
+
+  @override
+  String redemptionCostLabel(int cost) {
+    return 'Redemption cost: $cost';
+  }
+
+  @override
+  String get supportChatYou => 'You';
+
+  @override
+  String supportChatLinkedTicket(String ticketId) {
+    return 'Linked ticket: $ticketId';
+  }
+
+  @override
+  String get supportChatTicketFromLiveChat => 'Help request from live chat';
+
+  @override
+  String get supportChatTicketTitle => 'Live chat';
+
+  @override
+  String get cartCompleteOrderTitle => 'Complete your order';
+
+  @override
+  String get cartPopularAddonsSubtitle => 'Popular add-ons for your basket';
+
+  @override
+  String get cashierConfirmLogTip => 'Log this tip amount to the shift total?';
+
+  @override
+  String get checkoutPaymentSummaryTitle => 'Payment summary';
+
+  @override
+  String get addressesDeleteFailed =>
+      'Could not delete this address. Try again.';
+
+  @override
+  String get deliveryOrder8845Title => 'Order #8845';
+
+  @override
+  String get inventoryBatchLotLabel => 'Batch / lot';
+
+  @override
+  String get inventoryBatchLotHint => 'LOT-SAL-042';
+
+  @override
+  String get inventoryExpiryDateLabel => 'Expiry date';
+
+  @override
+  String get inventoryExpiryDateHint => '2026-06-20';
+
+  @override
+  String get inventoryEvidenceTitle => 'Receipt / photo evidence';
+
+  @override
+  String get inventoryAttachSupplierReceipt => 'Attach supplier receipt';
+
+  @override
+  String get inventoryAddShelfPhoto => 'Add shelf photo';
+
+  @override
+  String get mapDefaultAddressTitle => 'Home';
+
+  @override
+  String get mapDefaultAddressText => '123 Gastronomy Lane, Central Hub, Amman';
+
+  @override
+  String comboDiscountOff(String percent) {
+    return '$percent% off';
+  }
+
+  @override
+  String get billingPeriodWeekly => 'Weekly';
+
+  @override
+  String get billingPeriodMonthly => 'Monthly';
+
+  @override
+  String get catalogBrowseEmpty => 'New items will appear here when available.';
+
+  @override
+  String get guestOfferCartUnavailable =>
+      'This offer cannot be added to your cart yet.';
+
+  @override
+  String get profileRefreshed => 'Profile refreshed.';
+
+  @override
+  String get profileDeactivateNotAvailable =>
+      'Account deactivation is temporarily unavailable. Contact support.';
+
+  @override
+  String get profileDeactivateConfirmBody =>
+      'This ends the demo session and returns you to sign-in. Real account deletion will require support once the backend is live.';
+
+  @override
+  String get profileDeactivatedMock => 'Demo account signed out.';
+
+  @override
+  String get addressSavedSuccess => 'Address saved';
+
+  @override
+  String get addressSaveFailed => 'Could not save address';
+
+  @override
+  String get cashierAttachAddressTitle => 'Attach address to account';
+
+  @override
+  String get cashierMobileNumber => 'Mobile number';
+
+  @override
+  String get cashierAccountIdOptional => 'Account ID (optional)';
+
+  @override
+  String get cashierSaveAndAttach => 'Save & attach';
+
+  @override
+  String get cashierEnterAddressFirst => 'Enter an address first';
+
+  @override
+  String get cashierDeliveryAddressLabel => 'Delivery address';
+
+  @override
+  String get cashierSavedAddressesTitle => 'Saved addresses';
+
+  @override
+  String get cashierSearchAddressHint => 'Search by name or mobile';
+
+  @override
+  String get cashierNoMatchingAddresses => 'No matching saved addresses';
+
+  @override
+  String get cashierSaveAddressLabel => 'Save address';
+
+  @override
+  String get cashierAttachToAccountLabel => 'Attach to phone / account';
+
+  @override
+  String get cashierOfferAddedToCart => 'Offer added to cart';
+
+  @override
+  String get settingsToggleSaved => 'Setting saved';
+
+  @override
+  String get deliveryReturnProcessRefreshed => 'Return process refreshed.';
+
+  @override
+  String get adminCommandCenterBadge => 'Live Command Center';
+
+  @override
+  String get adminCommandCenterHeadline =>
+      'Priority now: late tickets, stockouts, cash close, and driver delays.';
+
+  @override
+  String get adminCommandCenterBody =>
+      'Built for the restaurant owner: fast decisions, clear operations, and direct links into every station.';
+
+  @override
+  String get adminActiveOrdersMetric => 'Active orders';
+
+  @override
+  String get adminUrgentAlertsMetric => 'Urgent alerts';
+
+  @override
+  String get adminOpenOrdersBoard => 'Open Orders Board';
+
+  @override
+  String get adminCashCloseAction => 'Cash Close';
+
+  @override
+  String get adminNeedsAttentionTitle => 'Needs Your Attention';
+
+  @override
+  String get adminNeedsAttentionSubtitle =>
+      'Prioritized by guest impact and shift risk.';
+
+  @override
+  String adminLateTicketsLabel(int count) {
+    return '$count tickets running late';
+  }
+
+  @override
+  String get adminLateTicketsDetail =>
+      'Shawarma and fryer station need attention within 4 minutes.';
+
+  @override
+  String get adminOpenOrdersAction => 'Open orders';
+
+  @override
+  String adminBelowThresholdDetail(int count) {
+    return '$count ingredients below threshold.';
+  }
+
+  @override
+  String get adminDriverDelayedLabel => 'Driver delayed on plated delivery';
+
+  @override
+  String adminDriverDelayedDetail(String orderId, String customer) {
+    return 'Order #$orderId on the road — $customer.';
+  }
+
+  @override
+  String get adminDeliveryRouteAction => 'Delivery route';
+
+  @override
+  String get adminNoUrgentAlerts =>
+      'No urgent alerts — operations look stable.';
+
+  @override
+  String get adminLiveOrdersSubtitle =>
+      'Every order channel with prep and settlement context.';
+
+  @override
+  String get adminCashCloseTitle => 'Cash Close';
+
+  @override
+  String get adminCashCloseSubtitle => 'Verify sales, tips, and refunds.';
+
+  @override
+  String get adminReviewShiftClose => 'Review Shift Close';
+
+  @override
+  String get adminStockoutImpactTitle => 'Menu Stockout Impact';
+
+  @override
+  String get adminStockoutImpactSubtitle =>
+      'Connect low ingredients to dishes before peak.';
+
+  @override
+  String get adminInventoryAction => 'Inventory';
+
+  @override
+  String get adminNoCriticalStock => 'No critical stock alerts.';
+
+  @override
+  String get adminDriversReturnsTitle => 'Drivers & Returns';
+
+  @override
+  String get adminDriversReturnsSubtitle =>
+      'Food delivery and plated returns in one view.';
+
+  @override
+  String get adminNoActiveDelivery => 'No active delivery tasks.';
+
+  @override
+  String adminOrderLabel(String id) {
+    return 'Order #$id';
+  }
+
+  @override
+  String adminTrayReturnLabel(String id) {
+    return 'Tray return #$id';
+  }
+
+  @override
+  String get adminReturnBadge => 'Return';
+
+  @override
+  String get adminOpenDeliveryTasks => 'Open Delivery Tasks';
+
+  @override
+  String get adminTeamSnapshotSubtitle => 'Current team by station.';
+
+  @override
+  String get adminQuickControlsTitle => 'Quick Controls';
+
+  @override
+  String get adminQuickControlsSubtitle =>
+      'Admin links without bottom navigation.';
+
+  @override
+  String get platesOpsBadge => 'Plate Asset & Deposit Ops';
+
+  @override
+  String get platesOpsHeadline =>
+      'Track trays, bowls, breakage, deposits, and returns from one board.';
+
+  @override
+  String get platesInStock => 'In stock';
+
+  @override
+  String get platesCirculating => 'Circulating';
+
+  @override
+  String get platesAssetValue => 'Asset value';
+
+  @override
+  String get platesCatalogSubtitle =>
+      'Physical assets with SKU, value, stock, and circulation.';
+
+  @override
+  String get platesReturnWindowValue => '48 hours';
+
+  @override
+  String get platesReturnReminders => 'Return reminders';
+
+  @override
+  String get platesBreakageTrackSubtitle =>
+      'Track breakage and missing items before settlement.';
+
+  @override
+  String get platesBreakageDefault => 'Plate breakage';
+
+  @override
+  String get platesBreakageDescription => 'Description';
+
+  @override
+  String get platesBreakageLossJod => 'Loss (JOD)';
+
+  @override
+  String platesStockNowUnits(int count) {
+    return 'Stock now $count units';
+  }
+
+  @override
+  String get supportTicketsTitle => 'Support Tickets';
+
+  @override
+  String get supportTicketsHero => 'Customer Support Center';
+
+  @override
+  String get supportTicketNotFound => 'Ticket not found';
+
+  @override
+  String get supportTicketStatusLabel => 'Status';
+
+  @override
+  String get supportTicketStatusUpdated => 'Status updated';
+
+  @override
+  String get supportTicketConversation => 'Conversation';
+
+  @override
+  String get supportTicketReplyArabic => 'Arabic reply';
+
+  @override
+  String get supportTicketReplyEnglish => 'English reply';
+
+  @override
+  String get supportTicketSendReply => 'Send reply';
+
+  @override
+  String get supportTicketReplyFailed => 'Could not send reply';
+
+  @override
+  String get supportTicketReplySent => 'Reply sent';
+
+  @override
+  String get supportTicketCustomerFeedback => 'Customer feedback';
+
+  @override
+  String get hrAttendancePayrollTitle => 'Attendance & Payroll';
+
+  @override
+  String get hrStaffAttendanceTooltip => 'Staff attendance';
+
+  @override
+  String get hrPeriodDaily => 'Daily';
+
+  @override
+  String get hrPeriodMonthly => 'Monthly';
+
+  @override
+  String get hrTotalPayable => 'Total payable';
+
+  @override
+  String get hrExportCsv => 'Export CSV';
+
+  @override
+  String get hrExportCsvSuccess => 'Payroll CSV exported.';
+
+  @override
+  String get hrPayrollRulesTitle => 'Payroll rules';
+
+  @override
+  String hrPayrollDelayRule(int minutes, String fee, String currency) {
+    return 'Delay > $minutes min → fee $fee $currency';
+  }
+
+  @override
+  String get hrDelayLabel => 'Delay';
+
+  @override
+  String get hrOvertimeLabel => 'Overtime';
+
+  @override
+  String get hrPercentLabel => 'Percent';
+
+  @override
+  String get hrPayableLabel => 'Payable';
+
+  @override
+  String get hrMinutesShort => 'min';
+
+  @override
+  String get hrHoursShort => 'h';
+
+  @override
+  String get hrOutcomeFullPay => 'Full pay';
+
+  @override
+  String get hrOutcomeDelayFee => 'Delay fee';
+
+  @override
+  String get hrOutcomeDelayFeeDouble => 'Fee ×2';
+
+  @override
+  String get hrOutcomeAbsence => 'Absence';
+
+  @override
+  String get hrOutcomeOvertime => 'Overtime';
+
+  @override
+  String get productEditorAddMenuItem => 'Add menu item';
+
+  @override
+  String get productEditorSaveFirst => 'Save the item first';
+
+  @override
+  String get productEditorPreview => 'Preview';
+
+  @override
+  String get productEditorBadge => 'Menu Item Editor';
+
+  @override
+  String get productEditorBadgeDesc =>
+      'Edit pricing, variants, modifiers, media, and station routing.';
+
+  @override
+  String get productEditorNameSection => 'Name & Description';
+
+  @override
+  String get productEditorNameSectionDesc =>
+      'Bilingual copy shown on customer menu cards.';
+
+  @override
+  String get productEditorArabicName => 'Arabic name';
+
+  @override
+  String get productEditorEnglishName => 'English name';
+
+  @override
+  String get productEditorArabicDesc => 'Arabic description';
+
+  @override
+  String get productEditorEnglishDesc => 'English description';
+
+  @override
+  String get productEditorPricingSection => 'Pricing & Variants';
+
+  @override
+  String get productEditorPricingSectionDesc =>
+      'Base price and portion/variant deltas.';
+
+  @override
+  String get productEditorBasePrice => 'Base price';
+
+  @override
+  String get productEditorAddVariant => 'Add variant';
+
+  @override
+  String get productEditorAddPortionTitle => 'Add portion size';
+
+  @override
+  String get productEditorPortionKeyLabel => 'Key (e.g. super)';
+
+  @override
+  String get productEditorPortionPriceDelta => 'Price delta (JOD)';
+
+  @override
+  String get productEditorEnterPortionKey => 'Enter a portion key';
+
+  @override
+  String get productEditorPortionAdded => 'Portion added';
+
+  @override
+  String get productEditorPortionKeyExists => 'Key already exists';
+
+  @override
+  String get productEditorModifiersSection => 'Modifiers';
+
+  @override
+  String get productEditorModifiersSectionDesc =>
+      'Attach catalog add-ons to this item.';
+
+  @override
+  String get productEditorNoAddons => 'No catalog addons yet.';
+
+  @override
+  String get productEditorMediaSection => 'Media & Display';
+
+  @override
+  String get productEditorMediaSectionDesc => 'Images and menu presentation.';
+
+  @override
+  String get productEditorMediaFallback => 'No image yet — add 1 to 5 photos.';
+
+  @override
+  String get productEditorPrepStationSection => 'Prep Station';
+
+  @override
+  String get productEditorPrepStationSectionDesc =>
+      'Route tickets to the correct kitchen lane.';
+
+  @override
+  String get productEditorAvailabilitySection => 'Availability & Channels';
+
+  @override
+  String get productEditorAvailabilitySectionDesc =>
+      'Control where this item is visible.';
+
+  @override
+  String get productEditorAvailableNow => 'Available now';
+
+  @override
+  String get productEditorFeatured => 'Featured in menu';
+
+  @override
+  String get productEditorSavePublishSection => 'Save & Publish';
+
+  @override
+  String get productEditorSavePublishCreateDesc =>
+      'Create then publish to the menu.';
+
+  @override
+  String get productEditorSavePublishEditDesc =>
+      'Persists edits to catalog and custom menu items.';
+
+  @override
+  String get productEditorAddMinImages => 'Add at least 1 image (up to 5)';
+
+  @override
+  String get productEditorCheckRequiredFields => 'Check required fields';
+
+  @override
+  String get productEditorMenuItemSaved => 'Menu item saved';
+
+  @override
+  String get productEditorPublishToMenu => 'Publish to menu';
+
+  @override
+  String get productEditorPublishTitle => 'Publish menu item';
+
+  @override
+  String get productEditorPublishMessage =>
+      'The item will appear in selected sales channels.';
+
+  @override
+  String get productEditorAddImageBeforePublish =>
+      'Add at least 1 image before publishing';
+
+  @override
+  String get productEditorCheckNamePrice => 'Check name and price';
+
+  @override
+  String get productEditorPublished => 'Published';
+
+  @override
+  String get productEditorBackToMenu => 'Back to menu management';
+
+  @override
+  String get productEditorPrepStationShawarma => 'Shawarma station';
+
+  @override
+  String get productEditorPrepStationFryer => 'Fryer station';
+
+  @override
+  String get productEditorPrepStationColdPrep => 'Cold prep';
+
+  @override
+  String get productEditorPrepStationDrinks => 'Drinks';
+
+  @override
+  String get auditLogTrueTrailBadge => 'True Audit Trail';
+
+  @override
+  String get auditLogHeroHeadline =>
+      'Track who changed what, when, and from which operational area.';
+
+  @override
+  String get auditLogTodayEvents => 'Today events';
+
+  @override
+  String get auditLogSensitiveChanges => 'Sensitive changes';
+
+  @override
+  String get auditLogNeedsReview => 'Needs review';
+
+  @override
+  String get auditLogRequestConfirmMessage =>
+      'A detailed audit request will be logged for review.';
+
+  @override
+  String get auditLogExportLog => 'Export log';
+
+  @override
+  String get auditLogExportDownloaded => 'Export file downloaded';
+
+  @override
+  String get auditLogTimelineSubtitle =>
+      'Timeline of administrative and operational events.';
+
+  @override
+  String get auditLogNoEventsInScope => 'No events in this scope.';
+
+  @override
+  String get auditLogDetailedAuditRequested => 'Detailed audit requested';
+
+  @override
+  String get auditLogAuditExported => 'Audit log exported';
+
+  @override
+  String get auditLogShiftCloseApproved => 'Shift close approved';
+
+  @override
+  String get auditLogUserActivated => 'User activated';
+
+  @override
+  String get auditLogUserDeactivated => 'User deactivated';
+
+  @override
+  String get auditLogDepositSettingsSaved => 'Deposit settings saved';
+
+  @override
+  String get auditLogTrayBreakageArea => 'Tray breakage';
+
+  @override
+  String get auditLogInventoryArea => 'Inventory';
+
+  @override
+  String get auditLogUserRoleChanged => 'User role changed';
+
+  @override
+  String get auditLogCashierShiftClosed => 'Cashier shift closed';
+
+  @override
+  String get auditLogTrayDepositEdited => 'Tray deposit policy edited';
+
+  @override
+  String get auditLogFiltersTitle => 'Audit Filters';
+
+  @override
+  String get auditLogFiltersSubtitle => 'Scope the log quickly.';
+
+  @override
+  String get auditLogGovernanceTitle => 'Governance Snapshot';
+
+  @override
+  String get auditLogGovernanceSubtitle =>
+      'Security and permission posture for this shift.';
+
+  @override
+  String get auditLogFailedLogins => 'Failed login attempts';
+
+  @override
+  String get auditLogPermissionChanges => 'Permission changes';
+
+  @override
+  String get auditLogFinancialEdits => 'Financial edits';
+
+  @override
+  String get auditLogInventorySubtitle =>
+      'Recent stock adjustments from inventory.';
+
+  @override
+  String get auditLogNoStockChanges => 'No stock changes yet.';
+
+  @override
+  String get auditLogActorOwner => 'Owner';
+
+  @override
+  String get auditLogActorOperator => 'Operator';
+
+  @override
+  String get auditLogActorFinance => 'Finance';
+
+  @override
+  String get auditLogActorLogistics => 'Logistics';
+
+  @override
+  String get auditLogActorSystem => 'System';
+
+  @override
+  String get auditLogAreaGovernance => 'Governance';
+
+  @override
+  String get auditLogAreaReports => 'Reports';
+
+  @override
+  String get auditLogAreaCashClose => 'Cash close';
+
+  @override
+  String get auditLogAreaRolesPrivacy => 'Roles & Privacy';
+
+  @override
+  String get auditLogAreaFinance => 'Finance';
+
+  @override
+  String get auditLogAreaAdminLog => 'Admin log';
+
+  @override
+  String get auditLogToday => 'Today';
+
+  @override
+  String get auditLogYesterday1820 => 'Yesterday 18:20';
+
+  @override
+  String get auditLogToday0942 => 'Today 09:42';
+
+  @override
+  String get auditLogToday0858 => 'Today 08:58';
+
+  @override
+  String get auditLogActorOperatorAhmad => 'Operator Ahmad';
+
+  @override
+  String get auditLogActorCashierLayla => 'Cashier Layla';
+
+  @override
+  String get auditLogAuditRequestDetail =>
+      'Request logged for review before shift close.';
+
+  @override
+  String get auditLogAuditExportDetail => 'CSV audit file downloaded.';
+
+  @override
+  String get auditLogShiftCloseDetail => 'Revenue, tips, and refunds approved.';
+
+  @override
+  String auditLogDepositSavedDetail(String amount, String hours) {
+    return 'Deposit $amount JOD · ${hours}h window';
+  }
+
+  @override
+  String get auditLogRoleChangeDetail =>
+      'Sara moved from Kitchen to Station Supervisor.';
+
+  @override
+  String get auditLogCashierCloseDetail =>
+      'Revenue, tips, and refunds were approved.';
+
+  @override
+  String get auditLogTrayDepositEditDetail =>
+      'Global deposit and return window updated.';
+
+  @override
+  String get auditLogSystemEntryDetail => 'Automated admin event recorded.';
+
+  @override
+  String get orderDetailAdminSendUpdate => 'Send update';
+
+  @override
+  String get orderDetailAdminOrderTotal => 'Order total';
+
+  @override
+  String get orderDetailAdminDeposit => 'Deposit';
+
+  @override
+  String get orderDetailAdminOnRoute => 'On route';
+
+  @override
+  String get orderDetailAdminOnRouteValue => '28 min';
+
+  @override
+  String get orderDetailAdminSendGuestUpdateTitle => 'Send guest update';
+
+  @override
+  String get orderDetailAdminUpdatePreparing => 'Order is preparing';
+
+  @override
+  String get orderDetailAdminUpdateReady => 'Order is ready';
+
+  @override
+  String get orderDetailAdminUpdateOnWay => 'Driver is on the way';
+
+  @override
+  String get orderDetailAdminUpdateDelay => 'Delay — we apologize';
+
+  @override
+  String get orderDetailAdminUpdateSent => 'Update sent';
+
+  @override
+  String get orderDetailAdminDelayNoticeSent => 'Delay notice sent';
+
+  @override
+  String get orderDetailAdminGuestPaymentTitle => 'Guest & Payment';
+
+  @override
+  String get orderDetailAdminGuestPaymentSubtitle =>
+      'Key context for closing and contact.';
+
+  @override
+  String get orderDetailAdminGuestLabel => 'Guest';
+
+  @override
+  String get orderDetailAdminChannelLabel => 'Channel';
+
+  @override
+  String get orderDetailAdminFoodTotal => 'Food total';
+
+  @override
+  String get orderDetailAdminTrayDeposit => 'Tray deposit';
+
+  @override
+  String get orderDetailAdminKitchenTicketTitle => 'Kitchen Ticket';
+
+  @override
+  String get orderDetailAdminKitchenTicketSubtitle =>
+      'Items and station summary.';
+
+  @override
+  String get orderDetailAdminPrepStationNote => 'Prep station';
+
+  @override
+  String get orderDetailAdminOpenKitchen => 'Open kitchen pass';
+
+  @override
+  String get orderDetailAdminActionsTitle => 'Admin Actions';
+
+  @override
+  String get orderDetailAdminContactGuest => 'Contact guest';
+
+  @override
+  String get orderDetailAdminChangeStatus => 'Change order status';
+
+  @override
+  String get orderDetailAdminChangeStatusTitle => 'Change status';
+
+  @override
+  String get orderDetailAdminBackToBoard => 'Back to order board';
+
+  @override
+  String get orderDetailAdminPosReceived => 'POS received';
+
+  @override
+  String get orderDetailAdminKitchenPrep => 'Kitchen prep';
+
+  @override
+  String get orderDetailAdminCloseSettle => 'Close & settle';
+
+  @override
+  String get orderDetailAdminTimelineNext => 'Next';
+
+  @override
+  String get orderDetailAdminTimelineTitle => 'Order Timeline';
+
+  @override
+  String get orderDetailAdminTimelineSubtitle => 'From entry to settlement.';
+
+  @override
+  String get orderDetailAdminRisksTitle => 'Risks & Notes';
+
+  @override
+  String get orderDetailAdminDeliveryTiming => 'Delivery timing';
+
+  @override
+  String get orderDetailAdminNoDeposit => 'No deposit';
+
+  @override
+  String get orderDetailAdminOperationalNote => 'Operational note';
+
+  @override
+  String get productEditorHeroHeadline =>
+      'Edit bilingual naming, pricing, variants, modifiers, prep routing, and availability.';
+
+  @override
+  String get productEditorIdentitySubtitle =>
+      'Customer-facing copy shown in the menu.';
+
+  @override
+  String get productEditorMediaGalleryHint =>
+      '1–5 images — warm food media for each angle.';
+
+  @override
+  String get productEditorMediaUsage =>
+      'Product gallery • menu card • POS tile';
+
+  @override
+  String get productEditorStationSubtitle =>
+      'Controls where the kitchen ticket appears.';
+
+  @override
+  String get orderDetailAdminContactPhone => '+962 7 9000 0000';
+
+  @override
+  String get commonOpen => 'Open';
+
+  @override
+  String get settingsOpsBadge => 'Operations Settings';
+
+  @override
+  String get settingsOpsHeroHeadline =>
+      'Control hours, stations, order rules, delivery zones, taxes, receipts, and alerts.';
+
+  @override
+  String get settingsAppAdminHeroHeadline =>
+      'System configuration, integrations, and platform permissions.';
+
+  @override
+  String get settingsHeroNineSections => '9 sections';
+
+  @override
+  String get settingsHeroUiOnly => 'Settings';
+
+  @override
+  String get settingsHeroDrawerNav => 'Drawer navigation';
+
+  @override
+  String get settingsBusinessHoursTitle => 'Business Hours & Order Rules';
+
+  @override
+  String get settingsBusinessHoursSubtitle =>
+      'Set service state, prep rules, and pre-order behavior.';
+
+  @override
+  String get settingsAcceptingOrders => 'Accepting orders now';
+
+  @override
+  String get settingsDeliveryEnabled => 'Delivery enabled now';
+
+  @override
+  String get settingsTodayHours => 'Today hours';
+
+  @override
+  String get settingsTodayHoursValue => '8:00 AM - 12:00 AM';
+
+  @override
+  String get settingsPreOrdersLabel => 'Pre-orders';
+
+  @override
+  String get settingsPreOrdersDetail => 'Up to 3 days ahead';
+
+  @override
+  String get settingsStationsTitle => 'Stations & Operating Rules';
+
+  @override
+  String get settingsStationsSubtitle =>
+      'Route menu items to kitchen stations and prep rules.';
+
+  @override
+  String get settingsShawarmaStation => 'Shawarma station';
+
+  @override
+  String get settingsShawarmaPrepDetail => '8 min average prep';
+
+  @override
+  String get settingsFryerStation => 'Fryer station';
+
+  @override
+  String get settingsFryerLoadDetail => 'Load limit 12 tickets';
+
+  @override
+  String get settingsLateTicketThreshold => 'Late-ticket threshold';
+
+  @override
+  String get settingsLateTicketDetail => 'Escalate after 15 minutes';
+
+  @override
+  String get settingsSystemPlatformTitle => 'System & platform';
+
+  @override
+  String get settingsSystemPlatformSubtitle =>
+      'Integrations, users, roles, and audit.';
+
+  @override
+  String get settingsIntegrationsDetail => 'Supabase, SMS, payments';
+
+  @override
+  String get settingsAuditTrailDetail => 'Full platform audit trail';
+
+  @override
+  String get settingsStaffTitle => 'Staff & attendance';
+
+  @override
+  String get settingsStaffSubtitle =>
+      'Shift roster, attendance, and approvals.';
+
+  @override
+  String get settingsStaffHoursDetail => 'Shifts, attendance, and hours';
+
+  @override
+  String get settingsAttendanceHrLabel => 'Attendance & HR';
+
+  @override
+  String get settingsAttendanceHrDetail => 'Attendance log and approvals';
+
+  @override
+  String get settingsFeesTaxesTitle => 'Fees & Taxes';
+
+  @override
+  String get settingsFeesTaxesSubtitle =>
+      'Delivery fees, tax display, and receipt layout.';
+
+  @override
+  String get settingsDeliveryFeesLabel => 'Delivery fees';
+
+  @override
+  String get settingsDeliveryFeesDetail => 'Zone-based delivery charge rules';
+
+  @override
+  String get settingsReceiptTemplateLabel => 'Receipt template';
+
+  @override
+  String get settingsReceiptTemplateDetail =>
+      'Logo, footer, and tax line layout';
+
+  @override
+  String get settingsNotificationsTitle => 'Notifications & Alerts';
+
+  @override
+  String get settingsNotificationsSubtitle =>
+      'Kitchen, inventory, and tray-return alerts.';
+
+  @override
+  String get settingsKitchenAlertsDetail => 'Prep delay and station overload';
+
+  @override
+  String get settingsLowStockAlert => 'Low stock alert';
+
+  @override
+  String get settingsLowStockDetail => 'Below 15% threshold';
+
+  @override
+  String get settingsTrayReturnReminders => 'Tray return reminders';
+
+  @override
+  String get settingsTrayReturnDetail => '60 minutes after delivery';
+
+  @override
+  String get settingsAppAdminShortcuts => 'App admin shortcuts';
+
+  @override
+  String get settingsOpsShortcuts => 'Operations shortcuts';
+
+  @override
+  String get settingsShortcutsSubtitle => 'Jump to high-traffic admin screens.';
+
+  @override
+  String get settingsAttendancePayrollShortcut => 'Attendance & payroll';
+
+  @override
+  String get settingsPreOrdersShortcut => 'Pre-orders';
+
+  @override
+  String get ordersMgmtFilterTitle => 'Filter order board';
+
+  @override
+  String get ordersMgmtFilterMessage =>
+      'Filter by channel, station, or delay status.';
+
+  @override
+  String get ordersMgmtFilterTooltip => 'Filter';
+
+  @override
+  String get ordersMgmtLaneNeedsDecision => 'Needs Decision';
+
+  @override
+  String get ordersMgmtLaneNeedsDecisionSub => 'Late, missing, or escalated';
+
+  @override
+  String get ordersMgmtLanePreparing => 'Preparing';
+
+  @override
+  String get ordersMgmtLanePreparingSub => 'Kitchen in progress';
+
+  @override
+  String get ordersMgmtLaneReadyRoute => 'Ready / On Route';
+
+  @override
+  String get ordersMgmtLaneReadyRouteSub => 'Ready to handoff or on the road';
+
+  @override
+  String get ordersMgmtHeroBadge => 'Live Order Board';
+
+  @override
+  String get ordersMgmtOpenOrders => 'Open orders';
+
+  @override
+  String get ordersMgmtActiveValue => 'Active value';
+
+  @override
+  String get ordersMgmtPlatedOrders => 'Plated orders';
+
+  @override
+  String get ordersMgmtEmptyLane => 'No orders here';
+
+  @override
+  String get ordersMgmtOpenDetail => 'Open detail';
+
+  @override
+  String get ordersMgmtEscalate => 'Escalate';
+
+  @override
+  String get ordersMgmtEscalationLogged => 'Escalation logged';
+
+  @override
+  String get ordersMgmtRecentlyClosed => 'Recently Closed';
+
+  @override
+  String get ordersMgmtHistory => 'History';
+
+  @override
+  String get ordersMgmtDeliveredStatus => 'Delivered';
+
+  @override
+  String get financialCloseBadge => 'Cash Close & Profit Split';
+
+  @override
+  String get financialCloseHeroHeadline =>
+      'Reconcile shift revenue, cash, cards, deposits, tips, then approve net profit.';
+
+  @override
+  String get financialCloseShiftRevenue => 'Shift revenue';
+
+  @override
+  String get financialCloseOrdersCount => 'Orders';
+
+  @override
+  String get financialCloseDistributableNet => 'Distributable net';
+
+  @override
+  String get financialCloseSummaryTitle => 'Shift Close Summary';
+
+  @override
+  String get financialCloseSummarySubtitle =>
+      'Operational numbers before approving the close.';
+
+  @override
+  String get financialCloseStatusLabel => 'Status';
+
+  @override
+  String get financialCloseStatusReady => 'Ready to close';
+
+  @override
+  String get financialCloseTenderTitle => 'Tender Reconciliation';
+
+  @override
+  String get financialCloseTenderSubtitle =>
+      'Cash, card, and wallet must match the cashier ledger.';
+
+  @override
+  String get financialCloseCash => 'Cash';
+
+  @override
+  String get financialCloseCards => 'Cards';
+
+  @override
+  String get financialCloseWallet => 'Wallet';
+
+  @override
+  String get financialCloseDepositsTitle => 'Deposits & Refunds';
+
+  @override
+  String get financialCloseDepositsSubtitle =>
+      'Tray deposits, refunds, and breakage exposure.';
+
+  @override
+  String get financialCloseRefundsToday => 'Refunds today';
+
+  @override
+  String get financialCloseBreakageFees => 'Potential breakage fees';
+
+  @override
+  String get financialCloseReviewTrayReturns => 'Review tray returns';
+
+  @override
+  String get financialCloseTipsTitle => 'Tips & Variance';
+
+  @override
+  String get financialCloseTipsSubtitle =>
+      'Shift tip pool and reconciliation variance.';
+
+  @override
+  String get financialCloseCurrentTips => 'Current shift tips';
+
+  @override
+  String get financialCloseVariance => 'Reconciliation variance';
+
+  @override
+  String get financialCloseSplitTitle => 'Net Profit Split';
+
+  @override
+  String get financialCloseSplitSubtitle =>
+      'Owner and operator shares after costs and tips.';
+
+  @override
+  String get financialCloseApproveTitle => 'Approve Close';
+
+  @override
+  String get financialCloseOwnerViewOnly => 'Owner view only';
+
+  @override
+  String get financialCloseApprovedReadOnly => 'Close approved (read-only)';
+
+  @override
+  String get financialCloseAwaitingApproval => 'Awaiting operator approval';
+
+  @override
+  String get financialCloseApproveSubtitle =>
+      'Lock the shift after reconciliation checks.';
+
+  @override
+  String get financialCloseApproveShift => 'Approve shift close';
+
+  @override
+  String get financialCloseApproveConfirmTitle => 'Approve close';
+
+  @override
+  String get financialCloseApproveConfirmMessage =>
+      'This will lock shift totals for audit.';
+
+  @override
+  String get financialCloseApprovedSuccess => 'Shift close approved';
+
+  @override
+  String get settingsStaffCardSubtitle => 'Staff hours and attendance.';
+
+  @override
+  String get settingsFeesTaxesCardSubtitle =>
+      'Sales tax, delivery fees, deposits, and receipts.';
+
+  @override
+  String get settingsDeliveryFeesZoneMinimum =>
+      'Zone-based fee and minimum order';
+
+  @override
+  String get settingsReceiptTemplateTerms => 'Logo, tax, and return terms';
+
+  @override
+  String get settingsNotificationsCardSubtitle =>
+      'Kitchen, driver, inventory, and return alerts.';
+
+  @override
+  String get settingsLateKitchenTicketAlerts => 'Late kitchen ticket alerts';
+
+  @override
+  String get settingsShortcutsJumpSubtitle =>
+      'Jump to specialized settings without bottom navigation.';
+
+  @override
+  String get ordersMgmtHeroHeadline =>
+      'Track every order from POS to kitchen to handoff.';
+
+  @override
+  String get ordersMgmtRecentlyClosedSub =>
+      'Completed or delivered orders for quick audit.';
+
+  @override
+  String get ordersMgmtOpPending =>
+      'Waiting for kitchen confirmation or item availability.';
+
+  @override
+  String get ordersMgmtOpReady => 'Ready for handoff, verify packaging.';
+
+  @override
+  String get ordersMgmtOpOnWay => 'On route, monitor arrival time.';
+
+  @override
+  String get ordersMgmtOpPreparing => 'In preparation, watch station timing.';
+
+  @override
+  String get financialCloseDepositsExcludedSubtitle =>
+      'Deposits are conditional funds and excluded from profit split.';
+
+  @override
+  String get financialCloseTipsSeparateSubtitle =>
+      'Tips stay separate from revenue and go to staff.';
+
+  @override
+  String get financialCloseSplitAfterCostsSubtitle =>
+      'After excluding tips, deposits, and operating expenses.';
+
+  @override
+  String get financialCloseApproveUiOnlySubtitle =>
+      'Review totals before approving the shift close.';
+
+  @override
+  String get financialCloseApproveMockMessage =>
+      'Shift close approval will be logged for audit.';
+
+  @override
+  String get financialCloseReportDownloaded =>
+      'Report downloaded — print to PDF from browser';
+
+  @override
+  String get financialCloseVarianceLabel => 'Variance';
+
+  @override
+  String get actionAdd => 'Add';
+
+  @override
+  String get catalogCrudAdded => 'Added';
+
+  @override
+  String get catalogCrudCheckFields => 'Check required fields';
+
+  @override
+  String get catalogCrudUpdated => 'Updated';
+
+  @override
+  String get catalogCrudUpdateFailed => 'Update failed';
+
+  @override
+  String get catalogCrudDeleted => 'Deleted';
+
+  @override
+  String get catalogCrudNameEn => 'Name EN';
+
+  @override
+  String get catalogCrudNameAr => 'Name AR';
+
+  @override
+  String get catalogCrudIconKey => 'Icon key';
+
+  @override
+  String get catalogCrudPrice => 'Price';
+
+  @override
+  String get catalogCrudMinOneImage => 'Add at least 1 image';
+
+  @override
+  String get menuCatalogTitle => 'Menu Catalog';
+
+  @override
+  String get menuCatalogTabCategories => 'Categories';
+
+  @override
+  String get menuCatalogTabAddons => 'Addons';
+
+  @override
+  String get menuCatalogTabRelated => 'Related';
+
+  @override
+  String get menuCatalogAddCategory => 'Add category';
+
+  @override
+  String get menuCatalogAddAddon => 'Add addon';
+
+  @override
+  String get menuCatalogAddonImageRequired => 'Add an image for the addon';
+
+  @override
+  String get menuCatalogLinkRelated => 'Link related products';
+
+  @override
+  String menuCatalogLinkRelatedSubtitle(String sampleIds) {
+    return 'Example IDs: $sampleIds';
+  }
+
+  @override
+  String get menuCatalogProductId => 'Product ID';
+
+  @override
+  String get menuCatalogRelatedIds => 'Related IDs (comma-separated)';
+
+  @override
+  String get menuCatalogSaveLink => 'Save link';
+
+  @override
+  String get menuCatalogSaved => 'Saved';
+
+  @override
+  String get menuCatalogEnterProductId => 'Enter a product ID';
+
+  @override
+  String get promoMgmtTabDiscounts => 'Discounts';
+
+  @override
+  String get promoMgmtTabOffers => 'Offers';
+
+  @override
+  String get promoMgmtCreateCombo => 'Create combo';
+
+  @override
+  String get promoMgmtDiscountPercent => 'Discount %';
+
+  @override
+  String get promoMgmtDiscountProduct => 'Discount product';
+
+  @override
+  String get promoMgmtMenuItemId => 'Menu item ID';
+
+  @override
+  String get promoMgmtNewOffer => 'New offer';
+
+  @override
+  String get promoMgmtSubscriptionMeal => 'Subscription meal';
+
+  @override
+  String orderDetailAdminHeroTitle(String orderId) {
+    return 'Order #$orderId admin timeline';
+  }
+
+  @override
+  String orderDetailAdminHeroBody(String customer) {
+    return '$customer • Verify handoff timing, deposit, and notes before closing.';
+  }
+
+  @override
+  String get orderDetailAdminActionsSubtitle =>
+      'Update status, notes, and escalations for this order.';
+
+  @override
+  String get orderDetailAdminChangeStatusMessage =>
+      'Choose the next status for this order.';
+
+  @override
+  String get orderDetailAdminTimelinePosDetail =>
+      'Order entered and payment captured.';
+
+  @override
+  String get orderDetailAdminTimelinePrepDetail => 'Items prepared and packed.';
+
+  @override
+  String get orderDetailAdminTimelineOnWayDetail =>
+      'Courier is on the way to the guest.';
+
+  @override
+  String get orderDetailAdminTimelineWaitingDetail =>
+      'Waiting for the next operational step.';
+
+  @override
+  String get orderDetailAdminTimelineCloseDetail =>
+      'Confirm handoff, deposit, and any breakage fee.';
+
+  @override
+  String get orderDetailAdminRisksSubtitle =>
+      'What the owner should know before closing this order.';
+
+  @override
+  String get orderDetailAdminRiskTimingDetail =>
+      'Eight minutes above route average.';
+
+  @override
+  String get orderDetailAdminRiskTrayDetail =>
+      'Confirm tray return expectation at handoff.';
+
+  @override
+  String hrPayrollOnTimeRule(int minutes) {
+    return 'On time (≤ $minutes min) → 100% salary';
+  }
+
+  @override
+  String hrPayrollDelayDoubleRule(int minutes) {
+    return 'Late > $minutes min → fee ×2';
+  }
+
+  @override
+  String hrPayrollAbsenceRule(int minutes) {
+    return 'Late > $minutes min → absence (0% even if present)';
+  }
+
+  @override
+  String hrPayrollOvertimeRule(int minutes, String multiplier) {
+    return 'Work > $minutes min beyond schedule → $multiplier× extra hours pay';
+  }
+
+  @override
+  String supportTicketsHeroBody(int count) {
+    return '$count active tickets — update status, reply to customers, track feedback.';
+  }
+
+  @override
+  String get supportTicketStatusOpen => 'Open';
+
+  @override
+  String get supportTicketStatusInProgress => 'In progress';
+
+  @override
+  String get supportTicketStatusWaiting => 'Waiting';
+
+  @override
+  String get supportTicketStatusResolved => 'Resolved';
+
+  @override
+  String get supportTicketStatusClosed => 'Closed';
+
+  @override
+  String get reportsHubBadge => 'Restaurant Analytics Hub';
+
+  @override
+  String get reportsHubHeadline =>
+      'Connect sales, channels, tips, waste, and trays to clear operating decisions.';
+
+  @override
+  String get reportsOpsScorecardsTitle => 'Operating Scorecards';
+
+  @override
+  String get reportsOpsScorecardsSubtitle =>
+      'Numbers that drive today, not just export files.';
+
+  @override
+  String get reportsAvgOrderLabel => 'Average order';
+
+  @override
+  String get reportsTrayReturnSuccess => 'Tray return success';
+
+  @override
+  String get reportsWasteBreakageCost => 'Waste & breakage cost';
+
+  @override
+  String get reportsTrendSubtitle => 'Order trend across recent service hours.';
+
+  @override
+  String get reportsTodayPeakLabel => 'Today peak';
+
+  @override
+  String get reportsTodayPeakValue => 'Lunch and evening delivery';
+
+  @override
+  String get reportsDecisionsTitle => 'Recommended Decisions';
+
+  @override
+  String get reportsDecisionsSubtitle =>
+      'Analytics connected to restaurant operations.';
+
+  @override
+  String get reportsInsightShawarmaLabel =>
+      'Increase shawarma prep before lunch';
+
+  @override
+  String get reportsInsightShawarmaDetail =>
+      'Channel sales are 12% above baseline.';
+
+  @override
+  String get reportsReviewFryerLabel => 'Review fryer wastage';
+
+  @override
+  String get reportsApproveTipsLabel => 'Approve tip distribution';
+
+  @override
+  String get reportsModulesTitle => 'Analytics Modules';
+
+  @override
+  String get reportsPlatesDepositsTitle => 'Plates & deposits';
+
+  @override
+  String get reportsExportTitle => 'Export & Share';
+
+  @override
+  String get reportsExportSubtitle =>
+      'Exports are now an outcome, not the whole screen.';
+
+  @override
+  String get reportsExportOperatorOnly =>
+      'Export is available to the operator role only.';
+
+  @override
+  String get preOrderOpsBadge => 'Pre-order Operations';
+
+  @override
+  String get preOrderOpsHeadline =>
+      'Review tomorrow orders, prep capacity, trays, and pickup windows before accepting pre-orders.';
+
+  @override
+  String get preOrderOpsNeedDecision => 'Need decision';
+
+  @override
+  String get preOrderOpsPickupWindows => 'Pickup windows';
+
+  @override
+  String get preOrderOpsReservedTrays => 'Reserved trays';
+
+  @override
+  String get preOrderOpsEmptyMessage => 'No pre-orders pending';
+
+  @override
+  String get preOrderOpsReviewQueue => 'Review Queue';
+
+  @override
+  String get preOrderOpsReviewQueueSub =>
+      'Each pre-order needs a clear decision before prep.';
+
+  @override
+  String get preOrderOpsAccept => 'Accept';
+
+  @override
+  String get preOrderOpsAccepted => 'Pre-order accepted';
+
+  @override
+  String get preOrderOpsAdjustTime => 'Adjust time';
+
+  @override
+  String get preOrderOpsPickupUpdated => 'Pickup time updated';
+
+  @override
+  String get preOrderOpsPrepCapacity => 'Prep Capacity';
+
+  @override
+  String get preOrderOpsPrepCapacitySub =>
+      'Accept orders based on available stations.';
+
+  @override
+  String get preOrderOpsStationShawarma => 'Shawarma';
+
+  @override
+  String get preOrderOpsStationPizza => 'Pizza';
+
+  @override
+  String get preOrderOpsStationPlated => 'Plated trays';
+
+  @override
+  String get preOrderOpsRulesTitle => 'Pre-order Rules';
+
+  @override
+  String get preOrderOpsRulesSubtitle =>
+      'Configure pre-order rules and availability.';
+
+  @override
+  String get preOrderOpsRuleCutoff => 'Cutoff: 9 PM';
+
+  @override
+  String get preOrderOpsRuleMinPrep => 'Minimum prep: 2 hours';
+
+  @override
+  String get preOrderOpsRuleTraysBeforePay => 'Confirm trays before payment';
+
+  @override
+  String get rewardsAdminSetupTitle => 'Rewards Setup';
+
+  @override
+  String get rewardsAdminPointsRules => 'Points rules';
+
+  @override
+  String rewardsAdminPointsPerJod(String points) {
+    return '$points points per JOD spent';
+  }
+
+  @override
+  String get rewardsAdminAddReward => 'Add reward';
+
+  @override
+  String get rewardsAdminPointsRequired => 'Points required';
+
+  @override
+  String get rewardsAdminCategory => 'Category';
+
+  @override
+  String get rewardsAdminAddToCatalog => 'Add to catalog';
+
+  @override
+  String get rewardsAdminActiveRewards => 'Active rewards';
+
+  @override
+  String get rewardsAdminRewardAdded => 'Reward added';
+
+  @override
+  String get rewardsAdminCategoryDrinks => 'Drinks';
+
+  @override
+  String get rewardsAdminCategorySides => 'Sides';
+
+  @override
+  String get rewardsAdminCategoryMain => 'Main';
+
+  @override
+  String get rewardsAdminArtIcon => 'Art icon';
+
+  @override
+  String get rewardsAdminColorAccent => 'Color accent';
+
+  @override
+  String get rewardsAdminBadgeAr => 'Badge AR';
+
+  @override
+  String get rewardsAdminBadgeEn => 'Badge EN';
+
+  @override
+  String get rewardsAdminArtGeneric => 'Generic';
+
+  @override
+  String get rewardsAdminArtBurger => 'Burger';
+
+  @override
+  String get rewardsAdminArtDrink => 'Drink';
+
+  @override
+  String get rewardsAdminArtFries => 'Fries';
+
+  @override
+  String get rewardsAdminArtBowl => 'Bowl';
+
+  @override
+  String get rewardsAdminArtDonut => 'Donut';
+
+  @override
+  String get rewardsAdminColorGold => 'Gold';
+
+  @override
+  String get rewardsAdminColorOrange => 'Orange';
+
+  @override
+  String get rewardsAdminColorOlive => 'Olive';
+
+  @override
+  String get rewardsAdminColorDelivery => 'Delivery';
+
+  @override
+  String get rewardsAdminColorDineIn => 'Dine in';
+
+  @override
+  String get rewardsAdminColorSecondary => 'Secondary';
+
+  @override
+  String get rewardsAdminColorTertiary => 'Tertiary';
+
+  @override
+  String get rewardsAdminColorOutline => 'Outline';
+
+  @override
+  String get rewardsAdminSoldOut => 'Sold out';
+
+  @override
+  String get rewardsAdminTitleAr => 'Title AR';
+
+  @override
+  String get rewardsAdminTitleEn => 'Title EN';
+
+  @override
+  String get rewardsAdminDescriptionAr => 'Description AR';
+
+  @override
+  String get rewardsAdminDescriptionEn => 'Description EN';
+
+  @override
+  String get rewardsAdminPointsLabel => 'Points';
+
+  @override
+  String rewardsAdminRewardMeta(int points, String category) {
+    return '$points pts · $category';
+  }
+
+  @override
+  String get quantityIncrease => 'Increase quantity';
+
+  @override
+  String get quantityDecrease => 'Decrease quantity';
+
+  @override
+  String get menuMgmtPublished => 'Published';
+
+  @override
+  String get menuMgmtDraft => 'Draft';
+
+  @override
+  String get menuMgmtPublish => 'Publish';
+
+  @override
+  String get menuMgmtUnpublish => 'Unpublish';
+
+  @override
+  String get menuMgmtPublishSuccess => 'Published';
+
+  @override
+  String get menuMgmtHiddenFromMenu => 'Hidden from customer menu';
+
+  @override
+  String get filterByRole => 'Filter by role';
+
+  @override
+  String get rbacUserNotFound => 'User not found';
+
+  @override
+  String get rbacAccountActions => 'Account actions';
+
+  @override
+  String get rbacApprove => 'Approve';
+
+  @override
+  String get rbacReject => 'Reject';
+
+  @override
+  String get rbacSuspend => 'Suspend';
+
+  @override
+  String get rbacActivate => 'Activate';
+
+  @override
+  String get rbacInvite => 'Invite';
+
+  @override
+  String get rbacInviteMockMessage => 'Invite sent';
+
+  @override
+  String get rbacApprovedMessage => 'Approved';
+
+  @override
+  String get rbacRejectedMessage => 'Rejected';
+
+  @override
+  String get rbacSuspendedMessage => 'Suspended';
+
+  @override
+  String get rbacActivatedMessage => 'Activated';
+
+  @override
+  String get rbacAssignedRoles => 'Assigned roles';
+
+  @override
+  String get rbacStatusActive => 'Active';
+
+  @override
+  String get rbacStatusPendingApproval => 'Pending approval';
+
+  @override
+  String get rbacStatusSuspended => 'Suspended';
+
+  @override
+  String get rbacOwnershipPercent => 'Ownership %';
+
+  @override
+  String get rbacOwnershipHint => 'e.g. 35';
+
+  @override
+  String get reviewModerationTitle => 'Review Moderation';
+
+  @override
+  String reviewModerationHeroBody(int count) {
+    return '$count reviews awaiting moderation — approve to publish, reject or flag for follow-up.';
+  }
+
+  @override
+  String get reviewModerationReject => 'Reject';
+
+  @override
+  String get reviewModerationFlag => 'Flag';
+
+  @override
+  String get reviewModerationUpdated => 'Review updated';
+
+  @override
+  String get reviewModerationStatusPending => 'Pending';
+
+  @override
+  String get reviewModerationStatusApproved => 'Approved';
+
+  @override
+  String get reviewModerationStatusRejected => 'Rejected';
+
+  @override
+  String get reviewModerationStatusFlagged => 'Flagged';
+
+  @override
+  String get plateEditorBadge => 'Asset & Deposit Editor';
+
+  @override
+  String get plateEditorHeadline =>
+      'Set asset value, stock, deposit, and breakage fees.';
+
+  @override
+  String get plateEditorAssetIdentityTitle => 'Asset Identity';
+
+  @override
+  String get plateEditorAssetIdentitySubtitle =>
+      'Used by inventory, delivery, and returns.';
+
+  @override
+  String get plateEditorAssetNameAr => 'Arabic asset name';
+
+  @override
+  String get plateEditorAssetNameEn => 'English asset name';
+
+  @override
+  String get plateEditorAssetSku => 'Asset SKU';
+
+  @override
+  String get plateEditorReplacementValue => 'Replacement value';
+
+  @override
+  String get plateEditorStockTitle => 'Stock & Circulation';
+
+  @override
+  String get plateEditorStockSubtitle =>
+      'Operational counts used by the return flow.';
+
+  @override
+  String get plateEditorRequiresDeposit => 'Requires deposit on delivery';
+
+  @override
+  String get plateEditorAvailableDelivery => 'Available for delivery orders';
+
+  @override
+  String get plateEditorDepositRulesSubtitle =>
+      'Deposit rules for this asset type.';
+
+  @override
+  String get plateEditorConditionFeesTitle => 'Condition & Fees';
+
+  @override
+  String get plateEditorConditionFeesSubtitle =>
+      'Used during plated return processing.';
+
+  @override
+  String get plateEditorFeeFullBreakage => 'Full breakage fee';
+
+  @override
+  String get plateEditorFeeScratch => 'Scratch / minor damage';
+
+  @override
+  String get plateEditorFeeMissing => 'Missing on return';
+
+  @override
+  String get plateEditorSaveTitle => 'Save Asset';
+
+  @override
+  String get plateEditorSaveSubtitle => 'Save plate settings for the menu.';
+
+  @override
+  String get plateEditorSavedSuccess => 'Asset settings saved';
+
+  @override
+  String get plateEditorBackToPlates => 'Back to plates';
+
+  @override
+  String get adminShowLess => 'Show less';
+
+  @override
+  String adminTipRowSubtitle(String orderId, String hours) {
+    return 'ID: $orderId · $hours hrs';
+  }
+
+  @override
+  String get rbacRoleDefaultsSaved => 'Role defaults saved';
+
+  @override
+  String get rbacNoPendingChanges => 'No pending permission changes to save';
+
+  @override
+  String get rbacResetDefaults => 'Reset defaults';
+
+  @override
+  String get rbacResetDefaultsSuccess => 'Reset to factory defaults';
+
+  @override
+  String rbacUsersWithRoleLink(int count) {
+    return '$count users with this role — view list';
+  }
+
+  @override
+  String get reportFilterPageSubtitle =>
+      'The same filter used inside the reports hub, available as a full admin page.';
+
+  @override
+  String get reviewModerationAlreadyProcessed =>
+      'This review was already moderated.';
+
+  @override
+  String get reviewModerationRejectConfirmTitle => 'Reject review?';
+
+  @override
+  String get reviewModerationRejectConfirmMessage =>
+      'The review will be hidden from the public menu.';
+
+  @override
+  String get reviewModerationFlagConfirmTitle => 'Flag review?';
+
+  @override
+  String get reviewModerationFlagConfirmMessage =>
+      'The review will be marked for support follow-up.';
+
+  @override
+  String get supportFaqDeleteConfirmTitle => 'Delete FAQ entry?';
+
+  @override
+  String get supportFaqDeleteConfirmMessage =>
+      'This entry will be removed from the public FAQ list.';
+
+  @override
+  String get supportFaqDeleteBlocked =>
+      'Keep at least one FAQ entry in the editor.';
+
+  @override
+  String get supportFaqDeleted => 'FAQ entry removed';
+
+  @override
+  String get rbacResetConfirmTitle => 'Reset role defaults?';
+
+  @override
+  String get rbacResetConfirmMessage =>
+      'All permissions for this role will return to factory defaults.';
+
+  @override
+  String get rbacAllPermissionsDenied =>
+      'At least one permission must be allowed before saving.';
+
+  @override
+  String get adminTipPoolEmpty =>
+      'Tip pool must be greater than zero before approval.';
+
+  @override
+  String get reportFilterAtLeastOneModule =>
+      'Select at least one report module.';
+
+  @override
+  String get marketingBlogUnpublishConfirmTitle => 'Move post to draft?';
+
+  @override
+  String get marketingBlogUnpublishConfirmMessage =>
+      'Published posts will no longer appear on the blog.';
+
+  @override
+  String get marketingBlogDeleteConfirmTitle => 'Delete blog post?';
+
+  @override
+  String get marketingBlogDeleteConfirmMessage =>
+      'This removes the post from marketing and the customer blog.';
+
+  @override
+  String get marketingBlogDraftNeedsTitle =>
+      'Add a title before publishing this draft.';
+
+  @override
+  String get opsKitchenBoardRefreshed => 'Kitchen pass refreshed.';
+
+  @override
+  String get opsInventoryItemRefreshed => 'Inventory item refreshed.';
+
+  @override
+  String get inventoryItemSelectTitle => 'Select an inventory item';
+
+  @override
+  String get inventoryItemSelectBody =>
+      'Open an alert from the inventory dashboard to review stock, supplier, and adjustment history.';
+
+  @override
+  String get inventoryItemOpenDashboard => 'Open inventory dashboard';
+
+  @override
+  String get opsStaffTipsRefreshed => 'Daily tips refreshed.';
+
+  @override
+  String get opsCashierHistoryRefreshed => 'Transaction history refreshed.';
+
+  @override
+  String get supportChatPriorityHigh => 'High';
+
+  @override
+  String get supportChatPriorityNormal => 'Normal';
+
+  @override
+  String supportChatWaitingMinutes(int minutes, String id) {
+    return 'Waiting $minutes min · $id';
+  }
+
+  @override
+  String get supportChatAcceptAction => 'Accept chat';
+
+  @override
+  String get supportChatAccepted => 'Chat accepted';
+
+  @override
+  String supportChatAcceptBodyAr(String customer, String id) {
+    return 'محادثة مباشرة مع $customer ($id)';
+  }
+
+  @override
+  String supportChatAcceptBodyEn(String customer, String id) {
+    return 'Live chat with $customer ($id)';
+  }
+
+  @override
+  String get supportChatAcceptReplyAr => 'تم قبول المحادثة من قائمة الانتظار.';
+
+  @override
+  String get supportChatAcceptReplyEn => 'Chat accepted from the queue.';
+
+  @override
+  String get supportChatAcceptFailed => 'Chat is no longer in the queue.';
+
+  @override
+  String get supportOrderLookupReadOnlyBanner =>
+      'Read-only lookup — orders cannot be edited';
+
+  @override
+  String get supportOrderLookupSearchLabel => 'Order # or customer';
+
+  @override
+  String get supportOrderLookupSearchHint => 'e.g. 4821';
+
+  @override
+  String get supportOrderLookupNoResults => 'No matching orders';
+
+  @override
+  String get staffTipHistoryNoData =>
+      'No tip history rows to export for this range.';
+
+  @override
+  String get marketingCalendarSelectDay =>
+      'Select a day on the calendar first.';
+
+  @override
+  String get marketingCalendarScheduleConfirmTitle => 'Schedule campaign?';
+
+  @override
+  String get marketingCalendarScheduleConfirmMessage =>
+      'Adds an internal planning slot only — does not publish to customers.';
+
+  @override
+  String get marketingCalendarScheduledSuccess => 'Campaign slot scheduled';
+
+  @override
+  String get marketingPushScheduleConfirmTitle => 'Schedule push send?';
+
+  @override
+  String get marketingPushScheduleConfirmMessage =>
+      'Schedules an in-app customer notification.';
+
+  @override
+  String get marketingPushDeleteConfirmTitle => 'Delete push campaign?';
+
+  @override
+  String get marketingPushDeleteConfirmMessage =>
+      'This removes the draft or scheduled campaign from the marketing list.';
+
+  @override
+  String get marketingPushBodyRequired =>
+      'Add notification body text before scheduling.';
+
+  @override
+  String get marketingPushScheduleFailed =>
+      'Campaign draft could not be scheduled.';
+
+  @override
+  String get opsDeliveryOrderRefreshed => 'Delivery order refreshed.';
+
+  @override
+  String get marketingSocialMetaBusiness => 'Meta Business';
+
+  @override
+  String get marketingSocialInstagramPlatform => 'Instagram';
+
+  @override
+  String get marketingSocialMetaSubtitle => 'Restaurant Facebook page';
+
+  @override
+  String get marketingSocialInstagramSubtitle => 'Posts & reels publishing';
+
+  @override
+  String get permissionMatrixEmpty => 'No capabilities apply to this role.';
+
+  @override
+  String get permissionAccessFull => 'Full';
+
+  @override
+  String get permissionAccessRead => 'Read';
+
+  @override
+  String get permissionAccessDenied => 'Denied';
+
+  @override
+  String get permissionAccessPostponed => 'Postponed';
+
+  @override
+  String rbacPostponedUntil(String date) {
+    return 'Postponed until $date';
+  }
+
+  @override
+  String get rbacSelectPostponeDate => 'Select postpone date';
+
+  @override
+  String get rbacPostponeDateRequired =>
+      'Choose a date when postponing access.';
+
+  @override
+  String get rbacOpenRoleDefaults => 'Open role defaults in Screen A';
+
+  @override
+  String get loginDemoModeNotice =>
+      'Use hub shortcuts to open a role workspace.';
+
+  @override
+  String get loginDemoSignedIn => 'Signed in successfully.';
+
+  @override
+  String get roleSelectionNoApprovedRoles =>
+      'No approved roles yet. Contact your app administrator.';
+
+  @override
+  String get registerViewTerms => 'View terms';
+
+  @override
+  String get rbacRoleGroupManagement => 'Management';
+
+  @override
+  String get rbacRoleGroupSpecialist => 'Specialist';
+
+  @override
+  String get rbacRoleGroupOperations => 'Operations';
+
+  @override
+  String get rbacRoleGroupManagementSpecialist => 'Management & specialist';
+
+  @override
+  String get customerDiscountsEmptyTitle => 'No active discounts';
+
+  @override
+  String get customerDiscountsEmptyBody =>
+      'Check back soon or browse the menu for current offers.';
+
+  @override
+  String get customerPromoNotFoundTitle => 'Promotion not found';
+
+  @override
+  String get customerPromoNotFoundBody =>
+      'This offer may have expired or been removed.';
+
+  @override
+  String get promoApplyUnavailable =>
+      'This promotion cannot be applied to your cart right now.';
+
+  @override
+  String get permSupportRefunds => 'Order refunds & cancel';
+
+  @override
+  String get permSupportSla => 'SLA & shift handover';
+
+  @override
+  String get permMarketingMenuPricing => 'Menu price publish';
+
+  @override
+  String get permMarketingPublish => 'Campaign publish';
+
+  @override
+  String get permOperatorCampaignApprove => 'Campaign co-approval';
+
+  @override
+  String get supportSlaAtRisk => 'SLA at risk';
+
+  @override
+  String get supportSlaBreached => 'SLA breached';
+
+  @override
+  String get supportResolvedToday => 'Resolved (24h)';
+
+  @override
+  String get supportAvgResponseTime => 'Avg response';
+
+  @override
+  String supportAvgResponseMinutes(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get supportShiftHandoverTitle => 'Shift handover';
+
+  @override
+  String get supportShiftHandoverHint =>
+      'Open tickets, blockers, and notes for the next agent…';
+
+  @override
+  String get supportShiftHandoverSaved => 'Handover notes saved';
+
+  @override
+  String supportShiftHandoverLast(String when) {
+    return 'Last handover: $when';
+  }
+
+  @override
+  String get supportAgentPerformanceTitle => 'Agent performance (today)';
+
+  @override
+  String get supportTicketCustomerPhone => 'Customer phone';
+
+  @override
+  String get supportTicketCustomerAddress => 'Customer address';
+
+  @override
+  String get supportTicketEscalateOperator => 'Escalate to Operator';
+
+  @override
+  String get supportTicketEscalateCashier => 'Escalate to Cashier';
+
+  @override
+  String supportTicketEscalated(String target) {
+    return 'Ticket escalated to $target';
+  }
+
+  @override
+  String get supportOrderLookupActionsBanner =>
+      'Support can issue refunds and cancel orders.';
+
+  @override
+  String get supportOrderRefundAction => 'Issue refund';
+
+  @override
+  String get supportOrderCancelAction => 'Cancel order';
+
+  @override
+  String get supportOrderRefundConfirmTitle => 'Issue refund?';
+
+  @override
+  String get supportOrderRefundConfirmMessage =>
+      'A refund will be logged for audit.';
+
+  @override
+  String get supportOrderCancelConfirmTitle => 'Cancel order?';
+
+  @override
+  String get supportOrderCancelConfirmMessage =>
+      'This marks the order cancelled and logs audit.';
+
+  @override
+  String get supportOrderRefunded => 'Refund recorded';
+
+  @override
+  String get supportOrderCancelled => 'Order cancelled';
+
+  @override
+  String get supportOrderAlreadyCancelled => 'Order is already cancelled';
+
+  @override
+  String get marketingPublishSubmit => 'Submit for operator approval';
+
+  @override
+  String get marketingPublishSubmitted => 'Sent to operator for co-approval';
+
+  @override
+  String get marketingPublishPendingTitle => 'Pending operator approval';
+
+  @override
+  String get marketingOfferActiveToggle => 'Customer visible';
+
+  @override
+  String get marketingOfferActiveOn => 'Live';
+
+  @override
+  String get marketingOfferActiveOff => 'Hidden';
+
+  @override
+  String get marketingPublishApprove => 'Approve & publish';
+
+  @override
+  String get marketingPublishReject => 'Reject';
+
+  @override
+  String get marketingPublishApproved => 'Campaign published';
+
+  @override
+  String get marketingPublishRejected => 'Campaign rejected';
+
+  @override
+  String get marketingSubscriptionContentOnly =>
+      'Manage subscription content and billing options.';
+
+  @override
+  String get marketingSubscriptionValue => 'Subscription value';
+
+  @override
+  String marketingSubscriptionMealsTotal(int count) {
+    return '$count meals';
+  }
+
+  @override
+  String marketingSubscriptionRegularSum(String amount) {
+    return 'Regular sum: $amount';
+  }
+
+  @override
+  String marketingSubscriptionSaving(String amount) {
+    return 'You save: $amount';
+  }
+
+  @override
+  String get marketingSubscriptionCoverage => 'Meals per day';
+
+  @override
+  String marketingSubscriptionUncovered(int count) {
+    return '$count days without meals';
+  }
+
+  @override
+  String marketingSubscriptionDayMeals(int day, int count) {
+    return 'Day $day: $count meals';
+  }
+
+  @override
+  String get marketingSubscriptionFreeDelivery => 'Free delivery';
+
+  @override
+  String marketingSubscriptionEditDay(int day) {
+    return 'Day $day';
+  }
+
+  @override
+  String get marketingSubscriptionPickMeals => 'Pick meals for this day';
+
+  @override
+  String get auditEventRefund => 'Refund';
+
+  @override
+  String get auditEventOrderCancel => 'Order cancel';
+
+  @override
+  String get auditEventPriceChange => 'Price change';
+
+  @override
+  String get auditEventOfferPublished => 'Offer published';
+
+  @override
+  String get marketingMenuPricePublishTitle => 'Menu price publish';
+
+  @override
+  String get marketingMenuPricePublishBanner =>
+      'Marketing can update base menu prices. Each change is logged for operator audit before publish.';
+
+  @override
+  String get operatorEscalationsInboxTitle => 'Support escalations';
+
+  @override
+  String get operatorEscalationsInboxSubtitle =>
+      'Tickets escalated from Support — refund, cancel, or policy requests';
+
+  @override
+  String get operatorEscalationAcknowledge => 'Acknowledge';
+
+  @override
+  String get operatorEscalationAcknowledged => 'Escalation acknowledged';
+
+  @override
+  String get operatorEscalationOpenTicket => 'Open ticket';
+
+  @override
+  String operatorEscalationTarget(String target) {
+    return 'Escalated to $target';
+  }
+
+  @override
+  String get marketingHomeOpsTitle => 'Today’s marketing pulse';
+
+  @override
+  String get marketingVisitorsToday => 'Visitors today';
+
+  @override
+  String get marketingPurchasesToday => 'Purchases today';
+
+  @override
+  String get marketingActiveCampaigns => 'Active campaigns';
+
+  @override
+  String get marketingTopSellers => 'Top 10 purchasing items';
+
+  @override
+  String get marketingTopRatings => 'Top ratings';
+
+  @override
+  String marketingPendingApprovals(int count) {
+    return '$count need approval';
+  }
+
+  @override
+  String get marketingSocialInteractions => 'Social interactions';
+
+  @override
+  String get marketingInsightFilterAll => 'All';
+
+  @override
+  String get marketingInsightFilterPending => 'Pending approval';
+
+  @override
+  String get marketingInsightFilterApproved => 'Approved';
+
+  @override
+  String get marketingInsightOpenEdit => 'Open editor';
+
+  @override
+  String get marketingInsightPurchasesHint =>
+      'Filter by day range — tap a row for related product';
+
+  @override
+  String get marketingInsightVisitorsHint =>
+      'Visitor volume by segment — tap for related campaign';
+
+  @override
+  String get marketingProductSearchHint => 'Search product by name';
+
+  @override
+  String get marketingDiscountProductPoints => 'Product points (locked)';
+
+  @override
+  String get marketingProductCreate => 'Create product';
+
+  @override
+  String get marketingProductPreviewTab => 'Preview';
+
+  @override
+  String get marketingProductDetailsTitle => 'Product details';
+
+  @override
+  String get marketingLoyaltyCreateSheetTitle => 'New loyalty occasion';
+
+  @override
+  String get marketingSocialMonitorTitle => 'Social monitoring';
+
+  @override
+  String get marketingSocialUsers => 'Users';
+
+  @override
+  String get marketingSocialBlogs => 'Blogs';
+
+  @override
+  String get marketingSocialActionsToday => 'Actions today';
+
+  @override
+  String get marketingSocialActionsWeek => 'Actions this week';
+
+  @override
+  String get marketingSocialNoIntegration =>
+      'Monitoring only — app integrations are managed elsewhere.';
+
+  @override
+  String get marketingPromoCodesTitle => 'Promotion codes';
+
+  @override
+  String get marketingPromoCodeCreate => 'Create promo code';
+
+  @override
+  String get marketingPromoCodeValue => 'Code';
+
+  @override
+  String get marketingPromoCodeCategory => 'Category';
+
+  @override
+  String get marketingPromoCategoryDiscount => 'Discount';
+
+  @override
+  String get marketingPromoCategoryAddPoints => 'Add points';
+
+  @override
+  String get marketingPromoCategoryFreeMeal => 'Free meal';
+
+  @override
+  String get marketingPromoCategoryInviteFriends => 'Invite friends';
+
+  @override
+  String get marketingBlogPlatforms => 'Posted to';
+
+  @override
+  String get marketingBlogPickPlatforms => 'Social platforms';
+
+  @override
+  String get brandingSettingsTitle => 'App branding';
+
+  @override
+  String get brandingSettingsSubtitle =>
+      'Name, slogan, and logo shown on splash and login (EN + AR).';
+
+  @override
+  String get brandingNameEn => 'App name (English)';
+
+  @override
+  String get brandingNameAr => 'App name (Arabic)';
+
+  @override
+  String get brandingSloganEn => 'Slogan (English)';
+
+  @override
+  String get brandingSloganAr => 'Slogan (Arabic)';
+
+  @override
+  String get brandingLogoUrl => 'Logo image URL';
+
+  @override
+  String get brandingLogoUrlHint => 'Leave empty for default logo';
+
+  @override
+  String get brandingSave => 'Save branding';
+
+  @override
+  String get brandingReset => 'Reset to defaults';
+
+  @override
+  String get brandingSaved => 'Branding updated';
+
+  @override
+  String get drawerGroupHub => 'Hub';
+
+  @override
+  String get drawerGroupOrders => 'Orders';
+
+  @override
+  String get drawerGroupMenu => 'Menu';
+
+  @override
+  String get drawerGroupPeople => 'People';
+
+  @override
+  String get drawerGroupMoney => 'Money';
+
+  @override
+  String get drawerGroupSettings => 'Settings';
+
+  @override
+  String get drawerGroupPromotions => 'Promotions';
+
+  @override
+  String get drawerGroupCatalog => 'Catalog';
+
+  @override
+  String get drawerGroupLoyalty => 'Loyalty';
+
+  @override
+  String get drawerGroupContent => 'Content';
+
+  @override
+  String get cartMoreFulfillmentOptions => 'More delivery options';
+
+  @override
+  String get cartHideFulfillmentOptions => 'Show fewer options';
 }
