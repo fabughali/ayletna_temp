@@ -13,7 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-/// Live chat that can escalate into a tracked support ticket.
+/// Customer live chat — messaging only; tickets are created by support staff.
 class CustomerSupportChatScreen extends ConsumerStatefulWidget {
   const CustomerSupportChatScreen({super.key});
 
@@ -90,16 +90,6 @@ class _CustomerSupportChatScreenState
                 icon: Icons.send_outlined,
                 fullWidth: true,
               ),
-              secondary:
-                  linkedId == null
-                      ? WidgetsAppButton(
-                        label: l10n.supportCreateTicketTitle,
-                        onPressed: () => _openTicket(isAr, l10n),
-                        icon: Icons.confirmation_number_outlined,
-                        variant: WidgetsAppButtonVariant.secondary,
-                        fullWidth: true,
-                      )
-                      : null,
             ),
           ],
         ),
@@ -179,38 +169,6 @@ class _CustomerSupportChatScreenState
           .sendCustomerMessage(text, isAr: isAr);
     }
     _message.clear();
-  }
-
-  void _openTicket(bool isAr, AppLocalizations l10n) {
-    final chat = ref.read(supportChatProvider);
-    final draft = _message.text.trim();
-    final customerLines =
-        chat.messages.where((m) => !m.fromAgent).map((m) => m.text).toList();
-    if (draft.isNotEmpty) customerLines.add(draft);
-    final body =
-        customerLines.isEmpty
-            ? l10n.supportChatTicketFromLiveChat
-            : customerLines.join('\n');
-    final ticket = ref
-        .read(supportTicketsProvider.notifier)
-        .createTicket(
-          titleAr: l10n.supportChatTicketTitle,
-          titleEn: l10n.supportChatTicketTitle,
-          bodyAr: body,
-          bodyEn: body,
-        );
-    if (ticket == null) return;
-    for (final line in customerLines.skip(1)) {
-      ref
-          .read(supportTicketsProvider.notifier)
-          .addCustomerReply(ticketId: ticket.id, bodyAr: line, bodyEn: line);
-    }
-    ref.read(supportChatProvider.notifier).linkTicket(ticket.id);
-    _message.clear();
-    if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(l10n.supportTicketOpened)));
   }
 }
 

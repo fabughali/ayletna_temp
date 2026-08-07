@@ -10,40 +10,20 @@ import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Customer support destination for cart and order-help actions.
-class CustomerSupportScreen extends ConsumerStatefulWidget {
+/// Customer support destination — chat/contact/FAQ + view existing tickets.
+class CustomerSupportScreen extends ConsumerWidget {
   const CustomerSupportScreen({super.key});
 
   @override
-  ConsumerState<CustomerSupportScreen> createState() =>
-      _CustomerSupportScreenState();
-}
-
-class _CustomerSupportScreenState extends ConsumerState<CustomerSupportScreen> {
-  final _titleEn = TextEditingController();
-  final _titleAr = TextEditingController();
-  final _bodyEn = TextEditingController();
-  final _bodyAr = TextEditingController();
-
-  @override
-  void dispose() {
-    _titleEn.dispose();
-    _titleAr.dispose();
-    _bodyEn.dispose();
-    _bodyAr.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final tickets = ref.watch(supportTicketsProvider).tickets;
 
     return WidgetsScaffoldPage(
@@ -58,11 +38,14 @@ class _CustomerSupportScreenState extends ConsumerState<CustomerSupportScreen> {
       child: ListView(
         children: [
           SizedBox(height: CoreSpacing.md(context)),
+          WidgetsPageHeader(
+            title: l10n.supportHeroTitle,
+            subtitle: l10n.supportHeroBody,
+          ),
           WidgetsAppCard(
             variant: WidgetsAppCardVariant.food,
             padding: EdgeInsets.all(CoreSpacing.lg(context)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
                 DecoratedBox(
                   decoration: BoxDecoration(
@@ -77,20 +60,14 @@ class _CustomerSupportScreenState extends ConsumerState<CustomerSupportScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: CoreSpacing.lg(context)),
-                Text(
-                  l10n.supportHeroTitle,
-                  style: CoreTypography.headlineLarge(
-                    context,
-                    scheme.onSurface,
-                  ).copyWith(fontWeight: FontWeight.w900),
-                ),
-                SizedBox(height: CoreSpacing.sm(context)),
-                Text(
-                  l10n.supportHeroBody,
-                  style: CoreTypography.bodyMedium(
-                    context,
-                    scheme.onSurfaceVariant,
+                SizedBox(width: CoreSpacing.md(context)),
+                Expanded(
+                  child: Text(
+                    l10n.screenSupport,
+                    style: CoreTypography.titleMedium(
+                      context,
+                      scheme.onSurface,
+                    ).copyWith(fontWeight: FontWeight.w900),
                   ),
                 ),
               ],
@@ -145,34 +122,6 @@ class _CustomerSupportScreenState extends ConsumerState<CustomerSupportScreen> {
                 onTap: () => context.push(AppRoutePaths.faq),
               ),
             ],
-          ),
-          SizedBox(height: CoreSpacing.lg(context)),
-          _CreateTicketCard(
-            isAr: isAr,
-            titleEn: _titleEn,
-            titleAr: _titleAr,
-            bodyEn: _bodyEn,
-            bodyAr: _bodyAr,
-            onSubmit: () {
-              final ticket = ref.read(supportTicketsProvider.notifier).createTicket(
-                titleAr: _titleAr.text,
-                titleEn: _titleEn.text,
-                bodyAr: _bodyAr.text,
-                bodyEn: _bodyEn.text,
-              );
-              if (ticket == null) {
-                UtilityMockFeedback.showWarning(
-                  context,
-                  isAr ? 'أدخل العنوان والوصف' : 'Enter title and description',
-                );
-                return;
-              }
-              _titleEn.clear();
-              _titleAr.clear();
-              _bodyEn.clear();
-              _bodyAr.clear();
-              UtilityMockFeedback.showSuccess(context, l10n.supportTicketOpened);
-            },
           ),
           SizedBox(height: CoreSpacing.lg(context)),
           _SupportTicketsCard(tickets: tickets, ref: ref),
@@ -288,7 +237,7 @@ class _SupportActionCard extends StatelessWidget {
           DecoratedBox(
             decoration: BoxDecoration(
               color: action.color.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+              borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
               border: Border.all(color: action.color.withValues(alpha: 0.20)),
             ),
             child: Padding(
@@ -315,72 +264,6 @@ class _SupportActionCard extends StatelessWidget {
           Align(
             alignment: AlignmentDirectional.centerEnd,
             child: Icon(Icons.arrow_forward, color: action.color),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _CreateTicketCard extends StatelessWidget {
-  const _CreateTicketCard({
-    required this.isAr,
-    required this.titleEn,
-    required this.titleAr,
-    required this.bodyEn,
-    required this.bodyAr,
-    required this.onSubmit,
-  });
-
-  final bool isAr;
-  final TextEditingController titleEn;
-  final TextEditingController titleAr;
-  final TextEditingController bodyEn;
-  final TextEditingController bodyAr;
-  final VoidCallback onSubmit;
-
-  @override
-  Widget build(BuildContext context) {
-    return WidgetsAppCard(
-      variant: WidgetsAppCardVariant.form,
-      padding: EdgeInsets.all(CoreSpacing.lg(context)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            isAr ? 'فتح تذكرة دعم' : 'Open support ticket',
-            style: CoreTypography.titleMedium(
-              context,
-              Theme.of(context).colorScheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-          SizedBox(height: CoreSpacing.md(context)),
-          WidgetsAppTextField(
-            controller: titleEn,
-            label: isAr ? 'العنوان (EN)' : 'Title (EN)',
-          ),
-          SizedBox(height: CoreSpacing.sm(context)),
-          WidgetsAppTextField(
-            controller: titleAr,
-            label: isAr ? 'العنوان (AR)' : 'Title (AR)',
-          ),
-          SizedBox(height: CoreSpacing.sm(context)),
-          WidgetsAppTextField(
-            controller: bodyEn,
-            label: isAr ? 'الوصف (EN)' : 'Description (EN)',
-            maxLines: 3,
-          ),
-          SizedBox(height: CoreSpacing.sm(context)),
-          WidgetsAppTextField(
-            controller: bodyAr,
-            label: isAr ? 'الوصف (AR)' : 'Description (AR)',
-            maxLines: 3,
-          ),
-          SizedBox(height: CoreSpacing.md(context)),
-          WidgetsAppButton(
-            label: isAr ? 'إرسال التذكرة' : 'Submit ticket',
-            icon: Icons.send_outlined,
-            onPressed: onSubmit,
           ),
         ],
       ),
@@ -423,9 +306,7 @@ class _SupportTicketsCard extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(vertical: CoreSpacing.md(context)),
               child: Text(
-                isAr
-                    ? 'لا توجد تذاكر بعد. أنشئ تذكرة جديدة أعلاه.'
-                    : 'No tickets yet. Create one using the form above.',
+                l10n.supportTicketsEmpty,
                 style: CoreTypography.bodyMedium(
                   context,
                   scheme.onSurfaceVariant,
@@ -437,7 +318,7 @@ class _SupportTicketsCard extends StatelessWidget {
             _SupportTicketTile(
               ticket: ticket,
               isAr: isAr,
-              onTap: () => _showTicketDetails(context, ticket, isAr, ref),
+              onTap: () => _showTicketDetails(context, ticket, isAr, ref, l10n),
             ),
             if (ticket != tickets.last)
               SizedBox(height: CoreSpacing.sm(context)),
@@ -452,6 +333,7 @@ class _SupportTicketsCard extends StatelessWidget {
     ModelSupportTicketRecord ticket,
     bool isAr,
     WidgetRef ref,
+    AppLocalizations l10n,
   ) {
     showModalBottomSheet<void>(
       context: context,
@@ -479,6 +361,7 @@ class _SupportTicketsCard extends StatelessWidget {
                     ticket: live,
                     isAr: isAr,
                     ref: ref,
+                    l10n: l10n,
                   );
                 },
               ),
@@ -488,15 +371,15 @@ class _SupportTicketsCard extends StatelessWidget {
   }
 }
 
-String _formatUpdated(DateTime updatedAt, bool isAr) {
+String _formatUpdated(DateTime updatedAt, AppLocalizations l10n) {
   final diff = DateTime.now().difference(updatedAt);
   if (diff.inMinutes < 60) {
-    return isAr ? 'منذ ${diff.inMinutes} د' : '${diff.inMinutes}m ago';
+    return l10n.timeAgoMinutes(diff.inMinutes);
   }
   if (diff.inHours < 24) {
-    return isAr ? 'منذ ${diff.inHours} س' : '${diff.inHours}h ago';
+    return l10n.timeAgoHours(diff.inHours);
   }
-  return isAr ? 'منذ ${diff.inDays} ي' : '${diff.inDays}d ago';
+  return l10n.timeAgoDays(diff.inDays);
 }
 
 class _SupportTicketTile extends StatelessWidget {
@@ -560,7 +443,7 @@ class _SupportTicketTile extends StatelessWidget {
                 ).copyWith(fontWeight: FontWeight.w900),
               ),
               Text(
-                _formatUpdated(ticket.updatedAt, isAr),
+                _formatUpdated(ticket.updatedAt, AppLocalizations.of(context)!),
                 style: CoreTypography.caption(context, scheme.onSurfaceVariant),
               ),
             ],
@@ -578,11 +461,13 @@ class _SupportTicketDetails extends StatefulWidget {
     required this.ticket,
     required this.isAr,
     required this.ref,
+    required this.l10n,
   });
 
   final ModelSupportTicketRecord ticket;
   final bool isAr;
   final WidgetRef ref;
+  final AppLocalizations l10n;
 
   @override
   State<_SupportTicketDetails> createState() => _SupportTicketDetailsState();
@@ -602,7 +487,7 @@ class _SupportTicketDetailsState extends State<_SupportTicketDetails> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = widget.l10n;
     final scheme = Theme.of(context).colorScheme;
     final ticket = widget.ticket;
     final isAr = widget.isAr;
@@ -641,14 +526,14 @@ class _SupportTicketDetailsState extends State<_SupportTicketDetails> {
               Padding(
                 padding: EdgeInsets.only(bottom: CoreSpacing.sm(context)),
                 child: Text(
-                  '${msg.isStaff ? (isAr ? 'الدعم: ' : 'Support: ') : ''}${isAr ? msg.bodyAr : msg.bodyEn}',
+                  '${msg.isStaff ? l10n.supportMessageStaffPrefix : ''}${isAr ? msg.bodyAr : msg.bodyEn}',
                   style: CoreTypography.caption(context, scheme.onSurfaceVariant),
                 ),
               ),
           ],
           SizedBox(height: CoreSpacing.sm(context)),
           Text(
-            _formatUpdated(ticket.updatedAt, isAr),
+            _formatUpdated(ticket.updatedAt, l10n),
             style: CoreTypography.caption(
               context,
               scheme.primary,
@@ -672,9 +557,7 @@ class _SupportTicketDetailsState extends State<_SupportTicketDetails> {
                 if (!ok) {
                   UtilityMockFeedback.showWarning(
                     context,
-                    isAr
-                        ? 'لا يمكن التقييم حتى يتم حل التذكرة'
-                        : 'Rate only after ticket is resolved',
+                    l10n.supportRateAfterResolved,
                   );
                   return;
                 }
@@ -687,7 +570,7 @@ class _SupportTicketDetailsState extends State<_SupportTicketDetails> {
             )
           else if (ticket.customerRating != null)
             Text(
-              '${isAr ? 'تقييمك' : 'Your rating'}: ${ticket.customerRating}/5',
+              '${l10n.supportYourRating}: ${ticket.customerRating}/5',
               style: CoreTypography.bodyMedium(context, scheme.onSurface),
             )
           else if (ticket.status == SupportTicketStatus.waitingCustomer)
@@ -696,12 +579,12 @@ class _SupportTicketDetailsState extends State<_SupportTicketDetails> {
               children: [
                 WidgetsAppTextField(
                   controller: _reply,
-                  label: isAr ? 'ردك' : 'Your reply',
+                  label: l10n.supportYourReply,
                   maxLines: 2,
                 ),
                 SizedBox(height: CoreSpacing.md(context)),
                 WidgetsAppButton(
-                  label: isAr ? 'إرسال الرد' : 'Send reply',
+                  label: l10n.supportSendReply,
                   icon: Icons.send_outlined,
                   onPressed: () {
                     final ok = widget.ref
