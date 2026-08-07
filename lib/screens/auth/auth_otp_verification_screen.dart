@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:ayletna_restaurant_app/core/app_config.dart';
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/app_providers.dart';
 import 'package:ayletna_restaurant_app/providers/auth_session_providers.dart';
+import 'package:ayletna_restaurant_app/providers/role_permissions_providers.dart';
 import 'package:ayletna_restaurant_app/providers/session_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
@@ -12,7 +14,7 @@ import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_avatar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_otp_input.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_phone_text.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_screen_layout.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -25,7 +27,6 @@ class AuthOtpVerificationScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final scheme = Theme.of(context).colorScheme;
     final otpSource = authOtpSourceFromQuery(source);
 
     Future<void> completeVerification(String code) async {
@@ -43,7 +44,13 @@ class AuthOtpVerificationScreen extends ConsumerWidget {
       if (otpSource == AuthOtpFlowSource.register) {
         final authState = ref.read(authSessionProvider);
         if (authState.isOperationalRegistration) {
-          ref.read(sessionProvider.notifier).signInPendingApproval();
+          ref
+              .read(sessionProvider.notifier)
+              .signInPendingApproval(
+                requestedRoles: approvedRolesForRegistration(
+                  authState.registerAccountType,
+                ),
+              );
           ref.read(authSessionProvider.notifier).reset();
           context.go(AppRoutePaths.pendingApproval);
           return;
@@ -58,41 +65,38 @@ class AuthOtpVerificationScreen extends ConsumerWidget {
         return;
       }
 
-      ref.read(sessionProvider.notifier).signIn();
+      final authState = ref.read(authSessionProvider);
+      final access = resolveLoginAccess(
+        ref.read(rbacUsersProvider.notifier),
+        authState.loginIdentifier,
+      );
+      ref.read(sessionProvider.notifier).signIn(
+            roles: access.roles,
+            userId: access.userId,
+          );
       final session = ref.read(sessionProvider);
-      ref.read(appRoleProvider.notifier).state = session.approvedRoles.first;
+      // Keep a neutral role until the user picks a portal on /role-selection.
+      // Production-like: prefer admin hub when assigned, else first approved role.
+      final initialRole =
+          AppConfig.forcePostOtpRoleSelection
+              ? AppRole.customer
+              : (session.approvedRoles.contains(AppRole.admin)
+                  ? AppRole.admin
+                  : session.approvedRoles.first);
+      ref.read(appRoleProvider.notifier).state = initialRole;
       context.go(routeAfterLoginVerification(session));
     }
 
-    return Scaffold(
-      backgroundColor: scheme.surface,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            PositionedDirectional(
-              top: -CoreSpacing.xxl(context),
-              end: -CoreSpacing.xxl(context),
-              child: _GlowOrb(color: scheme.primary),
-            ),
-            PositionedDirectional(
-              bottom: CoreSpacing.xxl(context),
-              start: -CoreSpacing.xxl(context),
-              child: _GlowOrb(color: CoreColors.orderTypePlated),
-            ),
-            WidgetsScreenLayout(
-              child: Center(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.symmetric(
-                    vertical: CoreSpacing.xxl(context),
-                  ),
-                  child: AuthOtpCard(
-                    source: otpSource,
-                    onVerify: completeVerification,
-                  ),
-                ),
-              ),
-            ),
-          ],
+    return WidgetsScaffoldPage(
+      showAppBar: false,
+      showDrawer: false,
+      child: Center(
+        child: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(vertical: CoreSpacing.xxl(context)),
+          child: AuthOtpCard(
+            source: otpSource,
+            onVerify: completeVerification,
+          ),
         ),
       ),
     );
@@ -152,6 +156,7 @@ class _AuthOtpCardState extends ConsumerState<AuthOtpCard> {
     final auth = ref.read(authSessionProvider.notifier);
     final sent = auth.resendOtp();
     if (!sent) {
+      UtilityMockFeedback.showWarning(context, l10n.otpResendLimitReached);
       return;
     }
     setState(() => _remainingSeconds = _initialCountdownSeconds);
@@ -195,8 +200,7 @@ class _AuthOtpCardState extends ConsumerState<AuthOtpCard> {
                       widget.source == AuthOtpFlowSource.register
                           ? l10n.actionRegister
                           : l10n.screenLogin,
-                  onPressed:
-                      () => context.go(authOtpBackRoute(widget.source)),
+                  onPressed: () => context.go(authOtpBackRoute(widget.source)),
                   icon: Icons.arrow_back,
                   variant: WidgetsAppButtonVariant.ghost,
                 ),
@@ -315,7 +319,7 @@ class _SignupProgressMark extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
       ),
       child: SizedBox(height: CoreContentSizes.splashDividerHeight(context)),
     );
@@ -392,7 +396,7 @@ class _OtpHeroIcon extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: scheme.primaryContainer.withValues(alpha: 0.40),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         ),
         child: SizedBox.square(
           dimension: CoreContentSizes.logoCard(context) * 1.35,
@@ -433,32 +437,6 @@ class _SecurityNote extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _GlowOrb extends StatelessWidget {
-  const _GlowOrb({required this.color});
-
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.06),
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.08),
-            blurRadius: CoreSpacing.xxl(context),
-            spreadRadius: CoreSpacing.xxl(context),
-          ),
-        ],
-      ),
-      child: SizedBox.square(
-        dimension: CoreContentSizes.categoryHeroHeight(context),
-      ),
     );
   }
 }

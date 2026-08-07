@@ -1,3 +1,4 @@
+import 'package:ayletna_restaurant_app/core/app_config.dart';
 import 'package:ayletna_restaurant_app/core/core_color_scheme.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/session_providers.dart';
@@ -5,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum AuthOtpFlowSource { login, register, forgot }
 
-enum AuthRegisterAccountType { customer, staff, adminOwner }
+enum AuthRegisterAccountType { customer, staff, operator, owner }
 
 /// Draft auth flow state shared across login, OTP, register, and forgot-password.
 class AuthSessionState {
@@ -40,7 +41,8 @@ class AuthSessionState {
 
   bool get isOperationalRegistration =>
       registerAccountType == AuthRegisterAccountType.staff ||
-      registerAccountType == AuthRegisterAccountType.adminOwner;
+      registerAccountType == AuthRegisterAccountType.operator ||
+      registerAccountType == AuthRegisterAccountType.owner;
 
   AuthSessionState copyWith({
     bool? languageConfirmed,
@@ -62,9 +64,13 @@ class AuthSessionState {
     return AuthSessionState(
       languageConfirmed: languageConfirmed ?? this.languageConfirmed,
       loginIdentifier:
-          clearLoginIdentifier ? null : (loginIdentifier ?? this.loginIdentifier),
+          clearLoginIdentifier
+              ? null
+              : (loginIdentifier ?? this.loginIdentifier),
       resetIdentifier:
-          clearResetIdentifier ? null : (resetIdentifier ?? this.resetIdentifier),
+          clearResetIdentifier
+              ? null
+              : (resetIdentifier ?? this.resetIdentifier),
       pendingOtpSource:
           clearPendingOtp ? null : (pendingOtpSource ?? this.pendingOtpSource),
       registerAccountType: registerAccountType ?? this.registerAccountType,
@@ -97,10 +103,7 @@ class AuthSessionNotifier extends StateNotifier<AuthSessionState> {
     state = AuthSessionState(languageConfirmed: languageConfirmed);
   }
 
-  bool submitLogin({
-    required String identifier,
-    required String password,
-  }) {
+  bool submitLogin({required String identifier, required String password}) {
     if (identifier.trim().isEmpty || password.trim().isEmpty) {
       return false;
     }
@@ -207,6 +210,14 @@ bool isRoleApprovedForSession(SessionState session, AppRole role) {
 }
 
 String routeAfterLoginVerification(SessionState session) {
+  // Mock/dev: always open the portal chooser after login OTP.
+  if (AppConfig.forcePostOtpRoleSelection) {
+    return AppRoutePaths.roleSelection;
+  }
+  // Production-like: app admin lands on admin hub (switcher stays in Settings).
+  if (session.approvedRoles.contains(AppRole.admin)) {
+    return homeRouteForRole(AppRole.admin);
+  }
   if (session.approvedRoles.length <= 1) {
     final role = session.approvedRoles.first;
     return homeRouteForRole(role);
@@ -224,6 +235,7 @@ Set<AppRole> approvedRolesForRegistration(AuthRegisterAccountType type) {
       AppRole.delivery,
       AppRole.inventory,
     },
-    AuthRegisterAccountType.adminOwner => {AppRole.operator, AppRole.owner},
+    AuthRegisterAccountType.operator => {AppRole.operator},
+    AuthRegisterAccountType.owner => {AppRole.owner},
   };
 }
