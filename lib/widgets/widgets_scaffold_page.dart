@@ -135,6 +135,7 @@ class WidgetsScaffoldPage extends ConsumerWidget {
         path == AppRoutePaths.profile ||
         path == AppRoutePaths.accountSettings ||
         path == AppRoutePaths.editProfile ||
+        path == AppRoutePaths.support ||
         path == AppRoutePaths.mapPicker ||
         path == AppRoutePaths.paymentHistory ||
         path == AppRoutePaths.rewardsHistory) {
