@@ -2,10 +2,11 @@ import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/support_session_providers.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_action_bar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +22,8 @@ class CustomerSupportChatScreen extends ConsumerStatefulWidget {
       _CustomerSupportChatScreenState();
 }
 
-class _CustomerSupportChatScreenState extends ConsumerState<CustomerSupportChatScreen> {
+class _CustomerSupportChatScreenState
+    extends ConsumerState<CustomerSupportChatScreen> {
   final _message = TextEditingController();
 
   @override
@@ -33,12 +35,15 @@ class _CustomerSupportChatScreenState extends ConsumerState<CustomerSupportChatS
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final chat = ref.watch(supportChatProvider);
     final linkedId = chat.linkedTicketId;
     final linkedTicket =
-        linkedId == null ? null : ref.watch(supportTicketByIdProvider(linkedId));
+        linkedId == null
+            ? null
+            : ref.watch(supportTicketByIdProvider(linkedId));
+
+    final scheme = Theme.of(context).colorScheme;
 
     return WidgetsScaffoldPage(
       title: l10n.supportLiveChatTitle,
@@ -49,38 +54,69 @@ class _CustomerSupportChatScreenState extends ConsumerState<CustomerSupportChatS
           tooltip: l10n.supportTicketsTitle,
         ),
       ],
+      bottomSheet: Material(
+        color: scheme.surface,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            DecoratedBox(
+              decoration: BoxDecoration(
+                color: scheme.surface,
+                border: Border(
+                  top: BorderSide(color: scheme.outlineVariant),
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                  CoreSpacing.md(context),
+                  CoreSpacing.md(context),
+                  CoreSpacing.md(context),
+                  CoreSpacing.sm(context),
+                ),
+                child: WidgetsAppTextField(
+                  controller: _message,
+                  label: l10n.supportChatMessageLabel,
+                  hintText: l10n.supportChatMessageHint,
+                  prefixIcon: Icons.chat_bubble_outline,
+                  maxLines: 3,
+                ),
+              ),
+            ),
+            WidgetsActionBar(
+              primary: WidgetsAppButton(
+                label: l10n.supportChatSend,
+                onPressed: () => _sendMessage(isAr, l10n),
+                icon: Icons.send_outlined,
+                fullWidth: true,
+              ),
+              secondary:
+                  linkedId == null
+                      ? WidgetsAppButton(
+                        label: l10n.supportCreateTicketTitle,
+                        onPressed: () => _openTicket(isAr, l10n),
+                        icon: Icons.confirmation_number_outlined,
+                        variant: WidgetsAppButtonVariant.secondary,
+                        fullWidth: true,
+                      )
+                      : null,
+            ),
+          ],
+        ),
+      ),
       child: ListView(
+        padding: EdgeInsetsDirectional.only(
+          bottom: CoreSpacing.xxl(context) * 3,
+        ),
         children: [
           SizedBox(height: CoreSpacing.md(context)),
-          WidgetsAppCard(
-            variant: WidgetsAppCardVariant.food,
-            padding: EdgeInsets.all(CoreSpacing.lg(context)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.support_agent_outlined, color: scheme.primary),
-                SizedBox(height: CoreSpacing.md(context)),
-                Text(
-                  l10n.supportChatHeroTitle,
-                  style: CoreTypography.headlineLarge(
-                    context,
-                    scheme.onSurface,
-                  ).copyWith(fontWeight: FontWeight.w900),
-                ),
-                SizedBox(height: CoreSpacing.sm(context)),
-                Text(
-                  linkedTicket == null
-                      ? l10n.supportChatHeroBody
-                      : (isAr
-                          ? 'تذكرة مرتبطة: ${linkedTicket.id}'
-                          : 'Linked ticket: ${linkedTicket.id}'),
-                  style: CoreTypography.bodyMedium(
-                    context,
-                    scheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
+          WidgetsPageHeader(
+            title: l10n.supportChatHeroTitle,
+            subtitle:
+                linkedTicket == null
+                    ? l10n.supportChatHeroBody
+                    : l10n.supportChatLinkedTicket(linkedTicket.id),
+            eyebrow: l10n.supportLiveChatTitle,
           ),
           SizedBox(height: CoreSpacing.lg(context)),
           _ChatBubble(
@@ -98,7 +134,7 @@ class _CustomerSupportChatScreenState extends ConsumerState<CustomerSupportChatS
                 senderName:
                     entry.fromAgent
                         ? l10n.supportChatAgentName
-                        : (isAr ? 'أنت' : 'You'),
+                        : l10n.supportChatYou,
                 timestamp: _formatTime(entry.sentAt, isAr),
                 fromAgent: entry.fromAgent,
                 status: _ChatMessageStatus.sent,
@@ -112,46 +148,12 @@ class _CustomerSupportChatScreenState extends ConsumerState<CustomerSupportChatS
                 senderName:
                     msg.isStaff
                         ? l10n.supportChatAgentName
-                        : (isAr ? 'أنت' : 'You'),
+                        : l10n.supportChatYou,
                 timestamp: _formatTime(msg.sentAt, isAr),
                 fromAgent: msg.isStaff,
                 status: _ChatMessageStatus.delivered,
               ),
             ],
-          SizedBox(height: CoreSpacing.lg(context)),
-          WidgetsAppCard(
-            variant: WidgetsAppCardVariant.form,
-            padding: EdgeInsets.all(CoreSpacing.lg(context)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                WidgetsAppTextField(
-                  controller: _message,
-                  label: l10n.supportChatMessageLabel,
-                  hintText: l10n.supportChatMessageHint,
-                  prefixIcon: Icons.chat_bubble_outline,
-                  maxLines: 3,
-                ),
-                SizedBox(height: CoreSpacing.md(context)),
-                WidgetsAppButton(
-                  label: l10n.supportChatSend,
-                  onPressed: () => _sendMessage(isAr, l10n),
-                  icon: Icons.send_outlined,
-                  fullWidth: true,
-                ),
-                if (linkedId == null) ...[
-                  SizedBox(height: CoreSpacing.sm(context)),
-                  WidgetsAppButton(
-                    label: isAr ? 'فتح تذكرة دعم' : 'Open support ticket',
-                    onPressed: () => _openTicket(isAr, l10n),
-                    icon: Icons.confirmation_number_outlined,
-                    variant: WidgetsAppButtonVariant.secondary,
-                    fullWidth: true,
-                  ),
-                ],
-              ],
-            ),
-          ),
           SizedBox(height: CoreSpacing.xxl(context)),
         ],
       ),
@@ -168,13 +170,13 @@ class _CustomerSupportChatScreenState extends ConsumerState<CustomerSupportChatS
     final text = _message.text.trim();
     final linkedId = ref.read(supportChatProvider).linkedTicketId;
     if (linkedId != null) {
-      ref.read(supportTicketsProvider.notifier).addCustomerReply(
-        ticketId: linkedId,
-        bodyAr: text,
-        bodyEn: text,
-      );
+      ref
+          .read(supportTicketsProvider.notifier)
+          .addCustomerReply(ticketId: linkedId, bodyAr: text, bodyEn: text);
     } else {
-      ref.read(supportChatProvider.notifier).sendCustomerMessage(text, isAr: isAr);
+      ref
+          .read(supportChatProvider.notifier)
+          .sendCustomerMessage(text, isAr: isAr);
     }
     _message.clear();
   }
@@ -187,28 +189,28 @@ class _CustomerSupportChatScreenState extends ConsumerState<CustomerSupportChatS
     if (draft.isNotEmpty) customerLines.add(draft);
     final body =
         customerLines.isEmpty
-            ? (isAr ? 'طلب مساعدة من الدردشة المباشرة' : 'Help request from live chat')
+            ? l10n.supportChatTicketFromLiveChat
             : customerLines.join('\n');
-    final ticket = ref.read(supportTicketsProvider.notifier).createTicket(
-      titleAr: isAr ? 'دردشة مباشرة' : 'Live chat',
-      titleEn: 'Live chat',
-      bodyAr: body,
-      bodyEn: body,
-    );
+    final ticket = ref
+        .read(supportTicketsProvider.notifier)
+        .createTicket(
+          titleAr: l10n.supportChatTicketTitle,
+          titleEn: l10n.supportChatTicketTitle,
+          bodyAr: body,
+          bodyEn: body,
+        );
     if (ticket == null) return;
     for (final line in customerLines.skip(1)) {
-      ref.read(supportTicketsProvider.notifier).addCustomerReply(
-        ticketId: ticket.id,
-        bodyAr: line,
-        bodyEn: line,
-      );
+      ref
+          .read(supportTicketsProvider.notifier)
+          .addCustomerReply(ticketId: ticket.id, bodyAr: line, bodyEn: line);
     }
     ref.read(supportChatProvider.notifier).linkTicket(ticket.id);
     _message.clear();
     if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.supportTicketOpened)),
-    );
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(l10n.supportTicketOpened)));
   }
 }
 
@@ -236,14 +238,18 @@ class _ChatBubble extends StatelessWidget {
 
     return Align(
       alignment:
-          fromAgent ? AlignmentDirectional.centerStart : AlignmentDirectional.centerEnd,
+          fromAgent
+              ? AlignmentDirectional.centerStart
+              : AlignmentDirectional.centerEnd,
       child: Container(
-        constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.78),
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.sizeOf(context).width * 0.78,
+        ),
         margin: EdgeInsets.symmetric(horizontal: CoreSpacing.lg(context)),
         padding: EdgeInsets.all(CoreSpacing.md(context)),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.10),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
           border: Border.all(color: color.withValues(alpha: 0.22)),
         ),
         child: Column(
@@ -251,14 +257,21 @@ class _ChatBubble extends StatelessWidget {
           children: [
             Text(
               senderName,
-              style: CoreTypography.caption(context, color).copyWith(
-                fontWeight: FontWeight.w900,
-              ),
+              style: CoreTypography.caption(
+                context,
+                color,
+              ).copyWith(fontWeight: FontWeight.w900),
             ),
             SizedBox(height: CoreSpacing.xs(context)),
-            Text(text, style: CoreTypography.bodyMedium(context, scheme.onSurface)),
+            Text(
+              text,
+              style: CoreTypography.bodyMedium(context, scheme.onSurface),
+            ),
             SizedBox(height: CoreSpacing.xs(context)),
-            Text(timestamp, style: CoreTypography.caption(context, scheme.onSurfaceVariant)),
+            Text(
+              timestamp,
+              style: CoreTypography.caption(context, scheme.onSurfaceVariant),
+            ),
           ],
         ),
       ),
