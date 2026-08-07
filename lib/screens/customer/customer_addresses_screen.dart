@@ -4,14 +4,14 @@ import 'package:ayletna_restaurant_app/data/repositories/repository_providers.da
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_app_bar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_illustration_panel.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_screen_layout.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_status_pill.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,91 +27,80 @@ class CustomerAddressesScreen extends ConsumerWidget {
     final scheme = Theme.of(context).colorScheme;
     final addressesAsync = ref.watch(savedAddressesProvider);
 
-    return Scaffold(
-      appBar: WidgetsAppBar(
-        title: l10n.addressesTitle,
-        leading: WidgetsIconButton(
-          onPressed:
-              () =>
-                  context.canPop()
-                      ? context.pop()
-                      : context.go(AppRoutePaths.profile),
-          icon: Icons.arrow_back,
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+    return WidgetsScaffoldPage(
+      title: l10n.addressesTitle,
+      actions: [
+        WidgetsIconButton(
+          onPressed: () => context.push(AppRoutePaths.notifications),
+          icon: Icons.notifications_outlined,
+          tooltip: l10n.screenNotifications,
         ),
-        actions: [
-          WidgetsIconButton(
-            onPressed: () => context.push(AppRoutePaths.notifications),
-            icon: Icons.notifications_outlined,
-            tooltip: l10n.screenNotifications,
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: WidgetsScreenLayout(
-          child: addressesAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator()),
-            error:
-                (error, _) => WidgetsAsyncStateCard.error(
-                  title: l10n.addressesTitle,
-                  message: error.toString(),
-                  actionLabel: l10n.actionSave,
-                  onAction: () => ref.invalidate(savedAddressesProvider),
-                ),
-            data:
-                (addresses) => WidgetsRefreshList(
-                  onRefresh: () async {
-                    ref.invalidate(savedAddressesProvider);
-                    await ref.read(savedAddressesProvider.future);
-                  },
-                  child: ListView(
-                    children: [
-                      SizedBox(height: CoreSpacing.md(context)),
-                      WidgetsAppButton(
-                        label: l10n.addressesAddNew,
-                        onPressed:
-                            () => context.push(
-                              '${AppRoutePaths.mapPicker}?return=${AppRoutePaths.addresses}',
-                            ),
-                        icon: Icons.add_location_alt_outlined,
-                        fullWidth: true,
-                      ),
-                      SizedBox(height: CoreSpacing.lg(context)),
-                      if (addresses.isEmpty)
-                        WidgetsAsyncStateCard.empty(
-                          title: l10n.addressesTitle,
-                          message: l10n.mapRequiredFields,
-                          actionLabel: l10n.addressesAddNew,
-                          onAction:
-                              () => context.push(
-                                '${AppRoutePaths.mapPicker}?return=${AppRoutePaths.addresses}',
-                              ),
-                        )
-                      else
-                        for (final address in addresses) ...[
-                          _AddressCard(
-                            address: address,
-                            onDelete: () => _deleteAddress(context, ref, address),
-                          ),
-                          SizedBox(height: CoreSpacing.md(context)),
-                        ],
-                      SizedBox(height: CoreSpacing.xxl(context)),
-                      const _MapIllustrationCard(),
-                      SizedBox(height: CoreSpacing.md(context)),
-                      Text(
-                        l10n.addressesHelper,
-                        textAlign: TextAlign.center,
-                        style: CoreTypography.bodyMedium(
-                          context,
-                          scheme.onSurfaceVariant.withValues(alpha: 0.58),
-                        ),
-                      ),
-                      SizedBox(height: CoreSpacing.xxl(context)),
-                    ],
+      ],
+      child: addressesAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error:
+            (error, _) => WidgetsAsyncStateCard.error(
+              title: l10n.addressesTitle,
+              message: error.toString(),
+              actionLabel: l10n.actionSave,
+              onAction: () => ref.invalidate(savedAddressesProvider),
+            ),
+        data:
+            (addresses) => WidgetsRefreshList(
+              onRefresh: () async {
+                ref.invalidate(savedAddressesProvider);
+                await ref.read(savedAddressesProvider.future);
+              },
+              child: ListView(
+                children: [
+                  SizedBox(height: CoreSpacing.md(context)),
+                  WidgetsPageHeader(
+                    title: l10n.addressesTitle,
+                    subtitle: l10n.addressesHelper,
                   ),
-                ),
-          ),
-        ),
+                  WidgetsAppButton(
+                    label: l10n.addressesAddNew,
+                    onPressed:
+                        () => context.push(
+                          '${AppRoutePaths.mapPicker}?return=${AppRoutePaths.addresses}',
+                        ),
+                    icon: Icons.add_location_alt_outlined,
+                    fullWidth: true,
+                  ),
+                  SizedBox(height: CoreSpacing.lg(context)),
+                  if (addresses.isEmpty)
+                    WidgetsAsyncStateCard.empty(
+                      title: l10n.addressesTitle,
+                      message: l10n.addressesEmptyMessage,
+                      actionLabel: l10n.addressesAddNew,
+                      onAction:
+                          () => context.push(
+                            '${AppRoutePaths.mapPicker}?return=${AppRoutePaths.addresses}',
+                          ),
+                    )
+                  else
+                    for (final address in addresses) ...[
+                      _AddressCard(
+                        address: address,
+                        onDelete: () => _deleteAddress(context, ref, address),
+                      ),
+                      SizedBox(height: CoreSpacing.md(context)),
+                    ],
+                  SizedBox(height: CoreSpacing.xxl(context)),
+                  const _MapIllustrationCard(),
+                  SizedBox(height: CoreSpacing.md(context)),
+                  Text(
+                    l10n.addressesHelper,
+                    textAlign: TextAlign.center,
+                    style: CoreTypography.bodyMedium(
+                      context,
+                      scheme.onSurfaceVariant.withValues(alpha: 0.58),
+                    ),
+                  ),
+                  SizedBox(height: CoreSpacing.xxl(context)),
+                ],
+              ),
+            ),
       ),
     );
   }
@@ -143,7 +132,7 @@ class CustomerAddressesScreen extends ConsumerWidget {
       UtilityMockFeedback.showSuccess(context, l10n.addressesDelete);
     } catch (error) {
       if (!context.mounted) return;
-      UtilityMockFeedback.showError(context, l10n.comingSoon);
+      UtilityMockFeedback.showError(context, l10n.addressesDeleteFailed);
     }
   }
 }
@@ -176,7 +165,9 @@ class _AddressCard extends StatelessWidget {
           WidgetsIconButton(
             onPressed:
                 () => context.push(
-                  '${AppRoutePaths.mapPicker}?return=${AppRoutePaths.addresses}',
+                  '${AppRoutePaths.mapPicker}'
+                  '?return=${AppRoutePaths.addresses}'
+                  '&addressId=${address.id}',
                 ),
             icon: Icons.edit_outlined,
             tooltip: l10n.deliveryEdit,

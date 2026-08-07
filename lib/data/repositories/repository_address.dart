@@ -4,6 +4,10 @@ import 'package:ayletna_restaurant_app/data/models/model_saved_address.dart';
 abstract class RepositoryAddress {
   Future<List<ModelSavedAddress>> fetchSavedAddresses();
   Future<ModelSavedAddress> createAddress(ModelCreateAddressRequest request);
+  Future<ModelSavedAddress> updateAddress(
+    String id,
+    ModelCreateAddressRequest request,
+  );
   Future<void> deleteAddress(String id);
   Future<void> setDefaultAddress(String id);
 }

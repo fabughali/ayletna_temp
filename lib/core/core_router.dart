@@ -5,20 +5,21 @@ import 'package:ayletna_restaurant_app/providers/app_providers.dart';
 import 'package:ayletna_restaurant_app/providers/session_providers.dart';
 import 'package:ayletna_restaurant_app/screens/auth/auth_pending_approval_screen.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_route_guard.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_customer_shell.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_shell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ayletna_restaurant_app/screens/admin/app_admin_dashboard_screen.dart';
+import 'package:ayletna_restaurant_app/screens/admin/app_admin_role_permissions_screen.dart';
+import 'package:ayletna_restaurant_app/screens/admin/app_admin_user_detail_permissions_screen.dart';
+import 'package:ayletna_restaurant_app/screens/admin/app_admin_user_permissions_screen.dart';
 import 'package:ayletna_restaurant_app/screens/admin/admin_app_integrations_screen.dart';
 import 'package:ayletna_restaurant_app/screens/admin/admin_audit_log_screen.dart';
 import 'package:ayletna_restaurant_app/screens/admin/admin_daily_tip_distribution_screen.dart';
 import 'package:ayletna_restaurant_app/screens/admin/admin_dashboard_screen.dart';
 import 'package:ayletna_restaurant_app/screens/admin/admin_deposit_config_screen.dart';
 import 'package:ayletna_restaurant_app/screens/admin/admin_financial_calculation_screen.dart';
-import 'package:ayletna_restaurant_app/screens/admin/admin_loyalty_config_screen.dart';
-import 'package:ayletna_restaurant_app/screens/admin/admin_menu_catalog_screen.dart';
 import 'package:ayletna_restaurant_app/screens/admin/admin_menu_management_screen.dart';
-import 'package:ayletna_restaurant_app/screens/admin/admin_offers_management_screen.dart';
 import 'package:ayletna_restaurant_app/screens/admin/admin_order_detail_screen.dart';
 import 'package:ayletna_restaurant_app/screens/admin/admin_orders_management_screen.dart';
 import 'package:ayletna_restaurant_app/screens/admin/admin_owner_view_config_screen.dart';
@@ -29,11 +30,8 @@ import 'package:ayletna_restaurant_app/screens/admin/admin_product_editor_screen
 import 'package:ayletna_restaurant_app/screens/admin/admin_report_filter_screen.dart';
 import 'package:ayletna_restaurant_app/screens/admin/admin_reports_screen.dart';
 import 'package:ayletna_restaurant_app/screens/admin/admin_settings_screen.dart';
+import 'package:ayletna_restaurant_app/screens/admin/admin_staff_hours_report_screen.dart';
 import 'package:ayletna_restaurant_app/screens/admin/admin_attendance_hr_screen.dart';
-import 'package:ayletna_restaurant_app/screens/admin/admin_reviews_moderation_screen.dart';
-import 'package:ayletna_restaurant_app/screens/admin/admin_rewards_management_screen.dart';
-import 'package:ayletna_restaurant_app/screens/admin/admin_support_tickets_screen.dart';
-import 'package:ayletna_restaurant_app/screens/admin/admin_user_management_screen.dart';
 import 'package:ayletna_restaurant_app/screens/auth/auth_forgot_password_screen.dart';
 import 'package:ayletna_restaurant_app/screens/auth/auth_language_selection_screen.dart';
 import 'package:ayletna_restaurant_app/screens/auth/auth_login_screen.dart';
@@ -52,9 +50,11 @@ import 'package:ayletna_restaurant_app/screens/customer/customer_checkout_paymen
 import 'package:ayletna_restaurant_app/screens/customer/customer_checkout_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_category_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_combo_builder_screen.dart';
+import 'package:ayletna_restaurant_app/screens/customer/customer_combos_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_discounts_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_edit_profile_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_faq_screen.dart';
+import 'package:ayletna_restaurant_app/screens/customer/customer_blog_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_home_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_loyalty_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_map_picker_screen.dart';
@@ -67,12 +67,14 @@ import 'package:ayletna_restaurant_app/screens/customer/customer_payment_history
 import 'package:ayletna_restaurant_app/screens/customer/customer_plated_return_reminder_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_product_detail_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_product_reviews_screen.dart';
+import 'package:ayletna_restaurant_app/screens/customer/customer_promo_detail_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_profile_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_rating_review_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_redemption_confirm_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_rewards_catalog_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_rewards_history_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_search_screen.dart';
+import 'package:ayletna_restaurant_app/screens/customer/customer_subscriptions_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_support_chat_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_support_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_terms_screen.dart';
@@ -88,6 +90,16 @@ import 'package:ayletna_restaurant_app/screens/kitchen/kitchen_order_prep_screen
 import 'package:ayletna_restaurant_app/screens/staff/staff_attendance_screen.dart';
 import 'package:ayletna_restaurant_app/screens/staff/staff_daily_tips_screen.dart';
 import 'package:ayletna_restaurant_app/screens/staff/staff_tip_history_screen.dart';
+import 'package:ayletna_restaurant_app/screens/admin/admin_addons_management_screen.dart';
+import 'package:ayletna_restaurant_app/screens/admin/admin_menu_catalog_screen.dart';
+import 'package:ayletna_restaurant_app/screens/marketing/marketing_blog_screen.dart';
+import 'package:ayletna_restaurant_app/screens/marketing/marketing_campaign_calendar_screen.dart';
+import 'package:ayletna_restaurant_app/screens/marketing/marketing_dashboard_screen.dart';
+import 'package:ayletna_restaurant_app/screens/marketing/marketing_insight_detail_screen.dart';
+import 'package:ayletna_restaurant_app/screens/marketing/marketing_products_list_screen.dart';
+import 'package:ayletna_restaurant_app/screens/marketing/marketing_push_campaigns_screen.dart';
+import 'package:ayletna_restaurant_app/screens/owner/owner_dashboard_screen.dart';
+import 'package:ayletna_restaurant_app/screens/support/support_dashboard_screen.dart';
 
 final goRouterProvider = Provider<GoRouter>((ref) {
   final refresh = ValueNotifier<int>(0);
@@ -154,7 +166,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             ),
       ),
       ShellRoute(
-        builder: (_, __, child) => WidgetsCustomerShell(child: child),
+        builder: (_, __, child) => WidgetsShell(child: child),
         routes: [
           GoRoute(
             path: AppRoutePaths.home,
@@ -182,6 +194,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutePaths.faq,
             builder: (_, __) => const CustomerFaqScreen(),
+          ),
+          GoRoute(
+            path: AppRoutePaths.blog,
+            builder: (_, __) => const CustomerBlogScreen(),
           ),
           GoRoute(
             path: AppRoutePaths.notifications,
@@ -307,10 +323,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: AppRoutePaths.mapPicker,
         builder:
             (_, state) => CustomerMapPickerScreen(
-              returnRoute:
-                  state.uri.queryParameters['return'] == 'profile'
-                      ? AppRoutePaths.profile
-                      : AppRoutePaths.cart,
+              returnRoute: _mapPickerReturnRoute(
+                state.uri.queryParameters['return'],
+              ),
+              addressId: state.uri.queryParameters['addressId'],
             ),
       ),
       GoRoute(
@@ -320,6 +336,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutePaths.offers,
         builder: (_, __) => const CustomerOffersScreen(),
+      ),
+      GoRoute(
+        path: '/offers/:id',
+        builder:
+            (_, state) => CustomerPromoDetailScreen(
+              kind: CustomerPromoDetailKind.offer,
+              promoId: state.pathParameters['id']!,
+            ),
       ),
       GoRoute(
         path: AppRoutePaths.discounts,
@@ -332,6 +356,30 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutePaths.combo,
         builder: (_, __) => const CustomerComboBuilderScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.combos,
+        builder: (_, __) => const CustomerCombosScreen(),
+      ),
+      GoRoute(
+        path: '/combo/:id',
+        builder:
+            (_, state) => CustomerPromoDetailScreen(
+              kind: CustomerPromoDetailKind.combo,
+              promoId: state.pathParameters['id']!,
+            ),
+      ),
+      GoRoute(
+        path: AppRoutePaths.subscriptions,
+        builder: (_, __) => const CustomerSubscriptionsScreen(),
+      ),
+      GoRoute(
+        path: '/subscriptions/:id',
+        builder:
+            (_, state) => CustomerPromoDetailScreen(
+              kind: CustomerPromoDetailKind.subscription,
+              promoId: state.pathParameters['id']!,
+            ),
       ),
       GoRoute(
         path: AppRoutePaths.kitchen,
@@ -347,7 +395,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: AppRoutePaths.inventoryItem,
-        builder: (_, __) => const InventoryItemScreen(),
+        builder:
+            (_, state) => InventoryItemScreen(
+              itemKey: state.uri.queryParameters['item'],
+            ),
       ),
       GoRoute(
         path: AppRoutePaths.stockAdjustment,
@@ -398,114 +449,294 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (_, __) => const StaffTipHistoryScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.admin,
+        path: AppRoutePaths.appAdmin,
+        builder: (_, __) => const AppAdminDashboardScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.appAdminRoles,
+        builder:
+            (_, state) => AppAdminRolePermissionsScreen(
+              initialRole: _roleFilterFromQuery(state),
+            ),
+      ),
+      GoRoute(
+        path: AppRoutePaths.appAdminUsers,
+        builder:
+            (_, state) => AppAdminUserPermissionsScreen(
+              initialRoleFilter: _roleFilterFromQuery(state),
+            ),
+      ),
+      GoRoute(
+        path: '/app-admin/users/:userId',
+        builder:
+            (_, state) => AppAdminUserDetailPermissionsScreen(
+              userId: state.pathParameters['userId']!,
+            ),
+      ),
+      GoRoute(
+        path: AppRoutePaths.appAdminAudit,
+        builder: (_, __) => const AdminAuditLogScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.appAdminIntegrations,
+        builder: (_, __) => const AdminAppIntegrationsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.appAdminOwnerConfig,
+        builder: (_, __) => const AdminOwnerViewConfigScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.appAdminSettings,
+        builder:
+            (_, __) =>
+                const AdminSettingsScreen(scope: AdminSettingsScope.appAdmin),
+      ),
+      GoRoute(
+        path: AppRoutePaths.operatorHub,
         builder: (_, __) => const AdminDashboardScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.adminOrders,
+        path: AppRoutePaths.operatorOrders,
         builder: (_, __) => const AdminOrdersManagementScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.adminOrderDetail,
+        path: AppRoutePaths.operatorOrderDetail,
         builder:
             (_, state) => AdminOrderDetailScreen(
               orderId: state.uri.queryParameters['id'],
             ),
       ),
       GoRoute(
-        path: AppRoutePaths.adminReports,
-        builder: (_, __) => const AdminReportsScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.adminReportFilter,
-        builder: (_, __) => const AdminReportFilterScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.adminFinancial,
-        builder: (_, __) => const AdminFinancialCalculationScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.adminTipDistribution,
-        builder: (_, __) => const AdminDailyTipDistributionScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.adminPlates,
-        builder: (_, __) => const AdminPlatesManagementScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.adminPlateEditor,
-        builder: (_, __) => const AdminPlateEditorScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.adminDepositConfig,
-        builder: (_, __) => const AdminDepositConfigScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.adminUsers,
-        builder: (_, __) => const AdminUserManagementScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.adminMenu,
+        path: AppRoutePaths.operatorMenu,
         builder: (_, __) => const AdminMenuManagementScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.adminProductEditor,
-        builder: (_, state) => AdminProductEditorScreen(
-          createMode: state.uri.queryParameters['mode'] == 'create',
-          productId: state.uri.queryParameters['id'],
-        ),
+        path: AppRoutePaths.operatorProductEditor,
+        builder:
+            (_, state) => AdminProductEditorScreen(
+              createMode: state.uri.queryParameters['mode'] == 'create',
+              productId: state.uri.queryParameters['id'],
+            ),
       ),
       GoRoute(
-        path: AppRoutePaths.adminMenuCatalog,
-        builder: (_, __) => const AdminMenuCatalogScreen(),
+        path: AppRoutePaths.operatorTipDistribution,
+        builder: (_, __) => const AdminDailyTipDistributionScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.adminOffersMgmt,
-        builder: (_, __) => const AdminOffersManagementScreen(),
+        path: AppRoutePaths.operatorPlates,
+        builder: (_, __) => const AdminPlatesManagementScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.adminLoyaltyConfig,
-        builder: (_, __) => const AdminLoyaltyConfigScreen(),
+        path: AppRoutePaths.operatorPlateEditor,
+        builder: (_, __) => const AdminPlateEditorScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.adminOwnerConfig,
-        builder: (_, __) => const AdminOwnerViewConfigScreen(),
+        path: AppRoutePaths.operatorDepositConfig,
+        builder: (_, __) => const AdminDepositConfigScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.adminPreOrder,
+        path: AppRoutePaths.operatorPreOrders,
         builder: (_, __) => const AdminPreOrderScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.adminSettings,
-        builder: (_, __) => const AdminSettingsScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.adminAppIntegrations,
-        builder: (_, __) => const AdminAppIntegrationsScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.adminAudit,
-        builder: (_, __) => const AdminAuditLogScreen(),
-      ),
-      GoRoute(
-        path: AppRoutePaths.adminStaffHours,
+        path: AppRoutePaths.operatorAttendance,
         builder: (_, __) => const AdminAttendanceHrScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.adminAttendanceHr,
-        builder: (_, __) => const AdminAttendanceHrScreen(),
+        path: AppRoutePaths.operatorStaffHours,
+        builder: (_, __) => const AdminStaffHoursReportScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.adminSupportTickets,
-        builder: (_, __) => const AdminSupportTicketsScreen(),
+        path: AppRoutePaths.operatorReports,
+        builder: (_, __) => const AdminReportsScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.adminRewardsMgmt,
-        builder: (_, __) => const AdminRewardsManagementScreen(),
+        path: AppRoutePaths.operatorReportFilter,
+        builder: (_, __) => const AdminReportFilterScreen(),
       ),
       GoRoute(
-        path: AppRoutePaths.adminReviewsModeration,
-        builder: (_, __) => const AdminReviewsModerationScreen(),
+        path: AppRoutePaths.operatorFinancial,
+        builder: (_, __) => const AdminFinancialCalculationScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.operatorSettings,
+        builder:
+            (_, __) =>
+                const AdminSettingsScreen(scope: AdminSettingsScope.operator),
+      ),
+      GoRoute(
+        path: AppRoutePaths.ownerHub,
+        builder: (_, __) => const OwnerDashboardScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.ownerReports,
+        builder: (_, __) => const OwnerReportsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.ownerFinancial,
+        builder: (_, __) => const OwnerFinancialScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.ownerAudit,
+        builder: (_, __) => const OwnerAuditScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.supportDesk,
+        builder: (_, __) => const SupportDashboardScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.supportDeskTickets,
+        builder: (_, __) => const SupportTicketsRouteScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.supportDeskChat,
+        builder: (_, __) => const SupportChatRouteScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.supportDeskOrderLookup,
+        builder: (_, __) => const SupportOrderLookupRouteScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.supportDeskReviews,
+        builder: (_, __) => const SupportReviewsRouteScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.supportDeskFaq,
+        builder: (_, __) => const SupportFaqRouteScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingHub,
+        builder: (_, __) => const MarketingDashboardScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingOffers,
+        builder: (_, __) => const MarketingOffersRouteScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingDiscounts,
+        builder: (_, __) => const MarketingDiscountsRouteScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingPromotions,
+        builder: (_, __) => const MarketingDiscountsRouteScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingCombos,
+        builder: (_, __) => const MarketingCombosRouteScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingSubscriptions,
+        builder: (_, __) => const MarketingSubscriptionsRouteScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingCalendar,
+        builder: (_, __) => const MarketingCampaignCalendarScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingCatalog,
+        builder: (_, __) => const MarketingCatalogRouteScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingCategories,
+        builder:
+            (_, __) => const MarketingCatalogRouteScreen(categoriesOnly: true),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingProducts,
+        builder: (_, __) => const MarketingProductsListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingProductCreate,
+        builder:
+            (_, __) => const AdminMenuCatalogScreen(
+              productsHub: true,
+              createMode: true,
+              showPreviewTab: true,
+            ),
+      ),
+      GoRoute(
+        path: '/marketing/products/detail/:id',
+        builder: (_, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return AdminMenuCatalogScreen(
+            productsHub: true,
+            showPreviewTab: true,
+            lockProductId: id,
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingInsightVisitors,
+        builder:
+            (_, __) => const MarketingInsightDetailScreen(
+              kind: MarketingInsightKind.visitors,
+            ),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingInsightPurchases,
+        builder:
+            (_, __) => const MarketingInsightDetailScreen(
+              kind: MarketingInsightKind.purchases,
+            ),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingInsightTopSellers,
+        builder:
+            (_, __) => const MarketingInsightDetailScreen(
+              kind: MarketingInsightKind.topSellers,
+            ),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingInsightRatings,
+        builder:
+            (_, __) => const MarketingInsightDetailScreen(
+              kind: MarketingInsightKind.ratings,
+            ),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingInsightSocial,
+        builder:
+            (_, __) => const MarketingInsightDetailScreen(
+              kind: MarketingInsightKind.social,
+            ),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingInsightOffers,
+        builder:
+            (_, __) => const MarketingInsightDetailScreen(
+              kind: MarketingInsightKind.offers,
+            ),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingInsightCampaigns,
+        builder:
+            (_, __) => const MarketingInsightDetailScreen(
+              kind: MarketingInsightKind.campaigns,
+            ),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingAddons,
+        builder: (_, __) => const AdminAddonsManagementScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingLoyalty,
+        builder: (_, __) => const MarketingLoyaltyRouteScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingRewards,
+        builder: (_, __) => const MarketingRewardsRouteScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingSocial,
+        builder: (_, __) => const MarketingSocialIntegrationsScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingBlog,
+        builder: (_, __) => const MarketingBlogScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.marketingPushCampaigns,
+        builder: (_, __) => const MarketingPushCampaignsScreen(),
       ),
       GoRoute(
         path: '/order/:id',
@@ -525,6 +756,27 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
+
+AppRole? _roleFilterFromQuery(GoRouterState state) {
+  final roleParam = state.uri.queryParameters['role'];
+  if (roleParam == null) return null;
+  for (final role in AppRole.values) {
+    if (role.name == roleParam) return role;
+  }
+  return null;
+}
+
+String _mapPickerReturnRoute(String? raw) {
+  if (raw == null || raw.isEmpty) return AppRoutePaths.cart;
+  if (raw == 'profile' || raw == AppRoutePaths.profile) {
+    return AppRoutePaths.profile;
+  }
+  if (raw == 'addresses' || raw == AppRoutePaths.addresses) {
+    return AppRoutePaths.addresses;
+  }
+  if (raw.startsWith('/')) return raw;
+  return AppRoutePaths.cart;
+}
 
 /// PRD §6 navigation entry.
 abstract final class CoreRouter {

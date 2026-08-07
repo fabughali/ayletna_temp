@@ -41,6 +41,12 @@ class RepositoryAddressMock implements RepositoryAddress {
       iconKey: request.iconKey,
       isSelected: request.setAsDefault || _addresses.isEmpty,
       canRemove: true,
+      contactName: request.contactName?.trim(),
+      phone: request.phone?.trim(),
+      building: request.building?.trim(),
+      floor: request.floor?.trim(),
+      accessCode: request.accessCode?.trim(),
+      customerAccountId: request.customerAccountId?.trim(),
     );
 
     if (created.isSelected) {
@@ -52,6 +58,53 @@ class RepositoryAddressMock implements RepositoryAddress {
 
     _addresses = [..._addresses, created];
     return created;
+  }
+
+  @override
+  Future<ModelSavedAddress> updateAddress(
+    String id,
+    ModelCreateAddressRequest request,
+  ) async {
+    await Future<void>.delayed(const Duration(milliseconds: 250));
+
+    final index = _addresses.indexWhere((address) => address.id == id);
+    if (index < 0) {
+      throw const AddressValidationException('not_found');
+    }
+
+    final label = request.label.trim();
+    final line = request.addressLine.trim();
+    if (label.isEmpty || line.isEmpty) {
+      throw const AddressValidationException('fields_required');
+    }
+
+    final existing = _addresses[index];
+    var updated = existing.copyWith(
+      labelAr: label,
+      labelEn: label,
+      addressAr: line,
+      addressEn: line,
+      iconKey: request.iconKey,
+      contactName: request.contactName?.trim(),
+      phone: request.phone?.trim(),
+      building: request.building?.trim(),
+      floor: request.floor?.trim(),
+      accessCode: request.accessCode?.trim(),
+      customerAccountId: request.customerAccountId?.trim(),
+      isSelected: request.setAsDefault ? true : existing.isSelected,
+    );
+
+    if (request.setAsDefault) {
+      _addresses = [
+        for (final address in _addresses)
+          address.id == id
+              ? updated
+              : address.copyWith(isSelected: false),
+      ];
+    } else {
+      _addresses = [..._addresses]..[index] = updated;
+    }
+    return updated;
   }
 
   @override

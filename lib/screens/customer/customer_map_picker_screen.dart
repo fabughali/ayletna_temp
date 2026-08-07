@@ -1,5 +1,6 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/data/models/model_create_address_request.dart';
+import 'package:ayletna_restaurant_app/data/models/model_saved_address.dart';
 import 'package:ayletna_restaurant_app/data/repositories/repository_providers.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
@@ -20,10 +21,14 @@ import 'package:go_router/go_router.dart';
 class CustomerMapPickerScreen extends ConsumerStatefulWidget {
   const CustomerMapPickerScreen({
     this.returnRoute = AppRoutePaths.cart,
+    this.addressId,
     super.key,
   });
 
   final String returnRoute;
+
+  /// When set, the screen edits that saved address and prefills its values.
+  final String? addressId;
 
   @override
   ConsumerState<CustomerMapPickerScreen> createState() =>
@@ -36,6 +41,10 @@ class _CustomerMapPickerScreenState
   final _titleController = TextEditingController();
   final _addressController = TextEditingController();
   var _mapSelected = false;
+  var _editInitialized = false;
+  ModelSavedAddress? _editingAddress;
+
+  bool get _isEditing => widget.addressId != null;
 
   bool get _canSave =>
       _mapSelected &&
@@ -49,10 +58,41 @@ class _CustomerMapPickerScreenState
     super.dispose();
   }
 
+  Future<void> _ensureEditPrefill(bool isAr) async {
+    final addressId = widget.addressId;
+    if (!_isEditing || _editInitialized || addressId == null) return;
+    _editInitialized = true;
+
+    final addresses =
+        await ref.read(repositoryAddressProvider).fetchSavedAddresses();
+    if (!mounted) return;
+
+    ModelSavedAddress? match;
+    for (final address in addresses) {
+      if (address.id == addressId) {
+        match = address;
+        break;
+      }
+    }
+    if (match == null) return;
+
+    _editingAddress = match;
+    _titleController.text = match.labelForLocale(isAr);
+    _addressController.text = match.addressForLocale(isAr);
+    setState(() => _mapSelected = true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+
+    if (_isEditing && !_editInitialized) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _ensureEditPrefill(isAr);
+      });
+    }
 
     return PopScope(
       canPop: context.canPop(),
@@ -150,16 +190,26 @@ class _CustomerMapPickerScreenState
   Future<void> _saveAddress(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     setState(() => _isSaving = true);
+    final request = ModelCreateAddressRequest(
+      label: _titleController.text.trim(),
+      addressLine: _addressController.text.trim(),
+      iconKey: _editingAddress?.iconKey ?? 'home',
+      setAsDefault: _editingAddress?.isSelected ?? true,
+      contactName: _editingAddress?.contactName,
+      phone: _editingAddress?.phone,
+      building: _editingAddress?.building,
+      floor: _editingAddress?.floor,
+      accessCode: _editingAddress?.accessCode,
+      customerAccountId: _editingAddress?.customerAccountId,
+    );
     try {
-      await ref
-          .read(repositoryAddressProvider)
-          .createAddress(
-            ModelCreateAddressRequest(
-              label: _titleController.text.trim(),
-              addressLine: _addressController.text.trim(),
-              setAsDefault: true,
-            ),
-          );
+      final repo = ref.read(repositoryAddressProvider);
+      final addressId = widget.addressId;
+      if (addressId != null) {
+        await repo.updateAddress(addressId, request);
+      } else {
+        await repo.createAddress(request);
+      }
       ref.invalidate(savedAddressesProvider);
       if (!context.mounted) return;
       UtilityMockFeedback.showSuccess(context, l10n.mapSaveAddress);
@@ -187,36 +237,26 @@ class _CompactMapPreview extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusImage),
-      onTap: onSelect,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusImage),
-        child: SizedBox(
-          height: CoreContentSizes.categoryHeroHeight(context) * 0.72,
+    return AspectRatio(
+      aspectRatio: 16 / 10,
+      child: Material(
+        color: scheme.surfaceContainerHighest.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
+        child: InkWell(
+          onTap: onSelect,
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
           child: Stack(
-            fit: StackFit.expand,
             children: [
-              CustomPaint(
-                painter: _MapGridPainter(
-                  background: scheme.secondaryContainer,
-                  road: scheme.surface.withValues(alpha: 0.56),
-                  roadStrong: scheme.surface.withValues(alpha: 0.78),
-                  park: scheme.primaryContainer.withValues(alpha: 0.28),
-                ),
-              ),
               Center(child: _DeliveryPin(label: l10n.mapDeliveryPin)),
               PositionedDirectional(
-                top: CoreSpacing.md(context),
-                end: CoreSpacing.md(context),
+                start: CoreSpacing.md(context),
+                bottom: CoreSpacing.md(context),
                 child: WidgetsStatusPill(
                   label:
-                      selected ? l10n.mapLocationSelected : l10n.mapSelectOnMap,
-                  icon:
                       selected
-                          ? Icons.check_circle_outline
-                          : Icons.touch_app_outlined,
-                  color: selected ? CoreColors.semanticSuccess : scheme.primary,
+                          ? l10n.mapLocationSelected
+                          : l10n.mapSelectOnMap,
+                  color: selected ? scheme.secondary : scheme.primary,
                   compact: true,
                 ),
               ),
@@ -236,145 +276,32 @@ class _DeliveryPin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         DecoratedBox(
           decoration: BoxDecoration(
             color: scheme.primary,
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
-            border: Border.all(color: scheme.surface, width: 2),
-            boxShadow: [
-              BoxShadow(
-                color: scheme.shadow.withValues(alpha: 0.22),
-                blurRadius: CoreSpacing.md(context),
-                offset: Offset(0, CoreSpacing.xs(context)),
-              ),
-            ],
+            shape: BoxShape.circle,
           ),
           child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: CoreSpacing.md(context),
-              vertical: CoreSpacing.xs(context),
-            ),
-            child: Text(
-              label,
-              style: CoreTypography.bodyMedium(
-                context,
-                scheme.onPrimary,
-              ).copyWith(fontWeight: FontWeight.w800),
+            padding: EdgeInsets.all(CoreSpacing.md(context)),
+            child: Icon(
+              Icons.location_on,
+              color: scheme.onPrimary,
+              size: CoreContentSizes.buttonIcon(context),
             ),
           ),
         ),
-        SizedBox(height: CoreSpacing.sm(context)),
-        Icon(
-          Icons.location_on,
-          color: scheme.primary,
-          size: CoreContentSizes.successIcon(context) * 0.72,
-        ),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: scheme.shadow.withValues(alpha: 0.20),
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
-          ),
-          child: SizedBox(
-            width: CoreSpacing.xl(context),
-            height: CoreSpacing.xs(context),
-          ),
+        SizedBox(height: CoreSpacing.xs(context)),
+        Text(
+          label,
+          style: CoreTypography.caption(
+            context,
+            scheme.onSurfaceVariant,
+          ).copyWith(fontWeight: FontWeight.w700),
         ),
       ],
     );
-  }
-}
-
-class _MapGridPainter extends CustomPainter {
-  const _MapGridPainter({
-    required this.background,
-    required this.road,
-    required this.roadStrong,
-    required this.park,
-  });
-
-  final Color background;
-  final Color road;
-  final Color roadStrong;
-  final Color park;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final bgPaint =
-        Paint()
-          ..shader = LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [background.withValues(alpha: 0.72), park],
-          ).createShader(Offset.zero & size);
-    canvas.drawRect(Offset.zero & size, bgPaint);
-
-    final roadPaint =
-        Paint()
-          ..color = road
-          ..strokeWidth = 1.4;
-    final strongRoadPaint =
-        Paint()
-          ..color = roadStrong
-          ..strokeWidth = 2.4;
-
-    for (var x = -size.width; x < size.width * 1.6; x += size.width / 9) {
-      canvas.drawLine(
-        Offset(x, 0),
-        Offset(x + size.width * 0.62, size.height),
-        roadPaint,
-      );
-    }
-    for (var x = -size.width * 0.5; x < size.width * 1.3; x += size.width / 7) {
-      canvas.drawLine(
-        Offset(x, size.height),
-        Offset(x + size.width * 0.82, 0),
-        roadPaint,
-      );
-    }
-    for (var y = size.height * 0.12; y < size.height; y += size.height / 8) {
-      canvas.drawLine(
-        Offset(0, y),
-        Offset(size.width, y - size.height * 0.22),
-        strongRoadPaint,
-      );
-    }
-
-    final blockPaint = Paint()..color = park.withValues(alpha: 0.20);
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          size.width * 0.05,
-          size.height * 0.24,
-          size.width * 0.26,
-          size.height * 0.18,
-        ),
-        Radius.circular(CoreSpacing.radiusImage),
-      ),
-      blockPaint,
-    );
-    canvas.drawRRect(
-      RRect.fromRectAndRadius(
-        Rect.fromLTWH(
-          size.width * 0.62,
-          size.height * 0.12,
-          size.width * 0.28,
-          size.height * 0.22,
-        ),
-        Radius.circular(CoreSpacing.radiusImage),
-      ),
-      blockPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _MapGridPainter oldDelegate) {
-    return oldDelegate.background != background ||
-        oldDelegate.road != road ||
-        oldDelegate.roadStrong != roadStrong ||
-        oldDelegate.park != park;
   }
 }
