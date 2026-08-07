@@ -4468,6 +4468,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get profileChoosePhoto => 'اختر صورة';
 
   @override
+  String get profileTakePhoto => 'التقاط صورة';
+
+  @override
+  String get profileChooseFromGallery => 'اختيار من المعرض';
+
+  @override
+  String get profilePhotoPickFailed => 'تعذر تحديث صورة الملف. حاول مرة أخرى.';
+
+  @override
   String get profileRemovePhoto => 'إزالة الصورة';
 
   @override

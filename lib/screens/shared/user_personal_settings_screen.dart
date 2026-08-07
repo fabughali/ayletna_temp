@@ -7,6 +7,7 @@ import 'package:ayletna_restaurant_app/providers/session_providers.dart';
 import 'package:ayletna_restaurant_app/providers/role_permissions_providers.dart';
 import 'package:ayletna_restaurant_app/providers/user_profile_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_profile_photo.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_role_labels.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_role_switcher.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
@@ -244,95 +245,13 @@ class _ProfileHeaderCard extends ConsumerWidget {
   final String? avatarUrl;
   final AppLocalizations l10n;
 
-  static const _presetAvatars = <String>[
-    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=240&h=240&q=80',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=240&h=240&q=80',
-    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=240&h=240&q=80',
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=240&h=240&q=80',
-    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=240&h=240&q=80',
-    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=240&h=240&q=80',
-  ];
-
-  Future<void> _openPhotoSheet(BuildContext context, WidgetRef ref) async {
-    final scheme = Theme.of(context).colorScheme;
-    final result = await showModalBottomSheet<Object>(
-      context: context,
-      showDragHandle: true,
-      builder: (sheetContext) {
-        return SafeArea(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              CoreSpacing.lg(sheetContext),
-              CoreSpacing.sm(sheetContext),
-              CoreSpacing.lg(sheetContext),
-              CoreSpacing.lg(sheetContext),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  l10n.profileChangePhoto,
-                  style: CoreTypography.titleMedium(
-                    sheetContext,
-                    scheme.onSurface,
-                  ).copyWith(fontWeight: FontWeight.w900),
-                ),
-                SizedBox(height: CoreSpacing.xs(sheetContext)),
-                Text(
-                  l10n.profileChoosePhoto,
-                  style: CoreTypography.caption(
-                    sheetContext,
-                    scheme.onSurfaceVariant,
-                  ),
-                ),
-                SizedBox(height: CoreSpacing.lg(sheetContext)),
-                Wrap(
-                  spacing: CoreSpacing.md(sheetContext),
-                  runSpacing: CoreSpacing.md(sheetContext),
-                  alignment: WrapAlignment.center,
-                  children: [
-                    for (final url in _presetAvatars)
-                      InkWell(
-                        customBorder: const CircleBorder(),
-                        onTap: () => Navigator.pop(sheetContext, url),
-                        child: WidgetsAvatar(
-                          imageUrl: url,
-                          radius: CoreContentSizes.profileAvatarRadius(
-                            sheetContext,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-                if (avatarUrl != null) ...[
-                  SizedBox(height: CoreSpacing.lg(sheetContext)),
-                  WidgetsAppButton(
-                    label: l10n.profileRemovePhoto,
-                    onPressed: () => Navigator.pop(sheetContext, false),
-                    icon: Icons.delete_outline,
-                    variant: WidgetsAppButtonVariant.outline,
-                    fullWidth: true,
-                  ),
-                ],
-              ],
-            ),
-          ),
-        );
-      },
+  Future<void> _openPhotoSheet(BuildContext context, WidgetRef ref) {
+    return UtilityProfilePhoto.presentPicker(
+      context,
+      hasExistingPhoto: avatarUrl != null && avatarUrl!.isNotEmpty,
+      onAvatarChanged:
+          (url) => ref.read(userProfileRepositoryProvider).setAvatarUrl(url),
     );
-
-    if (!context.mounted || result == null) return;
-    final repo = ref.read(userProfileRepositoryProvider);
-    if (result == false) {
-      repo.setAvatarUrl(null);
-      UtilityMockFeedback.showSuccess(context, l10n.profilePhotoUpdated);
-      return;
-    }
-    if (result is String && result.isNotEmpty) {
-      repo.setAvatarUrl(result);
-      UtilityMockFeedback.showSuccess(context, l10n.profilePhotoUpdated);
-    }
   }
 
   @override

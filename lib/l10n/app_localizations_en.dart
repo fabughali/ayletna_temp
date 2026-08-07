@@ -4495,6 +4495,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profileChoosePhoto => 'Choose a photo';
 
   @override
+  String get profileTakePhoto => 'Take photo';
+
+  @override
+  String get profileChooseFromGallery => 'Choose from gallery';
+
+  @override
+  String get profilePhotoPickFailed =>
+      'Couldn\'t update profile image. Try again.';
+
+  @override
   String get profileRemovePhoto => 'Remove photo';
 
   @override

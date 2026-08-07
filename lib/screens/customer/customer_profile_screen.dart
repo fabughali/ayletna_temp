@@ -9,6 +9,7 @@ import 'package:ayletna_restaurant_app/providers/session_providers.dart';
 import 'package:ayletna_restaurant_app/providers/user_profile_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_profile_photo.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
@@ -121,25 +122,12 @@ class _ProfileSummaryCard extends ConsumerWidget {
     final profile = ref.watch(userProfileProvider);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     void openPhotoSheet() {
-      UtilityMockFeedback.showActionSheet(
-        context: context,
-        title: l10n.profileChangePhoto,
-        message: l10n.profilePersonalProfile,
-        actions: [
-          MockSheetAction(
-            label: l10n.actionSave,
-            icon: Icons.photo_camera_outlined,
-            onSelected: () {
-              ref.read(userProfileProvider.notifier).setAvatarUrl(
-                    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=240&h=240&q=80',
-                  );
-              UtilityMockFeedback.showSuccess(
-                context,
-                l10n.profilePhotoUpdated,
-              );
-            },
-          ),
-        ],
+      UtilityProfilePhoto.presentPicker(
+        context,
+        hasExistingPhoto:
+            profile.avatarUrl != null && profile.avatarUrl!.isNotEmpty,
+        onAvatarChanged:
+            (url) => ref.read(userProfileProvider.notifier).setAvatarUrl(url),
       );
     }
 

@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Ayletna needs camera access to update your profile photo.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Ayletna needs photo library access to update your profile photo.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Ayletna needs photo library access to save profile photos.</string>
 </dict>
 </plist>

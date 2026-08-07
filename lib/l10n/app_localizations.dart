@@ -8600,6 +8600,24 @@ abstract class AppLocalizations {
   /// **'Choose a photo'**
   String get profileChoosePhoto;
 
+  /// No description provided for @profileTakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get profileTakePhoto;
+
+  /// No description provided for @profileChooseFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from gallery'**
+  String get profileChooseFromGallery;
+
+  /// No description provided for @profilePhotoPickFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t update profile image. Try again.'**
+  String get profilePhotoPickFailed;
+
   /// No description provided for @profileRemovePhoto.
   ///
   /// In en, this message translates to:
