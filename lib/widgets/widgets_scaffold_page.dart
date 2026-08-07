@@ -131,7 +131,9 @@ class WidgetsScaffoldPage extends ConsumerWidget {
         path == AppRoutePaths.cart ||
         path == AppRoutePaths.orderHistory ||
         path == AppRoutePaths.rewards ||
-        path == AppRoutePaths.notifications) {
+        path == AppRoutePaths.notifications ||
+        path == AppRoutePaths.profile ||
+        path == AppRoutePaths.accountSettings) {
       return base;
     }
     final hasCart = base.any((widget) => widget is WidgetsCartIconButton);
