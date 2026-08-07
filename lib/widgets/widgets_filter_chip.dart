@@ -46,7 +46,7 @@ class WidgetsFilterChip extends StatelessWidget {
                 : scheme.outlineVariant,
       ),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
       ),
     );
   }
