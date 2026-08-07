@@ -1,6 +1,5 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/data/models/model_customer_notification.dart';
-import 'package:ayletna_restaurant_app/data/models/model_customer_notification_category.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/app_providers.dart';
@@ -12,6 +11,7 @@ import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_avatar.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_filter_chip.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_list_item.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
@@ -43,12 +43,26 @@ class CustomerNotificationsScreen extends ConsumerWidget {
         },
         child: Builder(
           builder: (context) {
-            final visible = ref.watch(visibleCustomerNotificationsProvider);
+            final selectedCategory = ref.watch(
+              selectedCustomerNotificationCategoryProvider,
+            );
+            final visible =
+                ref
+                    .watch(visibleCustomerNotificationsProvider)
+                    .where(
+                      (item) => customerNotificationMatchesCategory(
+                        item,
+                        selectedCategory,
+                      ),
+                    )
+                    .toList(growable: false);
             if (visible.isEmpty) {
               return ListView(
                 children: [
                   SizedBox(height: CoreSpacing.md(context)),
                   _HeaderActions(l10n: l10n),
+                  SizedBox(height: CoreSpacing.lg(context)),
+                  _CategorySummary(l10n: l10n),
                   SizedBox(height: CoreSpacing.xl(context)),
                   WidgetsAsyncStateCard.empty(
                     title: l10n.notificationsRecentAlerts,
@@ -247,45 +261,50 @@ class _CategorySummary extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final scheme = Theme.of(context).colorScheme;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final rows = ref.watch(customerNotificationCategoriesProvider);
+    final selectedId = ref.watch(selectedCustomerNotificationCategoryProvider);
 
     return WidgetsAppCard(
-      title: l10n.notificationsCategories,
-      leading: Icon(Icons.category_outlined, color: scheme.primary),
+      variant: WidgetsAppCardVariant.food,
+      padding: EdgeInsets.all(CoreSpacing.lg(context)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (final row in rows) ...[
-            _CategoryRow(data: row),
-            SizedBox(height: CoreSpacing.xs(context)),
-          ],
+          Text(
+            l10n.notificationsCategories,
+            style: CoreTypography.titleMedium(
+              context,
+              Theme.of(context).colorScheme.onSurface,
+            ).copyWith(fontWeight: FontWeight.w900),
+          ),
+          SizedBox(height: CoreSpacing.md(context)),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (var index = 0; index < rows.length; index++) ...[
+                  WidgetsFilterChip(
+                    label: isAr ? rows[index].labelAr : rows[index].labelEn,
+                    icon: _categoryIcon(rows[index].iconKey),
+                    selected: selectedId == rows[index].id,
+                    onSelected:
+                        (_) =>
+                            ref
+                                .read(
+                                  selectedCustomerNotificationCategoryProvider
+                                      .notifier,
+                                )
+                                .state = rows[index].id,
+                  ),
+                  if (index < rows.length - 1)
+                    SizedBox(width: CoreSpacing.sm(context)),
+                ],
+              ],
+            ),
+          ),
         ],
       ),
-    );
-  }
-}
-
-class _CategoryRow extends StatelessWidget {
-  const _CategoryRow({required this.data});
-
-  final ModelCustomerNotificationCategory data;
-
-  @override
-  Widget build(BuildContext context) {
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    final scheme = Theme.of(context).colorScheme;
-    final color = _categoryColor(scheme, data.colorKey);
-
-    return WidgetsListItem(
-      title: isAr ? data.labelAr : data.labelEn,
-      dense: true,
-      leading: Icon(
-        _categoryIcon(data.iconKey),
-        size: CoreContentSizes.orderTypeIcon(context),
-        color: color,
-      ),
-      trailing: _CountBadge(count: data.count, color: color),
     );
   }
 
@@ -294,16 +313,7 @@ class _CategoryRow extends StatelessWidget {
       'delivery' => Icons.local_shipping_outlined,
       'eco' => Icons.eco_outlined,
       'admin' => Icons.admin_panel_settings_outlined,
-      _ => Icons.all_inbox_outlined,
-    };
-  }
-
-  Color _categoryColor(ColorScheme scheme, String key) {
-    return switch (key) {
-      'delivery' => CoreColors.orderTypeDelivery,
-      'secondary' => scheme.secondary,
-      'warning' => CoreColors.semanticWarning,
-      _ => scheme.primary,
+      _ => Icons.all_inclusive_outlined,
     };
   }
 }
@@ -374,36 +384,6 @@ class _SectionLabel extends StatelessWidget {
         context,
         scheme.onSurfaceVariant,
       ).copyWith(fontWeight: FontWeight.w900),
-    );
-  }
-}
-
-class _CountBadge extends StatelessWidget {
-  const _CountBadge({required this.count, required this.color});
-
-  final int count;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(minWidth: 28),
-      padding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.sm(context),
-        vertical: CoreSpacing.xs(context),
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
-      ),
-      child: Text(
-        count.toString(),
-        textAlign: TextAlign.center,
-        style: CoreTypography.caption(
-          context,
-          color,
-        ).copyWith(fontWeight: FontWeight.w900),
-      ),
     );
   }
 }
