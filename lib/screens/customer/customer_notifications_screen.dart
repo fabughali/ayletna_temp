@@ -202,8 +202,10 @@ class _HeaderActions extends ConsumerWidget {
         spacing: CoreSpacing.sm(context),
         runSpacing: CoreSpacing.sm(context),
         children: [
-          WidgetsAppButton(
-            label: l10n.notificationsClearAll,
+          WidgetsIconButton(
+            tooltip: l10n.notificationsClearAll,
+            icon: Icons.delete_sweep_outlined,
+            variant: WidgetsIconButtonVariant.outline,
             onPressed: () async {
               final confirmed = await UtilityMockFeedback.confirm(
                 context: context,
@@ -216,20 +218,21 @@ class _HeaderActions extends ConsumerWidget {
                 confirmVariant: WidgetsAppButtonVariant.secondary,
               );
               if (confirmed && context.mounted) {
-                ref.read(customerNotificationsDismissedProvider.notifier).clearAll();
+                ref
+                    .read(customerNotificationsDismissedProvider.notifier)
+                    .clearAll();
                 UtilityMockFeedback.showSuccess(
                   context,
                   l10n.notificationsClearAll,
                 );
               }
             },
-            icon: Icons.delete_sweep_outlined,
-            variant: WidgetsAppButtonVariant.outline,
           ),
-          WidgetsAppButton(
-            label: l10n.notificationsPreferences,
-            onPressed: () => context.push(AppRoutePaths.profile),
+          WidgetsIconButton(
+            tooltip: l10n.notificationsPreferences,
             icon: Icons.settings_outlined,
+            variant: WidgetsIconButtonVariant.tonal,
+            onPressed: () => context.push(AppRoutePaths.profile),
           ),
         ],
       ),
