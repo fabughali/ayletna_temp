@@ -4,13 +4,13 @@ import 'package:ayletna_restaurant_app/data/repositories/repository_providers.da
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_app_bar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_screen_layout.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_status_pill.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,12 +30,11 @@ class CustomerMapPickerScreen extends ConsumerStatefulWidget {
       _CustomerMapPickerScreenState();
 }
 
-class _CustomerMapPickerScreenState extends ConsumerState<CustomerMapPickerScreen> {
+class _CustomerMapPickerScreenState
+    extends ConsumerState<CustomerMapPickerScreen> {
   var _isSaving = false;
-  final _titleController = TextEditingController(text: 'Home');
-  final _addressController = TextEditingController(
-    text: '123 Gastronomy Lane, Central Hub, Amman',
-  );
+  final _titleController = TextEditingController();
+  final _addressController = TextEditingController();
   var _mapSelected = false;
 
   bool get _canSave =>
@@ -55,24 +54,25 @@ class _CustomerMapPickerScreenState extends ConsumerState<CustomerMapPickerScree
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
 
-    return Scaffold(
-      appBar: WidgetsAppBar(
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) context.go(widget.returnRoute);
+      },
+      child: WidgetsScaffoldPage(
         title: l10n.screenMapPicker,
-        leading: WidgetsIconButton(
-          onPressed:
-              () =>
-                  context.canPop()
-                      ? context.pop()
-                      : context.go(widget.returnRoute),
-          icon: Icons.arrow_back,
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-        ),
-      ),
-      body: SafeArea(
-        child: WidgetsScreenLayout(
+        child: WidgetsRefreshList(
+          onRefresh: () async {
+            UtilityMockFeedback.showInfo(context, l10n.screenMapPicker);
+          },
           child: ListView(
             children: [
               SizedBox(height: CoreSpacing.md(context)),
+              WidgetsPageHeader(
+                title: l10n.screenMapPicker,
+                subtitle: l10n.mapSelectHint,
+              ),
+              SizedBox(height: CoreSpacing.lg(context)),
               WidgetsAppCard(
                 variant: WidgetsAppCardVariant.food,
                 padding: EdgeInsets.all(CoreSpacing.lg(context)),
@@ -151,13 +151,15 @@ class _CustomerMapPickerScreenState extends ConsumerState<CustomerMapPickerScree
     final l10n = AppLocalizations.of(context)!;
     setState(() => _isSaving = true);
     try {
-      await ref.read(repositoryAddressProvider).createAddress(
-        ModelCreateAddressRequest(
-          label: _titleController.text.trim(),
-          addressLine: _addressController.text.trim(),
-          setAsDefault: true,
-        ),
-      );
+      await ref
+          .read(repositoryAddressProvider)
+          .createAddress(
+            ModelCreateAddressRequest(
+              label: _titleController.text.trim(),
+              addressLine: _addressController.text.trim(),
+              setAsDefault: true,
+            ),
+          );
       ref.invalidate(savedAddressesProvider);
       if (!context.mounted) return;
       UtilityMockFeedback.showSuccess(context, l10n.mapSaveAddress);
@@ -241,7 +243,7 @@ class _DeliveryPin extends StatelessWidget {
         DecoratedBox(
           decoration: BoxDecoration(
             color: scheme.primary,
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+            borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
             border: Border.all(color: scheme.surface, width: 2),
             boxShadow: [
               BoxShadow(
@@ -274,7 +276,7 @@ class _DeliveryPin extends StatelessWidget {
         DecoratedBox(
           decoration: BoxDecoration(
             color: scheme.shadow.withValues(alpha: 0.20),
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+            borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
           ),
           child: SizedBox(
             width: CoreSpacing.xl(context),
