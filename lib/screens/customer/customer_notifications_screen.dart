@@ -1,11 +1,13 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/data/models/model_customer_notification.dart';
 import 'package:ayletna_restaurant_app/data/models/model_customer_notification_category.dart';
-import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
+import 'package:ayletna_restaurant_app/providers/app_providers.dart';
 import 'package:ayletna_restaurant_app/providers/customer_action_providers.dart';
+import 'package:ayletna_restaurant_app/providers/session_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_open_notifications.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
@@ -19,54 +21,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// PRD [NotificationsScreen].
+/// PRD [NotificationsScreen] — customer marketing inbox + ops shift inbox.
 class CustomerNotificationsScreen extends ConsumerWidget {
   const CustomerNotificationsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final role = ref.watch(appRoleProvider);
+    if (!isCustomerNotificationsAudience(role)) {
+      return _OpsInboxScaffold(role: role);
+    }
 
     return WidgetsScaffoldPage(
       title: l10n.screenNotifications,
-      actions: [
-        Stack(
-          alignment: AlignmentDirectional.topEnd,
-          children: [
-            WidgetsIconButton(
-              onPressed:
-                  () => UtilityMockFeedback.showInfo(
-                    context,
-                    l10n.screenNotifications,
-                  ),
-              icon: Icons.notifications,
-              tooltip: l10n.screenNotifications,
-            ),
-            PositionedDirectional(
-              top: CoreSpacing.sm(context),
-              end: CoreSpacing.sm(context),
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: CoreColors.semanticError,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.surface,
-                    width: 2,
-                  ),
-                ),
-                child: SizedBox.square(dimension: CoreSpacing.sm(context)),
-              ),
-            ),
-          ],
-        ),
-        Padding(
-          padding: EdgeInsetsDirectional.only(end: CoreSpacing.md(context)),
-          child: const WidgetsAvatar(icon: Icons.person_outline),
-        ),
-      ],
       child: WidgetsRefreshList(
         onRefresh: () async {
           ref.read(customerNotificationsDismissedProvider.notifier).reset();
+          ref.invalidate(customerNotificationCategoriesProvider);
           UtilityMockFeedback.showSuccess(context, l10n.notificationsTitle);
         },
         child: Builder(
@@ -86,31 +58,131 @@ class CustomerNotificationsScreen extends ConsumerWidget {
               );
             }
 
-            return ListView(
-              children: [
-                SizedBox(height: CoreSpacing.md(context)),
-                _HeaderActions(l10n: l10n),
-                SizedBox(height: CoreSpacing.lg(context)),
-                _CategorySummary(l10n: l10n),
-                SizedBox(height: CoreSpacing.md(context)),
-                const _WeeklyReportCard(),
-                SizedBox(height: CoreSpacing.xl(context)),
-                _SectionLabel(label: l10n.notificationsRecentAlerts),
-                SizedBox(height: CoreSpacing.md(context)),
-                for (final item in visible.where((item) => !item.isSubdued)) ...[
-                  _NotificationCard(item: item),
-                  SizedBox(height: CoreSpacing.sm(context)),
-                ],
-                SizedBox(height: CoreSpacing.lg(context)),
-                _SectionLabel(label: l10n.notificationsYesterday),
-                SizedBox(height: CoreSpacing.md(context)),
-                for (final item in visible.where((item) => item.isSubdued))
-                  _NotificationCard(item: item),
-                SizedBox(height: CoreSpacing.xxl(context)),
-              ],
+            final recent =
+                visible.where((item) => !item.isSubdued).toList(growable: false);
+            final yesterday =
+                visible.where((item) => item.isSubdued).toList(growable: false);
+            // header + recent section + items + yesterday section + items + footer
+            final itemCount =
+                1 +
+                (recent.isEmpty ? 0 : 1 + recent.length) +
+                (yesterday.isEmpty ? 0 : 1 + yesterday.length) +
+                1;
+
+            return ListView.builder(
+              itemCount: itemCount,
+              itemBuilder: (context, index) {
+                var cursor = 0;
+                if (index == cursor) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: CoreSpacing.md(context)),
+                      _HeaderActions(l10n: l10n),
+                      SizedBox(height: CoreSpacing.lg(context)),
+                      _CategorySummary(l10n: l10n),
+                      SizedBox(height: CoreSpacing.md(context)),
+                      const _WeeklyReportCard(),
+                      SizedBox(height: CoreSpacing.xl(context)),
+                    ],
+                  );
+                }
+                cursor++;
+
+                if (recent.isNotEmpty) {
+                  if (index == cursor) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _SectionLabel(label: l10n.notificationsRecentAlerts),
+                        SizedBox(height: CoreSpacing.md(context)),
+                      ],
+                    );
+                  }
+                  cursor++;
+                  final recentIndex = index - cursor;
+                  if (recentIndex >= 0 && recentIndex < recent.length) {
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        bottom: CoreSpacing.sm(context),
+                      ),
+                      child: _NotificationCard(item: recent[recentIndex]),
+                    );
+                  }
+                  cursor += recent.length;
+                }
+
+                if (yesterday.isNotEmpty) {
+                  if (index == cursor) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        SizedBox(height: CoreSpacing.lg(context)),
+                        _SectionLabel(label: l10n.notificationsYesterday),
+                        SizedBox(height: CoreSpacing.md(context)),
+                      ],
+                    );
+                  }
+                  cursor++;
+                  final yesterdayIndex = index - cursor;
+                  if (yesterdayIndex >= 0 &&
+                      yesterdayIndex < yesterday.length) {
+                    return _NotificationCard(item: yesterday[yesterdayIndex]);
+                  }
+                  cursor += yesterday.length;
+                }
+
+                return SizedBox(height: CoreSpacing.xxl(context));
+              },
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+class _OpsInboxScaffold extends ConsumerWidget {
+  const _OpsInboxScaffold({required this.role});
+
+  final AppRole role;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final hub = homeRouteForRole(role);
+
+    return WidgetsScaffoldPage(
+      title: l10n.opsInboxTitle,
+      child: ListView(
+        children: [
+          SizedBox(height: CoreSpacing.md(context)),
+          WidgetsPageHeader(
+            title: l10n.opsInboxTitle,
+            subtitle: l10n.opsInboxSubtitle,
+          ),
+          WidgetsListItem(
+            title: l10n.opsInboxShiftAlertTitle,
+            subtitle: l10n.opsInboxShiftAlertBody,
+            leading: const Icon(Icons.schedule_outlined),
+            onTap: () => context.go(hub),
+          ),
+          SizedBox(height: CoreSpacing.sm(context)),
+          WidgetsListItem(
+            title: l10n.opsInboxOrderAlertTitle,
+            subtitle: l10n.opsInboxOrderAlertBody,
+            leading: const Icon(Icons.notifications_active_outlined),
+            onTap: () => context.go(hub),
+          ),
+          SizedBox(height: CoreSpacing.lg(context)),
+          WidgetsAppButton(
+            label: l10n.opsInboxOpenHub,
+            onPressed: () => context.go(hub),
+            icon: Icons.home_outlined,
+            fullWidth: true,
+          ),
+          SizedBox(height: CoreSpacing.xxl(context)),
+        ],
       ),
     );
   }
@@ -165,15 +237,15 @@ class _HeaderActions extends ConsumerWidget {
   }
 }
 
-class _CategorySummary extends StatelessWidget {
+class _CategorySummary extends ConsumerWidget {
   const _CategorySummary({required this.l10n});
 
   final AppLocalizations l10n;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
-    final rows = MockupCatalog.customerNotificationCategories;
+    final rows = ref.watch(customerNotificationCategoriesProvider);
 
     return WidgetsAppCard(
       title: l10n.notificationsCategories,
@@ -271,23 +343,7 @@ class _WeeklyReportCard extends StatelessWidget {
                 SizedBox(height: CoreSpacing.md(context)),
                 WidgetsAppButton(
                   label: l10n.notificationsViewDetails,
-                  onPressed:
-                      () => UtilityMockFeedback.showActionSheet(
-                        context: context,
-                        title: l10n.notificationsWeeklyReport,
-                        message: l10n.notificationsWeeklySubtitle,
-                        actions: [
-                          MockSheetAction(
-                            label: l10n.notificationsViewDetails,
-                            icon: Icons.analytics_outlined,
-                            onSelected:
-                                () => UtilityMockFeedback.showInfo(
-                                  context,
-                                  l10n.notificationsWeeklyReport,
-                                ),
-                          ),
-                        ],
-                      ),
+                  onPressed: () => context.push(AppRoutePaths.loyalty),
                   icon: Icons.arrow_forward,
                   variant: WidgetsAppButtonVariant.ghost,
                 ),
@@ -335,7 +391,7 @@ class _CountBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
       ),
       child: Text(
         count.toString(),
@@ -375,8 +431,8 @@ class _NotificationCard extends ConsumerWidget {
               DecoratedBox(
                 decoration: BoxDecoration(
                   color: color,
-                  borderRadius: const BorderRadiusDirectional.horizontal(
-                    start: Radius.circular(CoreSpacing.radiusCard),
+                  borderRadius: BorderRadiusDirectional.horizontal(
+                    start: Radius.circular(CoreSpacing.radiusCardOf(context)),
                   ),
                 ),
                 child: SizedBox(
@@ -454,10 +510,7 @@ class _NotificationCard extends ConsumerWidget {
                                           context.push(route);
                                           return;
                                         }
-                                        UtilityMockFeedback.showInfo(
-                                          context,
-                                          indexedAction.$2,
-                                        );
+                                        context.push(AppRoutePaths.home);
                                       },
                                       variant:
                                           item.primaryActionIndexes.contains(

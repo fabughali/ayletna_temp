@@ -130,7 +130,8 @@ class WidgetsScaffoldPage extends ConsumerWidget {
     if (!isStorefront ||
         path == AppRoutePaths.cart ||
         path == AppRoutePaths.orderHistory ||
-        path == AppRoutePaths.rewards) {
+        path == AppRoutePaths.rewards ||
+        path == AppRoutePaths.notifications) {
       return base;
     }
     final hasCart = base.any((widget) => widget is WidgetsCartIconButton);
