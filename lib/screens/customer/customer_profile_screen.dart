@@ -174,11 +174,14 @@ class _ProfileSummaryCard extends ConsumerWidget {
                         customBorder: const CircleBorder(),
                         onTap: openPhotoSheet,
                         child: SizedBox.square(
-                          dimension: 34,
+                          dimension:
+                              CoreContentSizes.profileAvatarEditBadge(context),
                           child: Icon(
                             Icons.photo_camera_outlined,
                             color: scheme.onPrimary,
-                            size: CoreContentSizes.orderTypeIcon(context),
+                            size: CoreContentSizes.profileAvatarEditIcon(
+                              context,
+                            ),
                           ),
                         ),
                       ),
