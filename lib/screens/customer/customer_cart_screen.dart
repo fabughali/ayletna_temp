@@ -1,10 +1,7 @@
-import 'package:ayletna_restaurant_app/core/app_config.dart';
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:ayletna_restaurant_app/data/models/model_cart_line.dart';
 import 'package:ayletna_restaurant_app/data/models/model_menu_item.dart';
-import 'package:ayletna_restaurant_app/data/models/model_saved_address.dart';
-import 'package:ayletna_restaurant_app/data/repositories/repository_providers.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/app_providers.dart';
@@ -21,12 +18,16 @@ import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_cart_customization_sheet.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_checkout_step_strip.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_customization_sheet.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_financial_summary.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_media_panel.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_food_tag.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_info_banner.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_mock_food_image.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_price_badge.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_quantity_stepper.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,13 +44,10 @@ class CustomerCartScreen extends ConsumerStatefulWidget {
 class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
   final _promoController = TextEditingController();
   _CartFulfillment _fulfillment = _CartFulfillment.delivery;
-  String? _selectedAddressId;
-  _CartPaymentType _paymentType = _CartPaymentType.card;
-  double _tipJod = 0;
+  bool _showMoreFulfillment = false;
 
   final _itemsSectionKey = GlobalKey();
   final _fulfillmentSectionKey = GlobalKey();
-  final _paymentSectionKey = GlobalKey();
   final _summarySectionKey = GlobalKey();
 
   @override
@@ -63,9 +61,6 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
     final l10n = AppLocalizations.of(context)!;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final isGuest = ref.watch(appRoleProvider) == AppRole.guest;
-    final addresses =
-        ref.watch(savedAddressesProvider).valueOrNull ??
-        const <ModelSavedAddress>[];
     final menuCatalog =
         ref.watch(menuAllItemsProvider).maybeWhen(
           data: (items) => items,
@@ -89,13 +84,128 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
     final totalBeforeSavings = summaryCosts.totalBeforeSavings;
     final promo = ref.watch(cartPromoProvider);
     final discount = promo.applied ? promo.discountJod : 0.0;
-    final summaryTotal = totalBeforeSavings - discount + _tipJod;
-    final selectedAddress = _resolveSelectedAddress(addresses);
-    final addressRequired = _requiresAddress(_fulfillment);
-    final canProceed = !addressRequired || selectedAddress != null;
+    final summaryTotal = totalBeforeSavings - discount;
     final hasItems = visibleItems.isNotEmpty;
-    final checkoutActiveStep = !hasItems ? 0 : (canProceed ? 3 : 1);
-    final checkoutCompletedThrough = !hasItems ? -1 : (canProceed ? 2 : 0);
+    final checkoutActiveStep = !hasItems ? 0 : 1;
+    final checkoutCompletedThrough = !hasItems ? -1 : 0;
+
+    final listChildren = <Widget>[
+      SizedBox(height: CoreSpacing.md(context)),
+      WidgetsPageHeader(
+        title: l10n.cartYourCartTitle,
+        subtitle: l10n.cartReviewSubtitle,
+      ),
+      _ItemsHeader(
+        count: visibleItems.length,
+        onClear: () => _clearCart(context),
+      ),
+      SizedBox(height: CoreSpacing.md(context)),
+      if (visibleItems.isEmpty) ...[
+        _EmptyCartPanel(onBrowse: () => context.go(AppRoutePaths.category)),
+        SizedBox(height: CoreSpacing.lg(context)),
+      ] else ...[
+        WidgetsCheckoutStepStrip(
+          activeStep: checkoutActiveStep,
+          completedThrough: checkoutCompletedThrough,
+          onStepTapped: _scrollToCheckoutStep,
+        ),
+        SizedBox(height: CoreSpacing.lg(context)),
+        KeyedSubtree(key: _itemsSectionKey, child: const SizedBox.shrink()),
+        for (var index = 0; index < visibleItems.length; index++) ...[
+          _CartItemCard(
+            item: visibleItems[index],
+            index: index,
+            onIncrement:
+                () => ref
+                    .read(cartProvider.notifier)
+                    .setQuantity(
+                      visibleItems[index].line.cartKey,
+                      visibleItems[index].quantity + 1,
+                    ),
+            onDecrement:
+                () => ref
+                    .read(cartProvider.notifier)
+                    .setQuantity(
+                      visibleItems[index].line.cartKey,
+                      visibleItems[index].quantity - 1,
+                    ),
+            onRemove: () => _removeItem(context, visibleItems[index]),
+          ),
+          SizedBox(height: CoreSpacing.md(context)),
+        ],
+        _CartSuggestionsSection(
+          cartItemIds: visibleItems.map((e) => e.line.itemId).toSet(),
+          menuItems: menuCatalog,
+          isAr: isAr,
+          l10n: l10n,
+        ),
+        SizedBox(height: CoreSpacing.lg(context)),
+        KeyedSubtree(
+          key: _fulfillmentSectionKey,
+          child: _FulfillmentSection(
+            selected: _fulfillment,
+            showMore: _showMoreFulfillment,
+            onToggleMore:
+                () => setState(
+                  () => _showMoreFulfillment = !_showMoreFulfillment,
+                ),
+            onSelected: _selectFulfillment,
+            onTerms: () => context.push(AppRoutePaths.terms),
+          ),
+        ),
+        SizedBox(height: CoreSpacing.lg(context)),
+        _PromoCodeCard(
+          controller: _promoController,
+          promoApplied: promo.applied,
+          savingsJod: discount,
+          onApply: () {
+            final ok = ref.read(cartPromoProvider.notifier).applyCode(
+              _promoController.text,
+              totalBeforeSavings,
+            );
+            if (!ok) {
+              UtilityMockFeedback.showWarning(
+                context,
+                l10n.cartInvalidPromoCode,
+              );
+              return;
+            }
+            UtilityMockFeedback.showSuccess(context, l10n.cartPromoCode);
+          },
+        ),
+        SizedBox(height: CoreSpacing.lg(context)),
+        if (isGuest) ...[
+          WidgetsInfoBanner(
+            title: l10n.guestSignInToOrder,
+            message: l10n.cartGuestSignInPrompt,
+            tone: WidgetsInfoBannerTone.warning,
+            icon: Icons.login_outlined,
+            action: WidgetsAppButton(
+              label: l10n.actionSignIn,
+              onPressed: () => context.push(AppRoutePaths.login),
+              icon: Icons.arrow_forward,
+              variant: WidgetsAppButtonVariant.outline,
+            ),
+          ),
+          SizedBox(height: CoreSpacing.lg(context)),
+        ],
+        KeyedSubtree(
+          key: _summarySectionKey,
+          child: _OrderSummaryCard(
+            subtotal: subtotal,
+            fulfillment: _fulfillment,
+            fulfillmentCharge: summaryCosts.fulfillmentCharge,
+            tax: summaryCosts.tax,
+            tipJod: 0,
+            discount: discount,
+            total: summaryTotal,
+          ),
+        ),
+        SizedBox(height: CoreSpacing.lg(context)),
+      ],
+      const _HelpCard(),
+      SizedBox(height: CoreSpacing.xxl(context)),
+    ];
 
     return WidgetsScaffoldPage(
       title: l10n.screenCart,
@@ -106,137 +216,13 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
           tooltip: l10n.screenNotifications,
         ),
       ],
-      child: ListView(
-        children: [
-          SizedBox(height: CoreSpacing.md(context)),
-          _BasketHero(count: visibleItems.length),
-          SizedBox(height: CoreSpacing.lg(context)),
-          _ItemsHeader(
-            count: visibleItems.length,
-            onClear: () => _clearCart(context),
-          ),
-          SizedBox(height: CoreSpacing.md(context)),
-          if (visibleItems.isEmpty) ...[
-            _EmptyCartPanel(onBrowse: () => context.go(AppRoutePaths.category)),
-            SizedBox(height: CoreSpacing.lg(context)),
-          ] else ...[
-            WidgetsCheckoutStepStrip(
-              activeStep: checkoutActiveStep,
-              completedThrough: checkoutCompletedThrough,
-              onStepTapped: _scrollToCheckoutStep,
-            ),
-            SizedBox(height: CoreSpacing.lg(context)),
-            KeyedSubtree(key: _itemsSectionKey, child: const SizedBox.shrink()),
-            for (var index = 0; index < visibleItems.length; index++) ...[
-              _CartItemCard(
-                item: visibleItems[index],
-                index: index,
-                onIncrement:
-                    () => ref
-                        .read(cartProvider.notifier)
-                        .setQuantity(
-                          visibleItems[index].line.cartKey,
-                          visibleItems[index].quantity + 1,
-                        ),
-                onDecrement:
-                    () => ref
-                        .read(cartProvider.notifier)
-                        .setQuantity(
-                          visibleItems[index].line.cartKey,
-                          visibleItems[index].quantity - 1,
-                        ),
-                onRemove: () => _removeItem(context, visibleItems[index]),
-              ),
-              SizedBox(height: CoreSpacing.md(context)),
-            ],
-            _CartSuggestionsSection(
-              cartItemIds: visibleItems.map((e) => e.line.itemId).toSet(),
-              menuItems: menuCatalog,
-              isAr: isAr,
-              l10n: l10n,
-            ),
-            SizedBox(height: CoreSpacing.lg(context)),
-            KeyedSubtree(
-              key: _fulfillmentSectionKey,
-              child: _FulfillmentSection(
-                selected: _fulfillment,
-                onSelected: _selectFulfillment,
-                onTerms: () => context.push(AppRoutePaths.terms),
-              ),
-            ),
-            SizedBox(height: CoreSpacing.lg(context)),
-            if (addressRequired) ...[
-              _DeliveryAddressCard(
-                address: selectedAddress,
-                onChoose: _showAddressPicker,
-              ),
-              SizedBox(height: CoreSpacing.lg(context)),
-            ],
-            KeyedSubtree(
-              key: _paymentSectionKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _PaymentTypeCard(
-                    selected: _paymentType,
-                    onSelected: (value) => setState(() => _paymentType = value),
-                  ),
-                  SizedBox(height: CoreSpacing.lg(context)),
-                  _TipSection(
-                    selectedTipJod: _tipJod,
-                    onSelected: (value) => setState(() => _tipJod = value),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: CoreSpacing.lg(context)),
-            _PromoCodeCard(
-              controller: _promoController,
-              promoApplied: promo.applied,
-              savingsJod: discount,
-              onApply: () {
-                final ok = ref.read(cartPromoProvider.notifier).applyCode(
-                  _promoController.text,
-                  totalBeforeSavings,
-                );
-                if (!ok) {
-                  UtilityMockFeedback.showWarning(
-                    context,
-                    isAr
-                        ? 'رمز غير صالح — جرّب AYLETNA10 أو WELCOME'
-                        : 'Invalid code — try AYLETNA10 or WELCOME',
-                  );
-                  return;
-                }
-                UtilityMockFeedback.showSuccess(context, l10n.cartPromoCode);
-              },
-            ),
-            SizedBox(height: CoreSpacing.lg(context)),
-            if (isGuest) ...[
-              WidgetsInfoBanner(
-                title: l10n.guestSignInToOrder,
-                message: l10n.cartGuestSignInPrompt,
-                tone: WidgetsInfoBannerTone.warning,
-                icon: Icons.login_outlined,
-                action: WidgetsAppButton(
-                  label: l10n.actionSignIn,
-                  onPressed: () => context.push(AppRoutePaths.login),
-                  icon: Icons.arrow_forward,
-                  variant: WidgetsAppButtonVariant.outline,
+      bottomSheet:
+          hasItems
+              ? _StickyCartBar(
+                totalLabel: UtilityFormatJod.format(
+                  summaryTotal,
+                  suffix: l10n.currencyJod,
                 ),
-              ),
-              SizedBox(height: CoreSpacing.lg(context)),
-            ],
-            KeyedSubtree(
-              key: _summarySectionKey,
-              child: _OrderSummaryCard(
-                subtotal: subtotal,
-                fulfillment: _fulfillment,
-                fulfillmentCharge: summaryCosts.fulfillmentCharge,
-                tax: summaryCosts.tax,
-                tipJod: _tipJod,
-                discount: discount,
-                total: summaryTotal,
                 proceedLabel:
                     isGuest
                         ? l10n.guestSignInToOrder
@@ -244,48 +230,35 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
                 onProceed:
                     isGuest
                         ? () => context.push(AppRoutePaths.login)
-                        : canProceed
-                        ? () {
-                          if (AppConfig.useSteppedCheckoutRoutes) {
-                            _syncCheckoutDraft(addresses);
-                            context.push(AppRoutePaths.checkout);
-                          } else {
-                            context.push(AppRoutePaths.orderConfirmation);
-                          }
-                        }
-                        : null,
-              ),
-            ),
-            SizedBox(height: CoreSpacing.lg(context)),
-          ],
-          const _HelpCard(),
-          SizedBox(height: CoreSpacing.xxl(context)),
-        ],
+                        : () => _onProceedCheckout(),
+              )
+              : null,
+      child: WidgetsRefreshList(
+        onRefresh: () async {
+          ref.invalidate(cartProvider);
+          ref.invalidate(cartPromoProvider);
+          if (context.mounted) {
+            UtilityMockFeedback.showInfo(context, l10n.screenCart);
+          }
+        },
+        child: ListView.builder(
+          itemCount: listChildren.length,
+          itemBuilder: (context, index) => listChildren[index],
+        ),
       ),
     );
   }
 
-  ModelSavedAddress? _resolveSelectedAddress(
-    List<ModelSavedAddress> addresses,
-  ) {
-    if (_selectedAddressId != null) {
-      for (final address in addresses) {
-        if (address.id == _selectedAddressId) return address;
-      }
-    }
-    for (final address in addresses) {
-      if (address.isSelected) return address;
-    }
-    return addresses.isEmpty ? null : addresses.first;
-  }
-
-  void _syncCheckoutDraft(List<ModelSavedAddress> addresses) {
+  void _syncCheckoutDraft() {
     final draft = ref.read(checkoutDraftProvider.notifier);
     draft.setFulfillment(_toCheckoutFulfillment(_fulfillment));
-    draft.setAddressId(_resolveSelectedAddress(addresses)?.id);
-    draft.setPaymentType(_toCheckoutPayment(_paymentType));
-    draft.setTipJod(_tipJod);
     draft.setPromoApplied(ref.read(cartPromoProvider).applied);
+  }
+
+  Future<void> _onProceedCheckout() async {
+    _syncCheckoutDraft();
+    if (!mounted) return;
+    context.push(AppRoutePaths.checkout);
   }
 
   CheckoutFulfillment _toCheckoutFulfillment(_CartFulfillment value) {
@@ -298,38 +271,21 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
     };
   }
 
-  CheckoutPaymentType _toCheckoutPayment(_CartPaymentType value) {
-    return switch (value) {
-      _CartPaymentType.card => CheckoutPaymentType.card,
-      _CartPaymentType.cash => CheckoutPaymentType.cash,
-    };
-  }
-
-  bool _requiresAddress(_CartFulfillment fulfillment) {
-    return fulfillment == _CartFulfillment.delivery ||
-        fulfillment == _CartFulfillment.groupDelivery ||
-        fulfillment == _CartFulfillment.plated;
-  }
-
   void _selectFulfillment(_CartFulfillment value) {
-    setState(() => _fulfillment = value);
-    final addresses =
-        ref.read(savedAddressesProvider).valueOrNull ??
-        const <ModelSavedAddress>[];
-    if (_requiresAddress(value) && _resolveSelectedAddress(addresses) == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _showAddressPicker();
-      });
-    }
+    setState(() {
+      _fulfillment = value;
+      if (value == _CartFulfillment.groupDelivery ||
+          value == _CartFulfillment.plated) {
+        _showMoreFulfillment = true;
+      }
+    });
   }
 
   void _scrollToCheckoutStep(int step) {
     final key = switch (step) {
       0 => _itemsSectionKey,
       1 => _fulfillmentSectionKey,
-      2 => _paymentSectionKey,
-      3 => _summarySectionKey,
-      _ => _itemsSectionKey,
+      _ => _summarySectionKey,
     };
     final target = key.currentContext;
     if (target == null) return;
@@ -339,25 +295,6 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
       curve: Curves.easeInOut,
       alignment: 0.08,
     );
-  }
-
-  Future<void> _showAddressPicker() async {
-    final addresses =
-        ref.read(savedAddressesProvider).valueOrNull ??
-        const <ModelSavedAddress>[];
-    final address = await showDialog<ModelSavedAddress>(
-      context: context,
-      builder:
-          (dialogContext) => _AddressPickerDialog(
-            addresses: addresses,
-            onAddAddress: () {
-              Navigator.of(dialogContext).pop();
-              context.push('${AppRoutePaths.mapPicker}?return=profile');
-            },
-          ),
-    );
-    if (address == null || !mounted) return;
-    setState(() => _selectedAddressId = address.id);
   }
 
   Future<void> _clearCart(BuildContext context) async {
@@ -399,8 +336,6 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
 
 enum _CartFulfillment { dineIn, takeaway, delivery, groupDelivery, plated }
 
-enum _CartPaymentType { card, cash }
-
 class _CartSummaryCosts {
   const _CartSummaryCosts({
     required this.subtotal,
@@ -434,61 +369,6 @@ class _CartSummaryCosts {
       tax: fees.taxIncludedInPrices
           ? 0
           : (subtotal + taxableFulfillmentCharge) * fees.taxRate,
-    );
-  }
-}
-
-class _BasketHero extends StatelessWidget {
-  const _BasketHero({required this.count});
-
-  final int count;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
-
-    return WidgetsAppCard(
-      variant: WidgetsAppCardVariant.food,
-      padding: EdgeInsets.all(CoreSpacing.lg(context)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          WidgetsFoodMediaPanel(
-            height: CoreContentSizes.heroImageHeight(context),
-            badge: _FoodTag(
-              label: l10n.cartOrderItemsCount(count),
-              color: scheme.primary,
-            ),
-            child: CustomPaint(
-              painter: _BasketPainter(
-                color: scheme.primary,
-                accent: CoreColors.brandGold,
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.shopping_basket_outlined,
-                  size: CoreContentSizes.categoryMenuImageIcon(context),
-                  color: scheme.primary,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: CoreSpacing.lg(context)),
-          Text(
-            l10n.screenCart,
-            style: CoreTypography.headlineLarge(
-              context,
-              scheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-          SizedBox(height: CoreSpacing.sm(context)),
-          Text(
-            l10n.cartTermsNotice,
-            style: CoreTypography.bodyMedium(context, scheme.onSurfaceVariant),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -554,7 +434,7 @@ class _CartItemCard extends StatelessWidget {
         children: [
           WidgetsFoodMediaPanel(
             height: CoreContentSizes.categoryMenuImageHeight(context),
-            badge: _FoodTag(label: orderMeta.label, color: orderMeta.color),
+            badge: WidgetsFoodTag(label: orderMeta.label, color: orderMeta.color),
             child: WidgetsMockFoodImage(
               imageUrl: item.menuItem?.imageUrl,
               fallback: _CartDishMedia(
@@ -702,11 +582,15 @@ class _PromoCodeCard extends StatelessWidget {
 class _FulfillmentSection extends StatelessWidget {
   const _FulfillmentSection({
     required this.selected,
+    required this.showMore,
+    required this.onToggleMore,
     required this.onSelected,
     required this.onTerms,
   });
 
   final _CartFulfillment selected;
+  final bool showMore;
+  final VoidCallback onToggleMore;
   final ValueChanged<_CartFulfillment> onSelected;
   final VoidCallback onTerms;
 
@@ -760,25 +644,35 @@ class _FulfillmentSection extends StatelessWidget {
             color: CoreColors.orderTypeDelivery,
             onTap: () => onSelected(_CartFulfillment.delivery),
           ),
+          if (showMore) ...[
+            SizedBox(height: CoreSpacing.sm(context)),
+            _FulfillmentOption(
+              selected: selected == _CartFulfillment.groupDelivery,
+              title: l10n.cartGroupDeliveryTitle,
+              body: l10n.cartGroupDeliveryBody,
+              icon: Icons.groups_2_outlined,
+              color: CoreColors.brandOlive,
+              onTap: () => onSelected(_CartFulfillment.groupDelivery),
+            ),
+            SizedBox(height: CoreSpacing.sm(context)),
+            _FulfillmentOption(
+              selected: selected == _CartFulfillment.plated,
+              title: l10n.orderTypePlatedTitle,
+              body: l10n.orderTypePlatedBody,
+              icon: Icons.flatware_outlined,
+              color: CoreColors.orderTypePlated,
+              onTap: () => onSelected(_CartFulfillment.plated),
+            ),
+          ],
           SizedBox(height: CoreSpacing.sm(context)),
-          _FulfillmentOption(
-            selected: selected == _CartFulfillment.groupDelivery,
-            title: l10n.cartGroupDeliveryTitle,
-            body: l10n.cartGroupDeliveryBody,
-            icon: Icons.groups_2_outlined,
-            color: CoreColors.brandOlive,
-            onTap: () => onSelected(_CartFulfillment.groupDelivery),
+          TextButton(
+            onPressed: onToggleMore,
+            child: Text(
+              showMore
+                  ? l10n.cartHideFulfillmentOptions
+                  : l10n.cartMoreFulfillmentOptions,
+            ),
           ),
-          SizedBox(height: CoreSpacing.sm(context)),
-          _FulfillmentOption(
-            selected: selected == _CartFulfillment.plated,
-            title: l10n.orderTypePlatedTitle,
-            body: l10n.orderTypePlatedBody,
-            icon: Icons.flatware_outlined,
-            color: CoreColors.orderTypePlated,
-            onTap: () => onSelected(_CartFulfillment.plated),
-          ),
-          SizedBox(height: CoreSpacing.md(context)),
           Center(
             child: TextButton(
               onPressed: onTerms,
@@ -865,384 +759,6 @@ class _FulfillmentOption extends StatelessWidget {
   }
 }
 
-class _DeliveryAddressCard extends StatelessWidget {
-  const _DeliveryAddressCard({required this.address, required this.onChoose});
-
-  final ModelSavedAddress? address;
-  final VoidCallback onChoose;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    final selected = address;
-
-    return WidgetsAppCard(
-      variant: WidgetsAppCardVariant.form,
-      padding: EdgeInsets.all(CoreSpacing.lg(context)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.location_on_outlined, color: scheme.primary),
-              SizedBox(width: CoreSpacing.sm(context)),
-              Expanded(
-                child: Text(
-                  l10n.cartSelectedAddress,
-                  style: CoreTypography.titleMedium(
-                    context,
-                    scheme.onSurface,
-                  ).copyWith(fontWeight: FontWeight.w900),
-                ),
-              ),
-              WidgetsAppButton(
-                label: l10n.cartChooseAddress,
-                onPressed: onChoose,
-                icon: Icons.edit_location_alt_outlined,
-                variant: WidgetsAppButtonVariant.outline,
-              ),
-            ],
-          ),
-          SizedBox(height: CoreSpacing.md(context)),
-          if (selected == null)
-            Text(
-              l10n.cartAddressRequired,
-              style: CoreTypography.bodyMedium(context, scheme.error),
-            )
-          else ...[
-            Text(
-              isAr ? selected.labelAr : selected.labelEn,
-              style: CoreTypography.bodyMedium(
-                context,
-                scheme.onSurface,
-              ).copyWith(fontWeight: FontWeight.w900),
-            ),
-            SizedBox(height: CoreSpacing.xs(context)),
-            Text(
-              isAr ? selected.addressAr : selected.addressEn,
-              style: CoreTypography.caption(context, scheme.onSurfaceVariant),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _PaymentTypeCard extends StatelessWidget {
-  const _PaymentTypeCard({required this.selected, required this.onSelected});
-
-  final _CartPaymentType selected;
-  final ValueChanged<_CartPaymentType> onSelected;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
-
-    return WidgetsAppCard(
-      variant: WidgetsAppCardVariant.form,
-      padding: EdgeInsets.all(CoreSpacing.lg(context)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            l10n.cartPaymentType,
-            style: CoreTypography.titleMedium(
-              context,
-              scheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-          SizedBox(height: CoreSpacing.md(context)),
-          _PaymentTypeOption(
-            selected: selected == _CartPaymentType.card,
-            title: l10n.paymentMethodCard,
-            icon: Icons.credit_card_outlined,
-            onTap: () => onSelected(_CartPaymentType.card),
-          ),
-          SizedBox(height: CoreSpacing.sm(context)),
-          _PaymentTypeOption(
-            selected: selected == _CartPaymentType.cash,
-            title: l10n.paymentMethodCash,
-            icon: Icons.payments_outlined,
-            onTap: () => onSelected(_CartPaymentType.cash),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PaymentTypeOption extends StatelessWidget {
-  const _PaymentTypeOption({
-    required this.selected,
-    required this.title,
-    required this.icon,
-    required this.onTap,
-  });
-
-  final bool selected;
-  final String title;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final color = selected ? scheme.primary : scheme.onSurfaceVariant;
-
-    return WidgetsAppCard(
-      variant:
-          selected ? WidgetsAppCardVariant.food : WidgetsAppCardVariant.form,
-      padding: EdgeInsets.all(CoreSpacing.md(context)),
-      onTap: onTap,
-      child: Row(
-        children: [
-          Icon(icon, color: color),
-          SizedBox(width: CoreSpacing.md(context)),
-          Expanded(
-            child: Text(
-              title,
-              style: CoreTypography.bodyMedium(
-                context,
-                scheme.onSurface,
-              ).copyWith(fontWeight: FontWeight.w900),
-            ),
-          ),
-          Icon(
-            selected ? Icons.radio_button_checked : Icons.radio_button_off,
-            color: color,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TipSection extends StatefulWidget {
-  const _TipSection({required this.selectedTipJod, required this.onSelected});
-
-  final double selectedTipJod;
-  final ValueChanged<double> onSelected;
-
-  @override
-  State<_TipSection> createState() => _TipSectionState();
-}
-
-class _TipSectionState extends State<_TipSection> {
-  late final TextEditingController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = TextEditingController(
-      text: _formatTip(widget.selectedTipJod),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  String _formatTip(double amount) {
-    return amount == 0 ? '' : amount.toStringAsFixed(2);
-  }
-
-  void _selectTip(double amount) {
-    _controller.text = _formatTip(amount);
-    widget.onSelected(amount);
-  }
-
-  void _updateManualTip(String value) {
-    final parsed = double.tryParse(value.trim().replaceAll(',', '.'));
-    widget.onSelected(parsed == null || parsed < 0 ? 0 : parsed);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
-    final options = <({String label, double amount})>[
-      (label: l10n.cartNoTip, amount: 0),
-      (label: l10n.tipPreset1, amount: 1),
-      (label: l10n.tipPreset2, amount: 2),
-      (label: l10n.tipPreset5, amount: 5),
-    ];
-
-    return WidgetsAppCard(
-      variant: WidgetsAppCardVariant.food,
-      padding: EdgeInsets.all(CoreSpacing.lg(context)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.volunteer_activism_outlined, color: scheme.primary),
-              SizedBox(width: CoreSpacing.sm(context)),
-              Expanded(
-                child: Text(
-                  l10n.cartTipTitle,
-                  style: CoreTypography.titleMedium(
-                    context,
-                    scheme.onSurface,
-                  ).copyWith(fontWeight: FontWeight.w900),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: CoreSpacing.xs(context)),
-          Text(
-            l10n.cartTipSubtitle,
-            style: CoreTypography.caption(context, scheme.onSurfaceVariant),
-          ),
-          SizedBox(height: CoreSpacing.md(context)),
-          Wrap(
-            spacing: CoreSpacing.sm(context),
-            runSpacing: CoreSpacing.sm(context),
-            children: [
-              for (final option in options)
-                _TipChip(
-                  label: option.label,
-                  selected: widget.selectedTipJod == option.amount,
-                  onTap: () => _selectTip(option.amount),
-                ),
-            ],
-          ),
-          SizedBox(height: CoreSpacing.md(context)),
-          WidgetsAppTextField(
-            controller: _controller,
-            label: l10n.tipCustomAmountJod,
-            hintText: l10n.tipCustomAmountValue,
-            prefixIcon: Icons.edit_outlined,
-            keyboardType: const TextInputType.numberWithOptions(decimal: true),
-            onChanged: _updateManualTip,
-          ),
-          SizedBox(height: CoreSpacing.xs(context)),
-          Text(
-            l10n.tipCustomAmountBody,
-            style: CoreTypography.caption(context, scheme.onSurfaceVariant),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TipChip extends StatelessWidget {
-  const _TipChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return ChoiceChip(
-      selected: selected,
-      label: Text(label),
-      avatar:
-          selected
-              ? Icon(Icons.check, size: 18, color: scheme.onPrimary)
-              : null,
-      onSelected: (_) => onTap(),
-      selectedColor: scheme.primary,
-      labelStyle: CoreTypography.caption(
-        context,
-        selected ? scheme.onPrimary : scheme.onSurface,
-      ).copyWith(fontWeight: FontWeight.w900),
-      side: BorderSide(
-        color:
-            selected
-                ? scheme.primary
-                : scheme.outlineVariant.withValues(alpha: 0.9),
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-      ),
-    );
-  }
-}
-
-class _AddressPickerDialog extends StatelessWidget {
-  const _AddressPickerDialog({
-    required this.addresses,
-    required this.onAddAddress,
-  });
-
-  final List<ModelSavedAddress> addresses;
-  final VoidCallback onAddAddress;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
-
-    return Dialog(
-      insetPadding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.lg(context),
-        vertical: CoreSpacing.xl(context),
-      ),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 560),
-        child: Padding(
-          padding: EdgeInsets.all(CoreSpacing.lg(context)),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                l10n.deliveryChooseAddress,
-                style: CoreTypography.titleMedium(
-                  context,
-                  scheme.onSurface,
-                ).copyWith(fontWeight: FontWeight.w900),
-              ),
-              SizedBox(height: CoreSpacing.md(context)),
-              for (final address in addresses) ...[
-                WidgetsAppCard(
-                  variant: WidgetsAppCardVariant.form,
-                  padding: EdgeInsets.all(CoreSpacing.md(context)),
-                  onTap: () => Navigator.of(context).pop(address),
-                  leading: Icon(
-                    Icons.location_on_outlined,
-                    color: scheme.primary,
-                  ),
-                  title: isAr ? address.labelAr : address.labelEn,
-                  child: Text(
-                    isAr ? address.addressAr : address.addressEn,
-                    style: CoreTypography.caption(
-                      context,
-                      scheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-                SizedBox(height: CoreSpacing.sm(context)),
-              ],
-              WidgetsAppButton(
-                label: l10n.deliveryAddNewAddress,
-                onPressed: onAddAddress,
-                icon: Icons.add_location_alt_outlined,
-                variant: WidgetsAppButtonVariant.outline,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 class _OrderSummaryCard extends StatelessWidget {
   const _OrderSummaryCard({
     required this.subtotal,
@@ -1252,8 +768,6 @@ class _OrderSummaryCard extends StatelessWidget {
     required this.tipJod,
     required this.discount,
     required this.total,
-    required this.proceedLabel,
-    this.onProceed,
   });
 
   final double subtotal;
@@ -1263,107 +777,56 @@ class _OrderSummaryCard extends StatelessWidget {
   final double tipJod;
   final double discount;
   final double total;
-  final String proceedLabel;
-  final VoidCallback? onProceed;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
+    final isPlated = fulfillment == _CartFulfillment.plated;
+    final jod = l10n.currencyJod;
 
-    return WidgetsAppCard(
-      variant: WidgetsAppCardVariant.dashboard,
-      padding: EdgeInsets.all(CoreSpacing.lg(context)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            l10n.cartOrderSummary,
-            style: CoreTypography.titleMedium(
-              context,
-              scheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-          SizedBox(height: CoreSpacing.md(context)),
-          _SummaryLine(
-            label: l10n.cartSubtotal,
-            value: UtilityFormatJod.format(subtotal, suffix: l10n.currencyJod),
-          ),
-          _SummaryLine(
-            label: l10n.cartFulfillment,
-            value: _fulfillmentTitle(l10n, fulfillment),
-          ),
-          _SummaryLine(
-            label: _fulfillmentChargeLabel(l10n, fulfillment),
-            value:
-                fulfillmentCharge == 0
-                    ? l10n.cartFree
-                    : UtilityFormatJod.format(
-                      fulfillmentCharge,
-                      suffix: l10n.currencyJod,
-                    ),
-          ),
-          _SummaryLine(
-            label: l10n.cartEstimatedTax,
-            value: UtilityFormatJod.format(tax, suffix: l10n.currencyJod),
-          ),
-          _SummaryLine(
-            label: l10n.checkoutTip,
-            value:
-                tipJod == 0
-                    ? l10n.cartNoTip
-                    : UtilityFormatJod.format(tipJod, suffix: l10n.currencyJod),
-          ),
-          if (discount > 0)
-            _SummaryLine(
-              label: l10n.cartPromoCode,
-              value:
-                  '-${UtilityFormatJod.format(discount, suffix: l10n.currencyJod)}',
-            ),
-          Divider(
-            height: CoreSpacing.xl(context),
-            color: scheme.outlineVariant,
-          ),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: CoreColors.brandGold.withValues(alpha: 0.10),
-              borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-              border: Border.all(
-                color: CoreColors.brandGold.withValues(alpha: 0.22),
-              ),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(CoreSpacing.md(context)),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      l10n.cartTotal,
-                      style: CoreTypography.titleMedium(
-                        context,
-                        scheme.onSurface,
-                      ).copyWith(fontWeight: FontWeight.w900),
-                    ),
-                  ),
-                  WidgetsPriceBadge(
-                    priceLabel: UtilityFormatJod.format(
-                      total,
-                      suffix: l10n.currencyJod,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(height: CoreSpacing.lg(context)),
-          WidgetsAppButton(
-            label: proceedLabel,
-            onPressed: onProceed,
-            icon: Icons.arrow_forward,
-            fullWidth: true,
-          ),
-        ],
+    final lines = <WidgetsFinancialSummaryLine>[
+      WidgetsFinancialSummaryLine(
+        label: l10n.checkoutFood,
+        value: UtilityFormatJod.format(subtotal, suffix: jod),
+        accentColor: CoreColors.semanticRevenue,
       ),
+      WidgetsFinancialSummaryLine(
+        label: isPlated
+            ? l10n.checkoutDeposit
+            : _fulfillmentChargeLabel(l10n, fulfillment),
+        value:
+            fulfillmentCharge == 0
+                ? l10n.cartFree
+                : UtilityFormatJod.format(fulfillmentCharge, suffix: jod),
+        accentColor: isPlated ? CoreColors.semanticDeposit : null,
+      ),
+      WidgetsFinancialSummaryLine(
+        label: l10n.cartEstimatedTax,
+        value: UtilityFormatJod.format(tax, suffix: jod),
+      ),
+      WidgetsFinancialSummaryLine(
+        label: l10n.checkoutTip,
+        value:
+            tipJod == 0
+                ? l10n.cartNoTip
+                : UtilityFormatJod.format(tipJod, suffix: jod),
+        accentColor: CoreColors.semanticTip,
+      ),
+      if (discount > 0)
+        WidgetsFinancialSummaryLine(
+          label: l10n.cartPromoCode,
+          value: '-${UtilityFormatJod.format(discount, suffix: jod)}',
+        ),
+    ];
+
+    return WidgetsFinancialSummary(
+      title: l10n.cartOrderSummary,
+      subtitle: '${l10n.cartFulfillment}: ${_fulfillmentTitle(l10n, fulfillment)}',
+      lines: lines,
+      totalLabel: l10n.cartTotal,
+      totalValue: UtilityFormatJod.format(total, suffix: jod),
+      totalColor: CoreColors.brandGold,
+      accentColor: CoreColors.semanticRevenue,
     );
   }
 
@@ -1391,42 +854,6 @@ class _OrderSummaryCard extends StatelessWidget {
       _CartFulfillment.groupDelivery => l10n.cartGroupDeliveryFee,
       _CartFulfillment.plated => l10n.cartPlatedDeposit,
     };
-  }
-}
-
-class _SummaryLine extends StatelessWidget {
-  const _SummaryLine({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return Padding(
-      padding: EdgeInsets.only(bottom: CoreSpacing.sm(context)),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: CoreTypography.bodyMedium(
-                context,
-                scheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-          Text(
-            value,
-            style: CoreTypography.bodyMedium(
-              context,
-              scheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w800),
-          ),
-        ],
-      ),
-    );
   }
 }
 
@@ -1468,7 +895,7 @@ class _CartSuggestionsSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            isAr ? 'أكمل طلبك' : 'Complete your order',
+            l10n.cartCompleteOrderTitle,
             style: CoreTypography.titleMedium(
               context,
               scheme.onSurface,
@@ -1476,9 +903,7 @@ class _CartSuggestionsSection extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.sm(context)),
           Text(
-            isAr
-                ? 'إضافات شائعة مع طلبك'
-                : 'Popular add-ons for your basket',
+            l10n.cartPopularAddonsSubtitle,
             style: CoreTypography.caption(context, scheme.onSurfaceVariant),
           ),
           SizedBox(height: CoreSpacing.md(context)),
@@ -1674,33 +1099,70 @@ class _CartDishMedia extends StatelessWidget {
   }
 }
 
-class _FoodTag extends StatelessWidget {
-  const _FoodTag({required this.label, required this.color});
+class _StickyCartBar extends StatelessWidget {
+  const _StickyCartBar({
+    required this.totalLabel,
+    required this.proceedLabel,
+    required this.onProceed,
+  });
 
-  final String label;
-  final Color color;
+  final String totalLabel;
+  final String proceedLabel;
+  final VoidCallback onProceed;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Text(
-          label,
-          style: CoreTypography.caption(
-            context,
-            scheme.onSurface,
-          ).copyWith(fontWeight: FontWeight.w800),
+    return Material(
+      elevation: 8,
+      color: scheme.surface,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(
+            CoreSpacing.lg(context),
+            CoreSpacing.md(context),
+            CoreSpacing.lg(context),
+            CoreSpacing.md(context),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.cartTotal,
+                      style: CoreTypography.caption(
+                        context,
+                        scheme.onSurfaceVariant,
+                      ),
+                    ),
+                    Text(
+                      totalLabel,
+                      style: CoreTypography.titleMedium(
+                        context,
+                        CoreColors.brandGold,
+                      ).copyWith(fontWeight: FontWeight.w900),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: CoreSpacing.md(context)),
+              Expanded(
+                flex: 2,
+                child: WidgetsAppButton(
+                  label: proceedLabel,
+                  onPressed: onProceed,
+                  icon: Icons.arrow_forward,
+                  fullWidth: true,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
