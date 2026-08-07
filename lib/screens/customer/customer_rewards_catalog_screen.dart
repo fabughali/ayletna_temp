@@ -11,7 +11,6 @@ import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_filter_chip.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_media_panel.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_tag.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
@@ -43,13 +42,6 @@ class _CustomerRewardsCatalogScreenState
 
     return WidgetsScaffoldPage(
       title: l10n.rewardsCatalogTitle,
-      actions: [
-        WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.notifications),
-          icon: Icons.notifications_outlined,
-          tooltip: l10n.screenNotifications,
-        ),
-      ],
       child: WidgetsRefreshList(
         onRefresh: () async {
           ref.invalidate(activeRewardsProvider);

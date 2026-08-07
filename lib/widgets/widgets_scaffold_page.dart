@@ -126,10 +126,11 @@ class WidgetsScaffoldPage extends ConsumerWidget {
   ) {
     final base = List<Widget>.of(actions ?? const <Widget>[]);
     final isStorefront = role == AppRole.customer || role == AppRole.guest;
-    // Orders history is account chrome — no cart/notifications in the app bar.
+    // Account chrome routes — no auto cart in the app bar.
     if (!isStorefront ||
         path == AppRoutePaths.cart ||
-        path == AppRoutePaths.orderHistory) {
+        path == AppRoutePaths.orderHistory ||
+        path == AppRoutePaths.rewards) {
       return base;
     }
     final hasCart = base.any((widget) => widget is WidgetsCartIconButton);
