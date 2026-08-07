@@ -402,11 +402,13 @@ class _NotificationCard extends ConsumerWidget {
     final time = isAr ? item.timeAr : item.timeEn;
     final actions = isAr ? item.actionLabelsAr : item.actionLabelsEn;
     final color = _notificationColor(scheme, item.colorKey);
+    final accentWidth = CoreContentSizes.amountIndicatorWidth(context);
 
     return Opacity(
       opacity: item.isSubdued ? 0.76 : 1,
       child: WidgetsAppCard(
         accentColor: color,
+        padding: EdgeInsets.zero,
         child: IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -418,37 +420,39 @@ class _NotificationCard extends ConsumerWidget {
                     start: Radius.circular(CoreSpacing.radiusCardOf(context)),
                   ),
                 ),
-                child: SizedBox(
-                  width: CoreContentSizes.amountIndicatorWidth(context),
-                ),
+                child: SizedBox(width: accentWidth),
               ),
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.all(CoreSpacing.md(context)),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  padding: EdgeInsetsDirectional.fromSTEB(
+                    CoreSpacing.md(context),
+                    CoreSpacing.md(context),
+                    CoreSpacing.sm(context),
+                    CoreSpacing.md(context),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      WidgetsAvatar(
-                        icon: _notificationIcon(item.iconKey),
-                        color: color,
-                      ),
-                      SizedBox(width: CoreSpacing.md(context)),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          WidgetsAvatar(
+                            icon: _notificationIcon(item.iconKey),
+                            color: color,
+                          ),
+                          SizedBox(width: CoreSpacing.md(context)),
+                          Expanded(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Expanded(
-                                  child: Text(
-                                    title,
-                                    style: CoreTypography.bodyMedium(
-                                      context,
-                                      _titleColor(scheme, item.colorKey),
-                                    ).copyWith(fontWeight: FontWeight.w900),
-                                  ),
+                                Text(
+                                  title,
+                                  style: CoreTypography.bodyMedium(
+                                    context,
+                                    _titleColor(scheme, item.colorKey),
+                                  ).copyWith(fontWeight: FontWeight.w900),
                                 ),
+                                SizedBox(height: CoreSpacing.xs(context)),
                                 Text(
                                   time,
                                   style: CoreTypography.caption(
@@ -458,71 +462,75 @@ class _NotificationCard extends ConsumerWidget {
                                 ),
                               ],
                             ),
-                            SizedBox(height: CoreSpacing.xs(context)),
-                            Text(
-                              body,
-                              style: CoreTypography.caption(
-                                context,
-                                scheme.onSurfaceVariant,
-                              ),
-                            ),
-                            if (actions.isNotEmpty) ...[
-                              SizedBox(height: CoreSpacing.md(context)),
-                              Wrap(
-                                spacing: CoreSpacing.sm(context),
-                                runSpacing: CoreSpacing.sm(context),
-                                children: [
-                                  for (final indexedAction in actions.indexed)
-                                    WidgetsAppButton(
-                                      label: indexedAction.$2,
-                                      onPressed: () {
-                                        final routeIndex = indexedAction.$1;
-                                        final route =
-                                            routeIndex < item.actionRoutes.length
-                                                ? item.actionRoutes[routeIndex]
-                                                : null;
-                                        if (route != null && route.isNotEmpty) {
-                                          if (route == AppRoutePaths.orderTracking) {
-                                            ref
-                                                .read(
-                                                  activeTrackingOrderIdProvider
-                                                      .notifier,
-                                                )
-                                                .state = item.id;
-                                          }
-                                          context.push(route);
-                                          return;
-                                        }
-                                        context.push(AppRoutePaths.home);
-                                      },
-                                      variant:
-                                          item.primaryActionIndexes.contains(
-                                                indexedAction.$1,
-                                              )
-                                              ? WidgetsAppButtonVariant.primary
-                                              : WidgetsAppButtonVariant.outline,
-                                    ),
-                                ],
-                              ),
-                            ],
-                          ],
+                          ),
+                          WidgetsIconButton(
+                            onPressed:
+                                () => ref
+                                    .read(
+                                      customerNotificationsDismissedProvider
+                                          .notifier,
+                                    )
+                                    .dismiss(item.id),
+                            icon: Icons.close,
+                            tooltip:
+                                MaterialLocalizations.of(
+                                  context,
+                                ).closeButtonTooltip,
+                            variant: WidgetsIconButtonVariant.plain,
+                            buttonSize:
+                                context.coreTheme.iconButtonSize * 0.85,
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: CoreSpacing.sm(context)),
+                      Text(
+                        body,
+                        style: CoreTypography.caption(
+                          context,
+                          scheme.onSurfaceVariant,
                         ),
                       ),
-                      WidgetsIconButton(
-                        onPressed:
-                            () => ref
-                                .read(
-                                  customerNotificationsDismissedProvider
-                                      .notifier,
-                                )
-                                .dismiss(item.id),
-                        icon: Icons.close,
-                        tooltip:
-                            MaterialLocalizations.of(
-                              context,
-                            ).closeButtonTooltip,
-                        variant: WidgetsIconButtonVariant.tonal,
-                      ),
+                      if (actions.isNotEmpty) ...[
+                        SizedBox(height: CoreSpacing.md(context)),
+                        Wrap(
+                          spacing: CoreSpacing.sm(context),
+                          runSpacing: CoreSpacing.sm(context),
+                          children: [
+                            for (final indexedAction in actions.indexed)
+                              WidgetsAppButton(
+                                label: indexedAction.$2,
+                                compact: true,
+                                onPressed: () {
+                                  final routeIndex = indexedAction.$1;
+                                  final route =
+                                      routeIndex < item.actionRoutes.length
+                                          ? item.actionRoutes[routeIndex]
+                                          : null;
+                                  if (route != null && route.isNotEmpty) {
+                                    if (route ==
+                                        AppRoutePaths.orderTracking) {
+                                      ref
+                                          .read(
+                                            activeTrackingOrderIdProvider
+                                                .notifier,
+                                          )
+                                          .state = item.id;
+                                    }
+                                    context.push(route);
+                                    return;
+                                  }
+                                  context.push(AppRoutePaths.home);
+                                },
+                                variant:
+                                    item.primaryActionIndexes.contains(
+                                          indexedAction.$1,
+                                        )
+                                        ? WidgetsAppButtonVariant.primary
+                                        : WidgetsAppButtonVariant.outline,
+                              ),
+                          ],
+                        ),
+                      ],
                     ],
                   ),
                 ),
