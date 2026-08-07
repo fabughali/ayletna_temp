@@ -1,4 +1,5 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/data/models/model_customer_order_history.dart';
 import 'package:ayletna_restaurant_app/data/repositories/repository_providers.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
@@ -11,12 +12,16 @@ import 'package:ayletna_restaurant_app/providers/customer_action_providers.dart'
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_filter_chip.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_media_panel.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_food_tag.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_order_invoice_block.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_price_badge.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -41,13 +46,6 @@ class _CustomerOrderHistoryScreenState
 
     return WidgetsScaffoldPage(
       title: l10n.screenOrderHistory,
-      actions: [
-        WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.notifications),
-          icon: Icons.notifications_outlined,
-          tooltip: l10n.screenNotifications,
-        ),
-      ],
       child: ordersAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error:
@@ -74,24 +72,58 @@ class _CustomerOrderHistoryScreenState
               ref.invalidate(customerOrderHistoryProvider);
               await ref.read(customerOrderHistoryProvider.future);
             },
-            child: ListView(
-              children: [
-                SizedBox(height: CoreSpacing.md(context)),
-                _HistoryHero(
-                  selectedFilter: _selectedHistoryFilter,
-                  onSelected:
-                      (filter) =>
-                          setState(() => _selectedHistoryFilter = filter),
-                ),
-                SizedBox(height: CoreSpacing.lg(context)),
-                _FavoriteMealCard(order: favoriteOrder),
-                SizedBox(height: CoreSpacing.lg(context)),
-                _WarmStatsCard(orders: orders),
-                SizedBox(height: CoreSpacing.lg(context)),
-                _SectionHeader(title: l10n.orderHistoryTitle),
-                SizedBox(height: CoreSpacing.md(context)),
-                for (final order in orders) ...[
-                  _OrderHistoryCard(
+            child: ListView.builder(
+              itemCount: orders.length + 2,
+              itemBuilder: (context, index) {
+                if (index == 0) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      SizedBox(height: CoreSpacing.md(context)),
+                      WidgetsPageHeader(
+                        title: l10n.screenOrderHistory,
+                        subtitle: l10n.orderHistorySubtitle,
+                      ),
+                      _HistoryHero(
+                        selectedFilter: _selectedHistoryFilter,
+                        onSelected:
+                            (filter) => setState(
+                              () => _selectedHistoryFilter = filter,
+                            ),
+                      ),
+                      SizedBox(height: CoreSpacing.lg(context)),
+                      _FavoriteMealCard(order: favoriteOrder),
+                      SizedBox(height: CoreSpacing.lg(context)),
+                      _WarmStatsCard(orders: orders),
+                      SizedBox(height: CoreSpacing.lg(context)),
+                      WidgetsSectionHeader(title: l10n.orderHistoryTitle),
+                      SizedBox(height: CoreSpacing.md(context)),
+                    ],
+                  );
+                }
+                if (index == orders.length + 1) {
+                  return Column(
+                    children: [
+                      Center(
+                        child: WidgetsAppButton(
+                          label: l10n.orderHistoryShowMore,
+                          onPressed:
+                              () => UtilityMockFeedback.showInfo(
+                                context,
+                                l10n.orderHistoryLast30Days,
+                              ),
+                          icon: Icons.keyboard_arrow_down,
+                          variant: WidgetsAppButtonVariant.outline,
+                        ),
+                      ),
+                      SizedBox(height: CoreSpacing.xxl(context)),
+                    ],
+                  );
+                }
+                final order = orders[index - 1];
+                return Padding(
+                  padding: EdgeInsets.only(bottom: CoreSpacing.md(context)),
+                  child: _OrderHistoryCard(
                     order: order,
                     onViewInvoice: () => _showOrderReceipt(context, order),
                     onViewStatus: () => _showOrderProgress(context, order),
@@ -110,22 +142,8 @@ class _CustomerOrderHistoryScreenState
                       context.push(AppRoutePaths.ratingReview);
                     },
                   ),
-                  SizedBox(height: CoreSpacing.md(context)),
-                ],
-                Center(
-                  child: WidgetsAppButton(
-                    label: l10n.orderHistoryShowMore,
-                    onPressed:
-                        () => UtilityMockFeedback.showInfo(
-                          context,
-                          l10n.orderHistoryLast30Days,
-                        ),
-                    icon: Icons.keyboard_arrow_down,
-                    variant: WidgetsAppButtonVariant.outline,
-                  ),
-                ),
-                SizedBox(height: CoreSpacing.xxl(context)),
-              ],
+                );
+              },
             ),
           );
         },
@@ -154,7 +172,7 @@ class _CustomerOrderHistoryScreenState
           (dialogContext) => AlertDialog(
             contentPadding: EdgeInsets.all(CoreSpacing.lg(dialogContext)),
             content: SizedBox(
-              width: 420,
+              width: UtilitySizer.of(context, 420),
               child: WidgetsOrderInvoiceBlock(
                 cart: detail.lines,
                 sumData: sumData,
@@ -210,7 +228,7 @@ class _CustomerOrderHistoryScreenState
       context.go(AppRoutePaths.cart);
     } catch (error) {
       if (!context.mounted) return;
-      UtilityMockFeedback.showError(context, l10n.comingSoon);
+      UtilityMockFeedback.showError(context, l10n.orderReorderFailed);
     }
   }
 }
@@ -234,7 +252,7 @@ class _HistoryHero extends StatelessWidget {
         children: [
           WidgetsFoodMediaPanel(
             height: CoreContentSizes.heroImageHeight(context),
-            badge: _FoodTag(
+            badge: WidgetsFoodTag(
               label: l10n.orderHistoryWeekendSpecial,
               color: scheme.primary,
             ),
@@ -266,52 +284,39 @@ class _HistoryHero extends StatelessWidget {
             style: CoreTypography.bodyMedium(context, scheme.onSurfaceVariant),
           ),
           SizedBox(height: CoreSpacing.md(context)),
-          Wrap(
-            spacing: CoreSpacing.sm(context),
-            runSpacing: CoreSpacing.sm(context),
-            children: [
-              _HistoryFilterChip(
-                label: l10n.orderHistoryLast30Days,
-                icon: Icons.calendar_today_outlined,
-                selected: selectedFilter == 'last30',
-                onTap: () => onSelected('last30'),
-              ),
-              _HistoryFilterChip(
-                label: l10n.orderHistoryFilter,
-                icon: Icons.tune_outlined,
-                selected: selectedFilter != 'last30',
-                onTap:
-                    () => UtilityMockFeedback.showActionSheet(
-                      context: context,
-                      title: l10n.orderHistoryFilter,
-                      message: l10n.orderHistoryLast30Days,
-                      actions: [
-                        MockSheetAction(
-                          label: l10n.orderHistoryCompleted,
-                          icon: Icons.check_circle_outline,
-                          onSelected: () {
-                            onSelected('completed');
-                            UtilityMockFeedback.showInfo(
-                              context,
-                              l10n.orderHistoryCompleted,
-                            );
-                          },
-                        ),
-                        MockSheetAction(
-                          label: l10n.orderHistoryCancelled,
-                          icon: Icons.cancel_outlined,
-                          onSelected: () {
-                            onSelected('cancelled');
-                            UtilityMockFeedback.showInfo(
-                              context,
-                              l10n.orderHistoryCancelled,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-              ),
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                WidgetsFilterChip(
+                  label: l10n.filterAll,
+                  icon: Icons.all_inclusive_outlined,
+                  selected: selectedFilter == 'all',
+                  onSelected: (_) => onSelected('all'),
+                ),
+                SizedBox(width: CoreSpacing.sm(context)),
+                WidgetsFilterChip(
+                  label: l10n.orderHistoryLast30Days,
+                  icon: Icons.calendar_today_outlined,
+                  selected: selectedFilter == 'last30',
+                  onSelected: (_) => onSelected('last30'),
+                ),
+                SizedBox(width: CoreSpacing.sm(context)),
+                WidgetsFilterChip(
+                  label: l10n.orderHistoryCompleted,
+                  icon: Icons.check_circle_outline,
+                  selected: selectedFilter == 'completed',
+                  onSelected: (_) => onSelected('completed'),
+                ),
+                SizedBox(width: CoreSpacing.sm(context)),
+                WidgetsFilterChip(
+                  label: l10n.orderHistoryCancelled,
+                  icon: Icons.cancel_outlined,
+                  selected: selectedFilter == 'cancelled',
+                  onSelected: (_) => onSelected('cancelled'),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -380,7 +385,7 @@ class _FavoriteMealCard extends StatelessWidget {
             runSpacing: CoreSpacing.xs(context),
             children: [
               for (final item in items)
-                _FoodTag(label: item, color: scheme.primary),
+                WidgetsFoodTag(label: item, color: scheme.primary),
             ],
           ),
           SizedBox(height: CoreSpacing.md(context)),
@@ -489,7 +494,7 @@ class _WarmStatTile extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.18)),
       ),
       child: Padding(
@@ -514,25 +519,6 @@ class _WarmStatTile extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return Text(
-      title,
-      style: CoreTypography.titleMedium(
-        context,
-        scheme.onSurface,
-      ).copyWith(fontWeight: FontWeight.w900),
     );
   }
 }
@@ -592,7 +578,7 @@ class _OrderHistoryCard extends StatelessWidget {
                 DecoratedBox(
                   decoration: BoxDecoration(
                     color: scheme.primary.withValues(alpha: 0.10),
-                    borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+                    borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
                   ),
                   child: Padding(
                     padding: EdgeInsets.all(CoreSpacing.md(context)),
@@ -635,7 +621,7 @@ class _OrderHistoryCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                _FoodTag(label: statusLabel, color: statusColor),
+                WidgetsFoodTag(label: statusLabel, color: statusColor),
               ],
             ),
             SizedBox(height: CoreSpacing.md(context)),
@@ -644,7 +630,7 @@ class _OrderHistoryCard extends StatelessWidget {
               runSpacing: CoreSpacing.xs(context),
               children: [
                 for (final item in items)
-                  _FoodTag(label: item, color: scheme.onSurfaceVariant),
+                  WidgetsFoodTag(label: item, color: scheme.onSurfaceVariant),
               ],
             ),
             SizedBox(height: CoreSpacing.md(context)),
@@ -703,62 +689,6 @@ class _OrderHistoryCard extends StatelessWidget {
               ),
             ],
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _HistoryFilterChip extends StatelessWidget {
-  const _HistoryFilterChip({
-    required this.label,
-    required this.icon,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final IconData icon;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final color = selected ? scheme.primary : scheme.onSurfaceVariant;
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: selected ? 0.14 : 0.08),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-          border: Border.all(color: color.withValues(alpha: 0.22)),
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: CoreSpacing.md(context),
-            vertical: CoreSpacing.sm(context),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                color: color,
-                size: CoreContentSizes.orderTypeIcon(context),
-              ),
-              SizedBox(width: CoreSpacing.xs(context)),
-              Text(
-                label,
-                style: CoreTypography.caption(
-                  context,
-                  color,
-                ).copyWith(fontWeight: FontWeight.w900),
-              ),
-            ],
-          ),
         ),
       ),
     );
@@ -1035,7 +965,7 @@ class _OrderProgressTimelineRow extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: CoreSpacing.sm(context)),
-                      _FoodTag(label: statusLabel, color: color),
+                      WidgetsFoodTag(label: statusLabel, color: color),
                       if (visibleDriverPhone != null) ...[
                         SizedBox(width: CoreSpacing.xs(context)),
                         Flexible(
@@ -1079,7 +1009,7 @@ class _DriverInlineCall extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.24)),
       ),
       child: Padding(
@@ -1108,7 +1038,7 @@ class _DriverInlineCall extends StatelessWidget {
             Tooltip(
               message: l10n.orderHistoryCallDriver,
               child: InkWell(
-                borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+                borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
                 onTap: () async {
                   final launched = await UtilityUrlActions.launchExternalUri(
                     Uri(scheme: 'tel', path: phoneNumber),
@@ -1117,43 +1047,10 @@ class _DriverInlineCall extends StatelessWidget {
                     UtilityMockFeedback.showWarning(context, phoneNumber);
                   }
                 },
-                child: Icon(Icons.call_outlined, color: color, size: 18),
+                child: Icon(Icons.call_outlined, color: color, size: CoreContentSizes.orderTypeIcon(context)),
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _FoodTag extends StatelessWidget {
-  const _FoodTag({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Text(
-          label,
-          style: CoreTypography.caption(
-            context,
-            scheme.onSurface,
-          ).copyWith(fontWeight: FontWeight.w800),
         ),
       ),
     );
