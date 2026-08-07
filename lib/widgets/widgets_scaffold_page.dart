@@ -134,7 +134,8 @@ class WidgetsScaffoldPage extends ConsumerWidget {
         path == AppRoutePaths.notifications ||
         path == AppRoutePaths.profile ||
         path == AppRoutePaths.accountSettings ||
-        path == AppRoutePaths.mapPicker) {
+        path == AppRoutePaths.mapPicker ||
+        path == AppRoutePaths.paymentHistory) {
       return base;
     }
     final hasCart = base.any((widget) => widget is WidgetsCartIconButton);

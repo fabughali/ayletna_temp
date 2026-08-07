@@ -6,6 +6,8 @@ import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_error_message.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_price_badge.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
@@ -26,26 +28,22 @@ class CustomerPaymentHistoryScreen extends ConsumerWidget {
 
     return WidgetsScaffoldPage(
       title: l10n.screenPaymentHistory,
-      actions: [
-        WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.notifications),
-          icon: Icons.notifications_outlined,
-          tooltip: l10n.screenNotifications,
-        ),
-      ],
       child: WidgetsRefreshList(
         onRefresh: () async {
           ref.invalidate(customerOrderHistoryProvider);
         },
         child: ordersAsync.when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => Center(child: Text(e.toString())),
-          data: (orders) => _PaymentHistoryList(
-            orders: orders.where((o) => !o.isCancelled).toList(),
-            l10n: l10n,
-            isAr: isAr,
-            scheme: scheme,
-          ),
+          error:
+              (e, _) =>
+                  Center(child: WidgetsErrorMessage(message: e.toString())),
+          data:
+              (orders) => _PaymentHistoryList(
+                orders: orders.where((o) => !o.isCancelled).toList(),
+                l10n: l10n,
+                isAr: isAr,
+                scheme: scheme,
+              ),
         ),
       ),
     );
@@ -70,36 +68,17 @@ class _PaymentHistoryList extends StatelessWidget {
     return ListView(
       children: [
         SizedBox(height: CoreSpacing.md(context)),
-        WidgetsAppCard(
-          variant: WidgetsAppCardVariant.food,
-          padding: EdgeInsets.all(CoreSpacing.lg(context)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                l10n.profilePaymentHistory,
-                style: CoreTypography.headlineSmall(
-                  context,
-                  scheme.onSurface,
-                ).copyWith(fontWeight: FontWeight.w900),
-              ),
-              SizedBox(height: CoreSpacing.sm(context)),
-              Text(
-                l10n.profilePaymentHistorySubtitle,
-                style: CoreTypography.bodyMedium(
-                  context,
-                  scheme.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
+        WidgetsPageHeader(
+          title: l10n.profilePaymentHistory,
+          subtitle: l10n.profilePaymentHistorySubtitle,
+          eyebrow: l10n.screenPaymentHistory,
         ),
         SizedBox(height: CoreSpacing.lg(context)),
         if (orders.isEmpty)
           WidgetsAppCard(
             padding: EdgeInsets.all(CoreSpacing.lg(context)),
             child: Text(
-              isAr ? 'لا توجد مدفوعات مسجلة بعد.' : 'No payments recorded yet.',
+              l10n.paymentHistoryEmpty,
               style: CoreTypography.bodyMedium(
                 context,
                 scheme.onSurfaceVariant,
