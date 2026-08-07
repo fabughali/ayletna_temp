@@ -18,6 +18,7 @@ class WidgetsLanguagePreferencesSection extends ConsumerWidget {
     return WidgetsAppCard(
       title: l10n.screenLanguageSelection,
       leading: Icon(Icons.language_outlined, color: scheme.primary),
+      variant: WidgetsAppCardVariant.plain,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -70,61 +71,69 @@ class WidgetsLanguageOptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final radius = BorderRadius.circular(CoreSpacing.radiusCardOf(context));
 
-    return WidgetsAppCard(
-      onTap: onTap,
-      accentColor: selected ? scheme.primary : null,
-      variant:
+    // No shell/outline border — selected state is fill + check only.
+    return Material(
+      color:
           selected
-              ? WidgetsAppCardVariant.filled
-              : WidgetsAppCardVariant.outlined,
-      padding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.md(context),
-        vertical: CoreSpacing.sm(context),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: CoreTypography.titleMedium(
-                    context,
-                    selected ? scheme.primary : scheme.onSurface,
-                  ).copyWith(fontWeight: FontWeight.w900),
-                ),
-                SizedBox(height: CoreSpacing.xs(context)),
-                Text(
-                  subtitle,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: CoreTypography.caption(
-                    context,
-                    scheme.onSurfaceVariant,
-                  ).copyWith(fontWeight: FontWeight.w700),
-                ),
-              ],
-            ),
+              ? scheme.surfaceContainerHighest.withValues(alpha: 0.45)
+              : scheme.surface,
+      borderRadius: radius,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: radius,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: CoreSpacing.md(context),
+            vertical: CoreSpacing.sm(context),
           ),
-          SizedBox(width: CoreSpacing.sm(context)),
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 180),
-            child:
-                selected
-                    ? Icon(
-                      Icons.check_circle,
-                      key: const ValueKey('selected'),
-                      color: scheme.primary,
-                    )
-                    : Icon(
-                      Icons.radio_button_unchecked,
-                      key: const ValueKey('idle'),
-                      color: scheme.outline,
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: CoreTypography.titleMedium(
+                        context,
+                        selected ? scheme.primary : scheme.onSurface,
+                      ).copyWith(fontWeight: FontWeight.w900),
                     ),
+                    SizedBox(height: CoreSpacing.xs(context)),
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: CoreTypography.caption(
+                        context,
+                        scheme.onSurfaceVariant,
+                      ).copyWith(fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: CoreSpacing.sm(context)),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 180),
+                child:
+                    selected
+                        ? Icon(
+                          Icons.check_circle,
+                          key: const ValueKey('selected'),
+                          color: scheme.primary,
+                        )
+                        : Icon(
+                          Icons.radio_button_unchecked,
+                          key: const ValueKey('idle'),
+                          color: scheme.outline,
+                        ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
