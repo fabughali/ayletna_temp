@@ -8042,6 +8042,12 @@ abstract class AppLocalizations {
   /// **'Track open and resolved support requests.'**
   String get supportTicketsSubtitle;
 
+  /// No description provided for @supportViewMoreTickets.
+  ///
+  /// In en, this message translates to:
+  /// **'View more'**
+  String get supportViewMoreTickets;
+
   /// No description provided for @supportTicketRequestFollowUp.
   ///
   /// In en, this message translates to:
@@ -14999,7 +15005,7 @@ abstract class AppLocalizations {
   /// No description provided for @supportTicketsEmpty.
   ///
   /// In en, this message translates to:
-  /// **'No tickets yet. Create one using the form above.'**
+  /// **'No tickets yet.'**
   String get supportTicketsEmpty;
 
   /// No description provided for @supportMessageStaffPrefix.

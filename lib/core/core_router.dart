@@ -77,6 +77,7 @@ import 'package:ayletna_restaurant_app/screens/customer/customer_search_screen.d
 import 'package:ayletna_restaurant_app/screens/customer/customer_subscriptions_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_support_chat_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_support_screen.dart';
+import 'package:ayletna_restaurant_app/screens/customer/customer_support_tickets_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_terms_screen.dart';
 import 'package:ayletna_restaurant_app/screens/delivery/delivery_dashboard_screen.dart';
 import 'package:ayletna_restaurant_app/screens/delivery/delivery_order_screen.dart';
@@ -190,6 +191,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: AppRoutePaths.supportChat,
             builder: (_, __) => const CustomerSupportChatScreen(),
+          ),
+          GoRoute(
+            path: AppRoutePaths.supportTickets,
+            builder: (_, __) => const CustomerSupportTicketsScreen(),
           ),
           GoRoute(
             path: AppRoutePaths.faq,

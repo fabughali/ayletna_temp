@@ -49,7 +49,7 @@ class _CustomerSupportChatScreenState
       title: l10n.supportLiveChatTitle,
       actions: [
         WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.support),
+          onPressed: () => context.push(AppRoutePaths.supportTickets),
           icon: Icons.confirmation_number_outlined,
           tooltip: l10n.supportTicketsTitle,
         ),

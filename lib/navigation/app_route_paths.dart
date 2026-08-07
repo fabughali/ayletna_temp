@@ -20,7 +20,9 @@ abstract final class AppRoutePaths {
   static const cart = '/cart';
   static const support = '/support';
   static const supportChat = '/support-chat';
+  static const supportTickets = '/support-tickets';
   static const faq = '/faq';
+  static const blog = '/blog';
   static const terms = '/terms';
   static const orderType = '/order-type';
   static const dineIn = '/dine-in';
@@ -51,6 +53,11 @@ abstract final class AppRoutePaths {
   static const discounts = '/discounts';
   static const coupon = '/coupon';
   static const combo = '/combo';
+  static const combos = '/combos';
+  static const subscriptions = '/subscriptions';
+  static String offerDetail(String id) => '/offers/$id';
+  static String comboDetail(String id) => '/combo/$id';
+  static String subscriptionDetail(String id) => '/subscriptions/$id';
   static const kitchen = '/kitchen';
   static const kitchenPrep = '/kitchen-prep';
   static const inventory = '/inventory';
@@ -93,4 +100,72 @@ abstract final class AppRoutePaths {
   static const adminRewardsMgmt = '/admin-rewards-mgmt';
   static const adminMenuCatalog = '/admin-menu-catalog';
   static const adminReviewsModeration = '/admin-reviews-moderation';
+
+  // —— Management & specialist hubs (target model) ——
+  static const appAdmin = '/app-admin';
+  static const appAdminRoles = '/app-admin/roles';
+  static const appAdminUsers = '/app-admin/users';
+  static String appAdminUserDetail(String userId) => '/app-admin/users/$userId';
+  static const appAdminAudit = '/app-admin/audit';
+  static const appAdminIntegrations = '/app-admin/integrations';
+  static const appAdminOwnerConfig = '/app-admin/owner-config';
+  static const appAdminSettings = '/app-admin/settings';
+
+  static const operatorHub = '/operator';
+  static const operatorOrders = '/operator/orders';
+  static const operatorOrderDetail = '/operator/order-detail';
+  static const operatorMenu = '/operator/menu';
+  static const operatorProductEditor = '/operator/product-editor';
+  static const operatorTipDistribution = '/operator/tips/distribute';
+  static const operatorPlates = '/operator/plates';
+  static const operatorPlateEditor = '/operator/plate-editor';
+  static const operatorDepositConfig = '/operator/deposit-config';
+  static const operatorPreOrders = '/operator/pre-orders';
+  static const operatorAttendance = '/operator/attendance';
+  static const operatorStaffHours = '/operator/staff-hours';
+  static const operatorReports = '/operator/reports';
+  static const operatorReportFilter = '/operator/report-filter';
+  static const operatorFinancial = '/operator/financial-close';
+  static const operatorSettings = '/operator/settings';
+
+  static const ownerHub = '/owner';
+  static const ownerReports = '/owner/reports';
+  static const ownerFinancial = '/owner/financial';
+  static const ownerAudit = '/owner/audit';
+
+  /// Support staff hub (customer help page uses [support] = `/support`).
+  static const supportDesk = '/support-desk';
+  static const supportDeskTickets = '/support-desk/tickets';
+  static const supportDeskChat = '/support-desk/chat';
+  static const supportDeskOrderLookup = '/support-desk/order-lookup';
+  static const supportDeskReviews = '/support-desk/reviews';
+  static const supportDeskFaq = '/support-desk/faq';
+
+  static const marketingHub = '/marketing';
+  static const marketingOffers = '/marketing/offers';
+  static const marketingDiscounts = '/marketing/discounts';
+  /// Legacy path kept for old drawer bookmarks; same screen as discounts.
+  static const marketingPromotions = '/marketing/promotions';
+  static const marketingCatalog = '/marketing/catalog';
+  static const marketingCategories = '/marketing/categories';
+  static const marketingProducts = '/marketing/products';
+  static const marketingLoyalty = '/marketing/loyalty';
+  static const marketingRewards = '/marketing/rewards';
+  static const marketingSocial = '/marketing/social';
+  static const marketingBlog = '/marketing/blog';
+  static const marketingCalendar = '/marketing/calendar';
+  static const marketingCombos = '/marketing/combos';
+  static const marketingSubscriptions = '/marketing/subscriptions';
+  static const marketingAddons = '/marketing/addons';
+  static const marketingPushCampaigns = '/marketing/push-campaigns';
+  static const marketingProductCreate = '/marketing/products/create';
+  static String marketingProductDetail(String id) =>
+      '/marketing/products/detail/$id';
+  static const marketingInsightVisitors = '/marketing/insights/visitors';
+  static const marketingInsightPurchases = '/marketing/insights/purchases';
+  static const marketingInsightTopSellers = '/marketing/insights/top-sellers';
+  static const marketingInsightRatings = '/marketing/insights/ratings';
+  static const marketingInsightSocial = '/marketing/insights/social';
+  static const marketingInsightOffers = '/marketing/insights/offers';
+  static const marketingInsightCampaigns = '/marketing/insights/campaigns';
 }

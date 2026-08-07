@@ -31,7 +31,8 @@ abstract final class UtilityRouteGuard {
       // Allow help surfaces while waiting — contact support / FAQ must not dead-end.
       if (path == AppRoutePaths.faq ||
           path == AppRoutePaths.support ||
-          path == AppRoutePaths.supportChat) {
+          path == AppRoutePaths.supportChat ||
+          path == AppRoutePaths.supportTickets) {
         return null;
       }
       return AppRoutePaths.pendingApproval;
@@ -163,6 +164,7 @@ abstract final class UtilityRouteGuard {
     }
     if (path == AppRoutePaths.support ||
         path == AppRoutePaths.supportChat ||
+        path == AppRoutePaths.supportTickets ||
         path == AppRoutePaths.faq ||
         path == AppRoutePaths.blog) {
       return true;
@@ -259,7 +261,9 @@ abstract final class UtilityRouteGuard {
       AppRoutePaths.productDetail,
       AppRoutePaths.productReviews,
       AppRoutePaths.cart,
+      AppRoutePaths.support,
       AppRoutePaths.supportChat,
+      AppRoutePaths.supportTickets,
       AppRoutePaths.faq,
       AppRoutePaths.blog,
       AppRoutePaths.terms,
@@ -327,6 +331,7 @@ abstract final class UtilityRouteGuard {
       AppRoutePaths.cart,
       AppRoutePaths.support,
       AppRoutePaths.supportChat,
+      AppRoutePaths.supportTickets,
       AppRoutePaths.faq,
       AppRoutePaths.blog,
       AppRoutePaths.loyalty,

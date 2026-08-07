@@ -4199,6 +4199,9 @@ class AppLocalizationsEn extends AppLocalizations {
       'Track open and resolved support requests.';
 
   @override
+  String get supportViewMoreTickets => 'View more';
+
+  @override
   String get supportTicketRequestFollowUp => 'Request follow-up';
 
   @override
@@ -7850,8 +7853,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportValidationTitleBody => 'Enter title and description';
 
   @override
-  String get supportTicketsEmpty =>
-      'No tickets yet. Create one using the form above.';
+  String get supportTicketsEmpty => 'No tickets yet.';
 
   @override
   String get supportMessageStaffPrefix => 'Support: ';

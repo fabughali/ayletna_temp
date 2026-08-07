@@ -4176,6 +4176,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportTicketsSubtitle => 'تابع طلبات الدعم المفتوحة والمغلقة.';
 
   @override
+  String get supportViewMoreTickets => 'عرض المزيد';
+
+  @override
   String get supportTicketRequestFollowUp => 'طلب متابعة';
 
   @override
@@ -7793,8 +7796,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportValidationTitleBody => 'أدخل العنوان والوصف';
 
   @override
-  String get supportTicketsEmpty =>
-      'لا توجد تذاكر بعد. أنشئ تذكرة جديدة أعلاه.';
+  String get supportTicketsEmpty => 'لا توجد تذاكر بعد.';
 
   @override
   String get supportMessageStaffPrefix => 'الدعم: ';
