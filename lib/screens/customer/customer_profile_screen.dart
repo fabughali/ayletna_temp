@@ -1,20 +1,28 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
+import 'package:ayletna_restaurant_app/data/models/model_saved_address.dart';
+import 'package:ayletna_restaurant_app/data/repositories/repository_providers.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/rewards_admin_providers.dart';
 import 'package:ayletna_restaurant_app/providers/session_providers.dart';
+import 'package:ayletna_restaurant_app/providers/user_profile_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_avatar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_language_selector.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_phone_text.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_progress_bar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_status_pill.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_app_switch.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_theme_mode_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -26,26 +34,22 @@ class CustomerProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
 
     return WidgetsScaffoldPage(
-      title: l10n.screenProfile,
+      title: l10n.screenSettings,
       child: WidgetsRefreshList(
         onRefresh: () async {
-          UtilityMockFeedback.showInfo(context, l10n.comingSoon);
+          ref.invalidate(loyaltyPointsProvider);
+          ref.invalidate(savedAddressesProvider);
+          UtilityMockFeedback.showInfo(context, l10n.profileRefreshed);
         },
         child: ListView(
           children: [
             SizedBox(height: CoreSpacing.md(context)),
-            Text(
-              l10n.profileAccountSettings,
-              style: CoreTypography.caption(context, scheme.onSurfaceVariant),
+            WidgetsPageHeader(
+              title: l10n.profilePersonalProfile,
+              subtitle: l10n.profileAccountSettings,
             ),
-            Text(
-              l10n.profilePersonalProfile,
-              style: CoreTypography.headlineSmall(context, scheme.onSurface),
-            ),
-            SizedBox(height: CoreSpacing.lg(context)),
             const _ProfileSummaryCard(),
             SizedBox(height: CoreSpacing.lg(context)),
             const _LoyaltyStatusCard(),
@@ -57,6 +61,10 @@ class CustomerProfileScreen extends ConsumerWidget {
             const _PaymentHistoryCard(),
             SizedBox(height: CoreSpacing.lg(context)),
             const _SavedAddressesCard(),
+            SizedBox(height: CoreSpacing.lg(context)),
+            const WidgetsLanguagePreferencesSection(),
+            SizedBox(height: CoreSpacing.lg(context)),
+            const WidgetsThemeModeSelector(),
             SizedBox(height: CoreSpacing.lg(context)),
             const _NotificationPreferencesCard(),
             SizedBox(height: CoreSpacing.lg(context)),
@@ -75,7 +83,7 @@ class CustomerProfileScreen extends ConsumerWidget {
                 final confirmed = await UtilityMockFeedback.confirm(
                   context: context,
                   title: l10n.profileDeactivateAccount,
-                  message: l10n.comingSoon,
+                  message: l10n.profileDeactivateConfirmBody,
                   confirmLabel: l10n.actionConfirm,
                   cancelLabel: l10n.actionCancel,
                   confirmVariant: WidgetsAppButtonVariant.danger,
@@ -83,7 +91,14 @@ class CustomerProfileScreen extends ConsumerWidget {
                 );
 
                 if (confirmed && context.mounted) {
-                  UtilityMockFeedback.showWarning(context, l10n.comingSoon);
+                  UtilityMockFeedback.showSuccess(
+                    context,
+                    l10n.profileDeactivatedMock,
+                  );
+                  ref.read(sessionProvider.notifier).signOut();
+                  if (context.mounted) {
+                    context.go(AppRoutePaths.login);
+                  }
                 }
               },
               variant: WidgetsAppButtonVariant.danger,
@@ -96,13 +111,15 @@ class CustomerProfileScreen extends ConsumerWidget {
   }
 }
 
-class _ProfileSummaryCard extends StatelessWidget {
+class _ProfileSummaryCard extends ConsumerWidget {
   const _ProfileSummaryCard();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final profile = ref.watch(userProfileProvider);
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     void openPhotoSheet() {
       UtilityMockFeedback.showActionSheet(
         context: context,
@@ -112,11 +129,15 @@ class _ProfileSummaryCard extends StatelessWidget {
           MockSheetAction(
             label: l10n.actionSave,
             icon: Icons.photo_camera_outlined,
-            onSelected:
-                () => UtilityMockFeedback.showSuccess(
-                  context,
-                  l10n.profilePhotoUpdated,
-                ),
+            onSelected: () {
+              ref.read(userProfileProvider.notifier).setAvatarUrl(
+                    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=240&h=240&q=80',
+                  );
+              UtilityMockFeedback.showSuccess(
+                context,
+                l10n.profilePhotoUpdated,
+              );
+            },
           ),
         ],
       );
@@ -132,13 +153,16 @@ class _ProfileSummaryCard extends StatelessWidget {
               button: true,
               label: l10n.profileChangePhoto,
               child: InkWell(
-                borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+                borderRadius: BorderRadius.circular(
+                  CoreSpacing.radiusCardOf(context),
+                ),
                 onTap: openPhotoSheet,
                 child: Stack(
                   alignment: AlignmentDirectional.bottomEnd,
                   children: [
                     WidgetsAvatar(
                       icon: Icons.person,
+                      imageUrl: profile.avatarUrl,
                       color: scheme.primary,
                       radius: CoreContentSizes.profileAvatarRadius(context),
                     ),
@@ -154,7 +178,7 @@ class _ProfileSummaryCard extends StatelessWidget {
                           child: Icon(
                             Icons.photo_camera_outlined,
                             color: scheme.onPrimary,
-                            size: 18,
+                            size: CoreContentSizes.orderTypeIcon(context),
                           ),
                         ),
                       ),
@@ -165,7 +189,7 @@ class _ProfileSummaryCard extends StatelessWidget {
             ),
             SizedBox(height: CoreSpacing.md(context)),
             Text(
-              l10n.profileMemberName,
+              profile.displayName(isAr),
               textAlign: TextAlign.center,
               style: CoreTypography.titleMedium(
                 context,
@@ -286,13 +310,14 @@ class _LoyaltyStatusCard extends ConsumerWidget {
   }
 }
 
-class _ContactCard extends StatelessWidget {
+class _ContactCard extends ConsumerWidget {
   const _ContactCard();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final profile = ref.watch(userProfileProvider);
 
     return _SectionCard(
       title: l10n.profileContact,
@@ -301,13 +326,13 @@ class _ContactCard extends StatelessWidget {
       children: [
         _InfoLine(
           label: l10n.profilePhoneNumber,
-          value: l10n.profilePhoneValue,
+          value: profile.phone,
           forceValueLtr: true,
         ),
         SizedBox(height: CoreSpacing.md(context)),
         _InfoLine(
           label: l10n.profileEmailAddress,
-          value: l10n.profileEmailValue,
+          value: profile.email,
         ),
       ],
     );
@@ -322,7 +347,8 @@ class _PointsActivityCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final isArabic = Localizations.localeOf(context).languageCode == 'ar';
-    final transactions = ref.watch(loyaltyTransactionsProvider).take(3).toList();
+    final transactions =
+        ref.watch(loyaltyTransactionsProvider).take(3).toList();
 
     return WidgetsAppCard(
       variant: WidgetsAppCardVariant.food,
@@ -374,9 +400,7 @@ class _PointsActivityCard extends ConsumerWidget {
           SizedBox(height: CoreSpacing.lg(context)),
           if (transactions.isEmpty)
             Text(
-              isArabic
-                  ? 'لا توجد حركات نقاط بعد.'
-                  : 'No points activity yet.',
+              l10n.profileNoPointsActivity,
               style: CoreTypography.bodyMedium(
                 context,
                 scheme.onSurfaceVariant,
@@ -386,7 +410,7 @@ class _PointsActivityCard extends ConsumerWidget {
             for (final tx in transactions) ...[
               _PointsActivityTile(
                 title: isArabic ? tx.titleAr : tx.titleEn,
-                subtitle: isArabic ? 'حركة نقاط' : 'Points activity',
+                subtitle: l10n.profilePointsActivityLabel,
                 points:
                     tx.pointsDelta >= 0
                         ? '+${tx.pointsDelta}'
@@ -426,7 +450,7 @@ class _PointsActivityTile extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: CoreColors.brandOlive.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(
           color: CoreColors.brandOlive.withValues(alpha: 0.18),
         ),
@@ -504,7 +528,7 @@ class _PaymentHistoryCard extends StatelessWidget {
               DecoratedBox(
                 decoration: BoxDecoration(
                   color: scheme.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+                  borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(CoreSpacing.md(context)),
@@ -582,7 +606,7 @@ class _PaymentHistoryTile extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: scheme.primary.withValues(alpha: 0.07),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(color: scheme.primary.withValues(alpha: 0.16)),
       ),
       child: Padding(
@@ -627,20 +651,15 @@ class _PaymentHistoryTile extends StatelessWidget {
   }
 }
 
-class _SavedAddressesCard extends StatefulWidget {
+class _SavedAddressesCard extends ConsumerWidget {
   const _SavedAddressesCard();
 
   @override
-  State<_SavedAddressesCard> createState() => _SavedAddressesCardState();
-}
-
-class _SavedAddressesCardState extends State<_SavedAddressesCard> {
-  var _defaultAddressId = 'home';
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final addressesAsync = ref.watch(savedAddressesProvider);
 
     return _SectionCard(
       title: l10n.profileSavedAddresses,
@@ -652,32 +671,80 @@ class _SavedAddressesCardState extends State<_SavedAddressesCard> {
         variant: WidgetsAppButtonVariant.outline,
       ),
       children: [
-        _AddressTile(
-          icon: Icons.home,
-          title: l10n.profileHomeAddressTitle,
-          address: l10n.profileHomeAddress,
-          color: scheme.primary,
-          isDefault: _defaultAddressId == 'home',
-          onDefaultChanged: () => setState(() => _defaultAddressId = 'home'),
-          onDelete: () => _confirmDelete(context, l10n.profileHomeAddressTitle),
-        ),
-        SizedBox(height: CoreSpacing.md(context)),
-        _AddressTile(
-          icon: Icons.work_outline,
-          title: l10n.profileOfficeAddressTitle,
-          address: l10n.profileOfficeAddress,
-          color: scheme.onSurfaceVariant,
-          isDefault: _defaultAddressId == 'office',
-          onDefaultChanged: () => setState(() => _defaultAddressId = 'office'),
-          onDelete:
-              () => _confirmDelete(context, l10n.profileOfficeAddressTitle),
+        addressesAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error:
+              (error, _) => WidgetsAsyncStateCard.error(
+                title: l10n.profileSavedAddresses,
+                message: error.toString(),
+                actionLabel: l10n.actionSave,
+                onAction: () => ref.invalidate(savedAddressesProvider),
+              ),
+          data: (addresses) {
+            if (addresses.isEmpty) {
+              return WidgetsAsyncStateCard.empty(
+                title: l10n.profileSavedAddresses,
+                message: l10n.addressesEmptyMessage,
+                actionLabel: l10n.profileAddNew,
+                onAction:
+                    () => context.push(
+                      '${AppRoutePaths.mapPicker}?return=profile',
+                    ),
+              );
+            }
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (var i = 0; i < addresses.length; i++) ...[
+                  if (i > 0) SizedBox(height: CoreSpacing.md(context)),
+                  _AddressTile(
+                    icon: _profileAddressIcon(addresses[i].iconKey),
+                    title: addresses[i].labelForLocale(isAr),
+                    address: addresses[i].addressForLocale(isAr),
+                    color:
+                        addresses[i].isSelected
+                            ? scheme.primary
+                            : scheme.onSurfaceVariant,
+                    isDefault: addresses[i].isSelected,
+                    onDefaultChanged:
+                        () => _setDefaultAddress(context, ref, addresses[i].id),
+                    onDelete:
+                        () => _confirmDelete(context, ref, addresses[i]),
+                  ),
+                ],
+              ],
+            );
+          },
         ),
       ],
     );
   }
 
-  Future<void> _confirmDelete(BuildContext context, String title) async {
+  Future<void> _setDefaultAddress(
+    BuildContext context,
+    WidgetRef ref,
+    String id,
+  ) async {
     final l10n = AppLocalizations.of(context)!;
+    try {
+      await ref.read(repositoryAddressProvider).setDefaultAddress(id);
+      ref.invalidate(savedAddressesProvider);
+      if (!context.mounted) return;
+      UtilityMockFeedback.showSuccess(context, l10n.actionSave);
+    } catch (_) {
+      if (!context.mounted) return;
+      UtilityMockFeedback.showError(context, l10n.addressesDeleteFailed);
+    }
+  }
+
+  Future<void> _confirmDelete(
+    BuildContext context,
+    WidgetRef ref,
+    ModelSavedAddress address,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final title = address.labelForLocale(isAr);
     final confirmed = await UtilityMockFeedback.confirm(
       context: context,
       title: l10n.profileDeleteAddressTitle,
@@ -688,29 +755,35 @@ class _SavedAddressesCardState extends State<_SavedAddressesCard> {
       icon: Icons.delete_outline,
     );
 
-    if (confirmed && context.mounted) {
-      UtilityMockFeedback.showWarning(context, l10n.addressesDelete);
+    if (!confirmed || !context.mounted) return;
+
+    try {
+      await ref.read(repositoryAddressProvider).deleteAddress(address.id);
+      ref.invalidate(savedAddressesProvider);
+      if (!context.mounted) return;
+      UtilityMockFeedback.showSuccess(context, l10n.addressesDelete);
+    } catch (_) {
+      if (!context.mounted) return;
+      UtilityMockFeedback.showError(context, l10n.addressesDeleteFailed);
     }
   }
 }
 
-class _NotificationPreferencesCard extends StatefulWidget {
+IconData _profileAddressIcon(String key) {
+  return switch (key) {
+    'work' => Icons.work_outline,
+    'gym' => Icons.location_on_outlined,
+    _ => Icons.home_outlined,
+  };
+}
+
+class _NotificationPreferencesCard extends ConsumerWidget {
   const _NotificationPreferencesCard();
 
   @override
-  State<_NotificationPreferencesCard> createState() =>
-      _NotificationPreferencesCardState();
-}
-
-class _NotificationPreferencesCardState
-    extends State<_NotificationPreferencesCard> {
-  bool _orders = true;
-  bool _loyalty = true;
-  bool _marketing = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final profile = ref.watch(userProfileProvider);
 
     return _SectionCard(
       title: l10n.profileNotificationPreferences,
@@ -718,20 +791,27 @@ class _NotificationPreferencesCardState
         _PreferenceSwitch(
           title: l10n.profileOrderStatusUpdates,
           subtitle: l10n.profileOrderStatusSubtitle,
-          value: _orders,
-          onChanged: (value) => setState(() => _orders = value),
+          value: profile.orderAlerts,
+          onChanged:
+              (value) =>
+                  ref.read(userProfileProvider.notifier).setOrderAlerts(value),
         ),
         _PreferenceSwitch(
           title: l10n.profileLoyaltyRewards,
           subtitle: l10n.profileLoyaltySubtitle,
-          value: _loyalty,
-          onChanged: (value) => setState(() => _loyalty = value),
+          // Mock reuse of shiftAlerts until a dedicated loyaltyAlerts field exists.
+          value: profile.shiftAlerts,
+          onChanged:
+              (value) =>
+                  ref.read(userProfileProvider.notifier).setShiftAlerts(value),
         ),
         _PreferenceSwitch(
           title: l10n.profileMarketingOffers,
           subtitle: l10n.profileMarketingSubtitle,
-          value: _marketing,
-          onChanged: (value) => setState(() => _marketing = value),
+          value: profile.marketing,
+          onChanged:
+              (value) =>
+                  ref.read(userProfileProvider.notifier).setMarketing(value),
         ),
       ],
     );
@@ -833,7 +913,7 @@ class _AddressTile extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(color: scheme.outlineVariant),
       ),
       child: Padding(
@@ -844,7 +924,7 @@ class _AddressTile extends StatelessWidget {
             DecoratedBox(
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+                borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
               ),
               child: Padding(
                 padding: EdgeInsets.all(CoreSpacing.sm(context)),
@@ -872,7 +952,7 @@ class _AddressTile extends StatelessWidget {
                   ),
                   SizedBox(height: CoreSpacing.sm(context)),
                   InkWell(
-                    borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+                    borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
                     onTap: onDefaultChanged,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -960,7 +1040,7 @@ class _PreferenceSwitch extends StatelessWidget {
               ],
             ),
           ),
-          Switch(value: value, onChanged: onChanged),
+          WidgetsAppSwitch(value: value, onChanged: onChanged),
         ],
       ),
     );

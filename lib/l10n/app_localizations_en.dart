@@ -307,6 +307,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsDarkModeOn => 'On';
 
   @override
+  String get settingsAppearance => 'Appearance';
+
+  @override
+  String get settingsAppearanceSubtitle =>
+      'Choose light, dark, or match your device.';
+
+  @override
+  String get settingsThemeLight => 'Light';
+
+  @override
+  String get settingsThemeDark => 'Dark';
+
+  @override
+  String get settingsThemeAuto => 'Auto';
+
+  @override
   String get settingsNotificationsSummary => 'Push, Email';
 
   @override

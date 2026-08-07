@@ -4,20 +4,26 @@ import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/app_providers.dart';
 import 'package:ayletna_restaurant_app/providers/session_providers.dart';
+import 'package:ayletna_restaurant_app/providers/role_permissions_providers.dart';
 import 'package:ayletna_restaurant_app/providers/user_profile_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_role_labels.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_role_switcher.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_avatar.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_phone_text.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_status_pill.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_settings_row.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_phone_text.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_app_switch.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_theme_mode_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Personal account settings for staff and admin roles (profile, contact, alerts).
+/// Personal account settings — same chrome as customer Settings for every role.
 class UserPersonalSettingsScreen extends ConsumerWidget {
   const UserPersonalSettingsScreen({super.key});
 
@@ -28,56 +34,124 @@ class UserPersonalSettingsScreen extends ConsumerWidget {
     final profile = ref.watch(userProfileProvider);
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final scheme = Theme.of(context).colorScheme;
-    final roleLabel = _roleLabel(l10n, role);
-    final subtitle =
-        role == AppRole.cashier && profile.employeeId != null
-            ? l10n.cashierDrawerIdentity(
-              profile.employeeId!,
-              profile.displayName(isAr),
-            )
-            : l10n.settingsEmployeeSince;
+    final selectedCode = Localizations.localeOf(context).languageCode;
 
     return WidgetsScaffoldPage(
-      title: l10n.screenAccountSettings,
+      title: l10n.screenSettings,
       child: WidgetsRefreshList(
         onRefresh: () async {
           ref.read(userProfileRepositoryProvider).reset();
-          UtilityMockFeedback.showInfo(context, l10n.screenProfile);
+          UtilityMockFeedback.showInfo(context, l10n.settingsProfileRefreshed);
         },
         child: ListView(
           children: [
             SizedBox(height: CoreSpacing.md(context)),
-            Text(
-              l10n.profileAccountSettings,
-              style: CoreTypography.caption(context, scheme.onSurfaceVariant),
+            WidgetsPageHeader(
+              title: l10n.profilePersonalProfile,
+              subtitle: '${l10n.screenSettings} · ${roleLabel(l10n, role)}',
             ),
-            Text(
-              l10n.profilePersonalProfile,
-              style: CoreTypography.headlineSmall(context, scheme.onSurface),
+            _ProfileHeaderCard(
+              displayName: profile.displayName(isAr),
+              email: profile.email,
+              phone: profile.phone,
+              avatarUrl: profile.avatarUrl,
+              l10n: l10n,
             ),
+            SizedBox(height: CoreSpacing.lg(context)),
+            WidgetsSettingsRow(
+              title: l10n.screenLanguageSelection,
+              subtitle:
+                  selectedCode == 'ar'
+                      ? l10n.languageArabic
+                      : l10n.languageEnglish,
+              icon: Icons.language_outlined,
+              trailing: const Icon(Icons.chevron_right),
+              onTap:
+                  () => UtilityMockFeedback.showActionSheet(
+                    context: context,
+                    title: l10n.screenLanguageSelection,
+                    message: l10n.selectLanguageSubtitle,
+                    actions: [
+                      MockSheetAction(
+                        label: l10n.languageEnglish,
+                        onSelected:
+                            () =>
+                                ref
+                                    .read(appLocaleProvider.notifier)
+                                    .state = const Locale('en'),
+                      ),
+                      MockSheetAction(
+                        label: l10n.languageArabic,
+                        onSelected:
+                            () =>
+                                ref
+                                    .read(appLocaleProvider.notifier)
+                                    .state = const Locale('ar'),
+                      ),
+                    ],
+                  ),
+            ),
+            SizedBox(height: CoreSpacing.lg(context)),
+            const WidgetsThemeModeSelector(),
             SizedBox(height: CoreSpacing.sm(context)),
-            Text(
-              l10n.settingsPersonalSubtitle,
-              style: CoreTypography.bodyMedium(
-                context,
-                scheme.onSurfaceVariant,
+            WidgetsSettingsRow(
+              title: l10n.profileOrderStatusUpdates,
+              subtitle: l10n.profileOrderStatusSubtitle,
+              icon: Icons.local_shipping_outlined,
+              trailing: WidgetsAppSwitch(
+                value: profile.orderAlerts,
+                onChanged:
+                    (value) =>
+                        ref
+                            .read(userProfileRepositoryProvider)
+                            .setOrderAlerts(value),
               ),
             ),
-            SizedBox(height: CoreSpacing.lg(context)),
-            _ProfileSummaryCard(
-              displayName: profile.displayName(isAr),
-              subtitle: subtitle,
-              roleLabel: roleLabel,
+            SizedBox(height: CoreSpacing.sm(context)),
+            WidgetsSettingsRow(
+              title: l10n.settingsStaffShiftAlerts,
+              subtitle: l10n.settingsStaffShiftAlertsSubtitle,
+              icon: Icons.schedule_outlined,
+              trailing: WidgetsAppSwitch(
+                value: profile.shiftAlerts,
+                onChanged:
+                    (value) =>
+                        ref
+                            .read(userProfileRepositoryProvider)
+                            .setShiftAlerts(value),
+              ),
             ),
-            SizedBox(height: CoreSpacing.lg(context)),
-            _ContactCard(phone: profile.phone, email: profile.email),
-            SizedBox(height: CoreSpacing.lg(context)),
-            const _NotificationPreferencesCard(),
-            if (role == AppRole.operator || role == AppRole.owner) ...[
+            SizedBox(height: CoreSpacing.sm(context)),
+            WidgetsSettingsRow(
+              title: l10n.profileMarketingOffers,
+              subtitle: l10n.profileMarketingSubtitle,
+              icon: Icons.campaign_outlined,
+              trailing: WidgetsAppSwitch(
+                value: profile.marketing,
+                onChanged:
+                    (value) =>
+                        ref
+                            .read(userProfileRepositoryProvider)
+                            .setMarketing(value),
+              ),
+            ),
+            if (ref.watch(sessionProvider).approvedRoles.length >= 2) ...[
               SizedBox(height: CoreSpacing.lg(context)),
-              _BusinessSettingsCard(l10n: l10n),
+              WidgetsAppCard(
+                accentColor: scheme.primary,
+                padding: EdgeInsets.all(CoreSpacing.lg(context)),
+                child: const WidgetsRoleSwitcher(),
+              ),
             ],
-            SizedBox(height: CoreSpacing.lg(context)),
+            if (role == AppRole.operator || role == AppRole.admin) ...[
+              SizedBox(height: CoreSpacing.lg(context)),
+              _BusinessSettingsCard(l10n: l10n, role: role),
+            ],
+            if (role == AppRole.owner) ...[
+              SizedBox(height: CoreSpacing.lg(context)),
+              _OwnerShareCard(profileEmail: profile.email),
+            ],
+            SizedBox(height: CoreSpacing.xl(context)),
             WidgetsAppButton(
               label: l10n.profileLogout,
               onPressed: () {
@@ -86,6 +160,29 @@ class UserPersonalSettingsScreen extends ConsumerWidget {
                 context.go(AppRoutePaths.login);
               },
               variant: WidgetsAppButtonVariant.outline,
+              icon: Icons.logout,
+            ),
+            SizedBox(height: CoreSpacing.md(context)),
+            WidgetsAppButton(
+              label: l10n.profileDeactivateAccount,
+              onPressed: () async {
+                final confirmed = await UtilityMockFeedback.confirm(
+                  context: context,
+                  title: l10n.profileDeactivateAccount,
+                  message: l10n.profileDeactivateNotAvailable,
+                  confirmLabel: l10n.actionConfirm,
+                  cancelLabel: l10n.actionCancel,
+                  confirmVariant: WidgetsAppButtonVariant.danger,
+                  icon: Icons.warning_amber_outlined,
+                );
+                if (confirmed && context.mounted) {
+                  UtilityMockFeedback.showWarning(
+                    context,
+                    l10n.profileDeactivateNotAvailable,
+                  );
+                }
+              },
+              variant: WidgetsAppButtonVariant.danger,
             ),
             SizedBox(height: CoreSpacing.xxl(context)),
           ],
@@ -93,70 +190,174 @@ class UserPersonalSettingsScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  static String _roleLabel(AppLocalizations l10n, AppRole role) {
-    return switch (role) {
-      AppRole.cashier => l10n.roleCashier,
-      AppRole.kitchen => l10n.roleKitchen,
-      AppRole.delivery => l10n.roleDelivery,
-      AppRole.inventory => l10n.roleInventory,
-      AppRole.staff => l10n.roleStaff,
-      AppRole.operator => l10n.roleOperator,
-      AppRole.owner => l10n.roleOwner,
-      AppRole.customer => l10n.roleCustomer,
-      AppRole.guest => l10n.roleCustomer,
-    };
+class _OwnerShareCard extends ConsumerWidget {
+  const _OwnerShareCard({required this.profileEmail});
+
+  final String profileEmail;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final scheme = Theme.of(context).colorScheme;
+    final profile = ref.watch(userProfileProvider);
+    double? share = profile.ownershipPercentage;
+
+    if (share == null) {
+      final users = ref.watch(rbacUsersProvider);
+      for (final user in users) {
+        if (user.email == profileEmail) {
+          share = user.ownershipPercentage;
+          break;
+        }
+      }
+    }
+    share ??= 35;
+
+    return WidgetsAppCard(
+      title: l10n.ownershipPercentageLabel,
+      accentColor: scheme.primary,
+      child: Text(
+        l10n.ownershipShareValue('${share.round()}'),
+        style: CoreTypography.headlineSmall(
+          context,
+          scheme.primary,
+        ).copyWith(fontWeight: FontWeight.w900),
+      ),
+    );
   }
 }
 
-class _ProfileSummaryCard extends StatelessWidget {
-  const _ProfileSummaryCard({
+class _ProfileHeaderCard extends ConsumerWidget {
+  const _ProfileHeaderCard({
     required this.displayName,
-    required this.subtitle,
-    required this.roleLabel,
+    required this.email,
+    required this.phone,
+    required this.avatarUrl,
+    required this.l10n,
   });
 
   final String displayName;
-  final String subtitle;
-  final String roleLabel;
+  final String email;
+  final String phone;
+  final String? avatarUrl;
+  final AppLocalizations l10n;
+
+  static const _presetAvatars = <String>[
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=240&h=240&q=80',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=240&h=240&q=80',
+    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=240&h=240&q=80',
+    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=240&h=240&q=80',
+    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=240&h=240&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=240&h=240&q=80',
+  ];
+
+  Future<void> _openPhotoSheet(BuildContext context, WidgetRef ref) async {
+    final scheme = Theme.of(context).colorScheme;
+    final result = await showModalBottomSheet<Object>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              CoreSpacing.lg(sheetContext),
+              CoreSpacing.sm(sheetContext),
+              CoreSpacing.lg(sheetContext),
+              CoreSpacing.lg(sheetContext),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  l10n.profileChangePhoto,
+                  style: CoreTypography.titleMedium(
+                    sheetContext,
+                    scheme.onSurface,
+                  ).copyWith(fontWeight: FontWeight.w900),
+                ),
+                SizedBox(height: CoreSpacing.xs(sheetContext)),
+                Text(
+                  l10n.profileChoosePhoto,
+                  style: CoreTypography.caption(
+                    sheetContext,
+                    scheme.onSurfaceVariant,
+                  ),
+                ),
+                SizedBox(height: CoreSpacing.lg(sheetContext)),
+                Wrap(
+                  spacing: CoreSpacing.md(sheetContext),
+                  runSpacing: CoreSpacing.md(sheetContext),
+                  alignment: WrapAlignment.center,
+                  children: [
+                    for (final url in _presetAvatars)
+                      InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: () => Navigator.pop(sheetContext, url),
+                        child: WidgetsAvatar(
+                          imageUrl: url,
+                          radius: CoreContentSizes.profileAvatarRadius(
+                            sheetContext,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                if (avatarUrl != null) ...[
+                  SizedBox(height: CoreSpacing.lg(sheetContext)),
+                  WidgetsAppButton(
+                    label: l10n.profileRemovePhoto,
+                    onPressed: () => Navigator.pop(sheetContext, false),
+                    icon: Icons.delete_outline,
+                    variant: WidgetsAppButtonVariant.outline,
+                    fullWidth: true,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (!context.mounted || result == null) return;
+    final repo = ref.read(userProfileRepositoryProvider);
+    if (result == false) {
+      repo.setAvatarUrl(null);
+      UtilityMockFeedback.showSuccess(context, l10n.profilePhotoUpdated);
+      return;
+    }
+    if (result is String && result.isNotEmpty) {
+      repo.setAvatarUrl(result);
+      UtilityMockFeedback.showSuccess(context, l10n.profilePhotoUpdated);
+    }
+  }
 
   @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+  Widget build(BuildContext context, WidgetRef ref) {
     final scheme = Theme.of(context).colorScheme;
-
-    void openPhotoSheet() {
-      UtilityMockFeedback.showActionSheet(
-        context: context,
-        title: l10n.profileChangePhoto,
-        message: l10n.profilePersonalProfile,
-        actions: [
-          MockSheetAction(
-            label: l10n.actionSave,
-            icon: Icons.photo_camera_outlined,
-            onSelected:
-                () =>
-                    UtilityMockFeedback.showInfo(context, l10n.demoModeBanner),
-          ),
-        ],
-      );
-    }
+    final badgeSize = CoreContentSizes.profileAvatarEditBadge(context);
+    final badgeIconSize = CoreContentSizes.profileAvatarEditIcon(context);
 
     return WidgetsAppCard(
       accentColor: scheme.primary,
+      padding: EdgeInsets.all(CoreSpacing.xl(context)),
       child: Column(
         children: [
           Semantics(
             button: true,
             label: l10n.profileChangePhoto,
             child: InkWell(
-              borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-              onTap: openPhotoSheet,
+              customBorder: const CircleBorder(),
+              onTap: () => _openPhotoSheet(context, ref),
               child: Stack(
                 alignment: AlignmentDirectional.bottomEnd,
                 children: [
                   WidgetsAvatar(
                     icon: Icons.person,
+                    imageUrl: avatarUrl,
                     color: scheme.primary,
                     radius: CoreContentSizes.profileAvatarRadius(context),
                   ),
@@ -164,16 +365,12 @@ class _ProfileSummaryCard extends StatelessWidget {
                     color: scheme.primary,
                     shape: const CircleBorder(),
                     elevation: 2,
-                    child: InkWell(
-                      customBorder: const CircleBorder(),
-                      onTap: openPhotoSheet,
-                      child: SizedBox.square(
-                        dimension: 34,
-                        child: Icon(
-                          Icons.photo_camera_outlined,
-                          color: scheme.onPrimary,
-                          size: 18,
-                        ),
+                    child: SizedBox.square(
+                      dimension: badgeSize,
+                      child: Icon(
+                        Icons.photo_camera_outlined,
+                        color: scheme.onPrimary,
+                        size: badgeIconSize,
                       ),
                     ),
                   ),
@@ -182,12 +379,6 @@ class _ProfileSummaryCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: CoreSpacing.md(context)),
-          WidgetsStatusPill(
-            label: roleLabel,
-            color: scheme.primary,
-            compact: true,
-          ),
-          SizedBox(height: CoreSpacing.sm(context)),
           Text(
             displayName,
             textAlign: TextAlign.center,
@@ -197,11 +388,16 @@ class _ProfileSummaryCard extends StatelessWidget {
             ).copyWith(fontWeight: FontWeight.w900),
           ),
           Text(
-            subtitle,
+            email,
             textAlign: TextAlign.center,
-            style: CoreTypography.caption(context, scheme.onSurfaceVariant),
+            style: CoreTypography.bodyMedium(context, scheme.onSurfaceVariant),
           ),
-          SizedBox(height: CoreSpacing.lg(context)),
+          WidgetsPhoneText(
+            phone: phone,
+            textAlign: TextAlign.center,
+            style: CoreTypography.bodyMedium(context, scheme.onSurfaceVariant),
+          ),
+          SizedBox(height: CoreSpacing.md(context)),
           WidgetsAppButton(
             label: l10n.profileEditDetails,
             onPressed: () => context.push(AppRoutePaths.editProfile),
@@ -213,89 +409,24 @@ class _ProfileSummaryCard extends StatelessWidget {
   }
 }
 
-class _ContactCard extends StatelessWidget {
-  const _ContactCard({required this.phone, required this.email});
-
-  final String phone;
-  final String email;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
-
-    return WidgetsAppCard(
-      title: l10n.profileContact,
-      leading: Icon(
-        Icons.contact_mail_outlined,
-        color: scheme.onSurfaceVariant,
-      ),
-      accentColor: scheme.onSurfaceVariant,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _InfoLine(
-            label: l10n.profilePhoneNumber,
-            value: phone,
-            forceValueLtr: true,
-          ),
-          SizedBox(height: CoreSpacing.md(context)),
-          _InfoLine(label: l10n.profileEmailAddress, value: email),
-        ],
-      ),
-    );
-  }
-}
-
-class _NotificationPreferencesCard extends ConsumerWidget {
-  const _NotificationPreferencesCard();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
-    final profile = ref.watch(userProfileProvider);
-    final repo = ref.read(userProfileRepositoryProvider);
-
-    return WidgetsAppCard(
-      title: l10n.profileNotificationPreferences,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _PreferenceSwitch(
-            title: l10n.profileOrderStatusUpdates,
-            subtitle: l10n.settingsStaffOrderAlertsSubtitle,
-            value: profile.orderAlerts,
-            onChanged: repo.setOrderAlerts,
-          ),
-          _PreferenceSwitch(
-            title: l10n.settingsStaffShiftAlerts,
-            subtitle: l10n.settingsStaffShiftAlertsSubtitle,
-            value: profile.shiftAlerts,
-            onChanged: repo.setShiftAlerts,
-          ),
-          _PreferenceSwitch(
-            title: l10n.profileMarketingOffers,
-            subtitle: l10n.profileMarketingSubtitle,
-            value: profile.marketing,
-            onChanged: repo.setMarketing,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _BusinessSettingsCard extends StatelessWidget {
-  const _BusinessSettingsCard({required this.l10n});
+  const _BusinessSettingsCard({required this.l10n, required this.role});
 
   final AppLocalizations l10n;
+  final AppRole role;
+
+  String get _settingsRoute => switch (role) {
+    AppRole.admin => AppRoutePaths.appAdminSettings,
+    AppRole.operator => AppRoutePaths.operatorSettings,
+    _ => AppRoutePaths.operatorSettings,
+  };
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
     return WidgetsAppCard(
-      title: l10n.screenSettings,
+      title: l10n.drawerBusinessSettings,
       leading: Icon(Icons.tune_outlined, color: scheme.primary),
       accentColor: scheme.primary,
       child: Column(
@@ -307,100 +438,11 @@ class _BusinessSettingsCard extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.md(context)),
           WidgetsAppButton(
-            label: l10n.screenSettings,
-            onPressed: () => context.push(AppRoutePaths.adminSettings),
+            label: l10n.drawerBusinessSettings,
+            onPressed: () => context.push(_settingsRoute),
             icon: Icons.arrow_forward,
             variant: WidgetsAppButtonVariant.outline,
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _InfoLine extends StatelessWidget {
-  const _InfoLine({
-    required this.label,
-    required this.value,
-    this.forceValueLtr = false,
-  });
-
-  final String label;
-  final String value;
-  final bool forceValueLtr;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: CoreTypography.caption(
-            context,
-            scheme.onSurfaceVariant,
-          ).copyWith(fontWeight: FontWeight.w900),
-        ),
-        if (forceValueLtr)
-          WidgetsPhoneText(
-            phone: value,
-            style: CoreTypography.bodyMedium(context, scheme.onSurface),
-          )
-        else
-          Text(
-            value,
-            style: CoreTypography.bodyMedium(context, scheme.onSurface),
-          ),
-      ],
-    );
-  }
-}
-
-class _PreferenceSwitch extends StatelessWidget {
-  const _PreferenceSwitch({
-    required this.title,
-    required this.subtitle,
-    required this.value,
-    required this.onChanged,
-  });
-
-  final String title;
-  final String subtitle;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return Padding(
-      padding: EdgeInsets.only(bottom: CoreSpacing.md(context)),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: CoreTypography.bodyMedium(
-                    context,
-                    scheme.onSurface,
-                  ).copyWith(fontWeight: FontWeight.w800),
-                ),
-                Text(
-                  subtitle,
-                  style: CoreTypography.caption(
-                    context,
-                    scheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Switch(value: value, onChanged: onChanged),
         ],
       ),
     );

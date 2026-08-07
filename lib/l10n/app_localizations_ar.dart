@@ -306,6 +306,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settingsDarkModeOn => 'تشغيل';
 
   @override
+  String get settingsAppearance => 'المظهر';
+
+  @override
+  String get settingsAppearanceSubtitle =>
+      'اختر الوضع الفاتح أو الداكن أو مطابق الجهاز.';
+
+  @override
+  String get settingsThemeLight => 'فاتح';
+
+  @override
+  String get settingsThemeDark => 'داكن';
+
+  @override
+  String get settingsThemeAuto => 'تلقائي';
+
+  @override
   String get settingsNotificationsSummary => 'إشعارات، بريد';
 
   @override

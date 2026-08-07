@@ -668,6 +668,36 @@ abstract class AppLocalizations {
   /// **'On'**
   String get settingsDarkModeOn;
 
+  /// No description provided for @settingsAppearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingsAppearance;
+
+  /// No description provided for @settingsAppearanceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose light, dark, or match your device.'**
+  String get settingsAppearanceSubtitle;
+
+  /// No description provided for @settingsThemeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get settingsThemeLight;
+
+  /// No description provided for @settingsThemeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get settingsThemeDark;
+
+  /// No description provided for @settingsThemeAuto.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto'**
+  String get settingsThemeAuto;
+
   /// No description provided for @settingsNotificationsSummary.
   ///
   /// In en, this message translates to:
