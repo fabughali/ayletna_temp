@@ -23,11 +23,38 @@ class CustomerSupportChatScreen extends ConsumerStatefulWidget {
 class _CustomerSupportChatScreenState
     extends ConsumerState<CustomerSupportChatScreen> {
   final _message = TextEditingController();
+  final _scrollController = ScrollController();
+  int _lastMessageCount = -1;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToLatest(animate: false);
+    });
+  }
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _message.dispose();
     super.dispose();
+  }
+
+  void _scrollToLatest({bool animate = true}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) return;
+      final max = _scrollController.position.maxScrollExtent;
+      if (animate) {
+        _scrollController.animateTo(
+          max,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
+      } else {
+        _scrollController.jumpTo(max);
+      }
+    });
   }
 
   @override
@@ -42,6 +69,17 @@ class _CustomerSupportChatScreenState
             : ref.watch(supportTicketByIdProvider(linkedId));
 
     final scheme = Theme.of(context).colorScheme;
+    final messageCount =
+        linkedTicket == null
+            ? chat.messages.length
+            : linkedTicket.messages.length;
+    // Greeting bubble is always present (+1). Scroll when thread grows or opens.
+    final threadLength = messageCount + 1;
+    if (threadLength != _lastMessageCount) {
+      final firstPaint = _lastMessageCount < 0;
+      _lastMessageCount = threadLength;
+      _scrollToLatest(animate: !firstPaint);
+    }
 
     return WidgetsScaffoldPage(
       title: l10n.supportLiveChatTitle,
@@ -57,6 +95,8 @@ class _CustomerSupportChatScreenState
           children: [
             Expanded(
               child: ListView(
+                controller: _scrollController,
+                primary: false,
                 padding: EdgeInsetsDirectional.only(
                   bottom: CoreSpacing.md(context),
                 ),
@@ -177,6 +217,7 @@ class _CustomerSupportChatScreenState
           .sendCustomerMessage(text, isAr: isAr);
     }
     _message.clear();
+    _scrollToLatest();
   }
 }
 
