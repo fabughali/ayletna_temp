@@ -2,8 +2,6 @@ import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/support_session_providers.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_action_bar.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
@@ -25,11 +23,38 @@ class CustomerSupportChatScreen extends ConsumerStatefulWidget {
 class _CustomerSupportChatScreenState
     extends ConsumerState<CustomerSupportChatScreen> {
   final _message = TextEditingController();
+  final _scrollController = ScrollController();
+  int _lastMessageCount = -1;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToLatest(animate: false);
+    });
+  }
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _message.dispose();
     super.dispose();
+  }
+
+  void _scrollToLatest({bool animate = true}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scrollController.hasClients) return;
+      final max = _scrollController.position.maxScrollExtent;
+      if (animate) {
+        _scrollController.animateTo(
+          max,
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOut,
+        );
+      } else {
+        _scrollController.jumpTo(max);
+      }
+    });
   }
 
   @override
@@ -44,6 +69,17 @@ class _CustomerSupportChatScreenState
             : ref.watch(supportTicketByIdProvider(linkedId));
 
     final scheme = Theme.of(context).colorScheme;
+    final messageCount =
+        linkedTicket == null
+            ? chat.messages.length
+            : linkedTicket.messages.length;
+    // Greeting bubble is always present (+1). Scroll when thread grows or opens.
+    final threadLength = messageCount + 1;
+    if (threadLength != _lastMessageCount) {
+      final firstPaint = _lastMessageCount < 0;
+      _lastMessageCount = threadLength;
+      _scrollToLatest(animate: !firstPaint);
+    }
 
     return WidgetsScaffoldPage(
       title: l10n.supportLiveChatTitle,
@@ -54,105 +90,117 @@ class _CustomerSupportChatScreenState
           tooltip: l10n.supportTicketsTitle,
         ),
       ],
-      bottomSheet: Material(
-        color: scheme.surface,
+      child: SizedBox.expand(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Expanded(
+              child: ListView(
+                controller: _scrollController,
+                primary: false,
+                padding: EdgeInsetsDirectional.only(
+                  bottom: CoreSpacing.md(context),
+                ),
+                children: [
+                  SizedBox(height: CoreSpacing.md(context)),
+                  WidgetsPageHeader(
+                    title: l10n.supportChatHeroTitle,
+                    subtitle:
+                        linkedTicket == null
+                            ? l10n.supportChatHeroBody
+                            : l10n.supportChatLinkedTicket(linkedTicket.id),
+                    eyebrow: l10n.supportLiveChatTitle,
+                  ),
+                  SizedBox(height: CoreSpacing.lg(context)),
+                  _ChatBubble(
+                    text: l10n.supportChatAgentGreeting,
+                    senderName: l10n.supportChatAgentName,
+                    timestamp: _formatTime(DateTime.now(), isAr),
+                    fromAgent: true,
+                    status: _ChatMessageStatus.sent,
+                  ),
+                  if (linkedTicket == null)
+                    for (final entry in chat.messages) ...[
+                      SizedBox(height: CoreSpacing.sm(context)),
+                      _ChatBubble(
+                        text: entry.text,
+                        senderName:
+                            entry.fromAgent
+                                ? l10n.supportChatAgentName
+                                : l10n.supportChatYou,
+                        timestamp: _formatTime(entry.sentAt, isAr),
+                        fromAgent: entry.fromAgent,
+                        status: _ChatMessageStatus.sent,
+                      ),
+                    ],
+                  if (linkedTicket != null)
+                    for (final msg in linkedTicket.messages) ...[
+                      SizedBox(height: CoreSpacing.sm(context)),
+                      _ChatBubble(
+                        text: isAr ? msg.bodyAr : msg.bodyEn,
+                        senderName:
+                            msg.isStaff
+                                ? l10n.supportChatAgentName
+                                : l10n.supportChatYou,
+                        timestamp: _formatTime(msg.sentAt, isAr),
+                        fromAgent: msg.isStaff,
+                        status: _ChatMessageStatus.delivered,
+                      ),
+                    ],
+                  SizedBox(height: CoreSpacing.lg(context)),
+                ],
+              ),
+            ),
             DecoratedBox(
               decoration: BoxDecoration(
                 color: scheme.surface,
-                border: Border(
-                  top: BorderSide(color: scheme.outlineVariant),
-                ),
+                border: Border(top: BorderSide(color: scheme.outlineVariant)),
               ),
               child: Padding(
                 padding: EdgeInsets.fromLTRB(
                   CoreSpacing.md(context),
-                  CoreSpacing.md(context),
+                  CoreSpacing.sm(context),
                   CoreSpacing.md(context),
                   CoreSpacing.sm(context),
                 ),
-                child: WidgetsAppTextField(
-                  controller: _message,
-                  label: l10n.supportChatMessageLabel,
-                  hintText: l10n.supportChatMessageHint,
-                  prefixIcon: Icons.chat_bubble_outline,
-                  maxLines: 3,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: WidgetsAppTextField(
+                        controller: _message,
+                        label: l10n.supportChatMessageLabel,
+                        hintText: l10n.supportChatMessageHint,
+                        prefixIcon: Icons.chat_bubble_outline,
+                        showLabel: false,
+                        minLines: 1,
+                        maxLines: 5,
+                        textInputAction: TextInputAction.send,
+                        onSubmitted: (_) => _sendMessage(isAr, l10n),
+                      ),
+                    ),
+                    SizedBox(width: CoreSpacing.sm(context)),
+                    WidgetsIconButton(
+                      onPressed: () => _sendMessage(isAr, l10n),
+                      icon: Icons.send_rounded,
+                      tooltip: l10n.supportChatSend,
+                      variant: WidgetsIconButtonVariant.filled,
+                      buttonSize: context.coreTheme.buttonMinHeight,
+                    ),
+                  ],
                 ),
-              ),
-            ),
-            WidgetsActionBar(
-              primary: WidgetsAppButton(
-                label: l10n.supportChatSend,
-                onPressed: () => _sendMessage(isAr, l10n),
-                icon: Icons.send_outlined,
-                fullWidth: true,
               ),
             ),
           ],
         ),
-      ),
-      child: ListView(
-        padding: EdgeInsetsDirectional.only(
-          bottom: CoreSpacing.xxl(context) * 3,
-        ),
-        children: [
-          SizedBox(height: CoreSpacing.md(context)),
-          WidgetsPageHeader(
-            title: l10n.supportChatHeroTitle,
-            subtitle:
-                linkedTicket == null
-                    ? l10n.supportChatHeroBody
-                    : l10n.supportChatLinkedTicket(linkedTicket.id),
-            eyebrow: l10n.supportLiveChatTitle,
-          ),
-          SizedBox(height: CoreSpacing.lg(context)),
-          _ChatBubble(
-            text: l10n.supportChatAgentGreeting,
-            senderName: l10n.supportChatAgentName,
-            timestamp: _formatTime(DateTime.now(), isAr),
-            fromAgent: true,
-            status: _ChatMessageStatus.sent,
-          ),
-          if (linkedTicket == null)
-            for (final entry in chat.messages) ...[
-              SizedBox(height: CoreSpacing.sm(context)),
-              _ChatBubble(
-                text: entry.text,
-                senderName:
-                    entry.fromAgent
-                        ? l10n.supportChatAgentName
-                        : l10n.supportChatYou,
-                timestamp: _formatTime(entry.sentAt, isAr),
-                fromAgent: entry.fromAgent,
-                status: _ChatMessageStatus.sent,
-              ),
-            ],
-          if (linkedTicket != null)
-            for (final msg in linkedTicket.messages) ...[
-              SizedBox(height: CoreSpacing.sm(context)),
-              _ChatBubble(
-                text: isAr ? msg.bodyAr : msg.bodyEn,
-                senderName:
-                    msg.isStaff
-                        ? l10n.supportChatAgentName
-                        : l10n.supportChatYou,
-                timestamp: _formatTime(msg.sentAt, isAr),
-                fromAgent: msg.isStaff,
-                status: _ChatMessageStatus.delivered,
-              ),
-            ],
-          SizedBox(height: CoreSpacing.xxl(context)),
-        ],
       ),
     );
   }
 
   String _formatTime(DateTime time, bool isAr) {
     final locale = isAr ? 'ar' : 'en';
-    return DateFormat.jm(locale).format(time);
+    final date = DateFormat('dd.MM.yyyy', locale).format(time);
+    final clock = DateFormat.jm(locale).format(time);
+    return '$date · $clock';
   }
 
   void _sendMessage(bool isAr, AppLocalizations l10n) {
@@ -169,6 +217,7 @@ class _CustomerSupportChatScreenState
           .sendCustomerMessage(text, isAr: isAr);
     }
     _message.clear();
+    _scrollToLatest();
   }
 }
 
@@ -207,7 +256,7 @@ class _ChatBubble extends StatelessWidget {
         padding: EdgeInsets.all(CoreSpacing.md(context)),
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.10),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
           border: Border.all(color: color.withValues(alpha: 0.22)),
         ),
         child: Column(
