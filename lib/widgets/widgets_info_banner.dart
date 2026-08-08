@@ -28,7 +28,7 @@ class WidgetsInfoBanner extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: accent.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(color: accent.withValues(alpha: 0.26)),
       ),
       child: Padding(
