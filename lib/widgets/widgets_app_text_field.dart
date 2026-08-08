@@ -50,7 +50,10 @@ class WidgetsAppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final singleLine = maxLines == 1 && (minLines == null || minLines == 1);
+    // Keep the first row on the shared control height (matches icon buttons),
+    // even when [maxLines] allows the field to grow.
+    final matchControlHeight = maxLines == 1 || (minLines ?? 1) == 1;
+    final controlH = context.coreTheme.buttonMinHeight;
 
     return TextFormField(
       controller: controller,
@@ -77,11 +80,17 @@ class WidgetsAppTextField extends StatelessWidget {
         label: label,
         icon: prefixIcon,
         showLabel: showLabel,
-        matchControlHeight: singleLine,
+        matchControlHeight: matchControlHeight,
       ).copyWith(
         labelText: showLabel ? label : null,
         hintText: hintText,
         suffixIcon: suffixIcon,
+        // Default Material prefix icon is 48px and forces the field taller
+        // than [buttonMinHeight]; pin it to the control token.
+        prefixIconConstraints:
+            prefixIcon != null && matchControlHeight
+                ? BoxConstraints.tightFor(width: controlH, height: controlH)
+                : null,
       ),
     );
   }

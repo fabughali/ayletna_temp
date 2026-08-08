@@ -139,16 +139,12 @@ class _CustomerSupportChatScreenState
                       ),
                     ),
                     SizedBox(width: CoreSpacing.sm(context)),
-                    SizedBox(
-                      width: context.coreTheme.iconButtonSize,
-                      height: context.coreTheme.iconButtonSize,
-                      child: WidgetsIconButton(
-                        onPressed: () => _sendMessage(isAr, l10n),
-                        icon: Icons.send_rounded,
-                        tooltip: l10n.supportChatSend,
-                        variant: WidgetsIconButtonVariant.filled,
-                        buttonSize: context.coreTheme.iconButtonSize,
-                      ),
+                    WidgetsIconButton(
+                      onPressed: () => _sendMessage(isAr, l10n),
+                      icon: Icons.send_rounded,
+                      tooltip: l10n.supportChatSend,
+                      variant: WidgetsIconButtonVariant.filled,
+                      buttonSize: context.coreTheme.buttonMinHeight,
                     ),
                   ],
                 ),
