@@ -126,16 +126,17 @@ class _CustomerSupportChatScreenState
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Expanded(
-                      child: WidgetsAppTextField(
-                        controller: _message,
-                        label: l10n.supportChatMessageLabel,
-                        hintText: l10n.supportChatMessageHint,
-                        prefixIcon: Icons.chat_bubble_outline,
-                        showLabel: false,
-                        maxLines: 3,
-                        textInputAction: TextInputAction.send,
-                        onSubmitted: (_) => _sendMessage(isAr, l10n),
-                      ),
+                    child: WidgetsAppTextField(
+                      controller: _message,
+                      label: l10n.supportChatMessageLabel,
+                      hintText: l10n.supportChatMessageHint,
+                      prefixIcon: Icons.chat_bubble_outline,
+                      showLabel: false,
+                      minLines: 1,
+                      maxLines: 5,
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => _sendMessage(isAr, l10n),
+                    ),
                     ),
                     SizedBox(width: CoreSpacing.sm(context)),
                     WidgetsIconButton(
