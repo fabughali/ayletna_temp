@@ -28,6 +28,7 @@ class WidgetsScaffoldPage extends ConsumerWidget {
     this.actions,
     this.floatingActionButton,
     this.bottomSheet,
+    this.bottomNavigationBar,
     this.fullWidth = false,
     this.showAppBar = true,
     this.showDrawer = true,
@@ -44,6 +45,8 @@ class WidgetsScaffoldPage extends ConsumerWidget {
   final List<Widget>? actions;
   final Widget? floatingActionButton;
   final Widget? bottomSheet;
+  /// Prefer this over [bottomSheet] when the bar must reserve body space.
+  final Widget? bottomNavigationBar;
   final bool fullWidth;
   final bool showAppBar;
   final bool showDrawer;
@@ -113,6 +116,7 @@ class WidgetsScaffoldPage extends ConsumerWidget {
               : null,
       floatingActionButton: floatingActionButton,
       bottomSheet: bottomSheet,
+      bottomNavigationBar: bottomNavigationBar,
       body: SafeArea(
         child: WidgetsScreenLayout(fullWidth: fullWidth, child: child),
       ),

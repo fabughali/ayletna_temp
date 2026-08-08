@@ -2,8 +2,6 @@ import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/support_session_providers.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_action_bar.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
@@ -54,50 +52,52 @@ class _CustomerSupportChatScreenState
           tooltip: l10n.supportTicketsTitle,
         ),
       ],
-      bottomSheet: Material(
+      bottomNavigationBar: Material(
         color: scheme.surface,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: scheme.surface,
-                border: Border(
-                  top: BorderSide(color: scheme.outlineVariant),
-                ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  CoreSpacing.md(context),
-                  CoreSpacing.md(context),
-                  CoreSpacing.md(context),
-                  CoreSpacing.sm(context),
-                ),
-                child: WidgetsAppTextField(
-                  controller: _message,
-                  label: l10n.supportChatMessageLabel,
-                  hintText: l10n.supportChatMessageHint,
-                  prefixIcon: Icons.chat_bubble_outline,
-                  maxLines: 3,
-                ),
+        child: SafeArea(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: scheme.surface,
+              border: Border(
+                top: BorderSide(color: scheme.outlineVariant),
               ),
             ),
-            WidgetsActionBar(
-              primary: WidgetsAppButton(
-                label: l10n.supportChatSend,
-                onPressed: () => _sendMessage(isAr, l10n),
-                icon: Icons.send_outlined,
-                fullWidth: true,
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                CoreSpacing.md(context),
+                CoreSpacing.sm(context),
+                CoreSpacing.md(context),
+                CoreSpacing.sm(context),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: WidgetsAppTextField(
+                      controller: _message,
+                      label: l10n.supportChatMessageLabel,
+                      hintText: l10n.supportChatMessageHint,
+                      prefixIcon: Icons.chat_bubble_outline,
+                      showLabel: false,
+                      maxLines: 3,
+                      textInputAction: TextInputAction.send,
+                      onSubmitted: (_) => _sendMessage(isAr, l10n),
+                    ),
+                  ),
+                  SizedBox(width: CoreSpacing.sm(context)),
+                  WidgetsIconButton(
+                    onPressed: () => _sendMessage(isAr, l10n),
+                    icon: Icons.send_rounded,
+                    tooltip: l10n.supportChatSend,
+                    variant: WidgetsIconButtonVariant.filled,
+                  ),
+                ],
               ),
             ),
-          ],
+          ),
         ),
       ),
       child: ListView(
-        padding: EdgeInsetsDirectional.only(
-          bottom: CoreSpacing.xxl(context) * 3,
-        ),
         children: [
           SizedBox(height: CoreSpacing.md(context)),
           WidgetsPageHeader(
