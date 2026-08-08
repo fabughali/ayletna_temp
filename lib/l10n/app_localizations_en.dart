@@ -3152,6 +3152,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeStories => 'From Ayletna';
 
   @override
+  String get homeLatestBlogs => 'Latest blogs';
+
+  @override
+  String get homeBlogBadge => 'Blog';
+
+  @override
+  String get homeBlogRead => 'Read';
+
+  @override
   String get homeSubscriptionCta => 'Subscribe';
 
   @override
@@ -4506,6 +4515,34 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get profilePhotoPickFailed =>
       'Couldn\'t update profile image. Try again.';
+
+  @override
+  String get profileCameraPermissionTitle => 'Camera access';
+
+  @override
+  String get profileCameraPermissionBody =>
+      'Ayletna needs access to your camera so you can take a new profile photo.';
+
+  @override
+  String get profileGalleryPermissionTitle => 'Photo library access';
+
+  @override
+  String get profileGalleryPermissionBody =>
+      'Ayletna needs access to your photos so you can choose a profile image.';
+
+  @override
+  String get profilePermissionAllow => 'Allow';
+
+  @override
+  String get profilePermissionDeny => 'Don\'t allow';
+
+  @override
+  String get profileCameraPermissionDenied =>
+      'Camera access is required to take a profile photo.';
+
+  @override
+  String get profileGalleryPermissionDenied =>
+      'Photo library access is required to choose a profile image.';
 
   @override
   String get profileRemovePhoto => 'Remove photo';

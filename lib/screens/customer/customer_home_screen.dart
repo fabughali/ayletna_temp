@@ -1,26 +1,27 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
-import 'package:ayletna_restaurant_app/data/models/model_list_entry.dart';
+import 'package:ayletna_restaurant_app/data/models/model_admin_catalog.dart';
+import 'package:ayletna_restaurant_app/data/models/model_blog_post.dart';
 import 'package:ayletna_restaurant_app/data/models/model_menu_category.dart';
 import 'package:ayletna_restaurant_app/data/models/model_menu_item.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
-import 'package:ayletna_restaurant_app/providers/admin_catalog_providers.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
+import 'package:ayletna_restaurant_app/providers/customer_home_providers.dart';
+import 'package:ayletna_restaurant_app/providers/customer_offers_providers.dart';
 import 'package:ayletna_restaurant_app/providers/menu_providers.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_cart_customization_sheet.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_cart_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_catalog_product_cards.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_category_card.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_search_bar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_catalog_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_hero.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_home_loading_skeleton.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_mock_food_image.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_search_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -45,6 +46,11 @@ class CustomerHomeScreen extends ConsumerWidget {
         onRefresh: () async {
           ref.invalidate(menuCategoriesProvider);
           ref.invalidate(menuItemsProvider);
+          ref.invalidate(homeOffersProvider);
+          ref.invalidate(homeCombosProvider);
+          ref.invalidate(homeDiscountItemsProvider);
+          ref.invalidate(homeSubscriptionsProvider);
+          ref.invalidate(homeLatestBlogPostsProvider);
         },
         child: categoriesAsync.when(
           loading: () => const WidgetsHomeLoadingSkeleton(),
@@ -88,11 +94,7 @@ class CustomerHomeScreen extends ConsumerWidget {
                           },
                         ),
                         SizedBox(height: CoreSpacing.xl(context)),
-                        _HomeFeatureSections(
-                          offers: ref.watch(visibleOfferEntriesProvider),
-                          combos: ref.watch(visibleComboEntriesProvider),
-                          isAr: isAr,
-                        ),
+                        _HomeCatalogSections(isAr: isAr),
                         SizedBox(height: CoreSpacing.xxl(context)),
                       ],
                     ),
@@ -116,187 +118,252 @@ class CustomerHomeScreen extends ConsumerWidget {
 
 }
 
-class _HomeFeatureSections extends StatelessWidget {
-  const _HomeFeatureSections({
-    required this.offers,
-    required this.combos,
-    required this.isAr,
-  });
+/// Offers, discounts, combos, subscriptions, and latest blogs — same catalog cards.
+class _HomeCatalogSections extends ConsumerWidget {
+  const _HomeCatalogSections({required this.isAr});
 
-  final List<ModelListEntry> offers;
-  final List<ModelListEntry> combos;
   final bool isAr;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    // Single secondary promo rail — prefer offers, else combos.
-    if (offers.isNotEmpty) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+    final offers = ref.watch(homeOffersProvider);
+    final discounts = ref.watch(homeDiscountItemsProvider);
+    final combos = ref.watch(homeCombosProvider);
+    final subscriptions = ref.watch(homeSubscriptionsProvider);
+    final blogs = ref.watch(homeLatestBlogPostsProvider);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (offers.isNotEmpty) ...[
           _SectionHeader(
             title: l10n.homeOffers,
             actionLabel: l10n.homeViewAll,
             onAction: () => context.push(AppRoutePaths.offers),
           ),
           SizedBox(height: CoreSpacing.md(context)),
-          _EntryRail(
-            entries: offers,
-            isAr: isAr,
-            icon: Icons.local_offer_outlined,
-            color: CoreColors.brandGold,
-            actionLabel: l10n.guestClaimOffer,
-            onTap: (_) => context.push(AppRoutePaths.offers),
-          ),
+          _OffersGrid(offers: offers, isAr: isAr),
+          SizedBox(height: CoreSpacing.xl(context)),
         ],
-      );
-    }
-    if (combos.isNotEmpty) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
+        if (discounts.isNotEmpty) ...[
+          _SectionHeader(
+            title: l10n.homeDiscounts,
+            actionLabel: l10n.homeViewAll,
+            onAction: () => context.push(AppRoutePaths.discounts),
+          ),
+          SizedBox(height: CoreSpacing.md(context)),
+          _DiscountsGrid(items: discounts, isAr: isAr),
+          SizedBox(height: CoreSpacing.xl(context)),
+        ],
+        if (combos.isNotEmpty) ...[
           _SectionHeader(
             title: l10n.homeCombos,
             actionLabel: l10n.homeViewAll,
-            onAction: () => context.push(AppRoutePaths.combo),
+            onAction: () => context.push(AppRoutePaths.combos),
           ),
           SizedBox(height: CoreSpacing.md(context)),
-          _EntryRail(
-            entries: combos,
-            isAr: isAr,
-            icon: Icons.room_service_outlined,
-            color: CoreColors.brandOrange,
-            actionLabel: l10n.homeViewAll,
-            onTap: (_) => context.push(AppRoutePaths.combo),
-          ),
+          _CombosGrid(combos: combos, isAr: isAr),
+          SizedBox(height: CoreSpacing.xl(context)),
         ],
-      );
-    }
-    return const SizedBox.shrink();
-  }
-}
-
-class _EntryRail extends StatelessWidget {
-  const _EntryRail({
-    required this.entries,
-    required this.isAr,
-    required this.icon,
-    required this.color,
-    required this.actionLabel,
-    required this.onTap,
-  });
-
-  final List<ModelListEntry> entries;
-  final bool isAr;
-  final IconData icon;
-  final Color color;
-  final String actionLabel;
-  final ValueChanged<ModelListEntry> onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        for (var index = 0; index < entries.take(2).length; index++) ...[
-          _FeatureEntryCard(
-            entry: entries[index],
-            isAr: isAr,
-            icon: icon,
-            color: color,
-            actionLabel: actionLabel,
-            onTap: () => onTap(entries[index]),
+        if (subscriptions.isNotEmpty) ...[
+          _SectionHeader(
+            title: l10n.homeSubscriptions,
+            actionLabel: l10n.homeViewAll,
+            onAction: () => context.push(AppRoutePaths.subscriptions),
           ),
-          if (index != entries.take(2).length - 1)
-            SizedBox(height: CoreSpacing.sm(context)),
+          SizedBox(height: CoreSpacing.md(context)),
+          _SubscriptionsGrid(meals: subscriptions, isAr: isAr),
+          SizedBox(height: CoreSpacing.xl(context)),
+        ],
+        if (blogs.isNotEmpty) ...[
+          _SectionHeader(
+            title: l10n.homeLatestBlogs,
+            actionLabel: l10n.homeViewAll,
+            onAction: () => context.push(AppRoutePaths.blog),
+          ),
+          SizedBox(height: CoreSpacing.md(context)),
+          _BlogsGrid(posts: blogs, isAr: isAr),
         ],
       ],
     );
   }
 }
 
-class _FeatureEntryCard extends StatelessWidget {
-  const _FeatureEntryCard({
-    required this.entry,
-    required this.isAr,
-    required this.icon,
-    required this.color,
-    required this.actionLabel,
-    required this.onTap,
-  });
+class _OffersGrid extends ConsumerWidget {
+  const _OffersGrid({required this.offers, required this.isAr});
 
-  final ModelListEntry entry;
+  final List<ModelCatalogOffer> offers;
   final bool isAr;
-  final IconData icon;
-  final Color color;
-  final String actionLabel;
-  final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final title = isAr ? entry.titleAr : entry.titleEn;
-    final subtitle = isAr ? entry.subtitleAr : entry.subtitleEn;
-
-    return WidgetsAppCard(
-      variant: WidgetsAppCardVariant.food,
-      padding: EdgeInsets.all(CoreSpacing.md(context)),
-      onTap: onTap,
-      child: Row(
-        children: [
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(CoreSpacing.md(context)),
-              child: Icon(icon, color: color),
-            ),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    return WidgetsFoodCatalogGrid(
+      children: [
+        for (var index = 0; index < offers.length; index++)
+          WidgetsOfferProductCard.fromOffer(
+            offer: offers[index],
+            isAr: isAr,
+            l10n: l10n,
+            index: index,
+            onTap:
+                () => context.push(AppRoutePaths.offerDetail(offers[index].id)),
+            onAction: () {
+              final offer = offers[index];
+              if (isComboOfferId(offer.id)) {
+                context.push(AppRoutePaths.offerDetail(offer.id));
+                return;
+              }
+              final ok = applyOfferToCart(ref, offer);
+              if (!ok) {
+                context.push(AppRoutePaths.offerDetail(offer.id));
+                return;
+              }
+              UtilityMockFeedback.showSuccess(context, l10n.guestClaimOffer);
+              context.go(AppRoutePaths.cart);
+            },
           ),
-          SizedBox(width: CoreSpacing.md(context)),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: CoreTypography.bodyMedium(
-                    context,
-                    scheme.onSurface,
-                  ).copyWith(fontWeight: FontWeight.w900),
-                ),
-                SizedBox(height: CoreSpacing.xs(context)),
-                Text(
-                  subtitle ?? actionLabel,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: CoreTypography.caption(
-                    context,
-                    scheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: CoreSpacing.sm(context)),
-          WidgetsIconButton(
-            onPressed: onTap,
-            icon: Icons.arrow_forward,
-            tooltip: actionLabel,
-            variant: WidgetsIconButtonVariant.tonal,
-            color: color,
-          ),
-        ],
-      ),
+      ],
     );
   }
 }
 
+class _DiscountsGrid extends ConsumerWidget {
+  const _DiscountsGrid({required this.items, required this.isAr});
 
+  final List<ModelMenuItem> items;
+  final bool isAr;
 
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    return WidgetsFoodCatalogGrid(
+      children: [
+        for (var index = 0; index < items.length; index++)
+          WidgetsDiscountProductCard(
+            item: items[index],
+            isAr: isAr,
+            l10n: l10n,
+            index: index,
+            onAction: () {
+              showWidgetsCartCustomizationSheet(
+                context: context,
+                item: items[index],
+              );
+            },
+            onTap: () {
+              ref.read(selectedMenuItemIdProvider.notifier).state =
+                  items[index].id;
+              context.push(AppRoutePaths.productDetail);
+            },
+          ),
+      ],
+    );
+  }
+}
+
+class _CombosGrid extends ConsumerWidget {
+  const _CombosGrid({required this.combos, required this.isAr});
+
+  final List<ModelCatalogCombo> combos;
+  final bool isAr;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    return WidgetsFoodCatalogGrid(
+      children: [
+        for (var index = 0; index < combos.length; index++)
+          WidgetsComboProductCard(
+            combo: combos[index],
+            isAr: isAr,
+            l10n: l10n,
+            index: index,
+            onTap:
+                () =>
+                    context.push(AppRoutePaths.comboDetail(combos[index].id)),
+            onAction: () {
+              addComboToCart(ref, combos[index]);
+              if (!context.mounted) return;
+              UtilityMockFeedback.showSuccess(context, l10n.actionAddToCart);
+            },
+          ),
+      ],
+    );
+  }
+}
+
+class _SubscriptionsGrid extends ConsumerWidget {
+  const _SubscriptionsGrid({required this.meals, required this.isAr});
+
+  final List<ModelSubscriptionMeal> meals;
+  final bool isAr;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    return WidgetsFoodCatalogGrid(
+      children: [
+        for (var index = 0; index < meals.length; index++)
+          WidgetsSubscriptionCard(
+            meal: meals[index],
+            isAr: isAr,
+            l10n: l10n,
+            index: index,
+            imageUrl:
+                meals[index].primaryImageUrl ??
+                ref
+                    .watch(menuItemByIdProvider(meals[index].menuItemId))
+                    ?.primaryImageUrl,
+            actionLabel: l10n.homeSubscriptionCta,
+            onTap:
+                () => context.push(
+                  AppRoutePaths.subscriptionDetail(meals[index].id),
+                ),
+            onAction: () {
+              final linked = ref.read(
+                menuItemByIdProvider(meals[index].menuItemId),
+              );
+              if (linked != null) {
+                showWidgetsCartCustomizationSheet(
+                  context: context,
+                  item: linked,
+                );
+                return;
+              }
+              context.push(AppRoutePaths.subscriptionDetail(meals[index].id));
+            },
+          ),
+      ],
+    );
+  }
+}
+
+class _BlogsGrid extends StatelessWidget {
+  const _BlogsGrid({required this.posts, required this.isAr});
+
+  final List<BlogPost> posts;
+  final bool isAr;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return WidgetsFoodCatalogGrid(
+      children: [
+        for (var index = 0; index < posts.length; index++)
+          WidgetsBlogProductCard(
+            post: posts[index],
+            isAr: isAr,
+            l10n: l10n,
+            index: index,
+            onTap: () => context.push(AppRoutePaths.blog),
+            onAction: () => context.push(AppRoutePaths.blog),
+          ),
+      ],
+    );
+  }
+}
 
 
 class _HomeFoodHero extends ConsumerWidget {

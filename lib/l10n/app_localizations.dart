@@ -6056,6 +6056,24 @@ abstract class AppLocalizations {
   /// **'From Ayletna'**
   String get homeStories;
 
+  /// No description provided for @homeLatestBlogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest blogs'**
+  String get homeLatestBlogs;
+
+  /// No description provided for @homeBlogBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Blog'**
+  String get homeBlogBadge;
+
+  /// No description provided for @homeBlogRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read'**
+  String get homeBlogRead;
+
   /// No description provided for @homeSubscriptionCta.
   ///
   /// In en, this message translates to:
@@ -8623,6 +8641,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t update profile image. Try again.'**
   String get profilePhotoPickFailed;
+
+  /// No description provided for @profileCameraPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera access'**
+  String get profileCameraPermissionTitle;
+
+  /// No description provided for @profileCameraPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Ayletna needs access to your camera so you can take a new profile photo.'**
+  String get profileCameraPermissionBody;
+
+  /// No description provided for @profileGalleryPermissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo library access'**
+  String get profileGalleryPermissionTitle;
+
+  /// No description provided for @profileGalleryPermissionBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Ayletna needs access to your photos so you can choose a profile image.'**
+  String get profileGalleryPermissionBody;
+
+  /// No description provided for @profilePermissionAllow.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow'**
+  String get profilePermissionAllow;
+
+  /// No description provided for @profilePermissionDeny.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t allow'**
+  String get profilePermissionDeny;
+
+  /// No description provided for @profileCameraPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera access is required to take a profile photo.'**
+  String get profileCameraPermissionDenied;
+
+  /// No description provided for @profileGalleryPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo library access is required to choose a profile image.'**
+  String get profileGalleryPermissionDenied;
 
   /// No description provided for @profileRemovePhoto.
   ///

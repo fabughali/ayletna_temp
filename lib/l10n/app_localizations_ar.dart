@@ -3138,6 +3138,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get homeStories => 'من عيلتنا';
 
   @override
+  String get homeLatestBlogs => 'أحدث المقالات';
+
+  @override
+  String get homeBlogBadge => 'مدونة';
+
+  @override
+  String get homeBlogRead => 'اقرأ';
+
+  @override
   String get homeSubscriptionCta => 'اشترك';
 
   @override
@@ -4478,6 +4487,34 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get profilePhotoPickFailed => 'تعذر تحديث صورة الملف. حاول مرة أخرى.';
+
+  @override
+  String get profileCameraPermissionTitle => 'الوصول إلى الكاميرا';
+
+  @override
+  String get profileCameraPermissionBody =>
+      'تحتاج عيلتنا إلى الوصول إلى الكاميرا لالتقاط صورة ملفك الشخصي.';
+
+  @override
+  String get profileGalleryPermissionTitle => 'الوصول إلى مكتبة الصور';
+
+  @override
+  String get profileGalleryPermissionBody =>
+      'تحتاج عيلتنا إلى الوصول إلى صورك لاختيار صورة الملف الشخصي.';
+
+  @override
+  String get profilePermissionAllow => 'السماح';
+
+  @override
+  String get profilePermissionDeny => 'عدم السماح';
+
+  @override
+  String get profileCameraPermissionDenied =>
+      'يلزم الوصول إلى الكاميرا لالتقاط صورة الملف الشخصي.';
+
+  @override
+  String get profileGalleryPermissionDenied =>
+      'يلزم الوصول إلى مكتبة الصور لاختيار صورة الملف الشخصي.';
 
   @override
   String get profileRemovePhoto => 'إزالة الصورة';

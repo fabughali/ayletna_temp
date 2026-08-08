@@ -3,6 +3,7 @@ import 'package:ayletna_restaurant_app/data/models/model_cart_customization_opti
 import 'package:ayletna_restaurant_app/data/models/model_admin_catalog.dart';
 import 'package:ayletna_restaurant_app/data/models/model_list_entry.dart';
 import 'package:ayletna_restaurant_app/data/models/model_menu_category.dart';
+import 'package:ayletna_restaurant_app/providers/marketing_campaign_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 int _catalogSeq = 5000;
@@ -30,6 +31,7 @@ class AdminCatalogState {
     this.subscriptionOverrides = const {},
     this.addedSubscriptions = const [],
     this.addedPortionOptions = const [],
+    this.productAddonAttachments = const {},
   });
 
   final Set<String> deletedCategoryIds;
@@ -40,6 +42,10 @@ class AdminCatalogState {
   final List<ModelMenuAddon> addedAddons;
   final Map<String, ModelRelatedProductLink> relatedLinks;
   final Set<String> deletedRelatedProductIds;
+
+  /// When a product id is present, only these add-ons are offered (with overrides).
+  /// Missing key = legacy fallback to full add-on library.
+  final Map<String, List<ModelProductAddonAttachment>> productAddonAttachments;
   final Set<String> deletedComboIds;
   final Map<String, ModelCatalogCombo> comboOverrides;
   final List<ModelCatalogCombo> addedCombos;
@@ -126,36 +132,41 @@ class AdminCatalogState {
   }
 
   List<ModelCatalogCombo> get resolvedCombos {
-    final seeded =
-        MockupCatalog.comboHighlights.map(
-          (entry) => ModelCatalogCombo(
-            id: entry.id,
-            titleAr: entry.titleAr,
-            titleEn: entry.titleEn,
-            subtitleAr: entry.subtitleAr,
-            subtitleEn: entry.subtitleEn,
-            priceJod: 18.5,
-            itemIds: const [],
-            discountPercent: 12,
-          ),
-        );
+    final seeded = MockupCatalog.comboHighlights.map(
+      (entry) => ModelCatalogCombo(
+        id: entry.id,
+        titleAr: entry.titleAr,
+        titleEn: entry.titleEn,
+        subtitleAr: entry.subtitleAr,
+        subtitleEn: entry.subtitleEn,
+        priceJod: 18.5,
+        itemIds: const [],
+        discountPercent: 12,
+        imageUrls: [MockupCatalog.promoImageUrlFor(entry.id)],
+        isAvailable: true,
+        rewardPoints: 80,
+        campaignId: 'camp-1',
+      ),
+    );
     return [
       ...seeded
           .where((c) => !deletedComboIds.contains(c.id))
-          .map((c) => comboOverrides[c.id] ?? c),
-      ...addedCombos,
+          .map((c) => _comboWithPromoImages(comboOverrides[c.id] ?? c)),
+      ...addedCombos.map(_comboWithPromoImages),
     ];
   }
 
   List<ModelCatalogDiscount> get resolvedDiscounts {
-    final seeded =
-        MockupCatalog.discountedMenuItemIds.map(
-          (id) => ModelCatalogDiscount(
-            id: 'disc_$id',
-            menuItemId: id,
-            percentOff: 10,
-          ),
-        );
+    final seeded = MockupCatalog.discountedMenuItemIds.map(
+      (id) => ModelCatalogDiscount(
+        id: 'disc_$id',
+        menuItemId: id,
+        percentOff: 10,
+        active: true,
+        rewardPoints: 40,
+        campaignId: 'camp-1',
+      ),
+    );
     return [
       ...seeded
           .where((d) => !deletedDiscountIds.contains(d.id))
@@ -165,37 +176,52 @@ class AdminCatalogState {
   }
 
   List<ModelCatalogOffer> get resolvedOffers {
-    final seeded =
-        MockupCatalog.offers.map(
-          (o) => ModelCatalogOffer(
-            id: o.id,
-            titleAr: o.titleAr,
-            titleEn: o.titleEn,
-            subtitleAr: o.subtitleAr,
-            subtitleEn: o.subtitleEn,
-          ),
-        );
+    final seeded = MockupCatalog.offers.asMap().entries.map(
+      (entry) => ModelCatalogOffer(
+        id: entry.value.id,
+        titleAr: entry.value.titleAr,
+        titleEn: entry.value.titleEn,
+        subtitleAr: entry.value.subtitleAr,
+        subtitleEn: entry.value.subtitleEn,
+        imageUrls: [MockupCatalog.promoImageUrlFor(entry.value.id)],
+        active: true,
+        discountPercent: entry.key == 0 ? 10 : null,
+        rewardPoints: entry.key == 0 ? 50 : 100,
+        campaignId: 'camp-1',
+      ),
+    );
     return [
       ...seeded
           .where((o) => !deletedOfferIds.contains(o.id))
-          .map((o) => offerOverrides[o.id] ?? o),
-      ...addedOffers,
-    ].where((o) => o.active).toList();
+          .map((o) => _offerWithPromoImages(offerOverrides[o.id] ?? o)),
+      ...addedOffers.map(_offerWithPromoImages),
+    ];
   }
 
   List<ModelSubscriptionMeal> get resolvedSubscriptions {
-    final seeded =
-        MockupCatalog.subscriptionMenuItemIds.map((id) {
-          final item = MockupCatalog.itemById(id);
-          return ModelSubscriptionMeal(
-            id: 'sub_$id',
-            menuItemId: id,
-            titleAr: item?.nameAr ?? id,
-            titleEn: item?.nameEn ?? id,
-            priceJod: item?.priceJod ?? 0,
-            billingPeriod: 'monthly',
-          );
-        });
+    final seeded = MockupCatalog.subscriptionMenuItemIds.map((id) {
+      final item = MockupCatalog.itemById(id);
+      final ids = MockupCatalog.subscriptionMenuItemIds;
+      return ModelSubscriptionMeal(
+        id: 'sub_$id',
+        menuItemId: id,
+        titleAr: item?.nameAr ?? id,
+        titleEn: item?.nameEn ?? id,
+        priceJod: ((item?.priceJod ?? 0) * 20).clamp(15, 99),
+        billingPeriod: 'monthly',
+        isAvailable: true,
+        campaignId: 'camp-1',
+        freeDelivery: true,
+        imageUrls: [MockupCatalog.promoImageUrlFor(id)],
+        dayPlans: [
+          for (var day = 1; day <= 30; day++)
+            ModelSubscriptionDayPlan(
+              dayIndex: day,
+              menuItemIds: [ids[(day - 1) % ids.length]],
+            ),
+        ],
+      );
+    });
     return [
       ...seeded
           .where((s) => !deletedSubscriptionIds.contains(s.id))
@@ -226,6 +252,7 @@ class AdminCatalogState {
     Map<String, ModelSubscriptionMeal>? subscriptionOverrides,
     List<ModelSubscriptionMeal>? addedSubscriptions,
     List<ModelCartCustomizationOption>? addedPortionOptions,
+    Map<String, List<ModelProductAddonAttachment>>? productAddonAttachments,
   }) {
     return AdminCatalogState(
       deletedCategoryIds: deletedCategoryIds ?? this.deletedCategoryIds,
@@ -237,6 +264,8 @@ class AdminCatalogState {
       relatedLinks: relatedLinks ?? this.relatedLinks,
       deletedRelatedProductIds:
           deletedRelatedProductIds ?? this.deletedRelatedProductIds,
+      productAddonAttachments:
+          productAddonAttachments ?? this.productAddonAttachments,
       deletedComboIds: deletedComboIds ?? this.deletedComboIds,
       comboOverrides: comboOverrides ?? this.comboOverrides,
       addedCombos: addedCombos ?? this.addedCombos,
@@ -340,8 +369,8 @@ class AdminCatalogNotifier extends StateNotifier<AdminCatalogState> {
     if (link.productId.trim().isEmpty) return false;
     state = state.copyWith(
       relatedLinks: {...state.relatedLinks, link.productId: link},
-      deletedRelatedProductIds:
-          {...state.deletedRelatedProductIds}..remove(link.productId),
+      deletedRelatedProductIds: {...state.deletedRelatedProductIds}
+        ..remove(link.productId),
     );
     return true;
   }
@@ -349,6 +378,19 @@ class AdminCatalogNotifier extends StateNotifier<AdminCatalogState> {
   void deleteRelatedLink(String productId) {
     state = state.copyWith(
       deletedRelatedProductIds: {...state.deletedRelatedProductIds, productId},
+    );
+  }
+
+  void setProductAddonAttachments(
+    String productId,
+    List<ModelProductAddonAttachment> attachments,
+  ) {
+    if (productId.trim().isEmpty) return;
+    state = state.copyWith(
+      productAddonAttachments: {
+        ...state.productAddonAttachments,
+        productId: List<ModelProductAddonAttachment>.unmodifiable(attachments),
+      },
     );
   }
 
@@ -411,7 +453,9 @@ class AdminCatalogNotifier extends StateNotifier<AdminCatalogState> {
       );
       return;
     }
-    state = state.copyWith(deletedDiscountIds: {...state.deletedDiscountIds, id});
+    state = state.copyWith(
+      deletedDiscountIds: {...state.deletedDiscountIds, id},
+    );
   }
 
   bool addOffer(ModelCatalogOffer offer) {
@@ -445,8 +489,23 @@ class AdminCatalogNotifier extends StateNotifier<AdminCatalogState> {
     state = state.copyWith(deletedOfferIds: {...state.deletedOfferIds, id});
   }
 
+  ModelCatalogOffer? offerById(String id) {
+    for (final offer in state.resolvedOffers) {
+      if (offer.id == id) return offer;
+    }
+    return null;
+  }
+
+  bool setOfferActive(String id, {required bool active}) {
+    final offer = offerById(id);
+    if (offer == null) return false;
+    return updateOffer(offer.copyWith(active: active));
+  }
+
   bool addSubscription(ModelSubscriptionMeal meal) {
-    if (meal.menuItemId.trim().isEmpty) return false;
+    if (meal.titleEn.trim().isEmpty && meal.titleAr.trim().isEmpty) {
+      return false;
+    }
     state = state.copyWith(
       addedSubscriptions: [...state.addedSubscriptions, meal],
     );
@@ -501,7 +560,19 @@ final visiblePortionOptionsProvider =
     });
 
 final visibleCombosProvider = Provider<List<ModelCatalogCombo>>((ref) {
-  return ref.watch(adminCatalogProvider).resolvedCombos;
+  final campaigns = ref.watch(marketingCampaignEventsProvider);
+  return ref
+      .watch(adminCatalogProvider)
+      .resolvedCombos
+      .where((c) => c.isAvailable)
+      .where(
+        (c) => campaignCoversCombo(
+          campaigns: campaigns,
+          comboId: c.id,
+          campaignId: c.campaignId,
+        ),
+      )
+      .toList();
 });
 
 final visibleComboEntriesProvider = Provider<List<ModelListEntry>>((ref) {
@@ -514,13 +585,26 @@ final visibleComboEntriesProvider = Provider<List<ModelListEntry>>((ref) {
           titleEn: c.titleEn,
           subtitleAr: c.subtitleAr,
           subtitleEn: c.subtitleEn,
+          imageUrl: c.primaryImageUrl,
         ),
       )
       .toList();
 });
 
 final visibleOffersProvider = Provider<List<ModelCatalogOffer>>((ref) {
-  return ref.watch(adminCatalogProvider).resolvedOffers;
+  final campaigns = ref.watch(marketingCampaignEventsProvider);
+  return ref
+      .watch(adminCatalogProvider)
+      .resolvedOffers
+      .where((o) => o.active)
+      .where(
+        (o) => campaignCoversOffer(
+          campaigns: campaigns,
+          offerId: o.id,
+          campaignId: o.campaignId,
+        ),
+      )
+      .toList();
 });
 
 final visibleOfferEntriesProvider = Provider<List<ModelListEntry>>((ref) {
@@ -533,21 +617,57 @@ final visibleOfferEntriesProvider = Provider<List<ModelListEntry>>((ref) {
           titleEn: o.titleEn,
           subtitleAr: o.subtitleAr,
           subtitleEn: o.subtitleEn,
+          imageUrl: o.primaryImageUrl,
         ),
       )
       .toList();
 });
 
+ModelCatalogCombo _comboWithPromoImages(ModelCatalogCombo combo) {
+  if (combo.imageUrls.isNotEmpty) return combo;
+  return combo.copyWith(imageUrls: [MockupCatalog.promoImageUrlFor(combo.id)]);
+}
+
+ModelCatalogOffer _offerWithPromoImages(ModelCatalogOffer offer) {
+  if (offer.imageUrls.isNotEmpty) return offer;
+  return offer.copyWith(imageUrls: [MockupCatalog.promoImageUrlFor(offer.id)]);
+}
+
 final visibleDiscountsProvider = Provider<List<ModelCatalogDiscount>>((ref) {
-  return ref.watch(adminCatalogProvider).resolvedDiscounts;
+  final campaigns = ref.watch(marketingCampaignEventsProvider);
+  return ref
+      .watch(adminCatalogProvider)
+      .resolvedDiscounts
+      .where(
+        (d) => campaignCoversDiscount(
+          campaigns: campaigns,
+          discountId: d.id,
+          campaignId: d.campaignId,
+        ),
+      )
+      .toList();
 });
 
 final visibleDiscountItemIdsProvider = Provider<List<String>>((ref) {
   return ref.watch(visibleDiscountsProvider).map((d) => d.menuItemId).toList();
 });
 
-final visibleSubscriptionsProvider = Provider<List<ModelSubscriptionMeal>>((ref) {
-  return ref.watch(adminCatalogProvider).resolvedSubscriptions;
+final visibleSubscriptionsProvider = Provider<List<ModelSubscriptionMeal>>((
+  ref,
+) {
+  final campaigns = ref.watch(marketingCampaignEventsProvider);
+  return ref
+      .watch(adminCatalogProvider)
+      .resolvedSubscriptions
+      .where((s) => s.isAvailable)
+      .where(
+        (s) => campaignCoversSubscription(
+          campaigns: campaigns,
+          subscriptionId: s.id,
+          campaignId: s.campaignId,
+        ),
+      )
+      .toList();
 });
 
 final visibleSubscriptionItemIdsProvider = Provider<List<String>>((ref) {
@@ -557,18 +677,89 @@ final visibleSubscriptionItemIdsProvider = Provider<List<String>>((ref) {
       .toList();
 });
 
+final catalogOfferByIdProvider = Provider.family<ModelCatalogOffer?, String>((
+  ref,
+  id,
+) {
+  for (final offer in ref.watch(visibleOffersProvider)) {
+    if (offer.id == id) return offer;
+  }
+  return null;
+});
+
+final catalogComboByIdProvider = Provider.family<ModelCatalogCombo?, String>((
+  ref,
+  id,
+) {
+  for (final combo in ref.watch(visibleCombosProvider)) {
+    if (combo.id == id) return combo;
+  }
+  return null;
+});
+
+final catalogSubscriptionByIdProvider =
+    Provider.family<ModelSubscriptionMeal?, String>((ref, id) {
+      for (final meal in ref.watch(visibleSubscriptionsProvider)) {
+        if (meal.id == id) return meal;
+      }
+      return null;
+    });
+
 final relatedProductsForItemProvider = Provider.family<List<String>, String>((
   ref,
   productId,
 ) {
   final link = ref.watch(adminCatalogProvider).relatedLinks[productId];
   if (link != null &&
-      !ref.watch(adminCatalogProvider).deletedRelatedProductIds.contains(
-        productId,
-      )) {
+      !ref
+          .watch(adminCatalogProvider)
+          .deletedRelatedProductIds
+          .contains(productId)) {
     return link.relatedProductIds;
   }
   return const [];
 });
 
+/// Resolved add-ons for a product (attachments + price overrides).
+/// Missing attachment map → full library at catalog prices (legacy).
+final productAddonsForItemProvider =
+    Provider.family<List<ResolvedProductAddon>, String>((ref, productId) {
+      final catalog = ref.watch(adminCatalogProvider);
+      final library = catalog.resolvedAddons;
+      final attachments = catalog.productAddonAttachments[productId];
+      if (attachments == null) {
+        return [
+          for (final addon in library)
+            ResolvedProductAddon(
+              addon: addon,
+              priceDeltaJod: addon.priceDeltaJod,
+            ),
+        ];
+      }
+      final byId = {for (final addon in library) addon.id: addon};
+      final resolved = <ResolvedProductAddon>[];
+      for (final attachment in attachments) {
+        final addon = byId[attachment.addonId];
+        if (addon == null) continue;
+        resolved.add(
+          ResolvedProductAddon(
+            addon: addon,
+            priceDeltaJod: attachment.resolvedPriceDelta(addon),
+          ),
+        );
+      }
+      return resolved;
+    });
+
 String nextCatalogId(String prefix) => '${prefix}_${_catalogSeq++}';
+
+/// Customer/admin display pair: catalog add-on + effective price delta.
+class ResolvedProductAddon {
+  const ResolvedProductAddon({
+    required this.addon,
+    required this.priceDeltaJod,
+  });
+
+  final ModelMenuAddon addon;
+  final double priceDeltaJod;
+}
