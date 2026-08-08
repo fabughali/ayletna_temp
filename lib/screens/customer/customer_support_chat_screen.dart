@@ -158,7 +158,9 @@ class _CustomerSupportChatScreenState
 
   String _formatTime(DateTime time, bool isAr) {
     final locale = isAr ? 'ar' : 'en';
-    return DateFormat.jm(locale).format(time);
+    final date = DateFormat('dd.MM.yyyy', locale).format(time);
+    final clock = DateFormat.jm(locale).format(time);
+    return '$date · $clock';
   }
 
   void _sendMessage(bool isAr, AppLocalizations l10n) {
