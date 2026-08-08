@@ -52,7 +52,7 @@ class _CustomerSupportChatScreenState
           tooltip: l10n.supportTicketsTitle,
         ),
       ],
-      bottomSheet: Material(
+      bottomNavigationBar: Material(
         color: scheme.surface,
         child: SafeArea(
           child: DecoratedBox(
@@ -65,7 +65,7 @@ class _CustomerSupportChatScreenState
             child: Padding(
               padding: EdgeInsets.fromLTRB(
                 CoreSpacing.md(context),
-                CoreSpacing.md(context),
+                CoreSpacing.sm(context),
                 CoreSpacing.md(context),
                 CoreSpacing.sm(context),
               ),
@@ -78,6 +78,7 @@ class _CustomerSupportChatScreenState
                       label: l10n.supportChatMessageLabel,
                       hintText: l10n.supportChatMessageHint,
                       prefixIcon: Icons.chat_bubble_outline,
+                      showLabel: false,
                       maxLines: 3,
                       textInputAction: TextInputAction.send,
                       onSubmitted: (_) => _sendMessage(isAr, l10n),
@@ -86,7 +87,7 @@ class _CustomerSupportChatScreenState
                   SizedBox(width: CoreSpacing.sm(context)),
                   WidgetsIconButton(
                     onPressed: () => _sendMessage(isAr, l10n),
-                    icon: Icons.send_outlined,
+                    icon: Icons.send_rounded,
                     tooltip: l10n.supportChatSend,
                     variant: WidgetsIconButtonVariant.filled,
                   ),
@@ -97,9 +98,6 @@ class _CustomerSupportChatScreenState
         ),
       ),
       child: ListView(
-        padding: EdgeInsetsDirectional.only(
-          bottom: CoreSpacing.xxl(context) * 3,
-        ),
         children: [
           SizedBox(height: CoreSpacing.md(context)),
           WidgetsPageHeader(
