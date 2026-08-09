@@ -85,10 +85,15 @@ class WidgetsAppTextField extends StatelessWidget {
         labelText: showLabel ? label : null,
         hintText: hintText,
         suffixIcon: suffixIcon,
-        // Default Material prefix icon is 48px and forces the field taller
-        // than [buttonMinHeight]; pin it to the control token.
+        // Default Material prefix/suffix icon slots are 48px and force the
+        // field taller than the sizer-scaled [buttonMinHeight] (~44 on phone).
+        // Pin both slots to the control token so username/password match.
         prefixIconConstraints:
             prefixIcon != null && matchControlHeight
+                ? BoxConstraints.tightFor(width: controlH, height: controlH)
+                : null,
+        suffixIconConstraints:
+            suffixIcon != null && matchControlHeight
                 ? BoxConstraints.tightFor(width: controlH, height: controlH)
                 : null,
       ),

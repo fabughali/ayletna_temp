@@ -157,7 +157,6 @@ class _LoginCard extends StatelessWidget {
             label: l10n.fieldPassword,
             hintText: l10n.loginPasswordHint,
             prefixIcon: Icons.lock_outline,
-            showLabel: false,
             controller: passwordController,
             suffixIcon: WidgetsIconButton(
               onPressed: onTogglePassword,
