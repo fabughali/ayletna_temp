@@ -95,13 +95,6 @@ class _ConfirmationBody extends ConsumerWidget {
           icon: Icons.soup_kitchen_outlined,
           fullWidth: true,
         ),
-        secondary: WidgetsAppButton(
-          label: l10n.orderConfirmedHome,
-          onPressed: () => context.go(AppRoutePaths.home),
-          icon: Icons.restaurant_menu_outlined,
-          variant: WidgetsAppButtonVariant.outline,
-          fullWidth: true,
-        ),
       ),
       child: ListView(
         padding: EdgeInsetsDirectional.only(
