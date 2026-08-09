@@ -124,12 +124,18 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
           SizedBox(height: CoreSpacing.lg(context)),
         ],
       ],
-      const _HelpCard(),
       SizedBox(height: CoreSpacing.xxl(context)),
     ];
 
     return WidgetsScaffoldPage(
       title: l10n.screenCart,
+      actions: [
+        WidgetsIconButton(
+          icon: Icons.support_agent_outlined,
+          tooltip: l10n.screenSupport,
+          onPressed: () => context.push(AppRoutePaths.support),
+        ),
+      ],
       bottomSheet:
           hasItems
               ? _StickyCartBar(
@@ -435,29 +441,6 @@ class _CartSuggestionsSection extends StatelessWidget {
               SizedBox(height: CoreSpacing.sm(context)),
           ],
         ],
-      ),
-    );
-  }
-}
-
-class _HelpCard extends StatelessWidget {
-  const _HelpCard();
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    return WidgetsInfoBanner(
-      title: l10n.cartHelpTitle,
-      message: l10n.cartChatWithUs,
-      tone: WidgetsInfoBannerTone.info,
-      icon: Icons.support_agent,
-      action: WidgetsAppButton(
-        label: l10n.screenSupport,
-        onPressed: () => context.push(AppRoutePaths.support),
-        icon: Icons.support_agent_outlined,
-        variant: WidgetsAppButtonVariant.secondary,
-        fullWidth: true,
       ),
     );
   }
