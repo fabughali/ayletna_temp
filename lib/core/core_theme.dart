@@ -130,9 +130,10 @@ abstract final class CoreTheme {
           vertical: ((extensions.buttonMinHeight -
                       UtilitySizer.bandForWidth(resolvedWidth, 20, 22, 24)) /
                   2)
-              .clamp(10.0, 18.0),
+              .clamp(0.0, 18.0),
         ),
         constraints: BoxConstraints(minHeight: extensions.buttonMinHeight),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(
             UtilitySizer.ofWidth(resolvedWidth, CoreSpacing.radiusInput),
