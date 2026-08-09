@@ -151,7 +151,8 @@ abstract final class CoreDecorations {
   static EdgeInsets inputContentPadding(BuildContext context) {
     final controlH = context.coreTheme.buttonMinHeight;
     final lineH = UtilitySizer.band(context, 20, 22, 24);
-    final vertical = ((controlH - lineH) / 2).clamp(10.0, 18.0);
+    // Never force a floor that exceeds the control token (keeps fields equal).
+    final vertical = ((controlH - lineH) / 2).clamp(0.0, 18.0);
     return EdgeInsets.symmetric(
       horizontal: UtilitySizer.of(context, 16),
       vertical: vertical,
@@ -169,15 +170,18 @@ abstract final class CoreDecorations {
     return InputDecoration(
       isDense: true,
       labelText: showLabel ? label : null,
+      // Always-float keeps empty and filled fields on the same outline height.
       floatingLabelBehavior:
           showLabel
-              ? FloatingLabelBehavior.auto
+              ? FloatingLabelBehavior.always
               : FloatingLabelBehavior.never,
       prefixIcon:
           icon != null
               ? Icon(icon, size: UtilitySizer.of(context, 22))
               : null,
       contentPadding: inputContentPadding(context),
+      // minHeight only here — single-line fields lock maxHeight in
+      // [WidgetsAppTextField] so multiline inputs can still grow.
       constraints:
           matchControlHeight
               ? BoxConstraints(minHeight: controlH)

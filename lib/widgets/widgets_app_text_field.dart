@@ -50,9 +50,10 @@ class WidgetsAppTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Keep the first row on the shared control height (matches icon buttons),
-    // even when [maxLines] allows the field to grow.
-    final matchControlHeight = maxLines == 1 || (minLines ?? 1) == 1;
+    // Single-line fields lock to the shared control height (matches buttons).
+    // Multiline keeps a min first-row height but may grow with content.
+    final isSingleLine = maxLines == 1;
+    final matchControlHeight = isSingleLine || (minLines ?? 1) == 1;
     final controlH = context.coreTheme.buttonMinHeight;
 
     return TextFormField(
@@ -85,9 +86,16 @@ class WidgetsAppTextField extends StatelessWidget {
         labelText: showLabel ? label : null,
         hintText: hintText,
         suffixIcon: suffixIcon,
+        // Lock single-line outline height so suffix icons (e.g. password
+        // visibility) cannot stretch one field above another.
+        constraints:
+            isSingleLine
+                ? BoxConstraints(minHeight: controlH, maxHeight: controlH)
+                : matchControlHeight
+                ? BoxConstraints(minHeight: controlH)
+                : null,
         // Default Material prefix/suffix icon slots are 48px and force the
         // field taller than the sizer-scaled [buttonMinHeight] (~44 on phone).
-        // Pin both slots to the control token so username/password match.
         prefixIconConstraints:
             prefixIcon != null && matchControlHeight
                 ? BoxConstraints.tightFor(width: controlH, height: controlH)

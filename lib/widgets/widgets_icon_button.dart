@@ -41,15 +41,20 @@ class WidgetsIconButton extends StatelessWidget {
         label: tooltip,
         child: SizedBox(
           width: size,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: size),
-            child: IconButton(
-              onPressed: onPressed,
-              tooltip: tooltip,
+          height: size,
+          child: IconButton(
+            onPressed: onPressed,
+            tooltip: tooltip,
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints.tightFor(width: size, height: size),
+            style: IconButton.styleFrom(
+              minimumSize: Size.square(size),
+              maximumSize: Size.square(size),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               padding: EdgeInsets.zero,
-              constraints: BoxConstraints(minWidth: size, minHeight: size),
-              icon: Icon(icon, size: iconSize, color: accent),
+              visualDensity: VisualDensity.compact,
             ),
+            icon: Icon(icon, size: iconSize, color: accent),
           ),
         ),
       );
