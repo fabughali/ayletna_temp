@@ -15,11 +15,23 @@ import 'package:ayletna_restaurant_app/widgets/widgets_info_banner.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_error_message.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_order_invoice_block.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_price_badge.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+List<Widget> _orderConfirmationActions(BuildContext context) {
+  final l10n = AppLocalizations.of(context)!;
+  return [
+    WidgetsIconButton(
+      icon: Icons.support_agent_outlined,
+      tooltip: l10n.screenSupport,
+      onPressed: () => context.push(AppRoutePaths.support),
+    ),
+  ];
+}
 
 /// PRD [OrderConfirmationScreen] redesigned as a warm kitchen handoff.
 class CustomerOrderConfirmationScreen extends ConsumerWidget {
@@ -34,11 +46,15 @@ class CustomerOrderConfirmationScreen extends ConsumerWidget {
       loading:
           () => WidgetsScaffoldPage(
             title: l10n.screenOrderConfirmation,
+            showLeading: false,
+            actions: _orderConfirmationActions(context),
             child: const Center(child: CircularProgressIndicator()),
           ),
       error:
           (error, _) => WidgetsScaffoldPage(
             title: l10n.screenOrderConfirmation,
+            showLeading: false,
+            actions: _orderConfirmationActions(context),
             child: Center(
               child: WidgetsErrorMessage(message: error.toString()),
             ),
@@ -71,6 +87,8 @@ class _ConfirmationBody extends ConsumerWidget {
 
     return WidgetsScaffoldPage(
       title: l10n.screenOrderConfirmation,
+      showLeading: false,
+      actions: _orderConfirmationActions(context),
       bottomSheet: WidgetsActionBar(
         primary: WidgetsAppButton(
           label: l10n.orderConfirmedTrack,

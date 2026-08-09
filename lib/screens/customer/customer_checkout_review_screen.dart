@@ -49,8 +49,9 @@ class CustomerCheckoutReviewScreen extends ConsumerWidget {
     final discount = promo.applied ? promo.discountJod : 0.0;
     final pointsBalance = ref.watch(loyaltyPointsProvider).balance;
     final pointsValue = checkoutPointsValueJod(pointsBalance);
-    final afterPromo = (costs.totalBeforeSavings - discount + draft.tipJod)
-        .clamp(0.0, double.infinity);
+    final afterPromo =
+        (costs.subtotal + costs.fulfillmentCharge - discount + draft.tipJod)
+            .clamp(0.0, double.infinity);
     final pointsDiscount =
         draft.useLoyaltyPoints
             ? double.parse(
@@ -72,6 +73,8 @@ class CustomerCheckoutReviewScreen extends ConsumerWidget {
 
     return WidgetsScaffoldPage(
       title: l10n.cartCheckoutStepReview,
+      showLeading: false,
+      actions: const [],
       bottomSheet: WidgetsActionBar(
         primary: WidgetsAppButton(
           label:
@@ -180,7 +183,6 @@ class CustomerCheckoutReviewScreen extends ConsumerWidget {
             subtotal: subtotal,
             fulfillment: draft.fulfillment,
             fulfillmentCharge: costs.fulfillmentCharge,
-            tax: costs.tax,
             tipJod: draft.tipJod,
             discount: discount,
             pointsDiscount: pointsDiscount,
@@ -223,8 +225,9 @@ class CustomerCheckoutReviewScreen extends ConsumerWidget {
           ref.read(cartPromoProvider).applied
               ? ref.read(cartPromoProvider).discountJod
               : 0.0;
-      final afterPromo = (costs.totalBeforeSavings - discount + draft.tipJod)
-          .clamp(0.0, double.infinity);
+      final afterPromo =
+          (costs.subtotal + costs.fulfillmentCharge - discount + draft.tipJod)
+              .clamp(0.0, double.infinity);
       final pointsDiscount = checkoutPointsValueJod(
         balance,
       ).clamp(0.0, afterPromo);
