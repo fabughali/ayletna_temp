@@ -2357,6 +2357,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentMethodWallet => 'Wallet';
 
   @override
+  String get paymentMethodCliq => 'CliQ';
+
+  @override
+  String get paymentMethodVisaMaster => 'Visa / Mastercard';
+
+  @override
+  String get paymentMethodCashOnDelivery => 'Cash on delivery';
+
+  @override
+  String get checkoutLoyaltyPointsDiscount => 'Loyalty points';
+
+  @override
+  String get checkoutUseLoyaltyPoints => 'Deduct loyalty points from total';
+
+  @override
+  String checkoutLoyaltyPointsAvailable(String points, String amount) {
+    return '$points points available (−$amount)';
+  }
+
+  @override
+  String get checkoutCashTenderedLabel => 'I will pay with';
+
+  @override
+  String get checkoutCashTenderedHint => 'e.g. 20.00';
+
+  @override
+  String checkoutCashChangeDue(String amount) {
+    return 'Change due: $amount';
+  }
+
+  @override
+  String get checkoutCashChangeNeedMore =>
+      'Amount must be at least the order total.';
+
+  @override
+  String get checkoutReviewSubtitle =>
+      'Confirm fulfillment, payment, and totals before placing your order.';
+
+  @override
   String get paymentErrorDemo => 'Payment declined. Please try another method.';
 
   @override
@@ -8106,7 +8145,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get supportChatTicketTitle => 'Live chat';
 
   @override
-  String get cartCompleteOrderTitle => 'Complete your order';
+  String get cartCompleteOrderTitle => 'Related products';
 
   @override
   String get cartPopularAddonsSubtitle => 'Popular add-ons for your basket';

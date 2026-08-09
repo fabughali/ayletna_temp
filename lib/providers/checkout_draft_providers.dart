@@ -2,7 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum CheckoutFulfillment { dineIn, takeaway, delivery, groupDelivery, plated }
 
-enum CheckoutPaymentType { cash, card, wallet }
+/// Customer stepped-checkout payment options.
+enum CheckoutPaymentType { cliq, card, cash }
+
+/// Mock redeem rate: 800 loyalty points = 1.00 JOD (matches 200 pts → 0.25 JOD).
+const double kCheckoutRedeemPointsPerJod = 800;
 
 class CheckoutDraft {
   const CheckoutDraft({
@@ -11,6 +15,8 @@ class CheckoutDraft {
     this.paymentType = CheckoutPaymentType.card,
     this.tipJod = 0,
     this.promoApplied = false,
+    this.useLoyaltyPoints = false,
+    this.cashTenderedJod,
   });
 
   final CheckoutFulfillment fulfillment;
@@ -18,6 +24,9 @@ class CheckoutDraft {
   final CheckoutPaymentType paymentType;
   final double tipJod;
   final bool promoApplied;
+  final bool useLoyaltyPoints;
+  /// Amount the customer will hand the courier (COD). Null when not set.
+  final double? cashTenderedJod;
 
   CheckoutDraft copyWith({
     CheckoutFulfillment? fulfillment,
@@ -25,6 +34,9 @@ class CheckoutDraft {
     CheckoutPaymentType? paymentType,
     double? tipJod,
     bool? promoApplied,
+    bool? useLoyaltyPoints,
+    double? cashTenderedJod,
+    bool clearCashTendered = false,
   }) {
     return CheckoutDraft(
       fulfillment: fulfillment ?? this.fulfillment,
@@ -32,6 +44,11 @@ class CheckoutDraft {
       paymentType: paymentType ?? this.paymentType,
       tipJod: tipJod ?? this.tipJod,
       promoApplied: promoApplied ?? this.promoApplied,
+      useLoyaltyPoints: useLoyaltyPoints ?? this.useLoyaltyPoints,
+      cashTenderedJod:
+          clearCashTendered
+              ? null
+              : (cashTenderedJod ?? this.cashTenderedJod),
     );
   }
 }
@@ -48,7 +65,10 @@ class CheckoutDraftNotifier extends StateNotifier<CheckoutDraft> {
   }
 
   void setPaymentType(CheckoutPaymentType value) {
-    state = state.copyWith(paymentType: value);
+    state = state.copyWith(
+      paymentType: value,
+      clearCashTendered: value != CheckoutPaymentType.cash,
+    );
   }
 
   void setTipJod(double value) {
@@ -57,6 +77,17 @@ class CheckoutDraftNotifier extends StateNotifier<CheckoutDraft> {
 
   void setPromoApplied(bool value) {
     state = state.copyWith(promoApplied: value);
+  }
+
+  void setUseLoyaltyPoints(bool value) {
+    state = state.copyWith(useLoyaltyPoints: value);
+  }
+
+  void setCashTenderedJod(double? value) {
+    state = state.copyWith(
+      cashTenderedJod: value,
+      clearCashTendered: value == null,
+    );
   }
 
   void reset() {
@@ -68,3 +99,11 @@ final checkoutDraftProvider =
     StateNotifierProvider<CheckoutDraftNotifier, CheckoutDraft>(
       (ref) => CheckoutDraftNotifier(),
     );
+
+/// JOD value of [points] at the checkout redeem rate.
+double checkoutPointsValueJod(int points) {
+  if (points <= 0) return 0;
+  return double.parse(
+    (points / kCheckoutRedeemPointsPerJod).toStringAsFixed(2),
+  );
+}

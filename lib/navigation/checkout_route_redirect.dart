@@ -16,6 +16,7 @@ String? redirectCollapsedCheckoutRoute(String path) {
     AppRoutePaths.checkout,
     AppRoutePaths.tip,
     AppRoutePaths.payment,
+    AppRoutePaths.checkoutReview,
   };
 
   if (collapsedPaths.contains(path)) {

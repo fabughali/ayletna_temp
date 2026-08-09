@@ -6,19 +6,14 @@ import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/app_providers.dart';
 import 'package:ayletna_restaurant_app/providers/menu_providers.dart';
-import 'package:ayletna_restaurant_app/providers/cart_checkout_fees_providers.dart';
-import 'package:ayletna_restaurant_app/providers/cart_promo_providers.dart';
 import 'package:ayletna_restaurant_app/providers/cart_providers.dart';
-import 'package:ayletna_restaurant_app/providers/checkout_draft_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_cart_customization_sheet.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_checkout_step_strip.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_customization_sheet.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_financial_summary.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_media_panel.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_tag.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
@@ -33,7 +28,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// PRD CartScreen redesigned as a warm basket review.
+/// PRD CartScreen — basket items + related products (step 1).
 class CustomerCartScreen extends ConsumerStatefulWidget {
   const CustomerCartScreen({super.key});
 
@@ -42,20 +37,6 @@ class CustomerCartScreen extends ConsumerStatefulWidget {
 }
 
 class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
-  final _promoController = TextEditingController();
-  _CartFulfillment _fulfillment = _CartFulfillment.delivery;
-  bool _showMoreFulfillment = false;
-
-  final _itemsSectionKey = GlobalKey();
-  final _fulfillmentSectionKey = GlobalKey();
-  final _summarySectionKey = GlobalKey();
-
-  @override
-  void dispose() {
-    _promoController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -75,19 +56,7 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
       0,
       (sum, item) => sum + item.unitPriceJod * item.quantity,
     );
-    final fees = ref.watch(cartCheckoutFeesProvider);
-    final summaryCosts = _CartSummaryCosts.calculate(
-      subtotal: subtotal,
-      fulfillment: _fulfillment,
-      fees: fees,
-    );
-    final totalBeforeSavings = summaryCosts.totalBeforeSavings;
-    final promo = ref.watch(cartPromoProvider);
-    final discount = promo.applied ? promo.discountJod : 0.0;
-    final summaryTotal = totalBeforeSavings - discount;
     final hasItems = visibleItems.isNotEmpty;
-    final checkoutActiveStep = !hasItems ? 0 : 1;
-    final checkoutCompletedThrough = !hasItems ? -1 : 0;
 
     final listChildren = <Widget>[
       SizedBox(height: CoreSpacing.md(context)),
@@ -105,12 +74,11 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
         SizedBox(height: CoreSpacing.lg(context)),
       ] else ...[
         WidgetsCheckoutStepStrip(
-          activeStep: checkoutActiveStep,
-          completedThrough: checkoutCompletedThrough,
-          onStepTapped: _scrollToCheckoutStep,
+          activeStep: 0,
+          completedThrough: -1,
+          onStepTapped: (step) => _jumpToCheckoutStep(context, step),
         ),
         SizedBox(height: CoreSpacing.lg(context)),
-        KeyedSubtree(key: _itemsSectionKey, child: const SizedBox.shrink()),
         for (var index = 0; index < visibleItems.length; index++) ...[
           _CartItemCard(
             item: visibleItems[index],
@@ -140,40 +108,6 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
           l10n: l10n,
         ),
         SizedBox(height: CoreSpacing.lg(context)),
-        KeyedSubtree(
-          key: _fulfillmentSectionKey,
-          child: _FulfillmentSection(
-            selected: _fulfillment,
-            showMore: _showMoreFulfillment,
-            onToggleMore:
-                () => setState(
-                  () => _showMoreFulfillment = !_showMoreFulfillment,
-                ),
-            onSelected: _selectFulfillment,
-            onTerms: () => context.push(AppRoutePaths.terms),
-          ),
-        ),
-        SizedBox(height: CoreSpacing.lg(context)),
-        _PromoCodeCard(
-          controller: _promoController,
-          promoApplied: promo.applied,
-          savingsJod: discount,
-          onApply: () {
-            final ok = ref.read(cartPromoProvider.notifier).applyCode(
-              _promoController.text,
-              totalBeforeSavings,
-            );
-            if (!ok) {
-              UtilityMockFeedback.showWarning(
-                context,
-                l10n.cartInvalidPromoCode,
-              );
-              return;
-            }
-            UtilityMockFeedback.showSuccess(context, l10n.cartPromoCode);
-          },
-        ),
-        SizedBox(height: CoreSpacing.lg(context)),
         if (isGuest) ...[
           WidgetsInfoBanner(
             title: l10n.guestSignInToOrder,
@@ -189,19 +123,6 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
           ),
           SizedBox(height: CoreSpacing.lg(context)),
         ],
-        KeyedSubtree(
-          key: _summarySectionKey,
-          child: _OrderSummaryCard(
-            subtotal: subtotal,
-            fulfillment: _fulfillment,
-            fulfillmentCharge: summaryCosts.fulfillmentCharge,
-            tax: summaryCosts.tax,
-            tipJod: 0,
-            discount: discount,
-            total: summaryTotal,
-          ),
-        ),
-        SizedBox(height: CoreSpacing.lg(context)),
       ],
       const _HelpCard(),
       SizedBox(height: CoreSpacing.xxl(context)),
@@ -213,7 +134,7 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
           hasItems
               ? _StickyCartBar(
                 totalLabel: UtilityFormatJod.format(
-                  summaryTotal,
+                  subtotal,
                   suffix: l10n.currencyJod,
                 ),
                 proceedLabel:
@@ -223,13 +144,12 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
                 onProceed:
                     isGuest
                         ? () => context.push(AppRoutePaths.login)
-                        : () => _onProceedCheckout(),
+                        : () => context.push(AppRoutePaths.checkout),
               )
               : null,
       child: WidgetsRefreshList(
         onRefresh: () async {
           ref.invalidate(cartProvider);
-          ref.invalidate(cartPromoProvider);
           if (context.mounted) {
             UtilityMockFeedback.showInfo(context, l10n.screenCart);
           }
@@ -242,52 +162,17 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
     );
   }
 
-  void _syncCheckoutDraft() {
-    final draft = ref.read(checkoutDraftProvider.notifier);
-    draft.setFulfillment(_toCheckoutFulfillment(_fulfillment));
-    draft.setPromoApplied(ref.read(cartPromoProvider).applied);
-  }
-
-  Future<void> _onProceedCheckout() async {
-    _syncCheckoutDraft();
-    if (!mounted) return;
-    context.push(AppRoutePaths.checkout);
-  }
-
-  CheckoutFulfillment _toCheckoutFulfillment(_CartFulfillment value) {
-    return switch (value) {
-      _CartFulfillment.dineIn => CheckoutFulfillment.dineIn,
-      _CartFulfillment.takeaway => CheckoutFulfillment.takeaway,
-      _CartFulfillment.delivery => CheckoutFulfillment.delivery,
-      _CartFulfillment.groupDelivery => CheckoutFulfillment.groupDelivery,
-      _CartFulfillment.plated => CheckoutFulfillment.plated,
-    };
-  }
-
-  void _selectFulfillment(_CartFulfillment value) {
-    setState(() {
-      _fulfillment = value;
-      if (value == _CartFulfillment.groupDelivery ||
-          value == _CartFulfillment.plated) {
-        _showMoreFulfillment = true;
-      }
-    });
-  }
-
-  void _scrollToCheckoutStep(int step) {
-    final key = switch (step) {
-      0 => _itemsSectionKey,
-      1 => _fulfillmentSectionKey,
-      _ => _summarySectionKey,
-    };
-    final target = key.currentContext;
-    if (target == null) return;
-    Scrollable.ensureVisible(
-      target,
-      duration: const Duration(milliseconds: 350),
-      curve: Curves.easeInOut,
-      alignment: 0.08,
-    );
+  void _jumpToCheckoutStep(BuildContext context, int step) {
+    switch (step) {
+      case 0:
+        break;
+      case 1:
+        context.push(AppRoutePaths.checkout);
+      case 2:
+        context.push(AppRoutePaths.payment);
+      case 3:
+        context.push(AppRoutePaths.checkoutReview);
+    }
   }
 
   Future<void> _clearCart(BuildContext context) async {
@@ -324,45 +209,6 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
 
     ref.read(cartProvider.notifier).removeItem(item.line.cartKey);
     UtilityMockFeedback.showInfo(context, l10n.actionRemove);
-  }
-}
-
-enum _CartFulfillment { dineIn, takeaway, delivery, groupDelivery, plated }
-
-class _CartSummaryCosts {
-  const _CartSummaryCosts({
-    required this.subtotal,
-    required this.fulfillmentCharge,
-    required this.tax,
-  });
-
-  final double subtotal;
-  final double fulfillmentCharge;
-  final double tax;
-
-  double get totalBeforeSavings => subtotal + fulfillmentCharge + tax;
-
-  static _CartSummaryCosts calculate({
-    required double subtotal,
-    required _CartFulfillment fulfillment,
-    required CartCheckoutFees fees,
-  }) {
-    final fulfillmentCharge = switch (fulfillment) {
-      _CartFulfillment.dineIn => subtotal * fees.dineInServiceRate,
-      _CartFulfillment.takeaway => fees.takeawayPackagingFeeJod,
-      _CartFulfillment.delivery => fees.deliveryFeeJod,
-      _CartFulfillment.groupDelivery => fees.groupDeliveryFeeJod,
-      _CartFulfillment.plated => fees.platedDepositJod,
-    };
-    final taxableFulfillmentCharge =
-        fulfillment == _CartFulfillment.plated ? 0.0 : fulfillmentCharge;
-    return _CartSummaryCosts(
-      subtotal: subtotal,
-      fulfillmentCharge: fulfillmentCharge,
-      tax: fees.taxIncludedInPrices
-          ? 0
-          : (subtotal + taxableFulfillmentCharge) * fees.taxRate,
-    );
   }
 }
 
@@ -504,349 +350,6 @@ class _CartItemCard extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class _PromoCodeCard extends StatelessWidget {
-  const _PromoCodeCard({
-    required this.controller,
-    required this.promoApplied,
-    required this.savingsJod,
-    required this.onApply,
-  });
-
-  final TextEditingController controller;
-  final bool promoApplied;
-  final double savingsJod;
-  final VoidCallback onApply;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
-
-    return WidgetsAppCard(
-      variant: WidgetsAppCardVariant.form,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            l10n.cartPromoCode,
-            style: CoreTypography.titleMedium(
-              context,
-              scheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-          SizedBox(height: CoreSpacing.xs(context)),
-          Text(
-            promoApplied
-                ? UtilityFormatJod.format(savingsJod, suffix: l10n.currencyJod)
-                : l10n.cartPromoHint,
-            style: CoreTypography.caption(context, scheme.onSurfaceVariant),
-          ),
-          SizedBox(height: CoreSpacing.md(context)),
-          Row(
-            children: [
-              Expanded(
-                child: WidgetsAppTextField(
-                  controller: controller,
-                  label: l10n.cartPromoCode,
-                  hintText: l10n.cartPromoHint,
-                  readOnly: promoApplied,
-                ),
-              ),
-              SizedBox(width: CoreSpacing.sm(context)),
-              WidgetsAppButton(
-                label: promoApplied ? l10n.actionConfirm : l10n.actionApply,
-                onPressed: promoApplied ? null : onApply,
-                icon:
-                    promoApplied
-                        ? Icons.check_circle_outline
-                        : Icons.local_offer_outlined,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FulfillmentSection extends StatelessWidget {
-  const _FulfillmentSection({
-    required this.selected,
-    required this.showMore,
-    required this.onToggleMore,
-    required this.onSelected,
-    required this.onTerms,
-  });
-
-  final _CartFulfillment selected;
-  final bool showMore;
-  final VoidCallback onToggleMore;
-  final ValueChanged<_CartFulfillment> onSelected;
-  final VoidCallback onTerms;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
-
-    return WidgetsAppCard(
-      variant: WidgetsAppCardVariant.food,
-      padding: EdgeInsets.all(CoreSpacing.lg(context)),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            l10n.cartFulfillmentTitle,
-            style: CoreTypography.titleMedium(
-              context,
-              scheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-          SizedBox(height: CoreSpacing.xs(context)),
-          Text(
-            l10n.cartFulfillmentSubtitle,
-            style: CoreTypography.caption(context, scheme.onSurfaceVariant),
-          ),
-          SizedBox(height: CoreSpacing.md(context)),
-          _FulfillmentOption(
-            selected: selected == _CartFulfillment.dineIn,
-            title: l10n.orderTypeDineIn,
-            body: l10n.orderTypeDineInBody,
-            icon: Icons.table_restaurant_outlined,
-            color: CoreColors.orderTypeDineIn,
-            onTap: () => onSelected(_CartFulfillment.dineIn),
-          ),
-          SizedBox(height: CoreSpacing.sm(context)),
-          _FulfillmentOption(
-            selected: selected == _CartFulfillment.takeaway,
-            title: l10n.orderTypeTakeaway,
-            body: l10n.orderTypeTakeawayBody,
-            icon: Icons.takeout_dining_outlined,
-            color: CoreColors.orderTypeTakeaway,
-            onTap: () => onSelected(_CartFulfillment.takeaway),
-          ),
-          SizedBox(height: CoreSpacing.sm(context)),
-          _FulfillmentOption(
-            selected: selected == _CartFulfillment.delivery,
-            title: l10n.orderTypeDeliveryTitle,
-            body: l10n.orderTypeDeliveryBody,
-            icon: Icons.delivery_dining_outlined,
-            color: CoreColors.orderTypeDelivery,
-            onTap: () => onSelected(_CartFulfillment.delivery),
-          ),
-          if (showMore) ...[
-            SizedBox(height: CoreSpacing.sm(context)),
-            _FulfillmentOption(
-              selected: selected == _CartFulfillment.groupDelivery,
-              title: l10n.cartGroupDeliveryTitle,
-              body: l10n.cartGroupDeliveryBody,
-              icon: Icons.groups_2_outlined,
-              color: CoreColors.brandOlive,
-              onTap: () => onSelected(_CartFulfillment.groupDelivery),
-            ),
-            SizedBox(height: CoreSpacing.sm(context)),
-            _FulfillmentOption(
-              selected: selected == _CartFulfillment.plated,
-              title: l10n.orderTypePlatedTitle,
-              body: l10n.orderTypePlatedBody,
-              icon: Icons.flatware_outlined,
-              color: CoreColors.orderTypePlated,
-              onTap: () => onSelected(_CartFulfillment.plated),
-            ),
-          ],
-          SizedBox(height: CoreSpacing.sm(context)),
-          TextButton(
-            onPressed: onToggleMore,
-            child: Text(
-              showMore
-                  ? l10n.cartHideFulfillmentOptions
-                  : l10n.cartMoreFulfillmentOptions,
-            ),
-          ),
-          Center(
-            child: TextButton(
-              onPressed: onTerms,
-              child: Text(l10n.cartTermsAndConditions),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FulfillmentOption extends StatelessWidget {
-  const _FulfillmentOption({
-    required this.selected,
-    required this.title,
-    required this.body,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  final bool selected;
-  final String title;
-  final String body;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return WidgetsAppCard(
-      variant:
-          selected ? WidgetsAppCardVariant.food : WidgetsAppCardVariant.form,
-      padding: EdgeInsets.all(CoreSpacing.md(context)),
-      onTap: onTap,
-      child: Row(
-        children: [
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: selected ? 0.18 : 0.11),
-              shape: BoxShape.circle,
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(CoreSpacing.sm(context)),
-              child: Icon(icon, color: color),
-            ),
-          ),
-          SizedBox(width: CoreSpacing.md(context)),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: CoreTypography.bodyMedium(
-                    context,
-                    scheme.onSurface,
-                  ).copyWith(fontWeight: FontWeight.w900),
-                ),
-                SizedBox(height: CoreSpacing.xs(context)),
-                Text(
-                  body,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: CoreTypography.caption(
-                    context,
-                    scheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: CoreSpacing.sm(context)),
-          Icon(
-            selected ? Icons.radio_button_checked : Icons.radio_button_off,
-            color: selected ? color : scheme.onSurfaceVariant,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _OrderSummaryCard extends StatelessWidget {
-  const _OrderSummaryCard({
-    required this.subtotal,
-    required this.fulfillment,
-    required this.fulfillmentCharge,
-    required this.tax,
-    required this.tipJod,
-    required this.discount,
-    required this.total,
-  });
-
-  final double subtotal;
-  final _CartFulfillment fulfillment;
-  final double fulfillmentCharge;
-  final double tax;
-  final double tipJod;
-  final double discount;
-  final double total;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final isPlated = fulfillment == _CartFulfillment.plated;
-    final jod = l10n.currencyJod;
-
-    final lines = <WidgetsFinancialSummaryLine>[
-      WidgetsFinancialSummaryLine(
-        label: l10n.checkoutFood,
-        value: UtilityFormatJod.format(subtotal, suffix: jod),
-        accentColor: CoreColors.semanticRevenue,
-      ),
-      WidgetsFinancialSummaryLine(
-        label: isPlated
-            ? l10n.checkoutDeposit
-            : _fulfillmentChargeLabel(l10n, fulfillment),
-        value:
-            fulfillmentCharge == 0
-                ? l10n.cartFree
-                : UtilityFormatJod.format(fulfillmentCharge, suffix: jod),
-        accentColor: isPlated ? CoreColors.semanticDeposit : null,
-      ),
-      WidgetsFinancialSummaryLine(
-        label: l10n.cartEstimatedTax,
-        value: UtilityFormatJod.format(tax, suffix: jod),
-      ),
-      WidgetsFinancialSummaryLine(
-        label: l10n.checkoutTip,
-        value:
-            tipJod == 0
-                ? l10n.cartNoTip
-                : UtilityFormatJod.format(tipJod, suffix: jod),
-        accentColor: CoreColors.semanticTip,
-      ),
-      if (discount > 0)
-        WidgetsFinancialSummaryLine(
-          label: l10n.cartPromoCode,
-          value: '-${UtilityFormatJod.format(discount, suffix: jod)}',
-        ),
-    ];
-
-    return WidgetsFinancialSummary(
-      title: l10n.cartOrderSummary,
-      subtitle: '${l10n.cartFulfillment}: ${_fulfillmentTitle(l10n, fulfillment)}',
-      lines: lines,
-      totalLabel: l10n.cartTotal,
-      totalValue: UtilityFormatJod.format(total, suffix: jod),
-      totalColor: CoreColors.brandGold,
-      accentColor: CoreColors.semanticRevenue,
-    );
-  }
-
-  String _fulfillmentTitle(
-    AppLocalizations l10n,
-    _CartFulfillment fulfillment,
-  ) {
-    return switch (fulfillment) {
-      _CartFulfillment.dineIn => l10n.orderTypeDineIn,
-      _CartFulfillment.takeaway => l10n.orderTypeTakeaway,
-      _CartFulfillment.delivery => l10n.orderTypeDeliveryTitle,
-      _CartFulfillment.groupDelivery => l10n.cartGroupDeliveryTitle,
-      _CartFulfillment.plated => l10n.orderTypePlatedTitle,
-    };
-  }
-
-  String _fulfillmentChargeLabel(
-    AppLocalizations l10n,
-    _CartFulfillment fulfillment,
-  ) {
-    return switch (fulfillment) {
-      _CartFulfillment.dineIn => l10n.cartDineInServiceFee,
-      _CartFulfillment.takeaway => l10n.cartTakeawayPackagingFee,
-      _CartFulfillment.delivery => l10n.cartDeliveryFee,
-      _CartFulfillment.groupDelivery => l10n.cartGroupDeliveryFee,
-      _CartFulfillment.plated => l10n.cartPlatedDeposit,
-    };
   }
 }
 

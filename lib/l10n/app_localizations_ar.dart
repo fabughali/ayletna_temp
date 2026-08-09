@@ -2348,6 +2348,45 @@ class AppLocalizationsAr extends AppLocalizations {
   String get paymentMethodWallet => 'المحفظة';
 
   @override
+  String get paymentMethodCliq => 'كليك';
+
+  @override
+  String get paymentMethodVisaMaster => 'فيزا / ماستركارد';
+
+  @override
+  String get paymentMethodCashOnDelivery => 'الدفع نقداً عند الاستلام';
+
+  @override
+  String get checkoutLoyaltyPointsDiscount => 'نقاط الولاء';
+
+  @override
+  String get checkoutUseLoyaltyPoints => 'خصم نقاط الولاء من الإجمالي';
+
+  @override
+  String checkoutLoyaltyPointsAvailable(String points, String amount) {
+    return '$points نقطة متاحة (−$amount)';
+  }
+
+  @override
+  String get checkoutCashTenderedLabel => 'سأدفع بمبلغ';
+
+  @override
+  String get checkoutCashTenderedHint => 'مثال 20.00';
+
+  @override
+  String checkoutCashChangeDue(String amount) {
+    return 'الباقي للعميل: $amount';
+  }
+
+  @override
+  String get checkoutCashChangeNeedMore =>
+      'يجب أن يكون المبلغ على الأقل إجمالي الطلب.';
+
+  @override
+  String get checkoutReviewSubtitle =>
+      'راجع طريقة الاستلام والدفع والإجمالي قبل تأكيد الطلب.';
+
+  @override
   String get paymentErrorDemo => 'تم رفض الدفع. جرّب طريقة أخرى.';
 
   @override
@@ -8047,7 +8086,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportChatTicketTitle => 'دردشة مباشرة';
 
   @override
-  String get cartCompleteOrderTitle => 'أكمل طلبك';
+  String get cartCompleteOrderTitle => 'منتجات ذات صلة';
 
   @override
   String get cartPopularAddonsSubtitle => 'إضافات شائعة مع طلبك';

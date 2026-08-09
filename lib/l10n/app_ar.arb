@@ -923,6 +923,28 @@
   "paymentMethodCash": "نقداً",
   "paymentMethodCard": "بطاقة / Visa",
   "paymentMethodWallet": "المحفظة",
+  "paymentMethodCliq": "كليك",
+  "paymentMethodVisaMaster": "فيزا / ماستركارد",
+  "paymentMethodCashOnDelivery": "الدفع نقداً عند الاستلام",
+  "checkoutLoyaltyPointsDiscount": "نقاط الولاء",
+  "checkoutUseLoyaltyPoints": "خصم نقاط الولاء من الإجمالي",
+  "checkoutLoyaltyPointsAvailable": "{points} نقطة متاحة (−{amount})",
+  "@checkoutLoyaltyPointsAvailable": {
+    "placeholders": {
+      "points": { "type": "String" },
+      "amount": { "type": "String" }
+    }
+  },
+  "checkoutCashTenderedLabel": "سأدفع بمبلغ",
+  "checkoutCashTenderedHint": "مثال 20.00",
+  "checkoutCashChangeDue": "الباقي للعميل: {amount}",
+  "@checkoutCashChangeDue": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "checkoutCashChangeNeedMore": "يجب أن يكون المبلغ على الأقل إجمالي الطلب.",
+  "checkoutReviewSubtitle": "راجع طريقة الاستلام والدفع والإجمالي قبل تأكيد الطلب.",
   "paymentErrorDemo": "تم رفض الدفع. جرّب طريقة أخرى.",
   "cashierCurrentOrder": "الطلب الحالي",
   "cashierWalkIn": "داخل الصالة",
@@ -3038,7 +3060,7 @@
   },
   "supportChatTicketFromLiveChat": "طلب مساعدة من الدردشة المباشرة",
   "supportChatTicketTitle": "دردشة مباشرة",
-  "cartCompleteOrderTitle": "أكمل طلبك",
+  "cartCompleteOrderTitle": "منتجات ذات صلة",
   "cartPopularAddonsSubtitle": "إضافات شائعة مع طلبك",
   "cashierConfirmLogTip": "تسجيل هذا المبلغ كبقشيش في وردية اليوم؟",
   "checkoutPaymentSummaryTitle": "ملخص الدفع",
