@@ -169,6 +169,11 @@ class WidgetsAppDrawer extends ConsumerWidget {
           ],
         ),
         _DrawerDestination(
+          route: AppRoutePaths.favorites,
+          icon: Icons.favorite_border,
+          label: l10n.screenFavorites,
+        ),
+        _DrawerDestination(
           route: AppRoutePaths.blog,
           icon: Icons.article_outlined,
           label: l10n.drawerBlog,
@@ -246,6 +251,11 @@ class WidgetsAppDrawer extends ConsumerWidget {
             AppRoutePaths.category,
             AppRoutePaths.productDetail,
           ],
+        ),
+        _DrawerDestination(
+          route: AppRoutePaths.favorites,
+          icon: Icons.favorite_border,
+          label: l10n.screenFavorites,
         ),
         _DrawerDestination(
           route: AppRoutePaths.cart,

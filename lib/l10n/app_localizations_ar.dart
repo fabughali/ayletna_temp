@@ -39,6 +39,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get favoritesRemoved => 'أُزيل من المفضلة';
 
   @override
+  String get favoritesEmptyTitle => 'لا مفضّلات بعد';
+
+  @override
+  String get favoritesEmptySubtitle =>
+      'اضغط القلب على أي طبق لحفظه هنا وإعادة طلبه بسرعة.';
+
+  @override
+  String get favoritesClearAll => 'مسح كل المفضّلات';
+
+  @override
   String get actionAddToCart => 'أضف إلى السلة';
 
   @override
@@ -1247,6 +1257,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get screenMenu => 'المنيو';
+
+  @override
+  String get screenFavorites => 'المفضّلة';
 
   @override
   String get screenCategory => 'القسم';

@@ -15,6 +15,7 @@ abstract final class AppRoutePaths {
   static const home = '/home';
   static const search = '/search';
   static const category = '/category';
+  static const favorites = '/favorites';
   static const productDetail = '/product-detail';
   static const productReviews = '/product-reviews';
   static const cart = '/cart';
