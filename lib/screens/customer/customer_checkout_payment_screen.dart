@@ -35,14 +35,50 @@ class CustomerCheckoutPaymentScreen extends ConsumerStatefulWidget {
 
 class _CustomerCheckoutPaymentScreenState
     extends ConsumerState<CustomerCheckoutPaymentScreen> {
+  static const _presetTips = [0.0, 0.5, 1.0, 2.0];
+
   final _promoController = TextEditingController();
   final _cashTenderedController = TextEditingController();
+  final _customTipController = TextEditingController();
+  bool _customTipSelected = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final tip = ref.read(checkoutDraftProvider).tipJod;
+    final isPreset = _presetTips.any((p) => (p - tip).abs() < 0.001);
+    if (!isPreset && tip > 0) {
+      _customTipSelected = true;
+      _customTipController.text = tip.toStringAsFixed(2);
+    }
+  }
 
   @override
   void dispose() {
     _promoController.dispose();
     _cashTenderedController.dispose();
+    _customTipController.dispose();
     super.dispose();
+  }
+
+  void _selectPresetTip(double tip) {
+    setState(() => _customTipSelected = false);
+    ref.read(checkoutDraftProvider.notifier).setTipJod(tip);
+  }
+
+  void _selectCustomTip() {
+    setState(() => _customTipSelected = true);
+    final parsed = double.tryParse(_customTipController.text.trim());
+    ref.read(checkoutDraftProvider.notifier).setTipJod(
+      parsed == null || parsed < 0 ? 0 : parsed,
+    );
+  }
+
+  void _onCustomTipChanged(String raw) {
+    final parsed = double.tryParse(raw.trim());
+    ref.read(checkoutDraftProvider.notifier).setTipJod(
+      parsed == null || parsed < 0 ? 0 : double.parse(parsed.toStringAsFixed(2)),
+    );
   }
 
   @override
@@ -264,25 +300,60 @@ class _CustomerCheckoutPaymentScreenState
               scheme.onSurface,
             ).copyWith(fontWeight: FontWeight.w900),
           ),
+          SizedBox(height: CoreSpacing.xs(context)),
+          Text(
+            l10n.cartTipSubtitle,
+            style: CoreTypography.caption(context, scheme.onSurfaceVariant),
+          ),
           SizedBox(height: CoreSpacing.md(context)),
           Wrap(
             spacing: CoreSpacing.sm(context),
             runSpacing: CoreSpacing.sm(context),
             children: [
-              for (final tip in const [0.0, 0.5, 1.0, 2.0])
+              for (final tip in _presetTips)
                 WidgetsFilterChip(
                   label:
                       tip == 0
                           ? l10n.cartNoTip
                           : '${tip.toStringAsFixed(2)} ${l10n.currencyJod}',
-                  selected: draft.tipJod == tip,
-                  onSelected:
-                      (_) => ref
-                          .read(checkoutDraftProvider.notifier)
-                          .setTipJod(tip),
+                  selected: !_customTipSelected && draft.tipJod == tip,
+                  onSelected: (_) => _selectPresetTip(tip),
                 ),
+              WidgetsFilterChip(
+                label: l10n.tipCustom,
+                selected: _customTipSelected,
+                onSelected: (_) => _selectCustomTip(),
+              ),
             ],
           ),
+          if (_customTipSelected) ...[
+            SizedBox(height: CoreSpacing.md(context)),
+            WidgetsAppCard(
+              variant: WidgetsAppCardVariant.form,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    l10n.tipCustomAmountBody,
+                    style: CoreTypography.caption(
+                      context,
+                      scheme.onSurfaceVariant,
+                    ),
+                  ),
+                  SizedBox(height: CoreSpacing.md(context)),
+                  WidgetsAppTextField(
+                    controller: _customTipController,
+                    label: l10n.tipCustomAmountJod,
+                    hintText: l10n.tipCustomAmountValue,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    onChanged: _onCustomTipChanged,
+                  ),
+                ],
+              ),
+            ),
+          ],
           SizedBox(height: CoreSpacing.lg(context)),
           WidgetsCheckoutPromoCodeCard(
             controller: _promoController,
