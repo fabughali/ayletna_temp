@@ -31,6 +31,7 @@ class WidgetsScaffoldPage extends ConsumerWidget {
     this.fullWidth = false,
     this.showAppBar = true,
     this.showDrawer = true,
+    this.showLeading = true,
     this.backgroundColor,
     super.key,
   }) : assert(
@@ -47,6 +48,8 @@ class WidgetsScaffoldPage extends ConsumerWidget {
   final bool fullWidth;
   final bool showAppBar;
   final bool showDrawer;
+  /// When false, hides menu/back leading (e.g. stepped checkout steps 2–4).
+  final bool showLeading;
   final Color? backgroundColor;
 
   @override
@@ -84,7 +87,9 @@ class WidgetsScaffoldPage extends ConsumerWidget {
                   ),
                 ),
                 leading:
-                    isDrawerShell
+                    !showLeading
+                        ? const SizedBox.shrink()
+                        : isDrawerShell
                         ? Builder(
                           builder: (drawerContext) {
                             return WidgetsIconButton(
@@ -107,6 +112,7 @@ class WidgetsScaffoldPage extends ConsumerWidget {
                                 context,
                               ).backButtonTooltip,
                         ),
+                leadingWidth: showLeading ? null : 0,
                 actions: resolvedActions,
                 automaticallyImplyLeading: false,
               )
@@ -129,6 +135,10 @@ class WidgetsScaffoldPage extends ConsumerWidget {
     // Account chrome routes — no auto cart in the app bar.
     if (!isStorefront ||
         path == AppRoutePaths.cart ||
+        path == AppRoutePaths.checkout ||
+        path == AppRoutePaths.payment ||
+        path == AppRoutePaths.checkoutReview ||
+        path == AppRoutePaths.tip ||
         path == AppRoutePaths.orderHistory ||
         path == AppRoutePaths.rewards ||
         path == AppRoutePaths.notifications ||

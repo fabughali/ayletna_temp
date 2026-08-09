@@ -150,6 +150,8 @@ class _CustomerCheckoutScreenState
 
     return WidgetsScaffoldPage(
       title: l10n.cartCheckoutStepFulfillment,
+      showLeading: false,
+      actions: const [],
       child: ListView.builder(
         padding: EdgeInsets.symmetric(vertical: CoreSpacing.md(context)),
         itemCount: children.length,

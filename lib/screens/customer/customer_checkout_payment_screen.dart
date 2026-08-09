@@ -101,6 +101,8 @@ class _CustomerCheckoutPaymentScreenState
 
     return WidgetsScaffoldPage(
       title: l10n.cartCheckoutStepPayment,
+      showLeading: false,
+      actions: const [],
       bottomSheet: WidgetsActionBar(
         primary: WidgetsAppButton(
           label: isGuest ? l10n.guestSignInToOrder : l10n.actionContinue,

@@ -72,6 +72,8 @@ class CustomerCheckoutReviewScreen extends ConsumerWidget {
 
     return WidgetsScaffoldPage(
       title: l10n.cartCheckoutStepReview,
+      showLeading: false,
+      actions: const [],
       bottomSheet: WidgetsActionBar(
         primary: WidgetsAppButton(
           label:
