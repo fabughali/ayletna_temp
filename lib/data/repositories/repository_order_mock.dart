@@ -52,7 +52,10 @@ class RepositoryOrderMock implements RepositoryOrder {
         orderId == MockupCatalog.checkoutOrderRef) {
       return MockupCatalog.checkoutOrderDetail;
     }
-    return MockupCatalog.checkoutOrderDetail.copyWithReference(orderId);
+    return MockupCatalog.checkoutOrderDetail.copyWith(
+      id: normalized,
+      reference: orderId.startsWith('#') ? orderId : '#$orderId',
+    );
   }
 
   @override
@@ -77,10 +80,15 @@ class RepositoryOrderMock implements RepositoryOrder {
     }
 
     final orderId = 'SV-${DateTime.now().millisecondsSinceEpoch % 100000}';
-    final deliveryFee = _deliveryFeeFor(request.draft.fulfillment);
-    final deposit = request.draft.fulfillment == CheckoutFulfillment.plated
-        ? MockupCatalog.checkoutPlatedDepositJod
-        : 0.0;
+    final subtotal = request.lines.fold<double>(
+      0,
+      (sum, line) => sum + line.lineTotalJod,
+    );
+    final fulfillmentCharge = _fulfillmentChargeFor(
+      request.draft.fulfillment,
+      subtotal,
+    );
+    final isPlated = request.draft.fulfillment == CheckoutFulfillment.plated;
 
     final detail = ModelOrderDetail(
       id: orderId,
@@ -89,9 +97,14 @@ class RepositoryOrderMock implements RepositoryOrder {
       customerNameEn: MockupCatalog.customerDisplayNameEn,
       statusKey: 'pending',
       lines: [...request.lines],
-      deliveryFeeJod: deliveryFee,
-      depositJod: deposit,
+      deliveryFeeJod: isPlated ? 0 : fulfillmentCharge,
+      depositJod: isPlated ? fulfillmentCharge : 0,
       tipJod: request.draft.tipJod,
+      fulfillment: request.draft.fulfillment,
+      promoSavingsJod: request.promoSavingsJod,
+      pointsDiscountJod: request.pointsDiscountJod,
+      paymentType: request.draft.paymentType,
+      cashTenderedJod: request.draft.cashTenderedJod,
     );
 
     _placedOrders[orderId] = detail;
@@ -130,12 +143,20 @@ class RepositoryOrderMock implements RepositoryOrder {
     return [...MockupCatalog.cartPreviewLines];
   }
 
-  double _deliveryFeeFor(CheckoutFulfillment fulfillment) {
+  /// Matches [WidgetsCheckoutSummaryCosts.calculate] fee rules (mock catalog).
+  double _fulfillmentChargeFor(
+    CheckoutFulfillment fulfillment,
+    double subtotal,
+  ) {
     return switch (fulfillment) {
+      CheckoutFulfillment.dineIn =>
+        subtotal * MockupCatalog.checkoutDineInServiceRate,
+      CheckoutFulfillment.takeaway =>
+        MockupCatalog.checkoutTakeawayPackagingFeeJod,
       CheckoutFulfillment.delivery => MockupCatalog.checkoutDeliveryFeeJod,
-      CheckoutFulfillment.groupDelivery => MockupCatalog.checkoutDeliveryFeeJod,
-      CheckoutFulfillment.plated => MockupCatalog.checkoutDeliveryFeeJod,
-      _ => 0,
+      CheckoutFulfillment.groupDelivery =>
+        MockupCatalog.checkoutGroupDeliveryFeeJod,
+      CheckoutFulfillment.plated => MockupCatalog.checkoutPlatedDepositJod,
     };
   }
 
@@ -143,21 +164,5 @@ class RepositoryOrderMock implements RepositoryOrder {
     return fulfillment == CheckoutFulfillment.delivery ||
         fulfillment == CheckoutFulfillment.groupDelivery ||
         fulfillment == CheckoutFulfillment.plated;
-  }
-}
-
-extension on ModelOrderDetail {
-  ModelOrderDetail copyWithReference(String reference) {
-    return ModelOrderDetail(
-      id: reference.replaceAll('#', ''),
-      reference: reference.startsWith('#') ? reference : '#$reference',
-      customerNameAr: customerNameAr,
-      customerNameEn: customerNameEn,
-      statusKey: statusKey,
-      lines: lines,
-      deliveryFeeJod: deliveryFeeJod,
-      depositJod: depositJod,
-      tipJod: tipJod,
-    );
   }
 }

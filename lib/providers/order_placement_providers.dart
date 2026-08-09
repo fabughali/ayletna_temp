@@ -2,9 +2,13 @@ import 'package:ayletna_restaurant_app/data/models/model_cart_line.dart';
 import 'package:ayletna_restaurant_app/data/models/model_place_order_request.dart';
 import 'package:ayletna_restaurant_app/data/models/model_place_order_result.dart';
 import 'package:ayletna_restaurant_app/data/repositories/repository_providers.dart';
+import 'package:ayletna_restaurant_app/providers/cart_checkout_fees_providers.dart';
+import 'package:ayletna_restaurant_app/providers/cart_promo_providers.dart';
 import 'package:ayletna_restaurant_app/providers/cart_providers.dart';
 import 'package:ayletna_restaurant_app/providers/checkout_draft_providers.dart';
 import 'package:ayletna_restaurant_app/providers/customer_action_providers.dart';
+import 'package:ayletna_restaurant_app/providers/rewards_admin_providers.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_checkout_sections.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 typedef PlaceOrderState = AsyncValue<ModelPlaceOrderResult?>;
@@ -21,9 +25,36 @@ class PlaceOrderNotifier extends StateNotifier<PlaceOrderState> {
     try {
       final lines = ref.read(cartProvider);
       final draft = ref.read(checkoutDraftProvider);
-      final result = await ref
-          .read(repositoryOrderProvider)
-          .placeOrder(ModelPlaceOrderRequest(lines: lines, draft: draft));
+      final subtotal = lines.fold<double>(
+        0,
+        (sum, line) => sum + line.lineTotalJod,
+      );
+      final costs = WidgetsCheckoutSummaryCosts.calculate(
+        subtotal: subtotal,
+        fulfillment: draft.fulfillment,
+        fees: ref.read(cartCheckoutFeesProvider),
+      );
+      final promo = ref.read(cartPromoProvider);
+      final discount = promo.applied ? promo.discountJod : 0.0;
+      final afterPromo =
+          (costs.subtotal + costs.fulfillmentCharge - discount + draft.tipJod)
+              .clamp(0.0, double.infinity);
+      final pointsBalance =
+          draft.useLoyaltyPoints
+              ? ref.read(loyaltyPointsProvider).balance
+              : 0;
+      final pointsDiscount = checkoutPointsValueJod(
+        pointsBalance,
+      ).clamp(0.0, afterPromo);
+
+      final result = await ref.read(repositoryOrderProvider).placeOrder(
+        ModelPlaceOrderRequest(
+          lines: lines,
+          draft: draft,
+          promoSavingsJod: discount,
+          pointsDiscountJod: pointsDiscount,
+        ),
+      );
 
       ref.read(placedOrderIdProvider.notifier).state = result.orderId;
       ref.read(activeTrackingOrderIdProvider.notifier).state = result.orderId;
