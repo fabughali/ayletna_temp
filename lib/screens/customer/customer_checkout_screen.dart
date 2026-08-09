@@ -3,11 +3,7 @@ import 'package:ayletna_restaurant_app/data/models/model_saved_address.dart';
 import 'package:ayletna_restaurant_app/data/repositories/repository_providers.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
-import 'package:ayletna_restaurant_app/providers/cart_checkout_fees_providers.dart';
-import 'package:ayletna_restaurant_app/providers/cart_promo_providers.dart';
-import 'package:ayletna_restaurant_app/providers/cart_providers.dart';
 import 'package:ayletna_restaurant_app/providers/checkout_draft_providers.dart';
-import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_checkout_sections.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_checkout_step_strip.dart';
@@ -18,7 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Stepped checkout — fulfillment + promo (step 2).
+/// Stepped checkout — fulfillment (step 2).
 class CustomerCheckoutScreen extends ConsumerStatefulWidget {
   const CustomerCheckoutScreen({super.key});
 
@@ -30,18 +26,11 @@ class CustomerCheckoutScreen extends ConsumerStatefulWidget {
 class _CustomerCheckoutScreenState
     extends ConsumerState<CustomerCheckoutScreen> {
   bool _showMoreFulfillment = false;
-  final _promoController = TextEditingController();
 
   static const _extraFulfillments = [
     CheckoutFulfillment.groupDelivery,
     CheckoutFulfillment.plated,
   ];
-
-  @override
-  void dispose() {
-    _promoController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,24 +40,6 @@ class _CustomerCheckoutScreenState
     final addressRequired = _requiresAddress(draft.fulfillment);
     final showMore =
         _showMoreFulfillment || _extraFulfillments.contains(draft.fulfillment);
-    final cartLines = ref.watch(cartProvider);
-    final subtotal = cartLines.fold<double>(
-      0,
-      (sum, line) => sum + line.unitPriceJod * line.quantity,
-    );
-    final fees = ref.watch(cartCheckoutFeesProvider);
-    final costs = WidgetsCheckoutSummaryCosts.calculate(
-      subtotal: subtotal,
-      fulfillment: draft.fulfillment,
-      fees: fees,
-    );
-    final promo = ref.watch(cartPromoProvider);
-    final discount = promo.applied ? promo.discountJod : 0.0;
-    if (promo.applied &&
-        _promoController.text.trim().isEmpty &&
-        promo.code != null) {
-      _promoController.text = promo.code!;
-    }
 
     final children = <Widget>[
       WidgetsPageHeader(
@@ -110,24 +81,6 @@ class _CustomerCheckoutScreenState
               ),
         ),
       ],
-      SizedBox(height: CoreSpacing.lg(context)),
-      WidgetsCheckoutPromoCodeCard(
-        controller: _promoController,
-        promoApplied: promo.applied,
-        savingsJod: discount,
-        onApply: () {
-          final ok = ref.read(cartPromoProvider.notifier).applyCode(
-            _promoController.text,
-            costs.totalBeforeSavings,
-          );
-          if (!ok) {
-            UtilityMockFeedback.showWarning(context, l10n.cartInvalidPromoCode);
-            return;
-          }
-          ref.read(checkoutDraftProvider.notifier).setPromoApplied(true);
-          UtilityMockFeedback.showSuccess(context, l10n.cartPromoCode);
-        },
-      ),
       SizedBox(height: CoreSpacing.xxl(context)),
       WidgetsAppButton(
         label: l10n.actionContinue,
