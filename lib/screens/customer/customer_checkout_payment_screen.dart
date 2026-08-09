@@ -108,8 +108,10 @@ class _CustomerCheckoutPaymentScreenState
 
     final pointsBalance = ref.watch(loyaltyPointsProvider).balance;
     final pointsValue = checkoutPointsValueJod(pointsBalance);
-    final afterPromo = (costs.totalBeforeSavings - discount + draft.tipJod)
-        .clamp(0.0, double.infinity);
+    // Tax is not shown on the summary; payable excludes estimated tax.
+    final afterPromo =
+        (costs.subtotal + costs.fulfillmentCharge - discount + draft.tipJod)
+            .clamp(0.0, double.infinity);
     final pointsDiscount =
         draft.useLoyaltyPoints
             ? double.parse(
@@ -380,7 +382,6 @@ class _CustomerCheckoutPaymentScreenState
             subtotal: subtotal,
             fulfillment: draft.fulfillment,
             fulfillmentCharge: costs.fulfillmentCharge,
-            tax: costs.tax,
             tipJod: draft.tipJod,
             discount: discount,
             pointsDiscount: pointsDiscount,

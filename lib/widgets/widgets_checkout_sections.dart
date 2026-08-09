@@ -302,7 +302,6 @@ class WidgetsCheckoutOrderSummaryCard extends StatelessWidget {
     required this.subtotal,
     required this.fulfillment,
     required this.fulfillmentCharge,
-    required this.tax,
     required this.tipJod,
     required this.discount,
     required this.pointsDiscount,
@@ -313,7 +312,6 @@ class WidgetsCheckoutOrderSummaryCard extends StatelessWidget {
   final double subtotal;
   final CheckoutFulfillment fulfillment;
   final double fulfillmentCharge;
-  final double tax;
   final double tipJod;
   final double discount;
   final double pointsDiscount;
@@ -340,10 +338,6 @@ class WidgetsCheckoutOrderSummaryCard extends StatelessWidget {
                 ? l10n.cartFree
                 : UtilityFormatJod.format(fulfillmentCharge, suffix: jod),
         accentColor: isPlated ? CoreColors.semanticDeposit : null,
-      ),
-      WidgetsFinancialSummaryLine(
-        label: l10n.cartEstimatedTax,
-        value: UtilityFormatJod.format(tax, suffix: jod),
       ),
       WidgetsFinancialSummaryLine(
         label: l10n.checkoutTip,
