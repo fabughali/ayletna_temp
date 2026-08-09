@@ -162,7 +162,6 @@ class _CustomerOrderHistoryScreenState
     final sumData = orderTicketSumDataFromOrderDetail(
       detail,
       l10n,
-      paymentLabel: l10n.paymentMethodCard,
       paidTotal: order.totalJod,
     );
 

@@ -15,6 +15,7 @@ class OrderTicketSumData {
     required this.tipJod,
     required this.tipConfigured,
     required this.promoSavingsJod,
+    this.pointsDiscountJod = 0,
     required this.paymentSelected,
     required this.selectedPaymentLabel,
     required this.paidTotal,
@@ -33,6 +34,7 @@ class OrderTicketSumData {
   final double tipJod;
   final bool tipConfigured;
   final double promoSavingsJod;
+  final double pointsDiscountJod;
   final bool paymentSelected;
   final String selectedPaymentLabel;
   final double paidTotal;
@@ -92,6 +94,8 @@ abstract final class OrderTicketSumBuilders {
     ];
   }
 
+  /// Invoice totals matching stepped-checkout order summary (step 4):
+  /// food, fulfillment, tip, promo, points, total.
   static List<OrderTicketSumRow> invoiceSumRows(
     AppLocalizations l10n,
     OrderTicketSumData data,
@@ -99,7 +103,7 @@ abstract final class OrderTicketSumBuilders {
     final currency = l10n.currencyJod;
     return [
       OrderTicketSumRow(
-        label: orderTicketSumLabel(l10n.cashierSubtotal, currency),
+        label: orderTicketSumLabel(l10n.checkoutFood, currency),
         amount: orderTicketAmount(data.subtotal),
       ),
       if (data.fulfillmentSelected && data.fulfillmentLabel != null)
@@ -107,8 +111,27 @@ abstract final class OrderTicketSumBuilders {
           label: orderTicketSumLabel(data.fulfillmentLabel!, currency),
           amount: orderTicketAmount(data.fulfillmentCharge),
         ),
+      if (data.tipConfigured)
+        OrderTicketSumRow(
+          label: orderTicketSumLabel(l10n.checkoutTip, currency),
+          amount: orderTicketAmount(data.tipJod),
+        ),
+      if (data.promoSavingsJod > 0)
+        OrderTicketSumRow(
+          label: orderTicketSumLabel(l10n.cartPromoCode, currency),
+          amount: '-${orderTicketAmount(data.promoSavingsJod)}',
+        ),
+      if (data.pointsDiscountJod > 0)
+        OrderTicketSumRow(
+          label: orderTicketSumLabel(
+            l10n.checkoutLoyaltyPointsDiscount,
+            currency,
+          ),
+          amount: '-${orderTicketAmount(data.pointsDiscountJod)}',
+        ),
       OrderTicketSumRow(
-        label: orderTicketSumLabel(l10n.cashierTotal, currency),
+        dividerBefore: true,
+        label: orderTicketSumLabel(l10n.cartTotal, currency),
         amount: orderTicketAmount(data.total),
         emphasized: true,
       ),
@@ -159,6 +182,24 @@ abstract final class OrderTicketSumBuilders {
         OrderTicketSumRow(
           label: orderTicketSumLabel(data.fulfillmentLabel!, currency),
           amount: orderTicketAmount(data.fulfillmentCharge),
+        ),
+      if (data.tipConfigured)
+        OrderTicketSumRow(
+          label: orderTicketSumLabel(l10n.checkoutTip, currency),
+          amount: orderTicketAmount(data.tipJod),
+        ),
+      if (data.promoSavingsJod > 0)
+        OrderTicketSumRow(
+          label: orderTicketSumLabel(l10n.cartPromoCode, currency),
+          amount: '-${orderTicketAmount(data.promoSavingsJod)}',
+        ),
+      if (data.pointsDiscountJod > 0)
+        OrderTicketSumRow(
+          label: orderTicketSumLabel(
+            l10n.checkoutLoyaltyPointsDiscount,
+            currency,
+          ),
+          amount: '-${orderTicketAmount(data.pointsDiscountJod)}',
         ),
       if (data.priorBalanceJod > 0)
         OrderTicketSumRow(

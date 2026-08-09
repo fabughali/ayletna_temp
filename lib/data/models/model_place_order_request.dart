@@ -6,8 +6,12 @@ class ModelPlaceOrderRequest {
   const ModelPlaceOrderRequest({
     required this.lines,
     required this.draft,
+    this.promoSavingsJod = 0,
+    this.pointsDiscountJod = 0,
   });
 
   final List<ModelCartLine> lines;
   final CheckoutDraft draft;
+  final double promoSavingsJod;
+  final double pointsDiscountJod;
 }

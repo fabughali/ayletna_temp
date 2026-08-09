@@ -79,11 +79,7 @@ class _ConfirmationBody extends ConsumerWidget {
       order.totalJod,
       suffix: l10n.currencyJod,
     );
-    final receiptData = orderTicketSumDataFromOrderDetail(
-      order,
-      l10n,
-      paymentLabel: l10n.paymentMethodCard,
-    );
+    final receiptData = orderTicketSumDataFromOrderDetail(order, l10n);
 
     return WidgetsScaffoldPage(
       title: l10n.screenOrderConfirmation,
@@ -97,13 +93,6 @@ class _ConfirmationBody extends ConsumerWidget {
             context.go(AppRoutePaths.orderTracking);
           },
           icon: Icons.soup_kitchen_outlined,
-          fullWidth: true,
-        ),
-        secondary: WidgetsAppButton(
-          label: l10n.orderConfirmedHome,
-          onPressed: () => context.go(AppRoutePaths.home),
-          icon: Icons.restaurant_menu_outlined,
-          variant: WidgetsAppButtonVariant.outline,
           fullWidth: true,
         ),
       ),
@@ -121,7 +110,7 @@ class _ConfirmationBody extends ConsumerWidget {
           ),
           _ConfirmationHero(totalText: totalText, statusKey: order.statusKey),
           SizedBox(height: CoreSpacing.lg(context)),
-          _KitchenHandoffCard(orderReference: orderReference),
+          _KitchenHandoffCard(order: order),
           SizedBox(height: CoreSpacing.lg(context)),
           if (order.depositJod > 0) ...[
             WidgetsInfoBanner(
@@ -208,36 +197,32 @@ class _ConfirmationHero extends StatelessWidget {
 }
 
 class _KitchenHandoffCard extends ConsumerWidget {
-  const _KitchenHandoffCard({required this.orderReference});
+  const _KitchenHandoffCard({required this.order});
 
-  final String orderReference;
+  final ModelOrderDetail order;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    final draft = ref.watch(checkoutDraftProvider);
     final addresses =
         ref.watch(savedAddressesProvider).asData?.value ?? const [];
     final address = () {
-      final byId =
-          addresses.where((a) => a.id == draft.selectedAddressId).toList();
-      if (byId.isNotEmpty) return byId.first;
       final defaults = addresses.where((a) => a.isSelected).toList();
       if (defaults.isNotEmpty) return defaults.first;
       return addresses.isEmpty ? null : addresses.first;
     }();
     final addressLine =
         address?.addressForLocale(isAr) ?? l10n.orderConfirmedAddress;
-    final fulfillmentLabel = switch (draft.fulfillment) {
+    final fulfillmentLabel = switch (order.fulfillment) {
       CheckoutFulfillment.dineIn => l10n.orderTypeDineIn,
       CheckoutFulfillment.takeaway => l10n.orderTypeTakeaway,
       CheckoutFulfillment.plated => l10n.orderTypePlated,
       CheckoutFulfillment.groupDelivery => l10n.orderTypeDelivery,
       CheckoutFulfillment.delivery => l10n.orderTypeDelivery,
     };
-    final fulfillmentColor = switch (draft.fulfillment) {
+    final fulfillmentColor = switch (order.fulfillment) {
       CheckoutFulfillment.dineIn => CoreColors.orderTypeDineIn,
       CheckoutFulfillment.takeaway => CoreColors.orderTypeTakeaway,
       CheckoutFulfillment.plated => CoreColors.orderTypePlated,
@@ -279,7 +264,7 @@ class _KitchenHandoffCard extends ConsumerWidget {
                       ),
                     ),
                     Text(
-                      orderReference,
+                      order.reference,
                       style: CoreTypography.titleMedium(
                         context,
                         scheme.onSurface,

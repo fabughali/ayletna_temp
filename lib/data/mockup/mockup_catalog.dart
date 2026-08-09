@@ -23,6 +23,7 @@ import 'package:ayletna_restaurant_app/data/models/model_saved_address.dart';
 import 'package:ayletna_restaurant_app/data/models/model_support_ticket.dart';
 import 'package:ayletna_restaurant_app/data/models/model_staff_mock.dart';
 import 'package:ayletna_restaurant_app/data/models/model_wallet_transaction.dart';
+import 'package:ayletna_restaurant_app/providers/checkout_draft_providers.dart';
 import 'package:flutter/material.dart';
 
 /// Jordan / PRD placeholder menu & orders (no Stitch sample names).
@@ -393,8 +394,9 @@ abstract final class MockupCatalog {
     statusKey: 'pending',
     lines: checkoutReviewLines,
     deliveryFeeJod: checkoutDeliveryFeeJod,
-    depositJod: checkoutPlatedDepositJod,
+    depositJod: 0,
     tipJod: 0,
+    fulfillment: CheckoutFulfillment.delivery,
   );
 
   static const cartPreviewLines = <ModelCartLine>[
