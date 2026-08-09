@@ -43,8 +43,11 @@ class WidgetsActionBar extends StatelessWidget {
                 ),
                 SizedBox(height: CoreSpacing.md(context)),
               ],
+              // Do not use CrossAxisAlignment.stretch: Scaffold bottomSheet
+              // gives this bar unbounded max height, and stretch would force
+              // infinite-height constraints (breaks product detail, etc.).
               Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   if (leading != null) ...[
                     leading!,
@@ -54,7 +57,10 @@ class WidgetsActionBar extends StatelessWidget {
                     Expanded(child: secondary!),
                     SizedBox(width: CoreSpacing.md(context)),
                   ],
-                  Expanded(flex: secondary == null && leading == null ? 1 : 2, child: primary),
+                  Expanded(
+                    flex: secondary == null && leading == null ? 1 : 2,
+                    child: primary,
+                  ),
                 ],
               ),
             ],

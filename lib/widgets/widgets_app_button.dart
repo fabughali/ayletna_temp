@@ -48,16 +48,15 @@ class WidgetsAppButton extends StatelessWidget {
         compact
             ? context.coreTheme.buttonPaddingH * 0.72
             : context.coreTheme.buttonPaddingH;
-    final minimumSize = Size(
-      fullWidth ? double.infinity : 0,
-      controlH,
-    );
+    // Never put infinity into minimumSize — inside Expanded/Row that creates
+    // invalid BoxConstraints. fullWidth is handled by width sizing below.
+    final minimumSize = Size(0, controlH);
     final maximumSize = Size(double.infinity, controlH);
     // Size.fromHeight uses infinite width — keep that for default (Column) layout.
     // compact omits fixed width so Wrap/Row actions size to their labels.
     final Size? fixedSize =
         fullWidth
-            ? Size(double.infinity, controlH)
+            ? Size.fromHeight(controlH)
             : compact
             ? null
             : Size.fromHeight(controlH);
@@ -169,7 +168,10 @@ class WidgetsAppButton extends StatelessWidget {
       button: true,
       enabled: onPressed != null,
       label: label,
-      child: button,
+      child:
+          fullWidth
+              ? SizedBox(width: double.infinity, child: button)
+              : button,
     );
   }
 
