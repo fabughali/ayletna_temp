@@ -4,6 +4,7 @@ import 'package:ayletna_restaurant_app/data/repositories/repository_providers.da
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/checkout_draft_providers.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_action_bar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_checkout_sections.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_checkout_step_strip.dart';
@@ -40,75 +41,83 @@ class _CustomerCheckoutScreenState
     final addressRequired = _requiresAddress(draft.fulfillment);
     final showMore =
         _showMoreFulfillment || _extraFulfillments.contains(draft.fulfillment);
-
-    final children = <Widget>[
-      WidgetsPageHeader(
-        title: l10n.cartCheckoutStepFulfillment,
-        subtitle: l10n.cartFulfillmentSubtitle,
-      ),
-      SizedBox(height: CoreSpacing.md(context)),
-      WidgetsCheckoutStepStrip(
-        activeStep: 1,
-        completedThrough: 0,
-        onStepTapped: (step) => _jumpToStep(context, step),
-      ),
-      SizedBox(height: CoreSpacing.lg(context)),
-      WidgetsCheckoutFulfillmentSection(
-        selected: draft.fulfillment,
-        showMore: showMore,
-        onToggleMore:
-            () => setState(() => _showMoreFulfillment = !_showMoreFulfillment),
-        onSelected: (value) {
-          ref.read(checkoutDraftProvider.notifier).setFulfillment(value);
-          if (_extraFulfillments.contains(value)) {
-            setState(() => _showMoreFulfillment = true);
-          }
-        },
-        onTerms: () => context.push(AppRoutePaths.terms),
-      ),
-      if (addressRequired) ...[
-        SizedBox(height: CoreSpacing.lg(context)),
-        addressesAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => WidgetsErrorMessage(message: e.toString()),
-          data:
-              (addresses) => _AddressPicker(
-                addresses: addresses,
-                selectedId: draft.selectedAddressId,
-                onSelected:
-                    (id) =>
-                        ref.read(checkoutDraftProvider.notifier).setAddressId(id),
-              ),
-        ),
-      ],
-      SizedBox(height: CoreSpacing.xxl(context)),
-      WidgetsAppButton(
-        label: l10n.actionContinue,
-        icon: Icons.arrow_forward,
-        fullWidth: true,
-        onPressed:
-            !addressRequired || draft.selectedAddressId != null
-                ? () => context.push(AppRoutePaths.payment)
-                : null,
-      ),
-      SizedBox(height: CoreSpacing.sm(context)),
-      WidgetsAppButton(
-        label: l10n.screenCart,
-        icon: Icons.shopping_basket_outlined,
-        variant: WidgetsAppButtonVariant.outline,
-        fullWidth: true,
-        onPressed: () => context.go(AppRoutePaths.cart),
-      ),
-    ];
+    final canContinue =
+        !addressRequired || draft.selectedAddressId != null;
 
     return WidgetsScaffoldPage(
       title: l10n.cartCheckoutStepFulfillment,
       showLeading: false,
       actions: const [],
-      child: ListView.builder(
-        padding: EdgeInsets.symmetric(vertical: CoreSpacing.md(context)),
-        itemCount: children.length,
-        itemBuilder: (context, index) => children[index],
+      bottomSheet: WidgetsActionBar(
+        primary: WidgetsAppButton(
+          label: l10n.actionContinue,
+          icon: Icons.arrow_forward,
+          fullWidth: true,
+          onPressed:
+              canContinue ? () => context.push(AppRoutePaths.payment) : null,
+        ),
+        secondary: WidgetsAppButton(
+          label: l10n.prepBack,
+          icon: Icons.arrow_back,
+          variant: WidgetsAppButtonVariant.outline,
+          fullWidth: true,
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+              return;
+            }
+            context.go(AppRoutePaths.cart);
+          },
+        ),
+      ),
+      child: ListView(
+        padding: EdgeInsetsDirectional.only(
+          top: CoreSpacing.md(context),
+          bottom: CoreSpacing.xxl(context) * 3,
+        ),
+        children: [
+          WidgetsPageHeader(
+            title: l10n.cartCheckoutStepFulfillment,
+            subtitle: l10n.cartFulfillmentSubtitle,
+          ),
+          SizedBox(height: CoreSpacing.md(context)),
+          WidgetsCheckoutStepStrip(
+            activeStep: 1,
+            completedThrough: 0,
+            onStepTapped: (step) => _jumpToStep(context, step),
+          ),
+          SizedBox(height: CoreSpacing.lg(context)),
+          WidgetsCheckoutFulfillmentSection(
+            selected: draft.fulfillment,
+            showMore: showMore,
+            onToggleMore:
+                () =>
+                    setState(() => _showMoreFulfillment = !_showMoreFulfillment),
+            onSelected: (value) {
+              ref.read(checkoutDraftProvider.notifier).setFulfillment(value);
+              if (_extraFulfillments.contains(value)) {
+                setState(() => _showMoreFulfillment = true);
+              }
+            },
+            onTerms: () => context.push(AppRoutePaths.terms),
+          ),
+          if (addressRequired) ...[
+            SizedBox(height: CoreSpacing.lg(context)),
+            addressesAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) => WidgetsErrorMessage(message: e.toString()),
+              data:
+                  (addresses) => _AddressPicker(
+                    addresses: addresses,
+                    selectedId: draft.selectedAddressId,
+                    onSelected:
+                        (id) => ref
+                            .read(checkoutDraftProvider.notifier)
+                            .setAddressId(id),
+                  ),
+            ),
+          ],
+        ],
       ),
     );
   }
