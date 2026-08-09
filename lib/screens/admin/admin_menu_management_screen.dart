@@ -18,6 +18,7 @@ import 'package:ayletna_restaurant_app/widgets/widgets_metric_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_status_pill.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_app_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -58,7 +59,7 @@ class AdminMenuManagementScreen extends ConsumerWidget {
       floatingActionButton: WidgetsAppButton(
         label: l10n.menuAddNewItem,
         onPressed:
-            () => context.push('${AppRoutePaths.adminProductEditor}?mode=create'),
+            () => context.push('${AppRoutePaths.operatorProductEditor}?mode=create'),
         icon: Icons.add,
       ),
       child: WidgetsRefreshList(
@@ -140,20 +141,20 @@ class _HeaderActions extends ConsumerWidget {
             WidgetsAppButton(
               label: l10n.menuAddNewItem,
               onPressed:
-                  () => context.push('${AppRoutePaths.adminProductEditor}?mode=create'),
+                  () => context.push('${AppRoutePaths.operatorProductEditor}?mode=create'),
               icon: Icons.add,
             ),
             WidgetsAppButton(
               label: Localizations.localeOf(context).languageCode == 'ar'
                   ? 'فهرس المنيو'
                   : 'Menu catalog',
-              onPressed: () => context.push(AppRoutePaths.adminMenuCatalog),
+              onPressed: () => context.push(AppRoutePaths.marketingCatalog),
               icon: Icons.category_outlined,
               variant: WidgetsAppButtonVariant.outline,
             ),
             WidgetsAppButton(
               label: l10n.screenOffersManagement,
-              onPressed: () => context.push(AppRoutePaths.adminOffersMgmt),
+              onPressed: () => context.push(AppRoutePaths.marketingOffers),
               icon: Icons.local_offer_outlined,
               variant: WidgetsAppButtonVariant.outline,
             ),
@@ -359,8 +360,8 @@ class _MenuItemCard extends ConsumerWidget {
 
   String get _editorRoute =>
       catalogItemId != null
-          ? '${AppRoutePaths.adminProductEditor}?id=$catalogItemId'
-          : AppRoutePaths.adminProductEditor;
+          ? '${AppRoutePaths.operatorProductEditor}?id=$catalogItemId'
+          : AppRoutePaths.operatorProductEditor;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -414,8 +415,8 @@ class _MenuItemCard extends ConsumerWidget {
                           WidgetsStatusPill(
                             label:
                                 isPublished
-                                    ? (isAr ? 'منشور' : 'Published')
-                                    : (isAr ? 'مسودة' : 'Draft'),
+                                    ? l10n.menuMgmtPublished
+                                    : l10n.menuMgmtDraft,
                             color:
                                 isPublished
                                     ? CoreColors.semanticSuccess
@@ -500,7 +501,7 @@ class _MenuItemCard extends ConsumerWidget {
                   SizedBox(height: CoreSpacing.lg(context)),
                   Row(
                     children: [
-                      Switch(value: active, onChanged: onActiveChanged),
+                      WidgetsAppSwitch(value: active, onChanged: onActiveChanged),
                       SizedBox(width: CoreSpacing.xs(context)),
                       Text(
                         active ? l10n.menuActive : l10n.menuInactive,
@@ -531,8 +532,8 @@ class _MenuItemCard extends ConsumerWidget {
                                   MockSheetAction(
                                     label:
                                         isPublished
-                                            ? (isAr ? 'إلغاء النشر' : 'Unpublish')
-                                            : (isAr ? 'نشر' : 'Publish'),
+                                            ? l10n.menuMgmtUnpublish
+                                            : l10n.menuMgmtPublish,
                                     icon:
                                         isPublished
                                             ? Icons.visibility_off_outlined
@@ -546,9 +547,7 @@ class _MenuItemCard extends ConsumerWidget {
                                         );
                                         UtilityMockFeedback.showInfo(
                                           context,
-                                          isAr
-                                              ? 'تم إخفاء العنصر من المنيو'
-                                              : 'Hidden from customer menu',
+                                          l10n.menuMgmtHiddenFromMenu,
                                         );
                                       } else {
                                         notifier.publishProduct(
@@ -556,7 +555,7 @@ class _MenuItemCard extends ConsumerWidget {
                                         );
                                         UtilityMockFeedback.showSuccess(
                                           context,
-                                          isAr ? 'تم النشر' : 'Published',
+                                          l10n.menuMgmtPublishSuccess,
                                         );
                                       }
                                     },
@@ -647,6 +646,7 @@ class _AddedMenuItemCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final scheme = Theme.of(context).colorScheme;
 
@@ -676,13 +676,13 @@ class _AddedMenuItemCard extends ConsumerWidget {
             ),
           ),
           WidgetsStatusPill(
-            label: isPublished ? (isAr ? 'منشور' : 'Published') : (isAr ? 'مسودة' : 'Draft'),
+            label: isPublished ? l10n.menuMgmtPublished : l10n.menuMgmtDraft,
             color: isPublished ? CoreColors.semanticSuccess : CoreColors.brandGold,
           ),
           IconButton(
             onPressed:
                 () => context.push(
-                  '${AppRoutePaths.adminProductEditor}?id=${item.id}',
+                  '${AppRoutePaths.operatorProductEditor}?id=${item.id}',
                 ),
             icon: const Icon(Icons.edit_outlined),
           ),
@@ -693,7 +693,7 @@ class _AddedMenuItemCard extends ConsumerWidget {
                 isAr: isAr,
                 onConfirmed: () {
                   ref.read(adminMenuProvider.notifier).removeAddedMenuItem(item.id);
-                  UtilityMockFeedback.showInfo(context, isAr ? 'تم الحذف' : 'Removed');
+                  UtilityMockFeedback.showInfo(context, l10n.catalogCrudDeleted);
                 },
               );
             },

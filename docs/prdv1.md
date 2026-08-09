@@ -3,12 +3,13 @@
 
 | Field | Value |
 |-------|-------|
-| **Document ID** | PRD-v1.0.0 |
-| **Status** | Living specification — UI mockup implemented; backend integration planned |
-| **Last updated** | 2026-06-19 |
+| **Document ID** | PRD-v1.3.0 |
+| **Status** | Living specification — UI mock complete (frontend cycles closed); backend integration planned |
+| **Last updated** | 2026-08-01 |
 | **Scope** | Full product — single branch (Jordan, JOD) |
 | **Platforms** | Android · iOS · Web (admin + customer) |
-| **Repository** | `ayletna_restaurant_app` (Flutter monorepo) |
+| **Live demo** | https://fabughali.github.io/ayletna_temp/ |
+| **Repository** | https://github.com/fabughali/ayletna_temp · local `ayletna_restaurant_app` |
 
 ---
 
@@ -57,7 +58,8 @@ Build an integrated digital platform for **Ayletna Restaurant (مطعم عيلت
 
 - **Customers & guests** — browse, order, pay, track, loyalty.
 - **Operations** — cashier, kitchen, inventory, delivery.
-- **Management** — operator (admin), owner (read-heavy + configurable views).
+- **Management** — app admin (RBAC/users), operator (daily ops), owner (read-heavy + configurable views).
+- **Specialists** — support (tickets/chat/FAQ), marketing (offers/campaigns/loyalty content).
 - **Staff** — attendance, daily tip transparency.
 
 ### 1.4 Value proposition
@@ -124,45 +126,66 @@ Build an integrated digital platform for **Ayletna Restaurant (مطعم عيلت
 
 ## 3. Implementation status (as-built)
 
-> This section describes **what exists in the repository today** (June 2026). Production backend items are specified in later sections as targets.
+> What exists in the repository **today** (August 2026). Production backend targets remain in §10–§13 and §19.2.
 
 ### 3.1 Phase summary
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| UI shell & 75 screens | ✅ Complete | All role folders under `lib/screens/` |
-| Design system (`CoreTheme`, widgets) | ✅ Complete | Material 3, role themes, shared widgets |
-| Localization (AR/EN) | ✅ Complete | `app_ar.arb`, `app_en.arb` |
-| Routing & guards | ✅ Complete | `go_router`, `UtilityRouteGuard` |
-| Mock data layer | ✅ Complete | `MockupCatalog` |
-| Repository abstraction (start) | 🔄 In progress | Menu, order, address, user profile |
-| Supabase backend | ⏳ Planned | Schema, RLS, RPC defined in §10 |
-| Live payments / maps / FCM | ⏳ Planned | Adapter interfaces specified in §13 |
+| UI shell & screens (~103 `*_screen.dart`) | ✅ Complete | Five hubs + ops + customer under `lib/screens/` |
+| Design system (`CoreTheme`, shared widgets) | ✅ Complete | Material 3; one brand primary (falafel gold); hub tint only |
+| Localization (AR/EN) | ✅ Complete | `app_ar.arb`, `app_en.arb` — no hardcoded UI strings |
+| Routing & guards | ✅ Complete | `go_router`, `UtilityRouteGuard`, hub prefixes + legacy `/admin*` redirects |
+| Five-hub RBAC (UI mock) | ✅ Complete | Capability map; Screens A/B permissions UI |
+| Mock data + Riverpod | ✅ Complete | In-memory providers; `MockupCatalog` seed |
+| Closed frontend cycles (S1–S5) | ✅ Complete | Provider smoke: `test/frontend_cycle_smoke_test.dart` |
+| Support / marketing / operator enhancements | ✅ Complete (UI mock) | SLA, handover, refund/cancel, dual-approval offers, audit events |
+| Repository abstraction | ✅ Started | Menu, order, address (+ profile helpers) — mock implementations only |
+| Supabase backend | ⏳ Planned | Schema, RLS, RPC in §10 |
+| Live payments / maps / FCM | ⏳ Planned | Adapter interfaces in §13 |
 
 ### 3.2 Runtime feature flags (`lib/core/app_config.dart`)
 
-| Flag | Default | Purpose |
-|------|---------|---------|
-| `demoModeEnabled` | `true` | Shows demo banner on ops/admin routes; mock actions non-destructive |
-| `useSteppedCheckoutRoutes` | `false` | When `false`, `/checkout`, `/payment`, `/tip` redirect to unified `/cart`; when `true`, stepped checkout screens are used |
+| Flag | Default (code) | Purpose |
+|------|----------------|---------|
+| `demoModeEnabled` | `false` | When `true`, ops/admin show demo banner; mock actions stay non-destructive |
+| `useSteppedCheckoutRoutes` | `true` | **Product default:** `/cart` → `/checkout` → `/payment`. When `false`, fulfillment/payment/tip collapse onto unified `/cart` |
 
 ### 3.3 Demo / prototype behavior
 
-- Ops primary actions use `UtilityDemoActions` and `WidgetsMockActionButton` — info banners instead of fake financial success.
-- `WidgetsDemoModeBanner` on cashier, kitchen, delivery, inventory, staff, and admin routes.
+- Entire app is an **interactive UI mock**: zero HTTP/Supabase/local DB. Restart clears in-memory state.
+- Ops may use `UtilityDemoActions` / `WidgetsMockActionButton` when demo mode is on — never fake financial success for guests.
 - Session and roles are UI-mock via `appRoleProvider` / `sessionProvider` until Supabase Auth is wired.
+- Snackbar/toast alone is **not** a closed cycle. PASS = shared provider/repository state visible on another screen or role.
 
-### 3.4 Deliberate UX decisions (current build)
+### 3.4 Frontend cycle smoke (code-verified)
+
+| ID | Script | Pass when |
+|----|--------|-----------|
+| S1 | Cart → place order → tracking ids | Cart clears; `placedOrderIdProvider` + `activeTrackingOrderIdProvider` set |
+| S2 | Offer inactive ↔ `visibleOffersProvider` | Inactive offers hidden from customer; active visible |
+| S3 | Blog publish + push schedule | Published posts appear; schedule injects customer notification |
+| S4 | Support accept chat | Queue entry removed; ticket created; chat linked |
+| S5 | Cashier → kitchen | `receiveCashierTicket` appears on `kitchenBoardProvider` |
+
+### 3.5 Deliberate UX decisions (current build — do not regress)
 
 | Decision | Rationale |
 |----------|-----------|
 | **Drawer-first navigation** | No bottom navigation bar on any role; `WidgetsAppDrawer` is primary nav |
-| **Unified cart checkout** | Fulfillment, payment, tip, promo on one cart screen by default |
-| **Guest = shared customer home** | No separate guest browse screen; `/guest` sets role and redirects to `/home` |
+| **Stepped checkout (default)** | Cart → checkout (fulfillment + address) → payment (method + tip); unified cart available via flag |
+| **Checkout strip labels** | Basket → Fulfillment → Payment → Review (`WidgetsCheckoutStepStrip`) |
+| **Guest = shared customer home** | `/guest` sets role → `/home`; no separate guest browse screen |
 | **Coupon merged into cart** | `/coupon` redirects to `/cart`; promo apply inline |
-| **Wallet merged into profile/payment** | No standalone wallet hub screen in primary nav |
-| **Shared invoice widget** | `WidgetsOrderInvoiceBlock` reused on cashier, customer confirmation, order history, admin detail |
-| **Personal settings screen** | `UserPersonalSettingsScreen` at `/account-settings` for all operational roles |
+| **Wallet merged into profile/payment** | No standalone wallet hub in primary nav |
+| **Shared invoice widget** | `WidgetsOrderInvoiceBlock` on cashier, confirmation, history, admin detail |
+| **Personal settings** | `UserPersonalSettingsScreen` at `/account-settings` for all operational roles |
+| **Five hubs** | `/app-admin`, `/operator`, `/owner`, `/support-desk`, `/marketing` |
+| **Legacy `/admin*`** | Redirect-only per `AppRole` in `UtilityRouteGuard` |
+| **Multi-role switch** | One login; multiple roles; switch from Account Settings / `RoleSelectionScreen` when 2+ approved |
+| **Marketing offers co-approval** | New offers start inactive until operator approves; reject hides from customer |
+| **Subscriptions** | Marketing **content only** until payment provider wired |
+| **Mandatory audit events (mock)** | Every refund, every menu price change, every published/approved offer |
 
 ---
 
@@ -170,17 +193,38 @@ Build an integrated digital platform for **Ayletna Restaurant (مطعم عيلت
 
 ### 4.1 Role matrix
 
-| Role | Identifier (`AppRole`) | Primary capabilities |
-|------|------------------------|----------------------|
-| Operator | `operator` | Full control; financial formulas; users; reports; deposits/plates; tip approval |
-| Owner | `owner` | Configurable reports; revenue monitoring; audit; no day-to-day ops edits |
-| Cashier | `cashier` | POS; order types; tables; discounts; cash tips; deposit refunds |
-| Customer | `customer` | Menu; order; pay; track; loyalty; electronic tip |
-| Guest | `guest` | Browse menu/prices; sign-in required to checkout |
-| Delivery | `delivery` | Deliver; collect deposit; plate returns; attendance |
-| Kitchen | `kitchen` | Prep queue; status updates |
-| Inventory | `inventory` | Stock; adjustments; attendance |
-| Staff | `staff` | Attendance; daily tip view |
+| Role | Identifier (`AppRole`) | Hub route | Primary capabilities |
+|------|------------------------|-----------|----------------------|
+| App Admin | `admin` | `/app-admin` | Users; role/capability RBAC; app settings; integrations; audit; owner visibility rules |
+| Operator | `operator` | `/operator` | Daily ops: orders; menu (operational); tips; deposits/plates; HR; financial close |
+| Owner | `owner` | `/owner` | Configurable masked reports; revenue monitoring; audit — **no day-to-day ops edits** |
+| Support | `support` | `/support-desk` | Tickets; live chat queue; order lookup; FAQ editor; review moderation |
+| Marketing | `marketing` | `/marketing` | Offers; promotions/combos/subscriptions; catalog; loyalty/rewards; campaigns; social/blog |
+| Cashier | `cashier` | `/cashier` | POS; order types; tables; discounts; cash tips; deposit refunds |
+| Customer | `customer` | `/home` | Menu; order; pay; track; loyalty; electronic tip |
+| Guest | `guest` | `/home` | Browse menu/prices; sign-in required to checkout |
+| Delivery | `delivery` | `/delivery` | Deliver; collect deposit; plate returns; attendance |
+| Kitchen | `kitchen` | `/kitchen` | Prep queue; status updates |
+| Inventory | `inventory` | `/inventory` | Stock; adjustments; attendance |
+| Staff | `staff` | `/staff-attendance` | Attendance; daily tip view |
+
+> **Naming:** `AppRole.admin` is the **application administrator** — not a generic label for all management screens. Legacy `/admin*` paths are **redirect-only**; canonical hubs use the prefixes above. Full capability tables live in `docs/user_roles_permissions_matrix.md` (self-contained RBAC matrix).
+
+### 4.1a Confirmed product decisions (owner lock — 2026-06-19)
+
+| # | Decision |
+|---|----------|
+| 1 | **Single location** — one kitchen / cashier set (no multi-branch UI in v1) |
+| 2 | Support may **refund & cancel** orders directly; escalate to Operator/Cashier when needed |
+| 3 | **Marketing** publishes menu base prices (with audit) |
+| 4 | Support tickets show **full customer PII** (phone, address) |
+| 5 | SLA timers, shift handover, agent performance required in v1 support hub |
+| 6 | Push + social + blog + campaign calendar required at launch |
+| 7 | Campaign / offer go-live needs **Marketing + Operator** dual approval |
+| 8 | Subscriptions = marketing content only until payment wired |
+| 9 | Operator may **view and edit** support tickets & marketing campaigns when those roles are assigned |
+| 10 | **One login per person**; multiple roles; switch active role from Settings |
+| 11 | Audit every refund, every price change, every published offer |
 
 ### 4.2 Registration & approval
 
@@ -188,15 +232,17 @@ Build an integrated digital platform for **Ayletna Restaurant (مطعم عيلت
 |----------------------|----------|
 | `customer` | Active after OTP |
 | `guest` | No registration; browse only |
-| `cashier`, `kitchen`, `delivery`, `inventory` | `pending_approval` until operator approves |
-| `operator`, `owner` | **No self-registration** — created by operator only |
+| `cashier`, `kitchen`, `delivery`, `inventory`, `staff` | `pending_approval` until app admin / operator approves |
+| `operator`, `owner` | Self-registration UI exists (demo); production: **created by app admin only** |
+| `admin`, `support`, `marketing` | **No self-registration** — assigned by app admin only |
 
 **Security rules (production):**
 
 1. Source of truth: `profiles.role` + `profiles.status` in Supabase — not client-side role picker after login.
 2. `RoleSelectionScreen` only when user has **multiple approved roles** (session context switch).
-3. Role changes post-login: operator-only via user management + `audit_logs`.
-4. RLS uses `auth.uid()` and DB role — never trust client claims alone.
+3. Role changes post-login: app admin via user permissions (Screen B) + `audit_logs`.
+4. Operator may access assigned **ops** routes (`/kitchen`, `/cashier`, `/delivery`, `/inventory`, `/staff-*`) when approved for that role context.
+5. RLS uses `auth.uid()` and DB role — never trust client claims alone.
 
 ### 4.3 Account statuses (`profiles.status`)
 
@@ -251,8 +297,8 @@ flowchart TD
 
 ### 5.2 Operator — daily & monthly close
 
-1. Admin dashboard — live KPIs and attention queue.
-2. Orders, deposits, plates, offers management.
+1. Operator hub (`/operator`) — live KPIs and attention queue.
+2. Orders, deposits, plates, attendance/HR.
 3. **End of day:** approve `DailyTipDistributionScreen` → RPC `distribute_tips`.
 4. **End of month:** `FinancialCalculationScreen` → RPC profit (tips/deposits excluded from revenue).
 5. Export PDF/Excel + archive.
@@ -304,16 +350,7 @@ Guest entry (/guest) → sets guest role → /home
 
 ### 6.3 Checkout navigation modes
 
-**Mode A — Unified cart (default, `useSteppedCheckoutRoutes = false`):**
-
-```text
-/cart  (fulfillment + address + payment + tip + summary + proceed)
-  → /order-confirmation → /order-tracking
-```
-
-Legacy paths redirect to cart: `/order-type`, `/dine-in`, `/takeaway`, `/delivery-address`, `/plated-info`, `/checkout`, `/tip`, `/payment`, `/coupon`.
-
-**Mode B — Stepped checkout (`useSteppedCheckoutRoutes = true`):**
+**Mode A — Stepped checkout (default, `useSteppedCheckoutRoutes = true`):**
 
 ```text
 /cart → /checkout (fulfillment + address) → /payment (method + tip) → /order-confirmation
@@ -321,31 +358,56 @@ Legacy paths redirect to cart: `/order-type`, `/dine-in`, `/takeaway`, `/deliver
 
 State shared via `checkoutDraftProvider`.
 
-### 6.4 Operations & admin navigation
+**Mode B — Unified cart (`useSteppedCheckoutRoutes = false`):**
 
-All ops roles use **drawer navigation** via `WidgetsScaffoldPage` — no bottom bars.
+```text
+/cart  (fulfillment + address + payment + tip + summary + proceed)
+  → /order-confirmation → /order-tracking
+```
 
-| Role | Drawer hub routes |
-|------|-------------------|
-| Cashier | `/cashier`, order history, tip entry, deposit refund, account settings |
-| Kitchen | `/kitchen`, prep |
-| Delivery | `/delivery`, order detail, plated return task/process |
-| Inventory | `/inventory`, item detail, stock adjustment |
-| Staff | attendance, daily tips, tip history, account settings |
-| Operator/Owner | `/admin` hub + orders, menu, users, finance, reports, settings, audit |
+Legacy paths redirect to cart or stepped screens per flag: `/order-type`, `/dine-in`, `/takeaway`, `/delivery-address`, `/plated-info`, `/checkout`, `/tip`, `/payment`, `/coupon`.
+
+### 6.4 Operations & management navigation
+
+All ops and management roles use **drawer navigation** via `WidgetsScaffoldPage` — no bottom bars. Hub home routes come from `homeRouteForRole()` in `session_providers.dart`.
+
+| Role | Hub / home | Primary drawer destinations |
+|------|------------|----------------------------|
+| Cashier | `/cashier` | POS, order history, tip entry, deposit refund, account settings |
+| Kitchen | `/kitchen` | Dashboard, order prep |
+| Delivery | `/delivery` | Dashboard, order detail, plated return task/process |
+| Inventory | `/inventory` | Dashboard, item detail, stock adjustment |
+| Staff | `/staff-attendance` | Attendance, daily tips, tip history, account settings |
+| **App Admin** | `/app-admin` | Dashboard, roles & rules (A), users & permissions (B), audit, integrations, owner config, settings |
+| **Operator** | `/operator` | Dashboard, orders, menu, tips, plates, deposits, pre-orders, HR, reports, financial close, settings |
+| **Owner** | `/owner` | Dashboard, masked reports, financial summary, audit (read-only shells) |
+| **Support** | `/support-desk` | Dashboard, tickets, chat queue, order lookup, FAQ editor, review moderation |
+| **Marketing** | `/marketing` | Dashboard, offers, promotions/combos/subscriptions, catalog, loyalty, rewards, calendar, blog, push, social |
+
+**Customer support vs support staff:** Customer help uses `/support` (customer drawer). Support **staff** hub uses `/support-desk` — path collision intentionally avoided.
+
+**Legacy `/admin*` paths:** Still registered for bookmarks and deep links; `UtilityRouteGuard._legacyAdminRedirect` maps them to the correct hub per role (e.g. `/admin-orders` → `/operator/orders` for operator).
 
 ### 6.5 Route protection (`UtilityRouteGuard`)
 
-| Path prefix | Allowed roles |
-|-------------|---------------|
-| `/admin*` | `operator`, `owner` |
-| `/kitchen*` | `kitchen`, `operator` |
-| `/cashier*` | `cashier`, `operator` |
-| `/delivery*`, plated return | `delivery`, `operator` |
-| `/inventory*` | `inventory`, `operator` |
-| `/staff-*` | all operational roles + `operator` |
-| Customer paths (§7) | `customer`, `guest` (subset for guest) |
-| `/account-settings` | authenticated non-guest |
+| Path prefix | Allowed roles | Notes |
+|-------------|---------------|-------|
+| `/app-admin` | `admin` (approved) | Capability RBAC via `UtilityPermissionRouteMap` |
+| `/operator` | `operator` (approved) | Capability RBAC on sensitive routes |
+| `/owner` | `owner` (approved) | Read-only shells for reports/financial/audit |
+| `/support-desk` | `support` (approved) | Capability RBAC |
+| `/marketing` | `marketing` (approved) | Capability RBAC |
+| `/admin*` | `operator`, `owner` (approved) | **Redirect-only** → hub prefix per role |
+| `/kitchen`, `/kitchen-prep` | `kitchen`, `operator` (approved) | Operator cross-access per §4.2 |
+| `/cashier*` | `cashier`, `operator` (approved) | |
+| `/delivery*`, plated return | `delivery`, `operator` (approved) | |
+| `/inventory*`, `/stock-adjustment` | `inventory`, `operator` (approved) | |
+| `/staff-*` | `staff`, `kitchen`, `delivery`, `cashier`, `inventory`, `operator` (approved) | |
+| Customer paths (§7.2) | `customer`, `guest` (subset for guest) | Guest blocked from checkout without sign-in |
+| `/support`, `/support-chat`, `/faq` | all (including guest) | Customer-facing help |
+| `/account-settings`, `/edit-profile` | authenticated non-guest | |
+| `/role-selection` | users with **2+** approved roles | |
+| `/tip/daily/:date` | `admin`, `operator`, `owner`, `staff` (approved) | |
 
 **Deep links (required for production):**
 
@@ -358,7 +420,20 @@ All ops roles use **drawer navigation** via `WidgetsScaffoldPage` — no bottom 
 ## 7. Screen catalog
 
 > **Convention:** PRD name → file `lib/screens/<role>/<role>_<snake>_screen.dart` → class `<Role><Name>Screen`.  
-> **Total implemented:** 75 screen files + shared settings.
+> **Total implemented:** **97** screen files under `lib/screens/**/*_screen.dart` (see breakdown below).  
+> **Hub model:** Management/specialist screens often **reuse** the same Dart file at different route prefixes (e.g. `admin_orders_management_screen.dart` at `/operator/orders`).
+
+| § | Group | Files | Hub / route prefix |
+|---|-------|------:|-------------------|
+| 7.1 | Auth & shared | 9 | — |
+| 7.2 | Customer & ordering | 33 | `/home`, `/cart`, … |
+| 7.3 | Operations | 13 | `/kitchen`, `/cashier`, … |
+| 7.4 | Staff | 3 | `/staff-*` |
+| 7.6 | App Admin hub | 8 | `/app-admin` |
+| 7.7 | Operator hub | 15 | `/operator` |
+| 7.8 | Owner hub | 1 (+3 route shells) | `/owner` |
+| 7.9 | Support hub | 6 | `/support-desk` |
+| 7.10 | Marketing hub | 9 | `/marketing` |
 
 ### 7.1 Authentication & shared
 
@@ -372,6 +447,7 @@ All ops roles use **drawer navigation** via `WidgetsScaffoldPage` — no bottom 
 | 6 | ForgotPasswordScreen | `/forgot-password` | `auth_forgot_password_screen.dart` | UI ✅ |
 | 7 | RoleSelectionScreen | `/role-selection` | `auth_role_selection_screen.dart` | UI ✅ |
 | 8 | PendingApprovalScreen | `/pending-approval` | `auth_pending_approval_screen.dart` | UI ✅ |
+| — | GuestEntryScreen | `/guest` | route-only (no dedicated screen) | UI ✅ sets role → `/home` |
 | — | UserPersonalSettingsScreen | `/account-settings` | `user_personal_settings_screen.dart` | UI ✅ (all roles) |
 
 **Removed / merged:** `GuestBrowseScreen` → guest uses `CustomerHomeScreen`.
@@ -413,6 +489,16 @@ All ops roles use **drawer navigation** via `WidgetsScaffoldPage` — no bottom 
 
 **Collapsed / redirect-only routes:** `/order-type`, `/dine-in`, `/takeaway`, `/delivery-address`, `/plated-info`, `/tip`, `/coupon` → cart or stepped checkout per flag.
 
+### 7.2.1 Customer marketing addendum
+
+Routes below extend §7.2 for marketing surfaces linked from home, offers hub, and push deep links.
+
+| # | PRD name | Route | File | Notes |
+|---|----------|-------|------|-------|
+| — | CombosScreen | `/combos` | `customer_combos_screen.dart` | Browse combo bundles |
+| — | SubscriptionsScreen | `/subscriptions` | `customer_subscriptions_screen.dart` | Meal plans & recurring offers |
+| — | PromoDetailScreen | `/offers/:id` | `customer_promo_detail_screen.dart` | Offer / combo / subscription detail |
+
 **Removed / merged:** standalone `WalletScreen`, `CouponApplyScreen` — behavior in profile/cart.
 
 ### 7.3 Operations
@@ -441,30 +527,114 @@ All ops roles use **drawer navigation** via `WidgetsScaffoldPage` — no bottom 
 | 53 | StaffDailyTipsScreen | `/staff-tips` | `staff_daily_tips_screen.dart` |
 | 54 | StaffTipHistoryScreen | `/staff-tip-history` | `staff_tip_history_screen.dart` |
 
-### 7.5 Admin
+### 7.5 Legacy `/admin*` routes (redirect-only)
 
-| # | PRD name | Route | File |
-|---|----------|-------|------|
-| 55 | AdminDashboardScreen | `/admin` | `admin_dashboard_screen.dart` |
-| 56 | OrdersManagementScreen | `/admin-orders` | `admin_orders_management_screen.dart` |
-| 57 | OrderDetailAdminScreen | `/admin-order-detail` | `admin_order_detail_screen.dart` |
-| 58 | ReportsScreen | `/admin-reports` | `admin_reports_screen.dart` |
-| 59 | ReportFilterScreen | `/admin-report-filter` | `admin_report_filter_screen.dart` |
-| 60 | FinancialCalculationScreen | `/admin-financial` | `admin_financial_calculation_screen.dart` |
-| 61 | DailyTipDistributionScreen | `/admin-tip-distribution` | `admin_daily_tip_distribution_screen.dart` |
-| 62 | PlatesManagementScreen | `/admin-plates` | `admin_plates_management_screen.dart` |
-| 63 | PlateEditorScreen | `/admin-plate-editor` | `admin_plate_editor_screen.dart` |
-| 64 | DepositConfigScreen | `/admin-deposit-config` | `admin_deposit_config_screen.dart` |
-| 65 | UserManagementScreen | `/admin-users` | `admin_user_management_screen.dart` |
-| 66 | MenuManagementScreen | `/admin-menu` | `admin_menu_management_screen.dart` |
-| 67 | ProductEditorScreen | `/admin-product-editor` | `admin_product_editor_screen.dart` |
-| 68 | OffersManagementScreen | `/admin-offers-mgmt` | `admin_offers_management_screen.dart` |
-| 69 | LoyaltyConfigScreen | `/admin-loyalty-config` | `admin_loyalty_config_screen.dart` |
-| 70 | OwnerViewConfigScreen | `/admin-owner-config` | `admin_owner_view_config_screen.dart` |
-| 71 | PreOrderScreen | `/admin-pre-order` | `admin_pre_order_screen.dart` |
-| 72 | SettingsScreen | `/admin-settings` | `admin_settings_screen.dart` |
-| 73 | AuditLogScreen | `/admin-audit` | `admin_audit_log_screen.dart` |
-| 74 | StaffHoursReportScreen | `/admin-staff-hours` | `admin_staff_hours_report_screen.dart` |
+> **Removed:** `admin_user_management_screen.dart` — user list/detail live at `/app-admin/users` and `/app-admin/users/:id`.
+
+These paths remain for backward compatibility; the guard redirects to the canonical hub route per `AppRole`:
+
+| Legacy path | Redirect target (by role) |
+|-------------|---------------------------|
+| `/admin` | `/app-admin` · `/operator` · `/owner` · `/support-desk` · `/marketing` |
+| `/admin-users` | `/app-admin/users` |
+| `/admin-orders` | `/operator/orders` |
+| `/admin-reports` | `/operator/reports` or `/owner/reports` |
+| `/admin-financial` | `/operator/financial-close` or `/owner/financial` |
+| `/admin-audit` | `/app-admin/audit` or `/owner/audit` |
+| `/admin-offers-mgmt` | `/marketing/offers` |
+| `/admin-support-tickets` | `/support-desk/tickets` |
+| `/admin-order-detail` | `/operator/order-detail` |
+| `/admin-report-filter` | `/operator/report-filter` |
+| `/admin-tip-distribution` | `/operator/tips/distribute` |
+| `/admin-plates` | `/operator/plates` |
+| `/admin-plate-editor` | `/operator/plate-editor` |
+| `/admin-deposit-config` | `/operator/deposit-config` |
+| `/admin-menu` | `/operator/menu` |
+| `/admin-product-editor` | `/operator/product-editor` |
+| `/admin-pre-order` | `/operator/pre-orders` |
+| `/admin-attendance-hr` | `/operator/attendance` |
+| `/admin-staff-hours` | `/operator/staff-hours` |
+| `/admin-settings` | `/operator/settings` |
+| `/admin-app-integrations` | `/app-admin/integrations` |
+| `/admin-owner-config` | `/app-admin/owner-config` |
+| `/admin-loyalty-config` | `/marketing/loyalty` |
+| `/admin-rewards-mgmt` | `/marketing/rewards` |
+| `/admin-menu-catalog` | `/marketing/catalog` |
+| `/admin-reviews-moderation` | `/support-desk/reviews` |
+
+Full mapping: `UtilityRouteGuard._mapLegacyTo*` in `lib/utilities/utility_route_guard.dart`.
+
+### 7.6 App Admin hub (`/app-admin`)
+
+| PRD name | Route | File | Notes |
+|----------|-------|------|-------|
+| AppAdminDashboardScreen | `/app-admin` | `app_admin_dashboard_screen.dart` | Hub home |
+| RolePermissionsScreen (A) | `/app-admin/roles` | `app_admin_role_permissions_screen.dart` | Default rules per role |
+| UserPermissionsScreen (B) | `/app-admin/users` | `app_admin_user_permissions_screen.dart` | User list |
+| UserDetailPermissionsScreen (B) | `/app-admin/users/:id` | `app_admin_user_detail_permissions_screen.dart` | Inherited + overrides |
+| AuditLogScreen | `/app-admin/audit` | `admin_audit_log_screen.dart` | Shared file |
+| AppIntegrationsScreen | `/app-admin/integrations` | `admin_app_integrations_screen.dart` | OAuth UI mock |
+| OwnerViewConfigScreen | `/app-admin/owner-config` | `admin_owner_view_config_screen.dart` | Masked report fields |
+| SettingsScreen | `/app-admin/settings` | `admin_settings_screen.dart` | App-level settings |
+
+### 7.7 Operator hub (`/operator`)
+
+| PRD name | Route | File |
+|----------|-------|------|
+| AdminDashboardScreen | `/operator` | `admin_dashboard_screen.dart` |
+| OrdersManagementScreen | `/operator/orders` | `admin_orders_management_screen.dart` |
+| OrderDetailAdminScreen | `/operator/order-detail` | `admin_order_detail_screen.dart` |
+| MenuManagementScreen | `/operator/menu` | `admin_menu_management_screen.dart` |
+| ProductEditorScreen | `/operator/product-editor` | `admin_product_editor_screen.dart` |
+| DailyTipDistributionScreen | `/operator/tips/distribute` | `admin_daily_tip_distribution_screen.dart` |
+| PlatesManagementScreen | `/operator/plates` | `admin_plates_management_screen.dart` |
+| PlateEditorScreen | `/operator/plate-editor` | `admin_plate_editor_screen.dart` |
+| DepositConfigScreen | `/operator/deposit-config` | `admin_deposit_config_screen.dart` |
+| PreOrderScreen | `/operator/pre-orders` | `admin_pre_order_screen.dart` |
+| AttendanceHrScreen | `/operator/attendance` | `admin_attendance_hr_screen.dart` |
+| StaffHoursReportScreen | `/operator/staff-hours` | `admin_staff_hours_report_screen.dart` |
+| ReportsScreen | `/operator/reports` | `admin_reports_screen.dart` |
+| ReportFilterScreen | `/operator/report-filter` | `admin_report_filter_screen.dart` |
+| FinancialCalculationScreen | `/operator/financial-close` | `admin_financial_calculation_screen.dart` |
+| SettingsScreen | `/operator/settings` | `admin_settings_screen.dart` |
+
+### 7.8 Owner hub (`/owner`)
+
+| PRD name | Route | File | Notes |
+|----------|-------|------|-------|
+| OwnerDashboardScreen | `/owner` | `owner_dashboard_screen.dart` | Hub home |
+| OwnerReportsScreen | `/owner/reports` | `owner_dashboard_screen.dart` | Read-only shell → `AdminReportsScreen` |
+| OwnerFinancialScreen | `/owner/financial` | `owner_dashboard_screen.dart` | Read-only shell → `AdminFinancialCalculationScreen` |
+| OwnerAuditScreen | `/owner/audit` | `owner_dashboard_screen.dart` | Read-only shell → `AdminAuditLogScreen` |
+
+### 7.9 Support hub (`/support-desk`)
+
+| PRD name | Route | File |
+|----------|-------|------|
+| SupportDashboardScreen | `/support-desk` | `support/support_dashboard_screen.dart` |
+| SupportTicketsScreen | `/support-desk/tickets` | `admin/admin_support_tickets_screen.dart` |
+| SupportChatQueueScreen | `/support-desk/chat` | `support/support_chat_queue_screen.dart` |
+| SupportOrderLookupScreen | `/support-desk/order-lookup` | `support/support_order_lookup_screen.dart` |
+| SupportFaqEditorScreen | `/support-desk/faq` | `support/support_faq_editor_screen.dart` |
+| ReviewsModerationScreen | `/support-desk/reviews` | `admin/admin_reviews_moderation_screen.dart` |
+
+### 7.10 Marketing hub (`/marketing`)
+
+| PRD name | Route | File |
+|----------|-------|------|
+| MarketingDashboardScreen | `/marketing` | `marketing/marketing_dashboard_screen.dart` |
+| OffersManagementScreen | `/marketing/offers` | `admin/admin_offers_management_screen.dart` |
+| PromotionsManagementScreen | `/marketing/promotions` | `admin/admin_promotions_management_screen.dart` |
+| MenuCatalogScreen | `/marketing/catalog` | `admin/admin_menu_catalog_screen.dart` |
+| LoyaltyConfigScreen | `/marketing/loyalty` | `admin/admin_loyalty_config_screen.dart` |
+| RewardsManagementScreen | `/marketing/rewards` | `admin/admin_rewards_management_screen.dart` |
+| CampaignCalendarScreen | `/marketing/calendar` | `marketing/marketing_campaign_calendar_screen.dart` |
+| MarketingBlogScreen | `/marketing/blog` | `marketing/marketing_blog_screen.dart` |
+| PushCampaignsScreen | `/marketing/push-campaigns` | `marketing/marketing_push_campaigns_screen.dart` |
+| MarketingSocialIntegrationsScreen | `/marketing/social` | `marketing/marketing_dashboard_screen.dart` | Route-mounted widget |
+| *(customer surfaces)* | `/combos`, `/subscriptions` | `customer_combos_screen.dart`, `customer_subscriptions_screen.dart` | Also linked from marketing hub |
+
+**Marketing route aliases:** `/marketing/combos` and `/marketing/subscriptions` open `AdminPromotionsManagementScreen` with the matching tab; customer browse routes remain `/combos` and `/subscriptions`.
 
 ---
 
@@ -520,18 +690,24 @@ All ops roles use **drawer navigation** via `WidgetsScaffoldPage` — no bottom 
 | Plated return task + damage process | ✅ | `process_plated_return` RPC |
 | 60-minute return reminder | ✅ customer notification screen | FCM + cron |
 
-### 8.5 Admin & finance
+### 8.5 Management hubs & finance
+
+Covers **App Admin**, **Operator**, **Owner**, **Support**, and **Marketing** hubs (§7.6–§7.10). Operator and owner financial screens enforce tip/deposit isolation; owner views respect `owner_view_config` masking.
 
 | Requirement | Current UI | Production target |
 |-------------|------------|-------------------|
-| Live ops dashboard | ✅ | Real KPIs |
+| Five hub workspaces + drawers | ✅ | Same route model with live RBAC |
+| App admin RBAC (Screens A & B) | ✅ UI mock | Persist rules + overrides in Supabase |
+| Live ops dashboard (operator) | ✅ | Real KPIs |
 | Order management + detail with invoice | ✅ repository providers | |
 | Monthly profit calculation UI | ✅ | `calculate_monthly_profit_distribution` RPC |
 | Daily tip distribution approval | ✅ | `distribute_tips` RPC |
 | Plate asset catalog + editor | ✅ | |
 | Deposit config | ✅ | `app_settings` |
-| User management + approval | ✅ | `approve_staff_registration` |
-| Menu/product CRUD | ✅ | |
+| User approval workflow | ✅ | `approve_staff_registration` |
+| Menu/product CRUD (operator) | ✅ | |
+| Marketing offers / campaigns / social | ✅ UI mock | CMS + FCM + OAuth |
+| Support tickets / chat queue / FAQ editor | ✅ UI mock | Live desk integrations |
 | Audit log | ✅ | DB triggers |
 | Owner view field masking | ✅ | `owner_view_config` |
 | Reports + filters | ✅ | Export PDF/Excel |
@@ -971,8 +1147,9 @@ Order-type colors are **independent** of role theme colors on ops screens.
 
 ### 14.3 UI implementation rules
 
-Documented in `ui_design_prompt.txt`:
+See `docs/development_rules.md` for full implementation rules and `DESIGN.md` for design tokens.
 
+Key rules:
 - Theme-only styling — no per-screen color overrides.
 - `WidgetsScreenLayout` wraps all page bodies.
 - Naming: `widgets_<name>.dart` → class `Widgets<Name>`.
@@ -1176,18 +1353,18 @@ jobs:
 
 ## 19. Roadmap & definition of done
 
-### 19.1 Completed — UI mockup phase (2026 Q2)
+### 19.1 Completed — UI mockup phase (through 2026-08)
 
-- [x] 75 screens across 8 role groups
-- [x] Drawer-first navigation redesign
-- [x] Cashier POS tabs 4–5 + shared invoice widgets
-- [x] Customer cart unified checkout + progress strip
-- [x] Repository interfaces for menu, orders, addresses, profile
-- [x] Demo mode + mock action safety
-- [x] Google Fonts / Noto Arabic typography
-- [x] Route guards + deep link path constants
+- ~103 screens across customer, ops, staff, and five management/specialist hubs
+- Five-hub route model + legacy `/admin*` redirect map
+- Drawer-first navigation; stepped checkout default (`useSteppedCheckoutRoutes = true`)
+- Cashier → kitchen handoff; support chat accept → ticket; marketing offer dual-approval; blog/push → customer surfaces
+- Profile / tracking / confirmation honesty (live providers, not static l10n identity)
+- Repository interfaces for menu, orders, addresses (+ profile helpers) with mock implementations
+- Shared widget kit + `UtilitySizer` (design width 390) + ARB EN/AR
+- Provider smoke tests for cycles S1–S5
 
-### 19.2 Next — backend integration phase
+### 19.2 Next — backend integration phase (only remaining product work)
 
 | Sprint focus | Deliverables |
 |--------------|--------------|
@@ -1200,17 +1377,21 @@ jobs:
 | Admin finance | Monthly/daily RPCs hooked to admin screens |
 | Hardening | RLS tests, offline queue, E2E critical paths |
 
+**Switch point:** replace mock wiring in `lib/data/repositories/repository_providers.dart` (+ new `*Supabase` classes). Do not add HTTP clients inside screens.
+
 **Estimated duration post-UI:** 8–10 weeks with 2 Flutter + 1 backend engineer.
 
 ### 19.3 Definition of done — production v1
 
-- [ ] All §16 acceptance criteria pass on staging.
-- [ ] RLS migrations reviewed and penetration-tested.
-- [ ] No secrets in git; `flutter analyze` clean.
-- [ ] Critical RPC test coverage ≥ 80%.
-- [ ] Operator handbook (Arabic PDF).
-- [ ] App Store / Play / web URLs live.
-- [ ] `demoModeEnabled = false` in production build flavor.
+| # | Criterion |
+|---|-----------|
+| 1 | All §16 acceptance criteria pass on staging |
+| 2 | RLS migrations reviewed and penetration-tested |
+| 3 | No secrets in git; `flutter analyze` clean |
+| 4 | Critical RPC test coverage ≥ 80% |
+| 5 | Operator handbook (Arabic PDF) |
+| 6 | App Store / Play / web URLs live |
+| 7 | Production flavor keeps `demoModeEnabled = false` |
 
 ---
 
@@ -1227,24 +1408,30 @@ jobs:
 | RLS | Row Level Security in Postgres |
 | Split payment | Separate food / tip / deposit components |
 
-### 20.2 Pre-launch checklist
+### 20.2 Pre-launch checklist (production)
 
-- [ ] Payment gateway selected; split payments enabled
-- [ ] Wallet contract + production webhook
-- [ ] Google Maps API quotas configured
-- [ ] FCM + APNs certificates
-- [ ] Menu, plate catalog, deposit defaults loaded
-- [ ] Jordan privacy policy published
-- [ ] Staff training day (cashier, driver, operator)
+| # | Item |
+|---|------|
+| 1 | Payment gateway selected; split payments enabled |
+| 2 | Wallet contract + production webhook |
+| 3 | Google Maps API quotas configured |
+| 4 | FCM + APNs certificates |
+| 5 | Menu, plate catalog, deposit defaults loaded |
+| 6 | Jordan privacy policy published |
+| 7 | Staff training day (cashier, driver, operator) |
 
-### 20.3 Companion documents
+### 20.3 Canonical companion documents (this repo)
 
 | Document | Purpose |
 |----------|---------|
-| `color_list_chat_gpt.txt` | Hex color source of truth |
-| `ui_design_prompt.txt` | UI implementation rules and naming |
-| `docs/UI_UX_REDESIGN_CHECKLIST.md` | Redesign sprint tracking (internal) |
-| `.cursor/rules` | IDE coding standards (Riverpod, M3, lists) |
+| `docs/prdv1.md` (this file) | Product: routes, roles, journeys, fields, backend targets |
+| `docs/development_rules.md` | How to implement Flutter UI/mock logic |
+| `docs/user_roles_permissions_matrix.md` | Full RBAC capability matrix |
+| `DESIGN.md` | Visual tokens for Impeccable / Stitch |
+| `PRODUCT.md` | Short product brief for design agents |
+| `AGENTS.md` | Condensed agent operating brief |
+| `color_list_chat_gpt.txt` | Hex color source of truth (also mirrored in `DESIGN.md` / `CoreColors`) |
+| `.cursor/rules/stitch-redesign.mdc` | Stitch visual-refresh discipline |
 
 ### 20.4 Placeholders (update before launch)
 
@@ -1259,8 +1446,10 @@ jobs:
 
 | Version | Date | Summary |
 |---------|------|---------|
-| **1.0.0** | 2026-06-19 | Initial PRD v1: as-built UI state, drawer navigation, repository layer, backend spec, financial rules, complete screen catalog |
+| **1.3.0** | 2026-08-01 | UI mock close-out: §3 cycles S1–S5; owner decisions §4.1a; roadmap §19 updated; companion docs reduced to canonical set |
+| **1.1.0** | 2026-06-28 | Five-hub architecture; §7 catalog expanded; legacy `/admin*` redirects |
+| **1.0.0** | 2026-06-19 | Initial PRD v1 |
 
 ---
 
-**End of document — Ayletna Restaurant PRD v1.0.0**
+**End of document — Ayletna Restaurant PRD v1.3.0**

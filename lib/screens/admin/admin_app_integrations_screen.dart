@@ -1,12 +1,11 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
-import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/admin_integration_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_hub_nav_actions.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_info_banner.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
@@ -204,13 +203,7 @@ class _AdminAppIntegrationsScreenState
 
     return WidgetsScaffoldPage(
       title: l10n.screenAppIntegrations,
-      actions: [
-        WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.adminSettings),
-          icon: Icons.settings_outlined,
-          tooltip: l10n.screenSettings,
-        ),
-      ],
+      actions: WidgetsHubNavActions.forContext(context),
       child: WidgetsRefreshList(
         onRefresh: () async {
           await Future<void>.delayed(const Duration(milliseconds: 300));
@@ -535,7 +528,7 @@ class _AdminAppIntegrationsScreenState
                     ),
                   ),
                   value: _aiSupportChatEnabled,
-                  activeColor: CoreColors.brandOlive,
+                  activeThumbColor: CoreColors.brandOlive,
                   onChanged:
                       (value) => setState(() => _aiSupportChatEnabled = value),
                 ),

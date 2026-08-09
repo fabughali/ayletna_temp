@@ -1,4 +1,5 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:ayletna_restaurant_app/data/models/model_staff_mock.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
@@ -7,13 +8,16 @@ import 'package:ayletna_restaurant_app/providers/attendance_providers.dart';
 import 'package:ayletna_restaurant_app/providers/staff_session_providers.dart';
 import 'package:ayletna_restaurant_app/services/service_attendance_biometric.dart';
 import 'package:ayletna_restaurant_app/services/service_attendance_wifi.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_info_banner.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -43,7 +47,7 @@ class StaffAttendanceScreen extends ConsumerWidget {
       ],
       child: WidgetsRefreshList(
         onRefresh:
-            () async => UtilityMockFeedback.showSuccess(
+            () async => UtilityMockFeedback.showInfo(
               context,
               l10n.screenStaffAttendance,
             ),
@@ -122,10 +126,10 @@ class _AttendanceHero extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.access_time,
                 color: scheme.primary,
-                large: true,
+                size: CoreContentSizes.emptyStateIcon(context), iconSize: CoreContentSizes.kpiIcon(context),
               ),
               SizedBox(width: CoreSpacing.md(context)),
               Expanded(
@@ -150,7 +154,7 @@ class _AttendanceHero extends StatelessWidget {
                   ],
                 ),
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: statusLabel,
                 color: statusColor,
                 icon: Icons.circle,
@@ -162,17 +166,17 @@ class _AttendanceHero extends StatelessWidget {
             spacing: CoreSpacing.sm(context),
             runSpacing: CoreSpacing.sm(context),
             children: [
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.staffMainKitchen,
                 color: scheme.primary,
                 icon: Icons.location_on_outlined,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.staffLeadChef,
                 color: CoreColors.orderTypePlated,
                 icon: Icons.restaurant_menu_outlined,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.staffExpectedEarningsValue,
                 color: CoreColors.semanticSuccess,
                 icon: Icons.payments_outlined,
@@ -287,13 +291,13 @@ class _ShiftDetailTile extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
       ),
       child: Padding(
         padding: EdgeInsets.all(CoreSpacing.sm(context)),
         child: Row(
           children: [
-            _IconBubble(icon: _icon(detail.iconKey), color: color),
+            WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), icon: _icon(detail.iconKey), color: color),
             SizedBox(width: CoreSpacing.sm(context)),
             Expanded(
               child: Column(
@@ -346,7 +350,7 @@ class _StationContextCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.room_service_outlined,
                 color: scheme.primary,
               ),
@@ -506,9 +510,7 @@ class _AttendanceGateCardState extends ConsumerState<_AttendanceGateCard> {
     setState(() => _isSubmitting = false);
 
     if (ok) {
-      UtilityMockFeedback.showSuccess(
-        context,
-        mode == AttendanceActionMode.coming
+      UtilityDemoActions.complete(context, successMessage: mode == AttendanceActionMode.coming
             ? l10n.staffCheckInAction
             : l10n.staffCheckOutShift,
       );
@@ -651,8 +653,6 @@ class _WifiStatusPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
     return wifiAsync.when(
       loading:
           () => WidgetsInfoBanner(
@@ -672,27 +672,9 @@ class _WifiStatusPanel extends StatelessWidget {
           );
         }
         if (wifi.isRestaurantWifi) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              WidgetsInfoBanner(
-                tone: WidgetsInfoBannerTone.success,
-                message:
-                    wifi.isDemoSimulation
-                        ? l10n.attendanceWifiDemoMatched(wifi.currentSsid ?? '')
-                        : l10n.attendanceWifiConnected(wifi.currentSsid ?? ''),
-              ),
-              if (wifi.isDemoSimulation) ...[
-                SizedBox(height: CoreSpacing.xs(context)),
-                Text(
-                  l10n.attendanceWifiWebDemoNote,
-                  style: CoreTypography.caption(
-                    context,
-                    scheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ],
+          return WidgetsInfoBanner(
+            tone: WidgetsInfoBannerTone.success,
+            message: l10n.attendanceWifiConnected(wifi.currentSsid ?? ''),
           );
         }
         return WidgetsInfoBanner(
@@ -741,7 +723,7 @@ class _ContextLine extends StatelessWidget {
     padding: EdgeInsets.only(bottom: CoreSpacing.sm(context)),
     child: Row(
       children: [
-        Icon(Icons.circle, color: color, size: 9),
+        Icon(Icons.circle, color: color, size: UtilitySizer.of(context, 9)),
         SizedBox(width: CoreSpacing.sm(context)),
         Expanded(
           child: Text(
@@ -772,7 +754,7 @@ class _NoteStrip extends StatelessWidget {
   Widget build(BuildContext context) => DecoratedBox(
     decoration: BoxDecoration(
       color: color.withValues(alpha: 0.08),
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
       border: Border.all(color: color.withValues(alpha: 0.18)),
     ),
     child: Padding(
@@ -788,82 +770,4 @@ class _NoteStrip extends StatelessWidget {
   );
 }
 
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({
-    required this.label,
-    required this.color,
-    required this.icon,
-  });
 
-  final String label;
-  final Color color;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: CoreContentSizes.orderTypeIcon(context),
-              color: color,
-            ),
-            SizedBox(width: CoreSpacing.xs(context)),
-            Text(
-              label,
-              style: CoreTypography.caption(
-                context,
-                color,
-              ).copyWith(fontWeight: FontWeight.w900),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({
-    required this.icon,
-    required this.color,
-    this.large = false,
-  });
-
-  final IconData icon;
-  final Color color;
-  final bool large;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(CoreSpacing.sm(context)),
-        child: Icon(
-          icon,
-          color: color,
-          size:
-              large
-                  ? CoreContentSizes.logoCard(context) * 0.52
-                  : CoreContentSizes.orderTypeIcon(context),
-        ),
-      ),
-    );
-  }
-}

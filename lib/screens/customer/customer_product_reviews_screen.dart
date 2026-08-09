@@ -3,9 +3,12 @@ import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/menu_providers.dart';
 import 'package:ayletna_restaurant_app/providers/reviews_admin_providers.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_cart_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,7 +25,7 @@ class CustomerProductReviewsScreen extends ConsumerWidget {
     final item = ref.watch(selectedMenuItemProvider);
     final title =
         item == null
-            ? (isAr ? 'تقييمات المنتج' : 'Product reviews')
+            ? l10n.productReviewsTitle
             : (isAr ? item.nameAr : item.nameEn);
     final reviews = ref.watch(approvedReviewsForProductProvider(item?.id));
 
@@ -36,18 +39,25 @@ class CustomerProductReviewsScreen extends ConsumerWidget {
         ),
         const WidgetsCartIconButton(),
       ],
-      child: ListView(
+      child: WidgetsRefreshList(
+        onRefresh: () async {
+          ref.invalidate(approvedReviewsForProductProvider(item?.id));
+          if (context.mounted) {
+            UtilityMockFeedback.showInfo(context, l10n.productReviewsTitle);
+          }
+        },
+        child: ListView(
         children: [
           SizedBox(height: CoreSpacing.md(context)),
-          _ReviewsHero(title: title, isAr: isAr, count: reviews.length),
-          SizedBox(height: CoreSpacing.lg(context)),
+          WidgetsPageHeader(
+            title: l10n.productReviewsApprovedTitle,
+            subtitle: l10n.productReviewsCountFor(reviews.length, title),
+          ),
           if (reviews.isEmpty)
             WidgetsAppCard(
               padding: EdgeInsets.all(CoreSpacing.lg(context)),
               child: Text(
-                isAr
-                    ? 'لا توجد تقييمات معتمدة بعد. قيّم طلبك بعد التوصيل.'
-                    : 'No approved reviews yet. Rate your order after delivery.',
+                l10n.productReviewsEmptyPrompt,
                 style: CoreTypography.bodyMedium(
                   context,
                   Theme.of(context).colorScheme.onSurfaceVariant,
@@ -62,68 +72,7 @@ class CustomerProductReviewsScreen extends ConsumerWidget {
             ],
           SizedBox(height: CoreSpacing.xxl(context)),
         ],
-      ),
-    );
-  }
-}
-
-class _ReviewsHero extends StatelessWidget {
-  const _ReviewsHero({
-    required this.title,
-    required this.isAr,
-    required this.count,
-  });
-
-  final String title;
-  final bool isAr;
-  final int count;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return WidgetsAppCard(
-      variant: WidgetsAppCardVariant.food,
-      padding: EdgeInsets.all(CoreSpacing.lg(context)),
-      child: Row(
-        children: [
-          DecoratedBox(
-            decoration: BoxDecoration(
-              color: CoreColors.brandGold.withValues(alpha: 0.16),
-              shape: BoxShape.circle,
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(CoreSpacing.md(context)),
-              child: const Icon(
-                Icons.rate_review_outlined,
-                color: CoreColors.brandGold,
-              ),
-            ),
-          ),
-          SizedBox(width: CoreSpacing.md(context)),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  isAr ? 'تقييمات معتمدة' : 'Approved reviews',
-                  style: CoreTypography.headlineSmall(
-                    context,
-                    scheme.onSurface,
-                  ).copyWith(fontWeight: FontWeight.w900),
-                ),
-                SizedBox(height: CoreSpacing.xs(context)),
-                Text(
-                  isAr ? '$count تقييم لـ $title' : '$count reviews for $title',
-                  style: CoreTypography.caption(
-                    context,
-                    scheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

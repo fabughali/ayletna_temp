@@ -1,28 +1,34 @@
 import 'dart:math' as math;
 
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:ayletna_restaurant_app/data/models/model_cart_customization_option.dart';
 import 'package:ayletna_restaurant_app/data/models/model_menu_item.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
-import 'package:ayletna_restaurant_app/data/models/model_admin_catalog.dart';
 import 'package:ayletna_restaurant_app/providers/admin_catalog_providers.dart';
+import 'package:ayletna_restaurant_app/providers/admin_session_providers.dart';
 import 'package:ayletna_restaurant_app/providers/rewards_admin_providers.dart';
 import 'package:ayletna_restaurant_app/providers/cart_providers.dart';
 import 'package:ayletna_restaurant_app/providers/menu_providers.dart';
 import 'package:ayletna_restaurant_app/providers/reviews_admin_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_cart_option_labels.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_action_bar.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_addon_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_cart_customization_sheet.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_cart_icon_button.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_choice_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_food_tag.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_mock_food_image.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_price_badge.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_quantity_stepper.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_related_product_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -47,11 +53,37 @@ class _CustomerProductDetailScreenState
   final _instructionsController = TextEditingController();
 
   static const _fallbackPrice = 14.50;
+  /// Large seed so PageView can scroll both ways while looping.
+  static const _galleryLoopSeed = 5000;
 
   @override
   void initState() {
     super.initState();
-    _galleryController = PageController();
+    _galleryController = PageController(initialPage: _galleryLoopSeed);
+  }
+
+  int _galleryPageForRealIndex(int realIndex, int length) {
+    if (length <= 1) {
+      return 0;
+    }
+    final current =
+        _galleryController.hasClients
+            ? (_galleryController.page?.round() ?? _galleryLoopSeed)
+            : _galleryLoopSeed;
+    return current + (realIndex - (current % length));
+  }
+
+  void _jumpGalleryToStart(int length) {
+    if (!_galleryController.hasClients) {
+      return;
+    }
+    if (length <= 1) {
+      _galleryController.jumpToPage(0);
+      return;
+    }
+    _galleryController.jumpToPage(
+      _galleryLoopSeed - (_galleryLoopSeed % length),
+    );
   }
 
   @override
@@ -76,7 +108,7 @@ class _CustomerProductDetailScreenState
             ? l10n.productMansafDescription
             : (isAr ? item.descriptionAr : item.descriptionEn);
     final basePrice = item?.priceJod ?? _fallbackPrice;
-    final addons = ref.watch(visibleAddonsProvider);
+    final addons = ref.watch(productAddonsForItemProvider(item?.id ?? ''));
     final portions = ref.watch(visiblePortionOptionsProvider);
     final total = _calculateTotal(basePrice, portions, addons);
     final totalText = UtilityFormatJod.format(total, suffix: l10n.currencyJod);
@@ -85,63 +117,77 @@ class _CustomerProductDetailScreenState
 
     return WidgetsScaffoldPage(
       title: productName,
-      actions: [
-        WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.notifications),
-          icon: Icons.notifications_outlined,
-          tooltip: l10n.screenNotifications,
-        ),
-        const WidgetsCartIconButton(),
+      actions: const [
+        WidgetsCartIconButton(),
       ],
-      bottomSheet: _StickyCartPanel(
-        quantity: _quantity,
-        totalText: totalText,
-        onMinus:
-            () => setState(() {
-              if (_quantity > 1) {
-                _quantity--;
-              }
-            }),
-        onPlus: () => setState(() => _quantity++),
-        onAdd: () {
-          if (item != null) {
-            final remarks = _instructionsController.text.trim();
-            final configuration = _configurationSummary(l10n, portions, addons);
-            final configKey = [
-              _portionKey,
-              ..._selectedAddonKeys,
-              if (remarks.isNotEmpty) 'r:$remarks',
-            ].join('|');
-            ref
-                .read(cartProvider.notifier)
-                .addConfiguredItem(
-                  item: item,
-                  quantity: _quantity,
-                  unitPriceJod: total / _quantity,
-                  configurationKey: configKey,
-                  configurationAr: configuration,
-                  configurationEn: configuration,
-                  remarks: remarks.isEmpty ? null : remarks,
-                );
-          }
-          final pointsEarned =
-              (total * ref.read(rewardsCatalogProvider).pointsPerJod).round();
-          if (pointsEarned > 0) {
-            ref.read(loyaltyPointsProvider.notifier).addPoints(
-              pointsEarned,
-              titleEn: 'Order add-on',
-              titleAr: 'إضافة للطلب',
-            );
-          }
-          _showRewardCartDialog(context, pointsEarned > 0 ? pointsEarned : 10 * _quantity);
-        },
-      ),
-      child: ListView(
-        padding: EdgeInsetsDirectional.only(
-          top: CoreSpacing.md(context),
-          bottom: CoreSpacing.xxl(context) * 3,
+      bottomSheet: WidgetsActionBar(
+        secondary: WidgetsQuantityStepper(
+          value: _quantity,
+          min: 1,
+          expanded: true,
+          onIncrement: () => setState(() => _quantity++),
+          onDecrement:
+              () => setState(() {
+                if (_quantity > 1) {
+                  _quantity--;
+                }
+              }),
         ),
-        children: [
+        primary: WidgetsAppButton(
+          label: l10n.productAddToCartAmount(totalText),
+          onPressed: () {
+            if (item != null) {
+              final remarks = _instructionsController.text.trim();
+              final configuration = _configurationSummary(l10n, portions, addons);
+              final configKey = [
+                _portionKey,
+                ..._selectedAddonKeys,
+                if (remarks.isNotEmpty) 'r:$remarks',
+              ].join('|');
+              ref
+                  .read(cartProvider.notifier)
+                  .addConfiguredItem(
+                    item: item,
+                    quantity: _quantity,
+                    unitPriceJod: total / _quantity,
+                    configurationKey: configKey,
+                    configurationAr: configuration,
+                    configurationEn: configuration,
+                    remarks: remarks.isEmpty ? null : remarks,
+                  );
+            }
+            final pointsRate = ref
+                .read(rewardsCatalogProvider)
+                .earnRateForBalance(
+                  ref.read(loyaltyPointsProvider).balance,
+                );
+            final doubleMultiplier =
+                ref.read(adminGrowthConfigProvider).doublePoints ? 2.0 : 1.0;
+            final pointsEarned =
+                (total * pointsRate * doubleMultiplier).round();
+            if (pointsEarned > 0) {
+              ref.read(loyaltyPointsProvider.notifier).addPoints(
+                pointsEarned,
+                titleEn: lookupAppLocalizations(
+                  const Locale('en'),
+                ).productLoyaltyOrderAddon,
+                titleAr: lookupAppLocalizations(
+                  const Locale('ar'),
+                ).productLoyaltyOrderAddon,
+              );
+            }
+            _showRewardCartDialog(
+              context,
+              pointsEarned > 0 ? pointsEarned : 10 * _quantity,
+            );
+          },
+          icon: Icons.add_shopping_cart_outlined,
+          fullWidth: true,
+        ),
+      ),
+      child: Builder(
+        builder: (context) {
+          final detailChildren = <Widget>[
           _ProductGallery(
             imageUrls: galleryImages,
             selectedIndex: _galleryIndex,
@@ -150,30 +196,45 @@ class _CustomerProductDetailScreenState
             onSelected: (index) {
               setState(() => _galleryIndex = index);
               _galleryController.animateToPage(
-                index,
+                _galleryPageForRealIndex(index, galleryImages.length),
                 duration: const Duration(milliseconds: 260),
                 curve: Curves.easeOutCubic,
               );
             },
           ),
           SizedBox(height: CoreSpacing.lg(context)),
-          Text(
-            productName,
-            style: CoreTypography.headlineLarge(
-              context,
-              scheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w900),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  productName,
+                  style: CoreTypography.headlineLarge(
+                    context,
+                    scheme.onSurface,
+                  ).copyWith(fontWeight: FontWeight.w900),
+                ),
+              ),
+              SizedBox(width: CoreSpacing.sm(context)),
+              WidgetsPriceBadge(
+                priceLabel: UtilityFormatJod.format(
+                  basePrice,
+                  suffix: l10n.currencyJod,
+                ),
+                compact: true,
+              ),
+            ],
           ),
           SizedBox(height: CoreSpacing.sm(context)),
           Wrap(
             spacing: CoreSpacing.sm(context),
             runSpacing: CoreSpacing.xs(context),
             children: [
-              _FoodTag(
+              WidgetsFoodTag(
                 label: l10n.orderTypeDineIn,
                 color: CoreColors.orderTypeDineIn,
               ),
-              _FoodTag(label: l10n.productBestSeller, color: scheme.primary),
+              WidgetsFoodTag(label: l10n.productBestSeller, color: scheme.primary),
             ],
           ),
           SizedBox(height: CoreSpacing.md(context)),
@@ -186,26 +247,9 @@ class _CustomerProductDetailScreenState
             ),
           ),
           SizedBox(height: CoreSpacing.md(context)),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              WidgetsPriceBadge(
-                priceLabel: UtilityFormatJod.format(
-                  basePrice,
-                  suffix: l10n.currencyJod,
-                ),
-              ),
-              SizedBox(width: CoreSpacing.md(context)),
-              Expanded(
-                child: Text(
-                  l10n.productInclVat,
-                  style: CoreTypography.caption(
-                    context,
-                    scheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-            ],
+          Text(
+            l10n.productInclVat,
+            style: CoreTypography.caption(context, scheme.onSurfaceVariant),
           ),
           SizedBox(height: CoreSpacing.lg(context)),
           Text(
@@ -219,6 +263,7 @@ class _CustomerProductDetailScreenState
           ),
           SizedBox(height: CoreSpacing.xl(context)),
           _AddonsSection(
+            productId: item?.id ?? '',
             selectedKeys: _selectedAddonKeys,
             onToggle: (key, selected) {
               setState(() {
@@ -253,7 +298,9 @@ class _CustomerProductDetailScreenState
                   _selectedAddonKeys.clear();
                   _instructionsController.clear();
                 });
-                _galleryController.jumpToPage(0);
+                _jumpGalleryToStart(
+                  _galleryImagesFor(relatedItem.imageUrl).length,
+                );
               },
               onAdd:
                   (relatedItem) => showWidgetsCartCustomizationSheet(
@@ -262,7 +309,16 @@ class _CustomerProductDetailScreenState
                   ),
             ),
           ],
-        ],
+        ];
+          return ListView.builder(
+            padding: EdgeInsetsDirectional.only(
+              top: CoreSpacing.md(context),
+              bottom: CoreSpacing.xxl(context) * 3,
+            ),
+            itemCount: detailChildren.length,
+            itemBuilder: (context, index) => detailChildren[index],
+          );
+        },
       ),
     );
   }
@@ -331,27 +387,29 @@ class _CustomerProductDetailScreenState
   double _calculateTotal(
     double basePrice,
     List<ModelCartCustomizationOption> portions,
-    List<ModelMenuAddon> addons,
+    List<ResolvedProductAddon> addons,
   ) {
     final portionPrice = portions
         .where((option) => option.key == _portionKey)
         .fold(0.0, (sum, option) => sum + option.priceDeltaJod);
     final addonPrice = addons
-        .where((addon) => _selectedAddonKeys.contains(addon.key))
-        .fold(0.0, (sum, addon) => sum + addon.priceDeltaJod);
+        .where((entry) => _selectedAddonKeys.contains(entry.addon.key))
+        .fold(0.0, (sum, entry) => sum + entry.priceDeltaJod);
     return (basePrice + portionPrice + addonPrice) * _quantity;
   }
 
   String _configurationSummary(
     AppLocalizations l10n,
     List<ModelCartCustomizationOption> portions,
-    List<ModelMenuAddon> addons,
+    List<ResolvedProductAddon> addons,
   ) {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final parts = <String>[
       cartOptionLabel(_portionKey, l10n),
-      for (final addon in addons.where((a) => _selectedAddonKeys.contains(a.key)))
-        isAr ? addon.labelAr : addon.labelEn,
+      for (final entry in addons.where(
+        (a) => _selectedAddonKeys.contains(a.addon.key),
+      ))
+        isAr ? entry.addon.labelAr : entry.addon.labelEn,
     ];
     return parts.join(' • ');
   }
@@ -386,7 +444,7 @@ class _CartRewardDialog extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(
             color: scheme.surface,
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+            borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
           ),
           child: Padding(
             padding: EdgeInsets.all(CoreSpacing.lg(context)),
@@ -412,10 +470,10 @@ class _CartRewardDialog extends StatelessWidget {
                   ),
                   child: Padding(
                     padding: EdgeInsets.all(CoreSpacing.lg(context)),
-                    child: const Icon(
+                    child: Icon(
                       Icons.stars_rounded,
                       color: CoreColors.brandGold,
-                      size: 44,
+                      size: UtilitySizer.of(context, 44),
                     ),
                   ),
                 ),
@@ -525,16 +583,25 @@ class _ProductGallery extends StatelessWidget {
           SizedBox(
             height: CoreContentSizes.categoryHeroHeight(context) * 0.86,
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+              borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
               child: PageView.builder(
                 controller: controller,
-                itemCount: imageUrls.length,
-                onPageChanged: onChanged,
-                itemBuilder:
-                    (context, index) => WidgetsMockFoodImage(
-                      imageUrl: imageUrls[index],
-                      fallback: _GalleryFallback(index: index),
-                    ),
+                // Null itemCount = unbounded pages; map via modulo for loop.
+                itemCount: imageUrls.length <= 1 ? imageUrls.length : null,
+                onPageChanged: (index) {
+                  if (imageUrls.isEmpty) {
+                    return;
+                  }
+                  onChanged(index % imageUrls.length);
+                },
+                itemBuilder: (context, index) {
+                  final realIndex =
+                      imageUrls.isEmpty ? 0 : index % imageUrls.length;
+                  return WidgetsMockFoodImage(
+                    imageUrl: imageUrls[realIndex],
+                    fallback: _GalleryFallback(index: realIndex),
+                  );
+                },
               ),
             ),
           ),
@@ -607,11 +674,11 @@ class _GalleryThumbnail extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
           border: Border.all(
             color: selected ? scheme.primary : scheme.outlineVariant,
             width: selected ? 2 : 1,
@@ -650,107 +717,32 @@ class _RelatedProductsRail extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          isAr ? 'منتجات ذات صلة' : 'Related products',
+          l10n.productRelatedProducts,
           style: CoreTypography.headlineSmall(
             context,
             scheme.onSurface,
           ).copyWith(fontWeight: FontWeight.w900),
         ),
-        SizedBox(height: CoreSpacing.xs(context)),
-        Text(
-          isAr
-              ? 'اقتراحات مناسبة مع هذا الصنف.'
-              : 'Suggestions that pair well with this item.',
-          style: CoreTypography.caption(context, scheme.onSurfaceVariant),
-        ),
         SizedBox(height: CoreSpacing.md(context)),
         SizedBox(
-          height: 230,
+          height: UtilitySizer.of(context, 360),
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: items.length,
             separatorBuilder:
                 (context, index) => SizedBox(width: CoreSpacing.md(context)),
             itemBuilder:
-                (context, index) => _RelatedProductCard(
+                (context, index) => WidgetsRelatedProductCard.fromItem(
                   item: items[index],
                   isAr: isAr,
                   l10n: l10n,
-                  onOpen: () => onOpen(items[index]),
-                  onAdd: () => onAdd(items[index]),
+                  index: index,
+                  onTap: () => onOpen(items[index]),
+                  onAction: () => onAdd(items[index]),
                 ),
           ),
         ),
       ],
-    );
-  }
-}
-
-class _RelatedProductCard extends StatelessWidget {
-  const _RelatedProductCard({
-    required this.item,
-    required this.isAr,
-    required this.l10n,
-    required this.onOpen,
-    required this.onAdd,
-  });
-
-  final ModelMenuItem item;
-  final bool isAr;
-  final AppLocalizations l10n;
-  final VoidCallback onOpen;
-  final VoidCallback onAdd;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return SizedBox(
-      width: 188,
-      child: WidgetsAppCard(
-        variant: WidgetsAppCardVariant.food,
-        padding: EdgeInsets.all(CoreSpacing.sm(context)),
-        onTap: onOpen,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
-                child: WidgetsMockFoodImage(
-                  imageUrl: item.imageUrl,
-                  fallback: _GalleryFallback(index: item.id.hashCode),
-                ),
-              ),
-            ),
-            SizedBox(height: CoreSpacing.sm(context)),
-            Text(
-              isAr ? item.nameAr : item.nameEn,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: CoreTypography.bodyMedium(
-                context,
-                scheme.onSurface,
-              ).copyWith(fontWeight: FontWeight.w900),
-            ),
-            SizedBox(height: CoreSpacing.xs(context)),
-            Text(
-              UtilityFormatJod.format(item.priceJod, suffix: l10n.currencyJod),
-              style: CoreTypography.caption(
-                context,
-                scheme.primary,
-              ).copyWith(fontWeight: FontWeight.w900),
-            ),
-            SizedBox(height: CoreSpacing.sm(context)),
-            WidgetsAppButton(
-              label: l10n.actionAddToCart,
-              onPressed: onAdd,
-              icon: Icons.add_shopping_cart_outlined,
-              fullWidth: true,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -775,7 +767,7 @@ class _GalleryDot extends StatelessWidget {
         height: 8,
         decoration: BoxDecoration(
           color: selected ? scheme.primary : scheme.outlineVariant,
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
         ),
       ),
     );
@@ -834,8 +826,8 @@ class _ReviewPreviewSheet extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: scheme.surface,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(CoreSpacing.radiusCard * 1.35),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(CoreSpacing.radiusCardOf(context) * 1.35),
         ),
         boxShadow: [
           BoxShadow(
@@ -863,9 +855,9 @@ class _ReviewPreviewSheet extends StatelessWidget {
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     color: scheme.outlineVariant,
-                    borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+                    borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
                   ),
-                  child: const SizedBox(width: 44, height: 4),
+                  child: SizedBox(width: CoreContentSizes.sheetGrabberWidth(context), height: CoreContentSizes.sheetGrabberHeight(context)),
                 ),
               ),
               SizedBox(height: CoreSpacing.lg(context)),
@@ -1034,7 +1026,7 @@ class _MetaRow extends StatelessWidget {
       children: [
         InkWell(
           onTap: onRatingTap,
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
           child: Padding(
             padding: EdgeInsets.symmetric(
               horizontal: CoreSpacing.xs(context),
@@ -1092,27 +1084,29 @@ class _PortionSection extends ConsumerWidget {
           children: [
             Expanded(
               child: Text(
-                l10n.productSizePortion,
+                l10n.productChooseYourSide,
                 style: CoreTypography.titleMedium(
                   context,
                   scheme.onSurface,
                 ).copyWith(fontWeight: FontWeight.w900),
               ),
             ),
-            _FoodTag(label: l10n.productRequired, color: scheme.primary),
+            WidgetsFoodTag(label: l10n.productRequired, color: scheme.primary),
           ],
         ),
         SizedBox(height: CoreSpacing.md(context)),
         for (var index = 0; index < portions.length; index++) ...[
-          _PortionTile(
-            optionKey: portions[index].key,
-            selectedKey: selectedKey,
+          WidgetsChoiceCard(
             title: cartOptionLabel(portions[index].key, l10n),
-            priceLabel: UtilityFormatJod.format(
-              portions[index].priceDeltaJod,
-              suffix: l10n.currencyJod,
-            ),
-            onChanged: onChanged,
+            subtitle:
+                portions[index].priceDeltaJod > 0
+                    ? UtilityFormatJod.format(
+                      portions[index].priceDeltaJod,
+                      suffix: l10n.currencyJod,
+                    )
+                    : null,
+            selected: portions[index].key == selectedKey,
+            onTap: () => onChanged(portions[index].key),
           ),
           if (index != portions.length - 1)
             SizedBox(height: CoreSpacing.sm(context)),
@@ -1122,61 +1116,14 @@ class _PortionSection extends ConsumerWidget {
   }
 }
 
-class _PortionTile extends StatelessWidget {
-  const _PortionTile({
-    required this.optionKey,
-    required this.selectedKey,
-    required this.title,
-    required this.priceLabel,
-    required this.onChanged,
-  });
-
-  final String optionKey;
-  final String selectedKey;
-  final String title;
-  final String priceLabel;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    final isSelected = optionKey == selectedKey;
-
-    return WidgetsAppCard(
-      variant:
-          isSelected ? WidgetsAppCardVariant.food : WidgetsAppCardVariant.form,
-      padding: EdgeInsets.all(CoreSpacing.md(context)),
-      onTap: () => onChanged(optionKey),
-      child: Row(
-        children: [
-          Icon(
-            isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-            color: isSelected ? scheme.primary : scheme.onSurfaceVariant,
-          ),
-          SizedBox(width: CoreSpacing.md(context)),
-          Expanded(
-            child: Text(
-              title,
-              style: CoreTypography.bodyMedium(
-                context,
-                scheme.onSurface,
-              ).copyWith(fontWeight: FontWeight.w800),
-            ),
-          ),
-          SizedBox(width: CoreSpacing.sm(context)),
-          WidgetsPriceBadge(priceLabel: priceLabel, compact: true),
-        ],
-      ),
-    );
-  }
-}
-
 class _AddonsSection extends ConsumerWidget {
   const _AddonsSection({
+    required this.productId,
     required this.selectedKeys,
     required this.onToggle,
   });
 
+  final String productId;
   final Set<String> selectedKeys;
   final void Function(String key, bool selected) onToggle;
 
@@ -1185,7 +1132,7 @@ class _AddonsSection extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    final addons = ref.watch(visibleAddonsProvider);
+    final addons = ref.watch(productAddonsForItemProvider(productId));
 
     if (addons.isEmpty) {
       return const SizedBox.shrink();
@@ -1195,164 +1142,36 @@ class _AddonsSection extends ConsumerWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          l10n.productAddonsPreferences,
+          l10n.productAddExtras,
           style: CoreTypography.titleMedium(
             context,
             scheme.onSurface,
           ).copyWith(fontWeight: FontWeight.w900),
         ),
         SizedBox(height: CoreSpacing.md(context)),
-        WidgetsAppCard(
-          variant: WidgetsAppCardVariant.form,
-          padding: EdgeInsets.zero,
-          child: Column(
-            children: [
-              for (var index = 0; index < addons.length; index++) ...[
-                if (index > 0) Divider(color: scheme.outlineVariant, height: 1),
-                _AddonTile(
-                  value: selectedKeys.contains(addons[index].key),
-                  onChanged:
-                      (value) => onToggle(addons[index].key, value),
-                  title: isAr ? addons[index].labelAr : addons[index].labelEn,
-                  price:
-                      addons[index].priceDeltaJod <= 0
-                          ? l10n.productFree
-                          : UtilityFormatJod.format(
-                            addons[index].priceDeltaJod,
-                            suffix: l10n.currencyJod,
-                          ),
+        for (var index = 0; index < addons.length; index++) ...[
+          WidgetsAddonCard.fromAddon(
+            addon: addons[index].addon,
+            title:
+                isAr
+                    ? addons[index].addon.labelAr
+                    : addons[index].addon.labelEn,
+            priceLabel:
+                addons[index].priceDeltaJod <= 0
+                    ? l10n.productFree
+                    : '+${UtilityFormatJod.format(addons[index].priceDeltaJod, suffix: l10n.currencyJod)}',
+            selected: selectedKeys.contains(addons[index].addon.key),
+            index: index,
+            onTap:
+                () => onToggle(
+                  addons[index].addon.key,
+                  !selectedKeys.contains(addons[index].addon.key),
                 ),
-              ],
-            ],
           ),
-        ),
+          if (index != addons.length - 1)
+            SizedBox(height: CoreSpacing.sm(context)),
+        ],
       ],
-    );
-  }
-}
-
-class _AddonTile extends StatelessWidget {
-  const _AddonTile({
-    required this.value,
-    required this.onChanged,
-    required this.title,
-    required this.price,
-  });
-
-  final bool value;
-  final ValueChanged<bool> onChanged;
-  final String title;
-  final String price;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return CheckboxListTile(
-      value: value,
-      onChanged: (next) => onChanged(next ?? false),
-      title: Text(title),
-      secondary: Text(
-        price,
-        style: CoreTypography.caption(context, scheme.onSurfaceVariant),
-      ),
-      controlAffinity: ListTileControlAffinity.leading,
-      contentPadding: EdgeInsetsDirectional.symmetric(
-        horizontal: CoreSpacing.md(context),
-      ),
-    );
-  }
-}
-
-class _StickyCartPanel extends StatelessWidget {
-  const _StickyCartPanel({
-    required this.quantity,
-    required this.totalText,
-    required this.onMinus,
-    required this.onPlus,
-    required this.onAdd,
-  });
-
-  final int quantity;
-  final String totalText;
-  final VoidCallback onMinus;
-  final VoidCallback onPlus;
-  final VoidCallback onAdd;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
-
-    return SafeArea(
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: scheme.surface,
-          border: Border(top: BorderSide(color: scheme.outlineVariant)),
-          boxShadow: [
-            BoxShadow(
-              color: scheme.shadow.withValues(alpha: 0.08),
-              blurRadius: 18,
-              offset: const Offset(0, -8),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(CoreSpacing.md(context)),
-          child: Row(
-            children: [
-              WidgetsQuantityStepper(
-                value: quantity,
-                min: 1,
-                onIncrement: onPlus,
-                onDecrement: onMinus,
-              ),
-              SizedBox(width: CoreSpacing.md(context)),
-              Expanded(
-                child: WidgetsAppButton(
-                  label: l10n.productAddToCartAmount(totalText),
-                  onPressed: onAdd,
-                  icon: Icons.add_shopping_cart_outlined,
-                  fullWidth: true,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FoodTag extends StatelessWidget {
-  const _FoodTag({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Text(
-          label,
-          style: CoreTypography.caption(
-            context,
-            scheme.onSurface,
-          ).copyWith(fontWeight: FontWeight.w800),
-        ),
-      ),
     );
   }
 }

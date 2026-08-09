@@ -14,6 +14,7 @@ import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_avatar.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_language_selector.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_phone_text.dart';
@@ -24,6 +25,7 @@ import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_status_pill.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_switch.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_theme_mode_selector.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -901,86 +903,128 @@ class _AddressTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+    final accent = isDefault ? scheme.primary : color;
+    final radius = CoreSpacing.radiusCardOf(context);
+    final actionSize = CoreContentSizes.compactIconButton(context);
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
-        border: Border.all(color: scheme.outlineVariant),
+        color: scheme.surfaceContainerHighest.withValues(alpha: 0.35),
+        borderRadius: BorderRadius.circular(radius),
+        border: Border.all(
+          color:
+              isDefault
+                  ? scheme.primary.withValues(alpha: 0.55)
+                  : scheme.outlineVariant,
+        ),
       ),
       child: Padding(
         padding: EdgeInsets.all(CoreSpacing.md(context)),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(CoreSpacing.sm(context)),
-                child: Icon(icon, color: color),
-              ),
-            ),
-            SizedBox(width: CoreSpacing.md(context)),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: CoreTypography.caption(
-                      context,
-                      scheme.onSurface,
-                    ).copyWith(fontWeight: FontWeight.w900),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                WidgetsIconBubble(
+                  icon: icon,
+                  color: accent,
+                  size: UtilitySizer.of(context, 44),
+                ),
+                SizedBox(width: CoreSpacing.md(context)),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: CoreTypography.titleMedium(
+                          context,
+                          scheme.onSurface,
+                        ).copyWith(fontWeight: FontWeight.w900, height: 1.25),
+                      ),
+                      SizedBox(height: CoreSpacing.xs(context)),
+                      Text(
+                        address,
+                        style: CoreTypography.bodyMedium(
+                          context,
+                          scheme.onSurfaceVariant,
+                        ).copyWith(height: 1.45),
+                      ),
+                    ],
                   ),
-                  Text(
-                    address,
-                    style: CoreTypography.caption(
-                      context,
-                      scheme.onSurfaceVariant,
+                ),
+                SizedBox(width: CoreSpacing.sm(context)),
+                Column(
+                  children: [
+                    WidgetsIconButton(
+                      onPressed:
+                          () => context.push(
+                            '${AppRoutePaths.mapPicker}?return=profile',
+                          ),
+                      icon: Icons.edit_outlined,
+                      tooltip: l10n.actionEdit,
+                      variant: WidgetsIconButtonVariant.tonal,
+                      buttonSize: actionSize,
                     ),
+                    SizedBox(height: CoreSpacing.xs(context)),
+                    WidgetsIconButton(
+                      onPressed: onDelete,
+                      icon: Icons.delete_outline,
+                      tooltip: l10n.addressesDelete,
+                      variant: WidgetsIconButtonVariant.tonal,
+                      buttonSize: actionSize,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: CoreSpacing.md(context)),
+            Divider(
+              height: 1,
+              thickness: 1,
+              color: scheme.outlineVariant.withValues(alpha: 0.7),
+            ),
+            SizedBox(height: CoreSpacing.sm(context)),
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(
+                  CoreSpacing.radiusChipOf(context),
+                ),
+                onTap: onDefaultChanged,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: CoreSpacing.xs(context),
                   ),
-                  SizedBox(height: CoreSpacing.sm(context)),
-                  InkWell(
-                    borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
-                    onTap: onDefaultChanged,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Checkbox(
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        width: UtilitySizer.of(context, 28),
+                        height: UtilitySizer.of(context, 28),
+                        child: Checkbox(
                           value: isDefault,
                           onChanged: (_) => onDefaultChanged(),
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
                         ),
-                        Text(
-                          AppLocalizations.of(context)!.addressesDefault,
-                          style: CoreTypography.caption(
-                            context,
-                            isDefault
-                                ? scheme.primary
-                                : scheme.onSurfaceVariant,
-                          ).copyWith(fontWeight: FontWeight.w800),
-                        ),
-                      ],
-                    ),
+                      ),
+                      SizedBox(width: CoreSpacing.sm(context)),
+                      Text(
+                        l10n.addressesDefault,
+                        style: CoreTypography.bodyMedium(
+                          context,
+                          isDefault
+                              ? scheme.primary
+                              : scheme.onSurfaceVariant,
+                        ).copyWith(fontWeight: FontWeight.w800),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-            WidgetsIconButton(
-              onPressed:
-                  () =>
-                      context.push('${AppRoutePaths.mapPicker}?return=profile'),
-              icon: Icons.edit_outlined,
-              tooltip: AppLocalizations.of(context)!.actionEdit,
-              variant: WidgetsIconButtonVariant.tonal,
-            ),
-            SizedBox(width: CoreSpacing.xs(context)),
-            WidgetsIconButton(
-              onPressed: onDelete,
-              icon: Icons.delete_outline,
-              tooltip: AppLocalizations.of(context)!.addressesDelete,
-              variant: WidgetsIconButtonVariant.tonal,
             ),
           ],
         ),

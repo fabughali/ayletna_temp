@@ -1,39 +1,66 @@
-# Ayletna Restaurant
+# Ayletna Restaurant · مطعم عيلتنا
 
-Ayletna Restaurant is a warm, Arabic-first digital restaurant experience built to make ordering, operations, and management feel elegant from the first tap. It brings the food menu, cart, loyalty, kitchen workflow, delivery tasks, cashier POS, inventory, staff tips, and admin reporting into one polished hospitality platform.
+Order like family. Run like a pro. **Ayletna** turns a beloved Jordanian kitchen into a complete digital hospitality experience — bilingual, beautiful, and built for every seat in the house.
 
-The app is designed around the real rhythm of a restaurant: guests browse rich food cards, customers build orders and track kitchen progress, cashiers work from a fast POS, kitchen staff see clear prep tickets, delivery teams handle pickups and plated returns, and managers monitor sales, staff, reports, deposits, and menu readiness from command-center screens.
+From the first scroll through falafel and shawarma to the last plated tray return, Ayletna connects guests, cashiers, kitchen, delivery, support, marketing, and owners in one warm, olive-and-gold branded world.
 
-## Highlights
+---
 
-- Arabic-first, RTL-ready customer journey with English support.
-- Real menu mockup for shawarma, qalayat, hummus, ful, drinks, sandwiches, falafel, pizza, manaqeesh, pastries, snacks, and burgers.
-- Food-focused storefront with dish imagery, price badges, popular picks, offers, combo builder, cart, checkout, payment, rewards, and order tracking.
-- Restaurant operations screens for cashier POS, order history, kitchen pass, kitchen prep, delivery pickup, plated return, inventory, stock adjustment, staff attendance, and staff tip history.
-- Admin command center for orders, reports, menu management, deposits, plates, users, loyalty, offers, pre-orders, audit logs, and settings.
-- Responsive Material 3 interface with role-aware themes, drawer navigation, full-width scrolling behavior, and polished mock feedback for every action.
+## Why Ayletna stands out
 
-## Technical Foundation
+- **Four real order channels** — dine-in, takeaway, delivery, and plated service with deposit & return  
+- **Arabic-first & English-ready** — true RTL/LTR with polished Material 3 UI  
+- **Full restaurant OS** — customer app, POS, kitchen board, inventory, delivery runs, tips, loyalty, and admin command centers  
+- **Financial clarity** — food revenue, tips, and plate deposits stay cleanly separated  
+- **Role-aware journeys** — guest, customer, cashier, kitchen, inventory, delivery, staff, support, marketing, operator, owner, and app admin  
 
-- Built with Flutter for a responsive web and mobile-ready experience.
-- Uses Riverpod for predictable state management.
-- Uses GoRouter for role-aware navigation and route flows.
-- Uses Flutter localization with Arabic-first copy and RTL support.
-- Uses centralized mock data models so the prototype feels realistic while staying easy to evolve.
-- Uses shared design tokens and reusable widgets for consistent cards, buttons, food media, price badges, drawers, reports, operations tickets, and screen layouts.
+---
 
-## Links
+## What you can do
 
-- Source code: https://github.com/fabughali/ayletna-restaurant-app
-- Live app (GitHub Pages): https://fabughali.github.io/ayletna_temp/
-- CI deploy preview: https://fabughali.github.io/ayletna-restaurant-app/
+### For guests & customers
+Browse rich menu cards, build combos, claim offers, stepped checkout, track orders, earn loyalty points, redeem rewards, manage addresses, chat with support, and read published blog content.
 
-## Deploy
+### For the floor & kitchen
+Run a fast cashier POS, send tickets to the kitchen pass, print or e-ticket receipts, settle plated deposits, prep orders, adjust stock with evidence, and complete delivery pickups plus plated returns.
 
-Push to `main` on the source repository triggers a GitHub Actions build and deploy to GitHub Pages.
+### For the business
+Moderate reviews, manage menus and promotions, co-approve marketing offers, run FAQ and ticket desks, schedule campaigns, configure loyalty growth, and monitor owner-level dashboards with permission-aware views.
 
-To refresh the legacy live URL at `ayletna_temp`, run from the project root:
+---
 
-```bash
-./deploy-only.sh
-```
+## Built with craft
+
+| Layer | Stack |
+|-------|--------|
+| App | Flutter (Android · iOS · Web) |
+| State | Riverpod (in-memory mock providers today) |
+| Navigation | go_router · drawer-first (no bottom nav) |
+| Design | Material 3 · shared widget system · `UtilitySizer` |
+| Locales | Arabic (RTL) · English (LTR) via ARB |
+| Data | Mock repositories — ready for Supabase switch |
+
+**Status:** UI mock complete; frontend action cycles closed (provider smoke S1–S5). Backend (Supabase Auth, orders, payments, RLS) is the remaining work.
+
+---
+
+## Canonical docs
+
+| Document | Purpose |
+|----------|---------|
+| [`docs/prdv1.md`](docs/prdv1.md) | Product requirements (screens, roles, finance, backend targets) |
+| [`docs/development_rules.md`](docs/development_rules.md) | How to implement Flutter UI & mock logic |
+| [`docs/user_roles_permissions_matrix.md`](docs/user_roles_permissions_matrix.md) | RBAC capability matrix |
+| [`DESIGN.md`](DESIGN.md) | Visual design system |
+| [`PRODUCT.md`](PRODUCT.md) | Short product brief for design agents |
+| [`AGENTS.md`](AGENTS.md) | Condensed agent operating brief |
+| `color_list_chat_gpt.txt` | Hex color source of truth |
+
+---
+
+## Explore
+
+- **GitHub:** https://github.com/fabughali/ayletna_temp  
+- **Live demo:** https://fabughali.github.io/ayletna_temp/  
+
+Welcome to the table. **Ayletna is ready when you are.**

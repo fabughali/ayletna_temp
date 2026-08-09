@@ -13,6 +13,7 @@ import 'package:ayletna_restaurant_app/widgets/widgets_list_item.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_status_pill.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_app_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -27,7 +28,7 @@ class AdminDepositConfigScreen extends ConsumerWidget {
     final config = ref.watch(adminDepositConfigProvider);
 
     return WidgetsScaffoldPage(
-      title: l10n.appTitle,
+      title: l10n.screenDepositConfig,
       actions: [
         WidgetsIconButton(
           onPressed: () => context.push(AppRoutePaths.profile),
@@ -121,13 +122,13 @@ class _Header extends StatelessWidget {
             color: scheme.onSurfaceVariant,
             compact: true,
           ),
-          Icon(Icons.chevron_right, size: 18, color: scheme.onSurfaceVariant),
+          Icon(Icons.chevron_right, size: CoreContentSizes.orderTypeIcon(context), color: scheme.onSurfaceVariant),
           WidgetsStatusPill(
             label: l10n.depositBreadcrumbLogistics,
             color: scheme.onSurfaceVariant,
             compact: true,
           ),
-          Icon(Icons.chevron_right, size: 18, color: scheme.onSurfaceVariant),
+          Icon(Icons.chevron_right, size: CoreContentSizes.orderTypeIcon(context), color: scheme.onSurfaceVariant),
           WidgetsStatusPill(
             label: l10n.depositBreadcrumbTrayReturns,
             color: CoreColors.semanticDeposit,
@@ -305,7 +306,7 @@ class _ReturnWindowCard extends StatelessWidget {
               Icons.notifications_active_outlined,
               color: scheme.tertiary,
             ),
-            trailing: Switch(
+            trailing: WidgetsAppSwitch(
               value: automatedReminders,
               onChanged: onReminderChanged,
             ),

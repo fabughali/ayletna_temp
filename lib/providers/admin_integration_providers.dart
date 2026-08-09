@@ -115,23 +115,23 @@ class AdminIntegrationConfigState {
         supabaseUrl.trim().isNotEmpty && supabaseAnonKey.trim().isNotEmpty,
       AdminIntegrationSection.sms =>
         smsProvider.trim().isNotEmpty &&
-        smsApiKey.trim().isNotEmpty &&
-        smsSenderId.trim().isNotEmpty,
+            smsApiKey.trim().isNotEmpty &&
+            smsSenderId.trim().isNotEmpty,
       AdminIntegrationSection.whatsapp =>
         whatsappPhoneNumberId.trim().isNotEmpty &&
-        whatsappAccessToken.trim().isNotEmpty,
+            whatsappAccessToken.trim().isNotEmpty,
       AdminIntegrationSection.telephony =>
         supportPhoneNumber.trim().isNotEmpty &&
-        defaultCountryCode.trim().isNotEmpty,
+            defaultCountryCode.trim().isNotEmpty,
       AdminIntegrationSection.payments =>
         paymentGatewayProvider.trim().isNotEmpty &&
-        (stripePublishableKey.trim().isNotEmpty ||
-            paymentGatewayApiKey.trim().isNotEmpty),
+            (stripePublishableKey.trim().isNotEmpty ||
+                paymentGatewayApiKey.trim().isNotEmpty),
       AdminIntegrationSection.ai =>
         aiProvider.trim().isNotEmpty && aiApiKey.trim().isNotEmpty,
       AdminIntegrationSection.attendanceWifi =>
         restaurantWifiSsid.trim().isNotEmpty &&
-        restaurantWifiBssid.trim().isNotEmpty,
+            restaurantWifiBssid.trim().isNotEmpty,
       AdminIntegrationSection.other =>
         googleMapsApiKey.trim().isNotEmpty ||
             fcmServerKey.trim().isNotEmpty ||
@@ -214,7 +214,8 @@ class AdminIntegrationConfigState {
       stripeSecretKey: stripeSecretKey ?? this.stripeSecretKey,
       stripeWebhookSecret: stripeWebhookSecret ?? this.stripeWebhookSecret,
       googlePayMerchantId: googlePayMerchantId ?? this.googlePayMerchantId,
-      googlePayMerchantName: googlePayMerchantName ?? this.googlePayMerchantName,
+      googlePayMerchantName:
+          googlePayMerchantName ?? this.googlePayMerchantName,
       applePayMerchantId: applePayMerchantId ?? this.applePayMerchantId,
       paymentGatewayApiKey: paymentGatewayApiKey ?? this.paymentGatewayApiKey,
       paymentGatewayMerchantId:

@@ -6,16 +6,23 @@ import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/data/models/model_cart_customization_option.dart';
 import 'package:ayletna_restaurant_app/providers/admin_catalog_providers.dart';
 import 'package:ayletna_restaurant_app/providers/admin_session_providers.dart';
+import 'package:ayletna_restaurant_app/providers/app_providers.dart';
 import 'package:ayletna_restaurant_app/providers/menu_providers.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_menu_price_audit.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_info_banner.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_cart_option_labels.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_catalog_images.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_catalog_image_editor.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -40,9 +47,10 @@ class _AdminProductEditorScreenState
     extends ConsumerState<AdminProductEditorScreen> {
   var _available = true;
   var _featured = true;
-  var _selectedStation = _PrepStation.shawarma;
+  var _selectedStation = PrepStation.shawarma;
+  var _selectedCategoryId = 'shawarma';
   final _selectedModifiers = <String>{};
-  String? _imageUrl;
+  List<String> _imageUrls = const [];
   late final TextEditingController _nameAr;
   late final TextEditingController _nameEn;
   late final TextEditingController _descAr;
@@ -69,7 +77,7 @@ class _AdminProductEditorScreenState
       _descAr.text = item.descriptionAr;
       _descEn.text = item.descriptionEn;
       _price.text = item.priceJod.toStringAsFixed(2);
-      _imageUrl = item.imageUrl;
+      _imageUrls = [...item.resolvedImageUrls];
     } else if (!widget.createMode) {
       final item = MockupCatalog.items.firstWhere(
         (candidate) => candidate.id == 'shawarma_meal_super',
@@ -80,7 +88,7 @@ class _AdminProductEditorScreenState
       _descAr.text = item.descriptionAr;
       _descEn.text = item.descriptionEn;
       _price.text = item.priceJod.toStringAsFixed(2);
-      _imageUrl = item.imageUrl;
+      _imageUrls = [...item.resolvedImageUrls];
     }
   }
 
@@ -98,13 +106,17 @@ class _AdminProductEditorScreenState
     if (widget.createMode) {
       return ModelMenuItem(
         id: 'draft_new',
-        categoryId: 'custom',
+        categoryId: _selectedCategoryId,
         nameAr: _nameAr.text,
         nameEn: _nameEn.text,
         priceJod: double.tryParse(_price.text) ?? 0,
         descriptionAr: _descAr.text,
         descriptionEn: _descEn.text,
-        imageUrl: _imageUrl,
+        imageUrls: _imageUrls,
+        imageUrl: _imageUrls.isNotEmpty ? _imageUrls.first : null,
+        isAvailable: _available,
+        isFeatured: _featured,
+        prepStation: _selectedStation,
       );
     }
     final editId = widget.productId;
@@ -129,15 +141,16 @@ class _AdminProductEditorScreenState
     final l10n = AppLocalizations.of(context)!;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final item = _resolveItem();
+    final isMarketing = ref.watch(appRoleProvider) == AppRole.marketing;
 
     return WidgetsScaffoldPage(
       title:
           widget.createMode
-              ? (isAr ? 'إضافة عنصر منيو' : 'Add menu item')
+              ? l10n.productEditorAddMenuItem
               : l10n.screenProductEditor,
       actions: [
         WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.adminMenu),
+          onPressed: () => context.push(AppRoutePaths.operatorMenu),
           icon: Icons.restaurant_menu_outlined,
           tooltip: l10n.screenMenuManagement,
         ),
@@ -146,7 +159,7 @@ class _AdminProductEditorScreenState
             if (widget.createMode) {
               UtilityMockFeedback.showInfo(
                 context,
-                isAr ? 'احفظ العنصر أولاً' : 'Save the item first',
+                l10n.productEditorSaveFirst,
               );
               return;
             }
@@ -155,7 +168,7 @@ class _AdminProductEditorScreenState
             context.push(AppRoutePaths.productDetail);
           },
           icon: Icons.visibility_outlined,
-          tooltip: isAr ? 'معاينة' : 'Preview',
+          tooltip: l10n.productEditorPreview,
         ),
       ],
       child: WidgetsRefreshList(
@@ -168,6 +181,14 @@ class _AdminProductEditorScreenState
             final isWide = constraints.maxWidth >= 860;
             final editor = Column(
               children: [
+                if (isMarketing) ...[
+                  WidgetsInfoBanner(
+                    title: l10n.marketingMenuPricePublishTitle,
+                    message: l10n.marketingMenuPricePublishBanner,
+                    icon: Icons.sell_outlined,
+                  ),
+                  SizedBox(height: CoreSpacing.lg(context)),
+                ],
                 _IdentityCard(
                   item: item,
                   isAr: isAr,
@@ -206,8 +227,16 @@ class _AdminProductEditorScreenState
                 _MediaCard(
                   item: item,
                   isAr: isAr,
-                  imageUrl: _imageUrl ?? item.imageUrl,
-                  onUpload: () => _pickImage(context, isAr),
+                  imageUrls: _imageUrls,
+                  onImagesChanged:
+                      (urls) => setState(() => _imageUrls = urls),
+                ),
+                SizedBox(height: CoreSpacing.lg(context)),
+                _CategoryCard(
+                  selectedCategoryId: _selectedCategoryId,
+                  onChanged:
+                      (id) => setState(() => _selectedCategoryId = id),
+                  isAr: isAr,
                 ),
                 SizedBox(height: CoreSpacing.lg(context)),
                 _StationCard(
@@ -237,7 +266,11 @@ class _AdminProductEditorScreenState
                   descEn: _descEn.text,
                   priceJod: double.tryParse(_price.text) ?? 0,
                   productId: item.id,
-                  imageUrl: _imageUrl,
+                  imageUrls: _imageUrls,
+                  selectedCategoryId: _selectedCategoryId,
+                  selectedStation: _selectedStation,
+                  available: _available,
+                  featured: _featured,
                 ),
               ],
             );
@@ -271,78 +304,6 @@ class _AdminProductEditorScreenState
       ),
     );
   }
-
-  Future<void> _pickImage(BuildContext context, bool isAr) async {
-    final urlController = TextEditingController(text: _imageUrl ?? '');
-    final presets =
-        MockupCatalog.items
-            .map((item) => item.imageUrl)
-            .whereType<String>()
-            .toSet()
-            .take(6)
-            .toList();
-    final picked = await showDialog<String>(
-      context: context,
-      builder:
-          (dialogContext) => AlertDialog(
-            title: Text(isAr ? 'صورة العنصر' : 'Item image'),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  WidgetsAppTextField(
-                    controller: urlController,
-                    label: isAr ? 'رابط الصورة' : 'Image URL',
-                    prefixIcon: Icons.link,
-                  ),
-                  if (presets.isNotEmpty) ...[
-                    SizedBox(height: CoreSpacing.md(context)),
-                    Text(
-                      isAr ? 'صور جاهزة' : 'Preset photos',
-                      style: CoreTypography.caption(
-                        context,
-                        Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    SizedBox(height: CoreSpacing.sm(context)),
-                    Wrap(
-                      spacing: CoreSpacing.sm(context),
-                      runSpacing: CoreSpacing.sm(context),
-                      children: [
-                        for (final url in presets)
-                          ActionChip(
-                            label: Text(url.split('/').last),
-                            onPressed: () => Navigator.pop(dialogContext, url),
-                          ),
-                      ],
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext),
-                child: Text(isAr ? 'إلغاء' : 'Cancel'),
-              ),
-              TextButton(
-                onPressed:
-                    () => Navigator.pop(dialogContext, urlController.text.trim()),
-                child: Text(isAr ? 'تطبيق' : 'Apply'),
-              ),
-            ],
-          ),
-    );
-    urlController.dispose();
-    if (picked == null || !mounted) return;
-    setState(() => _imageUrl = picked.isEmpty ? null : picked);
-    if (!context.mounted) return;
-    UtilityMockFeedback.showSuccess(
-      context,
-      isAr ? 'تم تحديث الصورة' : 'Image updated',
-    );
-  }
 }
 
 class _EditorHero extends StatelessWidget {
@@ -361,7 +322,7 @@ class _EditorHero extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(CoreSpacing.lg(context)),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         gradient: const LinearGradient(
           colors: [CoreColors.brandOlive, CoreColors.brandBrown],
           begin: AlignmentDirectional.topStart,
@@ -375,16 +336,14 @@ class _EditorHero extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _SoftBadge(
-                  label: isAr ? 'محرر عنصر منيو' : 'Menu Item Editor',
+                WidgetsSoftBadge(
+                  label: l10n.productEditorBadge,
                   color: CoreColors.surfaceLight,
                   foreground: CoreColors.brandBrown,
                 ),
                 SizedBox(height: CoreSpacing.md(context)),
                 Text(
-                  isAr
-                      ? 'حرر الاسم العربي والإنجليزي، السعر، الأحجام، الإضافات، ومحطة التحضير.'
-                      : 'Edit bilingual naming, pricing, variants, modifiers, prep routing, and availability.',
+                  l10n.productEditorHeroHeadline,
                   style: CoreTypography.headlineSmall(
                     context,
                     CoreColors.surfaceLight,
@@ -430,34 +389,32 @@ class _IdentityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return WidgetsAppCard(
-      title: isAr ? 'الاسم والوصف' : 'Name & Description',
-      subtitle:
-          isAr
-              ? 'النصوص التي تظهر للعميل في المنيو.'
-              : 'Customer-facing copy shown in the menu.',
-      leading: const _IconBubble(
+      title: l10n.productEditorNameSection,
+      subtitle: l10n.productEditorIdentitySubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.translate_outlined,
         color: CoreColors.brandOlive,
       ),
       child: Column(
         children: [
           WidgetsAppTextField(
-            label: isAr ? 'الاسم بالعربية' : 'Arabic name',
+            label: l10n.productEditorArabicName,
             controller: editable ? nameAr : null,
             initialValue: editable ? null : item.nameAr,
             prefixIcon: Icons.language_outlined,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           WidgetsAppTextField(
-            label: isAr ? 'الاسم بالإنجليزية' : 'English name',
+            label: l10n.productEditorEnglishName,
             controller: editable ? nameEn : null,
             initialValue: editable ? null : item.nameEn,
             prefixIcon: Icons.abc_outlined,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           WidgetsAppTextField(
-            label: isAr ? 'الوصف بالعربية' : 'Arabic description',
+            label: l10n.productEditorArabicDesc,
             controller: editable ? descAr : null,
             initialValue: editable ? null : item.descriptionAr,
             prefixIcon: Icons.notes_outlined,
@@ -465,7 +422,7 @@ class _IdentityCard extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.md(context)),
           WidgetsAppTextField(
-            label: isAr ? 'الوصف بالإنجليزية' : 'English description',
+            label: l10n.productEditorEnglishDesc,
             controller: editable ? descEn : null,
             initialValue: editable ? null : item.descriptionEn,
             prefixIcon: Icons.notes_outlined,
@@ -504,19 +461,19 @@ class _PricingAndVariantsCard extends ConsumerWidget {
     final portions = ref.watch(visiblePortionOptionsProvider);
 
     return WidgetsAppCard(
-      title: isAr ? 'السعر والأحجام' : 'Pricing & Variants',
+      title: l10n.productEditorPricingSection,
       subtitle:
           isAr
               ? 'أحجام الحصة من الكatalog — تظهر للعميل في التفاصيل والسلة.'
               : 'Portion sizes from catalog — shown on detail and cart sheets.',
-      leading: const _IconBubble(
+      leading: WidgetsIconBubble(
         icon: Icons.sell_outlined,
         color: CoreColors.semanticRevenue,
       ),
       child: Column(
         children: [
           WidgetsAppTextField(
-            label: isAr ? 'السعر الأساسي' : 'Base price',
+            label: l10n.productEditorBasePrice,
             controller: editable ? priceController : null,
             initialValue:
                 editable
@@ -540,7 +497,7 @@ class _PricingAndVariantsCard extends ConsumerWidget {
             ),
           SizedBox(height: CoreSpacing.sm(context)),
           WidgetsAppButton(
-            label: isAr ? 'إضافة حجم / نوع' : 'Add variant',
+            label: l10n.productEditorAddVariant,
             onPressed: () => _showAddVariantDialog(context, ref),
             variant: WidgetsAppButtonVariant.outline,
             icon: Icons.add,
@@ -558,18 +515,18 @@ class _PricingAndVariantsCard extends ConsumerWidget {
       context: context,
       builder:
           (dialogContext) => AlertDialog(
-            title: Text(isAr ? 'إضافة حجم' : 'Add portion size'),
+            title: Text(l10n.productEditorAddPortionTitle),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 WidgetsAppTextField(
                   controller: keyController,
-                  label: isAr ? 'المفتاح (مثل super)' : 'Key (e.g. super)',
+                  label: l10n.productEditorPortionKeyLabel,
                 ),
                 SizedBox(height: CoreSpacing.md(context)),
                 WidgetsAppTextField(
                   controller: priceController,
-                  label: isAr ? 'فرق السعر (د.أ)' : 'Price delta (JOD)',
+                  label: l10n.productEditorPortionPriceDelta,
                   keyboardType: TextInputType.number,
                 ),
               ],
@@ -577,7 +534,7 @@ class _PricingAndVariantsCard extends ConsumerWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text(isAr ? 'إلغاء' : 'Cancel'),
+                child: Text(l10n.actionCancel),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext, true),
@@ -598,7 +555,7 @@ class _PricingAndVariantsCard extends ConsumerWidget {
     if (key.isEmpty) {
       UtilityMockFeedback.showWarning(
         context,
-        isAr ? 'أدخل مفتاحاً للحجم' : 'Enter a portion key',
+        l10n.productEditorEnterPortionKey,
       );
       return;
     }
@@ -611,8 +568,8 @@ class _PricingAndVariantsCard extends ConsumerWidget {
     UtilityMockFeedback.showSuccess(
       context,
       ok
-          ? (isAr ? 'تمت إضافة الحجم' : 'Portion added')
-          : (isAr ? 'المفتاح موجود مسبقاً' : 'Key already exists'),
+          ? l10n.productEditorPortionAdded
+          : l10n.productEditorPortionKeyExists,
     );
   }
 }
@@ -634,12 +591,12 @@ class _ModifiersCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final addons = ref.watch(visibleAddonsProvider);
     return WidgetsAppCard(
-      title: isAr ? 'الإضافات والتعديلات' : 'Modifiers',
+      title: l10n.productEditorModifiersSection,
       subtitle:
           isAr
               ? 'إضافات اختيارية تظهر في الكاشير والعميل.'
               : 'Optional choices shown to cashier and guest.',
-      leading: const _IconBubble(
+      leading: WidgetsIconBubble(
         icon: Icons.tune_outlined,
         color: CoreColors.orderTypeTakeaway,
       ),
@@ -647,7 +604,7 @@ class _ModifiersCard extends ConsumerWidget {
         children: [
           if (addons.isEmpty)
             Text(
-              isAr ? 'لا توجد إضافات بعد.' : 'No catalog addons yet.',
+              l10n.productEditorNoAddons,
               style: CoreTypography.bodyMedium(
                 context,
                 Theme.of(context).colorScheme.onSurfaceVariant,
@@ -677,44 +634,28 @@ class _MediaCard extends StatelessWidget {
   const _MediaCard({
     required this.item,
     required this.isAr,
-    required this.imageUrl,
-    required this.onUpload,
+    required this.imageUrls,
+    required this.onImagesChanged,
   });
 
   final ModelMenuItem item;
   final bool isAr;
-  final String? imageUrl;
-  final VoidCallback onUpload;
+  final List<String> imageUrls;
+  final ValueChanged<List<String>> onImagesChanged;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return WidgetsAppCard(
-      title: isAr ? 'الصورة والعرض' : 'Media & Display',
-      subtitle:
-          isAr
-              ? 'صورة طعام دافئة بدل بطاقة إخبارية.'
-              : 'Warm food media, not a generic card.',
-      leading: const _IconBubble(
+      title: l10n.productEditorMediaSection,
+      subtitle: l10n.productEditorMediaGalleryHint,
+      leading: WidgetsIconBubble(
         icon: Icons.image_outlined,
         color: CoreColors.brandOrange,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (imageUrl != null && imageUrl!.isNotEmpty)
-            ClipRRect(
-              borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-              child: Image.network(
-                imageUrl!,
-                height: CoreContentSizes.heroImageHeight(context) * 0.45,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => _FoodPreview(color: CoreColors.brandOrange),
-              ),
-            )
-          else
-            _FoodPreview(color: CoreColors.brandOrange),
-          SizedBox(height: CoreSpacing.md(context)),
           Text(
             isAr ? item.nameAr : item.nameEn,
             style: CoreTypography.titleMedium(
@@ -724,22 +665,64 @@ class _MediaCard extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.xs(context)),
           Text(
-            isAr
-                ? 'صورة رئيسية • بطاقة المنيو • نقطة البيع'
-                : 'Hero image • menu card • POS tile',
+            l10n.productEditorMediaUsage,
             style: CoreTypography.caption(
               context,
               Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           SizedBox(height: CoreSpacing.md(context)),
-          WidgetsAppButton(
-            label: isAr ? 'رفع / تغيير الصورة' : 'Upload / change image',
-            onPressed: onUpload,
-            icon: Icons.cloud_upload_outlined,
-            variant: WidgetsAppButtonVariant.outline,
+          WidgetsCatalogImageEditor(
+            imageUrls: imageUrls,
+            onChanged: onImagesChanged,
+            isAr: isAr,
+            minImages: CatalogImageLimits.minProductImages,
+            maxImages: CatalogImageLimits.maxProductImages,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CategoryCard extends ConsumerWidget {
+  const _CategoryCard({
+    required this.selectedCategoryId,
+    required this.onChanged,
+    required this.isAr,
+  });
+
+  final String selectedCategoryId;
+  final ValueChanged<String> onChanged;
+  final bool isAr;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final categoriesAsync = ref.watch(menuCategoriesProvider);
+    final categories = categoriesAsync.valueOrNull ?? const [];
+
+    return WidgetsAppCard(
+      title: l10n.categoryEyebrow,
+      leading: WidgetsIconBubble(
+        icon: Icons.category_outlined,
+        color: CoreColors.brandBrown,
+      ),
+      child: DropdownButtonFormField<String>(
+        initialValue: selectedCategoryId,
+        decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        ),
+        items: categories.map((cat) {
+          return DropdownMenuItem(
+            value: cat.id,
+            child: Text(isAr ? cat.nameAr : cat.nameEn),
+          );
+        }).toList(),
+        onChanged: (val) {
+          if (val != null) onChanged(val);
+        },
       ),
     );
   }
@@ -752,25 +735,23 @@ class _StationCard extends StatelessWidget {
     required this.isAr,
   });
 
-  final _PrepStation selectedStation;
-  final ValueChanged<_PrepStation> onChanged;
+  final PrepStation selectedStation;
+  final ValueChanged<PrepStation> onChanged;
   final bool isAr;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return WidgetsAppCard(
-      title: isAr ? 'محطة التحضير' : 'Prep Station',
-      subtitle:
-          isAr
-              ? 'تحدد أين تظهر التذكرة في المطبخ.'
-              : 'Controls where the kitchen ticket appears.',
-      leading: const _IconBubble(
+      title: l10n.productEditorPrepStationSection,
+      subtitle: l10n.productEditorStationSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.soup_kitchen_outlined,
         color: CoreColors.brandBrown,
       ),
       child: Column(
         children: [
-          for (final station in _PrepStation.values)
+          for (final station in PrepStation.values)
             _StationOption(
               station: station,
               selected: station == selectedStation,
@@ -800,25 +781,23 @@ class _AvailabilityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return WidgetsAppCard(
-      title: isAr ? 'التوفر والقنوات' : 'Availability & Channels',
-      subtitle:
-          isAr
-              ? 'تحكم في ظهور العنصر حسب القناة.'
-              : 'Control where this item is visible.',
-      leading: const _IconBubble(
+      title: l10n.productEditorAvailabilitySection,
+      subtitle: l10n.productEditorAvailabilitySectionDesc,
+      leading: WidgetsIconBubble(
         icon: Icons.toggle_on_outlined,
         color: CoreColors.semanticSuccess,
       ),
       child: Column(
         children: [
           _SwitchLine(
-            label: isAr ? 'متاح للبيع الآن' : 'Available now',
+            label: l10n.productEditorAvailableNow,
             value: available,
             onChanged: onAvailableChanged,
           ),
           _SwitchLine(
-            label: isAr ? 'مميز في المنيو' : 'Featured in menu',
+            label: l10n.productEditorFeatured,
             value: featured,
             onChanged: onFeaturedChanged,
           ),
@@ -827,16 +806,16 @@ class _AvailabilityCard extends StatelessWidget {
             spacing: CoreSpacing.xs(context),
             runSpacing: CoreSpacing.xs(context),
             children: [
-              _SoftBadge(
-                label: isAr ? 'صالة' : 'Dine-in',
+              WidgetsSoftBadge(
+                label: l10n.orderTypeDineIn,
                 color: CoreColors.orderTypeDineIn,
               ),
-              _SoftBadge(
-                label: isAr ? 'سفري' : 'Takeaway',
+              WidgetsSoftBadge(
+                label: l10n.orderTypeTakeaway,
                 color: CoreColors.orderTypeTakeaway,
               ),
-              _SoftBadge(
-                label: isAr ? 'توصيل' : 'Delivery',
+              WidgetsSoftBadge(
+                label: l10n.orderTypeDelivery,
                 color: CoreColors.orderTypeDelivery,
               ),
             ],
@@ -858,7 +837,11 @@ class _SavePanel extends ConsumerWidget {
     required this.descEn,
     required this.priceJod,
     required this.productId,
-    this.imageUrl,
+    this.imageUrls = const [],
+    required this.selectedCategoryId,
+    required this.selectedStation,
+    required this.available,
+    required this.featured,
   });
 
   final AppLocalizations l10n;
@@ -870,35 +853,59 @@ class _SavePanel extends ConsumerWidget {
   final String descEn;
   final double priceJod;
   final String productId;
-  final String? imageUrl;
+  final List<String> imageUrls;
+  final String selectedCategoryId;
+  final PrepStation selectedStation;
+  final bool available;
+  final bool featured;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return WidgetsAppCard(
-      title: isAr ? 'حفظ ونشر' : 'Save & Publish',
+      title: l10n.productEditorSavePublishSection,
       subtitle:
           createMode
-              ? (isAr ? 'أنشئ العنصر ثم انشره على المنيو.' : 'Create then publish to the menu.')
-              : (isAr
-                  ? 'يحفظ التعديلات على عناصر الكatalog والعناصر المخصصة.'
-                  : 'Persists edits to catalog and custom menu items.'),
+              ? l10n.productEditorSavePublishCreateDesc
+              : l10n.productEditorSavePublishEditDesc,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           WidgetsAppButton(
             label: l10n.actionSave,
             onPressed: () {
+              if (imageUrls.length < CatalogImageLimits.minProductImages) {
+                UtilityMockFeedback.showWarning(
+                  context,
+                  l10n.productEditorAddMinImages,
+                );
+                return;
+              }
               final savedItem = ModelMenuItem(
                 id: productId,
-                categoryId: 'custom',
+                categoryId: selectedCategoryId,
                 nameAr: nameAr,
                 nameEn: nameEn,
                 priceJod: priceJod,
                 descriptionAr: descAr,
                 descriptionEn: descEn,
-                imageUrl: imageUrl,
+                imageUrls: imageUrls,
+                imageUrl: imageUrls.first,
+                isAvailable: available,
+                isFeatured: featured,
+                prepStation: selectedStation,
               );
               var ok = false;
+              if (!createMode &&
+                  productId.isNotEmpty &&
+                  productId != 'draft_new') {
+                recordMenuPriceChangeIfNeeded(
+                  ref,
+                  productId: productId,
+                  productNameEn:
+                      nameEn.trim().isNotEmpty ? nameEn.trim() : productId,
+                  newPriceJod: priceJod,
+                );
+              }
               if (productId.startsWith('menu_custom_')) {
                 ok = ref.read(adminMenuProvider.notifier).updateAddedMenuItem(savedItem);
               } else if (!createMode && productId.isNotEmpty && productId != 'draft_new') {
@@ -909,33 +916,37 @@ class _SavePanel extends ConsumerWidget {
               if (!ok) {
                 UtilityMockFeedback.showWarning(
                   context,
-                  isAr ? 'تحقق من الحقول' : 'Check required fields',
+                  l10n.productEditorCheckRequiredFields,
                 );
                 return;
               }
               UtilityMockFeedback.showSuccess(
                 context,
-                isAr ? 'تم حفظ عنصر المنيو' : 'Menu item saved',
+                l10n.productEditorMenuItemSaved,
               );
             },
             icon: Icons.save_outlined,
           ),
           SizedBox(height: CoreSpacing.sm(context)),
           WidgetsAppButton(
-            label: isAr ? 'نشر على المنيو' : 'Publish to menu',
+            label: l10n.productEditorPublishToMenu,
             onPressed:
                 () => UtilityMockFeedback.showActionSheet(
                   context: context,
-                  title: isAr ? 'نشر عنصر المنيو' : 'Publish menu item',
-                  message:
-                      isAr
-                          ? 'سيظهر العنصر في قنوات البيع المحددة.'
-                          : 'The item will appear in selected sales channels.',
+                  title: l10n.productEditorPublishTitle,
+                  message: l10n.productEditorPublishMessage,
                   actions: [
                     MockSheetAction(
                       label: l10n.actionConfirm,
                       icon: Icons.publish_outlined,
                       onSelected: () {
+                        if (imageUrls.length < CatalogImageLimits.minProductImages) {
+                          UtilityMockFeedback.showWarning(
+                            context,
+                            l10n.productEditorAddImageBeforePublish,
+                          );
+                          return;
+                        }
                         if (createMode) {
                           final created = ref
                               .read(adminMenuProvider.notifier)
@@ -945,15 +956,27 @@ class _SavePanel extends ConsumerWidget {
                                 descriptionAr: descAr,
                                 descriptionEn: descEn,
                                 priceJod: priceJod,
+                                imageUrls: imageUrls,
+                                categoryId: selectedCategoryId,
+                                isAvailable: available,
+                                isFeatured: featured,
+                                prepStation: selectedStation,
                               );
                           if (created == null) {
                             UtilityMockFeedback.showWarning(
                               context,
-                              isAr ? 'تحقق من الاسم والسعر' : 'Check name and price',
+                              l10n.productEditorCheckNamePrice,
                             );
                             return;
                           }
                         } else {
+                          recordMenuPriceChangeIfNeeded(
+                            ref,
+                            productId: productId,
+                            productNameEn:
+                                nameEn.trim().isNotEmpty ? nameEn.trim() : productId,
+                            newPriceJod: priceJod,
+                          );
                           ref
                               .read(adminMenuProvider.notifier)
                               .publishProduct(
@@ -964,9 +987,9 @@ class _SavePanel extends ConsumerWidget {
                         }
                         UtilityMockFeedback.showSuccess(
                           context,
-                          isAr ? 'تم النشر' : 'Published',
+                          l10n.productEditorPublished,
                         );
-                        context.push(AppRoutePaths.adminMenu);
+                        context.push(AppRoutePaths.operatorMenu);
                       },
                     ),
                   ],
@@ -976,8 +999,8 @@ class _SavePanel extends ConsumerWidget {
           ),
           SizedBox(height: CoreSpacing.sm(context)),
           WidgetsAppButton(
-            label: isAr ? 'رجوع لإدارة المنيو' : 'Back to menu management',
-            onPressed: () => context.push(AppRoutePaths.adminMenu),
+            label: l10n.productEditorBackToMenu,
+            onPressed: () => context.push(AppRoutePaths.operatorMenu),
             icon: Icons.arrow_back,
             variant: WidgetsAppButtonVariant.outline,
           ),
@@ -1005,11 +1028,11 @@ class _VariantRow extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Row(
         children: [
-          _SoftBadge(label: label, color: color),
+          WidgetsSoftBadge(label: label, color: color),
           SizedBox(width: CoreSpacing.sm(context)),
           Expanded(
             child: Text(
@@ -1064,23 +1087,24 @@ class _StationOption extends StatelessWidget {
     required this.isAr,
   });
 
-  final _PrepStation station;
+  final PrepStation station;
   final bool selected;
   final VoidCallback onTap;
   final bool isAr;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final color = selected ? CoreColors.brandOlive : CoreColors.brandBrown;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       child: Container(
         margin: EdgeInsets.only(bottom: CoreSpacing.sm(context)),
         padding: EdgeInsets.all(CoreSpacing.md(context)),
         decoration: BoxDecoration(
           color: color.withValues(alpha: selected ? 0.12 : 0.06),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
           border: Border.all(
             color: color.withValues(alpha: selected ? 0.35 : 0.14),
           ),
@@ -1094,7 +1118,7 @@ class _StationOption extends StatelessWidget {
             SizedBox(width: CoreSpacing.sm(context)),
             Expanded(
               child: Text(
-                station.label(isAr),
+                station.label(l10n),
                 style: CoreTypography.titleMedium(
                   context,
                   Theme.of(context).colorScheme.onSurface,
@@ -1131,7 +1155,7 @@ class _SwitchLine extends StatelessWidget {
         ).copyWith(fontWeight: FontWeight.w800),
       ),
       value: value,
-      activeColor: CoreColors.brandOlive,
+      activeThumbColor: CoreColors.brandOlive,
       onChanged: onChanged,
     );
   }
@@ -1146,7 +1170,7 @@ class _FoodPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       child: SizedBox(
         width: compact ? 96 : double.infinity,
         height: compact ? 96 : CoreContentSizes.heroImageHeight(context) * 0.58,
@@ -1165,55 +1189,6 @@ class _FoodPreview extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({required this.icon, required this.color});
-
-  final IconData icon;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 42,
-      height: 42,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-      ),
-      child: Icon(icon, color: color, size: 22),
-    );
-  }
-}
-
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({required this.label, required this.color, this.foreground});
-
-  final String label;
-  final Color color;
-  final Color? foreground;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.sm(context),
-        vertical: CoreSpacing.xs(context),
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: foreground == null ? 0.12 : 1),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-      ),
-      child: Text(
-        label,
-        style: CoreTypography.caption(
-          context,
-          foreground ?? color,
-        ).copyWith(fontWeight: FontWeight.w900),
       ),
     );
   }
@@ -1279,20 +1254,4 @@ class _ModifierData {
   final String labelAr;
   final String labelEn;
   final double priceJod;
-}
-
-enum _PrepStation {
-  shawarma,
-  fryer,
-  coldPrep,
-  drinks;
-
-  String label(bool isAr) {
-    return switch (this) {
-      _PrepStation.shawarma => isAr ? 'محطة الشاورما' : 'Shawarma station',
-      _PrepStation.fryer => isAr ? 'محطة المقالي' : 'Fryer station',
-      _PrepStation.coldPrep => isAr ? 'تحضير بارد' : 'Cold prep',
-      _PrepStation.drinks => isAr ? 'المشروبات' : 'Drinks',
-    };
-  }
 }

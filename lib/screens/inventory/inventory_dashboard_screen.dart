@@ -6,14 +6,17 @@ import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/inventory_session_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_file_download.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_report_export.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -51,7 +54,7 @@ class InventoryDashboardScreen extends ConsumerWidget {
       ],
       child: WidgetsRefreshList(
         onRefresh:
-            () async => UtilityMockFeedback.showSuccess(
+            () async => UtilityMockFeedback.showInfo(
               context,
               l10n.screenInventoryDashboard,
             ),
@@ -128,10 +131,10 @@ class _InventoryHero extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.inventory_2_outlined,
                 color: scheme.primary,
-                large: true,
+                size: CoreContentSizes.emptyStateIcon(context), iconSize: CoreContentSizes.kpiIcon(context),
               ),
               SizedBox(width: CoreSpacing.md(context)),
               Expanded(
@@ -163,22 +166,22 @@ class _InventoryHero extends StatelessWidget {
             spacing: CoreSpacing.sm(context),
             runSpacing: CoreSpacing.sm(context),
             children: [
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.inventoryLowStockAlerts,
                 color: CoreColors.semanticError,
                 icon: Icons.warning_amber_rounded,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.inventoryShipmentsToday,
                 color: CoreColors.orderTypeTakeaway,
                 icon: Icons.local_shipping_outlined,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.inventoryStorageHealth,
                 color: CoreColors.semanticSuccess,
                 icon: Icons.thermostat_outlined,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.inventoryValueDelta,
                 color: CoreColors.brandGold,
                 icon: Icons.trending_up_outlined,
@@ -303,7 +306,7 @@ class _InventoryActions extends ConsumerWidget {
             userEn: l10n.inventorySupplierName,
           ),
         );
-    UtilityMockFeedback.showSuccess(context, l10n.inventoryLogWastage);
+    UtilityDemoActions.complete(context, successMessage: l10n.inventoryLogWastage);
   }
 }
 
@@ -326,7 +329,7 @@ class _FreshnessAlertBoard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.spa_outlined,
                 color: CoreColors.semanticError,
               ),
@@ -352,7 +355,7 @@ class _FreshnessAlertBoard extends StatelessWidget {
                   ],
                 ),
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: alerts.length.toString(),
                 color: CoreColors.semanticError,
                 icon: Icons.priority_high_outlined,
@@ -391,12 +394,15 @@ class _FreshnessAlertCard extends StatelessWidget {
     final color = critical ? CoreColors.semanticError : CoreColors.brandOrange;
 
     return InkWell(
-      onTap: () => context.push(AppRoutePaths.inventoryItem),
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+      onTap:
+          () => context.push(
+            '${AppRoutePaths.inventoryItem}?item=${Uri.encodeComponent(alert.nameEn)}',
+          ),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
           border: Border.all(color: color.withValues(alpha: 0.20)),
         ),
         child: Padding(
@@ -404,7 +410,7 @@ class _FreshnessAlertCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon:
                     critical ? Icons.error_outline : Icons.inventory_2_outlined,
                 color: color,
@@ -432,7 +438,7 @@ class _FreshnessAlertCard extends StatelessWidget {
                   ],
                 ),
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: isAr ? alert.remainingAr : alert.remainingEn,
                 color: color,
                 icon: Icons.scale_outlined,
@@ -462,7 +468,7 @@ class _DishImpactCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.restaurant_menu_outlined,
                 color: CoreColors.brandOrange,
               ),
@@ -517,7 +523,7 @@ class _StorageZonesCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.thermostat_outlined,
                 color: scheme.primary,
               ),
@@ -559,7 +565,7 @@ class _StorageZoneTile extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.18)),
       ),
       child: Padding(
@@ -581,7 +587,7 @@ class _StorageZoneTile extends StatelessWidget {
                 ).copyWith(fontWeight: FontWeight.w800),
               ),
             ),
-            _SoftBadge(
+            WidgetsSoftBadge(
               label: isAr ? row.statusAr : row.statusEn,
               color: color,
               icon:
@@ -612,7 +618,7 @@ class _SupplierArrivalCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.local_shipping_outlined,
                 color: CoreColors.orderTypeTakeaway,
               ),
@@ -645,7 +651,7 @@ class _SupplierArrivalCard extends StatelessWidget {
             style: CoreTypography.bodyMedium(context, scheme.onSurfaceVariant),
           ),
           SizedBox(height: CoreSpacing.md(context)),
-          _SoftBadge(
+          WidgetsSoftBadge(
             label: l10n.inventorySupplierLeadTime,
             color: CoreColors.orderTypeTakeaway,
             icon: Icons.schedule_outlined,
@@ -674,7 +680,7 @@ class _IngredientLevelsBoard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(icon: Icons.kitchen_outlined, color: scheme.primary),
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), icon: Icons.kitchen_outlined, color: scheme.primary),
               SizedBox(width: CoreSpacing.sm(context)),
               Expanded(
                 child: Text(
@@ -687,7 +693,10 @@ class _IngredientLevelsBoard extends StatelessWidget {
               ),
               WidgetsAppButton(
                 label: l10n.inventoryFullList,
-                onPressed: () => context.push(AppRoutePaths.inventoryItem),
+                onPressed:
+                    () => context.push(
+                      '${AppRoutePaths.inventoryItem}?item=${Uri.encodeComponent(levels.first.nameEn)}',
+                    ),
                 variant: WidgetsAppButtonVariant.ghost,
               ),
             ],
@@ -715,10 +724,16 @@ class _IngredientLevelTile extends StatelessWidget {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final color = _levelColor(context, level.colorKey);
 
-    return DecoratedBox(
+    return InkWell(
+      onTap:
+          () => context.push(
+            '${AppRoutePaths.inventoryItem}?item=${Uri.encodeComponent(level.nameEn)}',
+          ),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
+      child: DecoratedBox(
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.16)),
       ),
       child: Padding(
@@ -736,7 +751,7 @@ class _IngredientLevelTile extends StatelessWidget {
                     ).copyWith(fontWeight: FontWeight.w800),
                   ),
                 ),
-                _SoftBadge(
+                WidgetsSoftBadge(
                   label: l10n.inventoryLevelMeta(level.percent, level.capacity),
                   color: color,
                   icon: Icons.scale_outlined,
@@ -745,7 +760,7 @@ class _IngredientLevelTile extends StatelessWidget {
             ),
             SizedBox(height: CoreSpacing.sm(context)),
             ClipRRect(
-              borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+              borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
               child: LinearProgressIndicator(
                 value: level.percent / 100,
                 minHeight: CoreSpacing.xs(context),
@@ -755,6 +770,7 @@ class _IngredientLevelTile extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }
@@ -788,7 +804,7 @@ class _WastageBoard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.delete_sweep_outlined,
                 color: CoreColors.semanticError,
               ),
@@ -812,9 +828,7 @@ class _WastageBoard extends ConsumerWidget {
                     mimeType: 'text/csv',
                   );
                   if (!context.mounted) return;
-                  UtilityMockFeedback.showSuccess(
-                    context,
-                    l10n.inventoryDownloadReport,
+                  UtilityDemoActions.complete(context, successMessage: l10n.inventoryDownloadReport,
                   );
                 },
                 icon: Icons.download_outlined,
@@ -847,7 +861,7 @@ class _WastageRow extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: CoreColors.semanticError.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(
           color: CoreColors.semanticError.withValues(alpha: 0.14),
         ),
@@ -856,7 +870,7 @@ class _WastageRow extends StatelessWidget {
         padding: EdgeInsets.all(CoreSpacing.sm(context)),
         child: Row(
           children: [
-            _IconBubble(
+            WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
               icon: Icons.delete_sweep_outlined,
               color: CoreColors.semanticError,
             ),
@@ -882,7 +896,7 @@ class _WastageRow extends StatelessWidget {
                 ],
               ),
             ),
-            _SoftBadge(
+            WidgetsSoftBadge(
               label: UtilityFormatJod.format(
                 log.valueLostJod,
                 suffix: l10n.currencyJod,
@@ -948,82 +962,4 @@ class _ImpactLine extends StatelessWidget {
   }
 }
 
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({
-    required this.label,
-    required this.color,
-    required this.icon,
-  });
 
-  final String label;
-  final Color color;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: CoreContentSizes.orderTypeIcon(context),
-              color: color,
-            ),
-            SizedBox(width: CoreSpacing.xs(context)),
-            Text(
-              label,
-              style: CoreTypography.caption(
-                context,
-                color,
-              ).copyWith(fontWeight: FontWeight.w900),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({
-    required this.icon,
-    required this.color,
-    this.large = false,
-  });
-
-  final IconData icon;
-  final Color color;
-  final bool large;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(CoreSpacing.sm(context)),
-        child: Icon(
-          icon,
-          color: color,
-          size:
-              large
-                  ? CoreContentSizes.logoCard(context) * 0.52
-                  : CoreContentSizes.orderTypeIcon(context),
-        ),
-      ),
-    );
-  }
-}

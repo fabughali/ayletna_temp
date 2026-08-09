@@ -5,15 +5,19 @@ import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/delivery_session_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_ops_glance_chip.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_price_badge.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_section_header.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -42,7 +46,7 @@ class DeliveryDashboardScreen extends ConsumerWidget {
       ],
       child: WidgetsRefreshList(
         onRefresh:
-            () async => UtilityMockFeedback.showSuccess(
+            () async => UtilityMockFeedback.showInfo(
               context,
               l10n.deliveryDashboardTitle,
             ),
@@ -55,7 +59,7 @@ class DeliveryDashboardScreen extends ConsumerWidget {
                 final isWide = constraints.maxWidth >= 940;
                 final queue = Column(
                   children: [
-                    _SectionHeader(
+                    WidgetsSectionHeader(
                       title: l10n.deliveryTasks,
                       subtitle: l10n.deliveryShiftSummary,
                       icon: Icons.route_outlined,
@@ -123,10 +127,10 @@ class _RouteHero extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.delivery_dining_outlined,
                 color: scheme.primary,
-                large: true,
+                size: CoreContentSizes.emptyStateIcon(context), iconSize: CoreContentSizes.kpiIcon(context),
               ),
               SizedBox(width: CoreSpacing.md(context)),
               Expanded(
@@ -158,22 +162,22 @@ class _RouteHero extends StatelessWidget {
             spacing: CoreSpacing.sm(context),
             runSpacing: CoreSpacing.sm(context),
             children: [
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.deliveryReadyToGo,
                 color: CoreColors.semanticSuccess,
                 icon: Icons.check_circle_outline,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.deliveryPendingKitchen,
                 color: CoreColors.orderTypePlated,
                 icon: Icons.soup_kitchen_outlined,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.deliveryReturnTasks,
                 color: scheme.primary,
                 icon: Icons.assignment_return_outlined,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.deliveryMilesAway,
                 color: scheme.secondary,
                 icon: Icons.near_me_outlined,
@@ -182,47 +186,6 @@ class _RouteHero extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-  });
-
-  final String title;
-  final String subtitle;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Row(
-      children: [
-        _IconBubble(icon: icon, color: scheme.primary),
-        SizedBox(width: CoreSpacing.sm(context)),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: CoreTypography.titleMedium(
-                  context,
-                  scheme.onSurface,
-                ).copyWith(fontWeight: FontWeight.w900),
-              ),
-              Text(
-                subtitle,
-                style: CoreTypography.caption(context, scheme.onSurfaceVariant),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }
@@ -247,7 +210,7 @@ class _ActiveDeliveryCard extends ConsumerWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.location_on_outlined,
                 color: scheme.secondary,
               ),
@@ -368,7 +331,7 @@ class _ActiveDeliveryCard extends ConsumerWidget {
     controller.dispose();
     if (saved == true && context.mounted) {
       ref.read(deliveryOrderNoteProvider.notifier).state = note;
-      UtilityMockFeedback.showSuccess(context, l10n.deliveryAddNote);
+      UtilityDemoActions.complete(context, successMessage: l10n.deliveryAddNote);
     }
   }
 }
@@ -390,7 +353,7 @@ class _PendingKitchenCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.soup_kitchen_outlined,
                 color: CoreColors.orderTypePlated,
               ),
@@ -400,7 +363,7 @@ class _PendingKitchenCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Order #8845',
+                      l10n.deliveryOrder8845Title,
                       style: CoreTypography.titleMedium(
                         context,
                         scheme.onSurface,
@@ -453,7 +416,7 @@ class _RouteMapCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(icon: Icons.map_outlined, color: scheme.primary),
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), icon: Icons.map_outlined, color: scheme.primary),
               SizedBox(width: CoreSpacing.sm(context)),
               Expanded(
                 child: Text(
@@ -464,7 +427,7 @@ class _RouteMapCard extends StatelessWidget {
                   ).copyWith(fontWeight: FontWeight.w900),
                 ),
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.deliveryMilesAway,
                 color: scheme.secondary,
                 icon: Icons.near_me_outlined,
@@ -473,7 +436,7 @@ class _RouteMapCard extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.md(context)),
           ClipRRect(
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+            borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
             child: SizedBox(
               height: CoreContentSizes.heroImageHeight(context) * 0.62,
               child: DecoratedBox(
@@ -528,7 +491,7 @@ class _ReturnsPreviewCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.assignment_return_outlined,
                 color: scheme.primary,
               ),
@@ -554,7 +517,7 @@ class _ReturnsPreviewCard extends ConsumerWidget {
                   ],
                 ),
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: tasks.length.toString(),
                 color: scheme.primary,
                 icon: Icons.inventory_2_outlined,
@@ -594,14 +557,14 @@ class _ReturnTaskPreview extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.18)),
       ),
       child: Padding(
         padding: EdgeInsets.all(CoreSpacing.sm(context)),
         child: Row(
           children: [
-            _IconBubble(icon: _taskIcon(task.iconKey), color: color),
+            WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), icon: _taskIcon(task.iconKey), color: color),
             SizedBox(width: CoreSpacing.sm(context)),
             Expanded(
               child: Column(
@@ -624,7 +587,7 @@ class _ReturnTaskPreview extends StatelessWidget {
                 ],
               ),
             ),
-            _SoftBadge(
+            WidgetsSoftBadge(
               label: isAr ? task.statusAr : task.statusEn,
               color: color,
               icon: Icons.schedule_outlined,
@@ -673,7 +636,7 @@ class _EarningsMiniCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.account_balance_wallet_outlined,
                 color: scheme.secondary,
               ),
@@ -825,7 +788,7 @@ class _InstructionStrip extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.18)),
       ),
       child: Padding(
@@ -845,86 +808,6 @@ class _InstructionStrip extends StatelessWidget {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({
-    required this.label,
-    required this.color,
-    required this.icon,
-  });
-
-  final String label;
-  final Color color;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: CoreContentSizes.orderTypeIcon(context),
-              color: color,
-            ),
-            SizedBox(width: CoreSpacing.xs(context)),
-            Text(
-              label,
-              style: CoreTypography.caption(
-                context,
-                color,
-              ).copyWith(fontWeight: FontWeight.w900),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({
-    required this.icon,
-    required this.color,
-    this.large = false,
-  });
-
-  final IconData icon;
-  final Color color;
-  final bool large;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(CoreSpacing.sm(context)),
-        child: Icon(
-          icon,
-          color: color,
-          size:
-              large
-                  ? CoreContentSizes.logoCard(context) * 0.52
-                  : CoreContentSizes.orderTypeIcon(context),
         ),
       ),
     );

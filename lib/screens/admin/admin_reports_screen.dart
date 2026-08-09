@@ -1,26 +1,36 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/admin_dashboard_providers.dart';
 import 'package:ayletna_restaurant_app/providers/attendance_hr_providers.dart';
+import 'package:ayletna_restaurant_app/providers/owner_view_config_providers.dart';
+import 'package:ayletna_restaurant_app/data/models/model_owner_view_config.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_owner_view_mask.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_file_download.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_report_export.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_hero_metric.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_report_filter_sheet.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_read_only_hub_banner.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// PRD [ReportsScreen].
 class AdminReportsScreen extends ConsumerStatefulWidget {
-  const AdminReportsScreen({super.key});
+  const AdminReportsScreen({this.readOnly = false, super.key});
+
+  final bool readOnly;
 
   @override
   ConsumerState<AdminReportsScreen> createState() => _AdminReportsScreenState();
@@ -33,6 +43,9 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final ownerMask = widget.readOnly
+        ? ref.watch(effectiveOwnerViewMaskProvider)
+        : OwnerViewMask.none;
 
     return WidgetsScaffoldPage(
       title: l10n.screenReports,
@@ -43,7 +56,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
           tooltip: l10n.screenReportFilter,
         ),
         WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.adminFinancial),
+          onPressed: () => context.push(AppRoutePaths.operatorFinancial),
           icon: Icons.payments_outlined,
           tooltip: l10n.screenFinancialCalculation,
         ),
@@ -57,9 +70,9 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
             final isWide = constraints.maxWidth >= 880;
             final scorecards = Column(
               children: [
-                _ExecutiveScorecards(l10n: l10n, isAr: isAr),
+                _ExecutiveScorecards(l10n: l10n, isAr: isAr, mask: ownerMask),
                 SizedBox(height: CoreSpacing.lg(context)),
-                _SalesTrendCard(l10n: l10n, isAr: isAr),
+                _SalesTrendCard(l10n: l10n, isAr: isAr, mask: ownerMask),
               ],
             );
             final insights = Column(
@@ -68,7 +81,12 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
                 SizedBox(height: CoreSpacing.lg(context)),
                 _ReportModulesCard(l10n: l10n, isAr: isAr),
                 SizedBox(height: CoreSpacing.lg(context)),
-                _ExportCenterCard(l10n: l10n, isAr: isAr, period: _period),
+                _ExportCenterCard(
+                  l10n: l10n,
+                  isAr: isAr,
+                  period: _period,
+                  readOnly: widget.readOnly,
+                ),
               ],
             );
 
@@ -78,7 +96,30 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
                 bottom: CoreSpacing.xxl(context),
               ),
               children: [
-                _ReportsHero(l10n: l10n, isAr: isAr),
+                if (widget.readOnly) ...[
+                  const WidgetsReadOnlyHubBanner(),
+                  if (ownerMask.configId != null)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: CoreSpacing.md(context)),
+                      child: WidgetsAppCard(
+                        child: ListTile(
+                          leading: const Icon(Icons.visibility_outlined),
+                          title: Text(l10n.ownerViewConfigApplied),
+                          subtitle: Text(
+                            ref
+                                    .watch(
+                                      ownerViewConfigByIdProvider(
+                                        ownerMask.configId!,
+                                      ),
+                                    )
+                                    ?.label(isAr) ??
+                                ownerMask.configId!,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+                _ReportsHero(l10n: l10n, isAr: isAr, mask: ownerMask),
                 SizedBox(height: CoreSpacing.lg(context)),
                 _PeriodSelector(
                   selected: _period,
@@ -111,17 +152,22 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
 enum _ReportPeriod { daily, weekly, monthly }
 
 class _ReportsHero extends StatelessWidget {
-  const _ReportsHero({required this.l10n, required this.isAr});
+  const _ReportsHero({
+    required this.l10n,
+    required this.isAr,
+    this.mask = OwnerViewMask.none,
+  });
 
   final AppLocalizations l10n;
   final bool isAr;
+  final OwnerViewMask mask;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.all(CoreSpacing.lg(context)),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         gradient: const LinearGradient(
           colors: [CoreColors.brandOlive, CoreColors.brandBrown],
           begin: AlignmentDirectional.topStart,
@@ -131,16 +177,14 @@ class _ReportsHero extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SoftBadge(
-            label: isAr ? 'مركز تحليلات المطعم' : 'Restaurant Analytics Hub',
+          WidgetsSoftBadge(
+            label: l10n.reportsHubBadge,
             color: CoreColors.surfaceLight,
             foreground: CoreColors.brandBrown,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           Text(
-            isAr
-                ? 'اربط المبيعات، القنوات، البقشيش، الهدر، والصواني بقرارات تشغيل واضحة.'
-                : 'Connect sales, channels, tips, waste, and trays to clear operating decisions.',
+            l10n.reportsHubHeadline,
             style: CoreTypography.headlineSmall(
               context,
               CoreColors.surfaceLight,
@@ -151,25 +195,31 @@ class _ReportsHero extends StatelessWidget {
             spacing: CoreSpacing.sm(context),
             runSpacing: CoreSpacing.sm(context),
             children: [
-              _HeroMetric(
+              WidgetsHeroMetric(
                 label: l10n.reportsDailySales,
-                value: UtilityFormatJod.format(
+                value: UtilityOwnerViewMask.formatJod(
                   MockupCatalog.adminRevenueJod,
+                  mask: mask,
+                  sensitive: mask.netProfitOnly,
                   suffix: l10n.currencyJod,
                 ),
                 icon: Icons.payments_outlined,
               ),
-              _HeroMetric(
+              WidgetsHeroMetric(
                 label: l10n.adminKpiOrders,
-                value: '${MockupCatalog.adminTodayOrders}',
+                value: mask.netProfitOnly
+                    ? '—'
+                    : '${MockupCatalog.adminTodayOrders}',
                 icon: Icons.receipt_long_outlined,
               ),
-              _HeroMetric(
+              WidgetsHeroMetric(
                 label: l10n.reportsTipTotals,
-                value: UtilityFormatJod.format(
-                  MockupCatalog.adminTipPoolJod,
-                  suffix: l10n.currencyJod,
-                ),
+                value: UtilityOwnerViewMask.shouldHideStaffSection(mask)
+                    ? '••••••'
+                    : UtilityFormatJod.format(
+                        MockupCatalog.adminTipPoolJod,
+                        suffix: l10n.currencyJod,
+                      ),
                 icon: Icons.volunteer_activism_outlined,
               ),
             ],
@@ -211,27 +261,29 @@ class _PeriodSelector extends StatelessWidget {
 }
 
 class _ExecutiveScorecards extends StatelessWidget {
-  const _ExecutiveScorecards({required this.l10n, required this.isAr});
+  const _ExecutiveScorecards({
+    required this.l10n,
+    required this.isAr,
+    this.mask = OwnerViewMask.none,
+  });
 
   final AppLocalizations l10n;
   final bool isAr;
+  final OwnerViewMask mask;
 
   @override
   Widget build(BuildContext context) {
     return WidgetsAppCard(
-      title: isAr ? 'مؤشرات تشغيلية' : 'Operating Scorecards',
-      subtitle:
-          isAr
-              ? 'أرقام تقود قرارات اليوم، لا ملفات تصدير فقط.'
-              : 'Numbers that drive today, not just export files.',
-      leading: const _IconBubble(
+      title: l10n.reportsOpsScorecardsTitle,
+      subtitle: l10n.reportsOpsScorecardsSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.query_stats_outlined,
         color: CoreColors.brandOlive,
       ),
       child: Column(
         children: [
           _ScoreRow(
-            label: isAr ? 'متوسط الطلب' : 'Average order',
+            label: l10n.reportsAvgOrderLabel,
             value: UtilityFormatJod.format(
               MockupCatalog.cashierAverageOrderJod,
               suffix: l10n.currencyJod,
@@ -240,21 +292,22 @@ class _ExecutiveScorecards extends StatelessWidget {
             color: CoreColors.semanticRevenue,
           ),
           _ScoreRow(
-            label: isAr ? 'إرجاع الصواني' : 'Tray return success',
+            label: l10n.reportsTrayReturnSuccess,
             value:
                 '${MockupCatalog.deliveryReturnsSuccessRate.toStringAsFixed(1)}%',
             detail: l10n.reportsSustainabilityBody,
             color: CoreColors.orderTypePlated,
           ),
-          _ScoreRow(
-            label: isAr ? 'تكلفة الهدر والكسر' : 'Waste & breakage cost',
-            value: UtilityFormatJod.format(
-              MockupCatalog.adminLossBreakageJod,
-              suffix: l10n.currencyJod,
+          if (!UtilityOwnerViewMask.shouldHideRawCostRow(mask))
+            _ScoreRow(
+              label: l10n.reportsWasteBreakageCost,
+              value: UtilityFormatJod.format(
+                MockupCatalog.adminLossBreakageJod,
+                suffix: l10n.currencyJod,
+              ),
+              detail: l10n.reportsInventoryWastageBody,
+              color: CoreColors.semanticError,
             ),
-            detail: l10n.reportsInventoryWastageBody,
-            color: CoreColors.semanticError,
-          ),
         ],
       ),
     );
@@ -262,20 +315,22 @@ class _ExecutiveScorecards extends StatelessWidget {
 }
 
 class _SalesTrendCard extends StatelessWidget {
-  const _SalesTrendCard({required this.l10n, required this.isAr});
+  const _SalesTrendCard({
+    required this.l10n,
+    required this.isAr,
+    this.mask = OwnerViewMask.none,
+  });
 
   final AppLocalizations l10n;
   final bool isAr;
+  final OwnerViewMask mask;
 
   @override
   Widget build(BuildContext context) {
     return WidgetsAppCard(
       title: l10n.reportsRevenueTrend,
-      subtitle:
-          isAr
-              ? 'اتجاه الطلبات خلال آخر ساعات الخدمة.'
-              : 'Order trend across recent service hours.',
-      leading: const _IconBubble(
+      subtitle: l10n.reportsTrendSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.show_chart_outlined,
         color: CoreColors.semanticRevenue,
       ),
@@ -293,9 +348,8 @@ class _SalesTrendCard extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.md(context)),
           _StatusStrip(
-            label: isAr ? 'ذروة اليوم' : 'Today peak',
-            value:
-                isAr ? 'الغداء والتوصيل المسائي' : 'Lunch and evening delivery',
+            label: l10n.reportsTodayPeakLabel,
+            value: l10n.reportsTodayPeakValue,
             color: CoreColors.brandOrange,
           ),
         ],
@@ -313,35 +367,26 @@ class _InsightQueueCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WidgetsAppCard(
-      title: isAr ? 'قرارات مقترحة' : 'Recommended Decisions',
-      subtitle:
-          isAr
-              ? 'تحليلات مرتبطة بتشغيل المطعم.'
-              : 'Analytics connected to restaurant operations.',
-      leading: const _IconBubble(
+      title: l10n.reportsDecisionsTitle,
+      subtitle: l10n.reportsDecisionsSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.lightbulb_outline,
         color: CoreColors.brandOrange,
       ),
       child: Column(
         children: [
           _InsightRow(
-            label:
-                isAr
-                    ? 'زِد تحضير الشاورما قبل الغداء'
-                    : 'Increase shawarma prep before lunch',
-            detail:
-                isAr
-                    ? 'مبيعات القناة أعلى من المتوسط بـ ١٢٪.'
-                    : 'Channel sales are 12% above baseline.',
+            label: l10n.reportsInsightShawarmaLabel,
+            detail: l10n.reportsInsightShawarmaDetail,
             color: CoreColors.brandOrange,
           ),
           _InsightRow(
-            label: isAr ? 'راجع هدر المقالي' : 'Review fryer wastage',
+            label: l10n.reportsReviewFryerLabel,
             detail: l10n.reportsInventoryWastageBody,
             color: CoreColors.semanticError,
           ),
           _InsightRow(
-            label: isAr ? 'اعتمد توزيع البقشيش' : 'Approve tip distribution',
+            label: l10n.reportsApproveTipsLabel,
             detail: l10n.reportsStaffTipsBody,
             color: CoreColors.semanticTip,
           ),
@@ -360,9 +405,9 @@ class _ReportModulesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WidgetsAppCard(
-      title: isAr ? 'وحدات التحليل' : 'Analytics Modules',
+      title: l10n.reportsModulesTitle,
       subtitle: l10n.reportsDetailedReports,
-      leading: const _IconBubble(
+      leading: WidgetsIconBubble(
         icon: Icons.dashboard_customize_outlined,
         color: CoreColors.orderTypeDelivery,
       ),
@@ -373,14 +418,14 @@ class _ReportModulesCard extends StatelessWidget {
             body: l10n.reportsSalesRevenueBody,
             icon: Icons.receipt_long_outlined,
             color: CoreColors.semanticRevenue,
-            route: AppRoutePaths.adminFinancial,
+            route: AppRoutePaths.operatorFinancial,
           ),
           _ModuleRow(
             title: l10n.reportsStaffTips,
             body: l10n.reportsStaffTipsBody,
             icon: Icons.badge_outlined,
             color: CoreColors.semanticTip,
-            route: AppRoutePaths.adminTipDistribution,
+            route: AppRoutePaths.operatorTipDistribution,
           ),
           _ModuleRow(
             title: l10n.reportsInventoryWastage,
@@ -390,11 +435,11 @@ class _ReportModulesCard extends StatelessWidget {
             route: AppRoutePaths.inventory,
           ),
           _ModuleRow(
-            title: isAr ? 'الصواني والعربون' : 'Plates & deposits',
+            title: l10n.reportsPlatesDepositsTitle,
             body: l10n.reportsSustainabilityBody,
             icon: Icons.room_service_outlined,
             color: CoreColors.orderTypePlated,
-            route: AppRoutePaths.adminPlates,
+            route: AppRoutePaths.operatorPlates,
           ),
         ],
       ),
@@ -407,11 +452,13 @@ class _ExportCenterCard extends ConsumerWidget {
     required this.l10n,
     required this.isAr,
     required this.period,
+    this.readOnly = false,
   });
 
   final AppLocalizations l10n;
   final bool isAr;
   final _ReportPeriod period;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -419,16 +466,21 @@ class _ExportCenterCard extends ConsumerWidget {
     final hr = ref.watch(attendanceHrProvider);
 
     return WidgetsAppCard(
-      title: isAr ? 'تصدير ومشاركة' : 'Export & Share',
-      subtitle:
-          isAr
-              ? 'التصدير أصبح نتيجة ثانوية، وليس مركز الشاشة.'
-              : 'Exports are now an outcome, not the whole screen.',
-      leading: const _IconBubble(
+      title: l10n.reportsExportTitle,
+      subtitle: l10n.reportsExportSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.ios_share_outlined,
         color: CoreColors.brandBrown,
       ),
-      child: Column(
+      child: readOnly
+          ? Text(
+              l10n.reportsExportOperatorOnly,
+              style: CoreTypography.caption(
+                context,
+                Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            )
+          : Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           WidgetsAppButton(
@@ -447,11 +499,7 @@ class _ExportCenterCard extends ConsumerWidget {
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(
-                    isAr
-                        ? 'تم تنزيل التقرير — اطبع كـ PDF من المتصفح'
-                        : 'Report downloaded — print to PDF from browser',
-                  ),
+                  content: Text(l10n.financialCloseReportDownloaded),
                 ),
               );
             },
@@ -499,14 +547,14 @@ class _ScoreRow extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Row(
         children: [
-          _IconBubble(
+          WidgetsIconBubble(
             icon: Icons.trending_up_outlined,
             color: color,
-            compact: true,
+            size: UtilitySizer.of(context, 36), iconSize: CoreContentSizes.orderTypeIcon(context),
           ),
           SizedBox(width: CoreSpacing.sm(context)),
           Expanded(
@@ -564,16 +612,16 @@ class _InsightRow extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.16)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _IconBubble(
+          WidgetsIconBubble(
             icon: Icons.insights_outlined,
             color: color,
-            compact: true,
+            size: UtilitySizer.of(context, 36), iconSize: CoreContentSizes.orderTypeIcon(context),
           ),
           SizedBox(width: CoreSpacing.sm(context)),
           Expanded(
@@ -625,11 +673,11 @@ class _ModuleRow extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Row(
         children: [
-          _IconBubble(icon: icon, color: color),
+          WidgetsIconBubble(icon: icon, color: color),
           SizedBox(width: CoreSpacing.sm(context)),
           Expanded(
             child: Column(
@@ -682,7 +730,7 @@ class _StatusStrip extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Row(
         children: [
@@ -695,121 +743,8 @@ class _StatusStrip extends StatelessWidget {
               ),
             ),
           ),
-          _SoftBadge(label: value, color: color),
+          WidgetsSoftBadge(label: value, color: color),
         ],
-      ),
-    );
-  }
-}
-
-class _HeroMetric extends StatelessWidget {
-  const _HeroMetric({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
-
-  final String label;
-  final String value;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 184,
-      padding: EdgeInsets.all(CoreSpacing.md(context)),
-      decoration: BoxDecoration(
-        color: CoreColors.surfaceLight.withValues(alpha: 0.16),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-        border: Border.all(
-          color: CoreColors.surfaceLight.withValues(alpha: 0.30),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: CoreColors.surfaceLight),
-          SizedBox(width: CoreSpacing.sm(context)),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: CoreTypography.titleMedium(
-                    context,
-                    CoreColors.surfaceLight,
-                  ).copyWith(fontWeight: FontWeight.w900),
-                ),
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: CoreTypography.caption(
-                    context,
-                    CoreColors.surfaceLight.withValues(alpha: 0.84),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({
-    required this.icon,
-    required this.color,
-    this.compact = false,
-  });
-
-  final IconData icon;
-  final Color color;
-  final bool compact;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = compact ? 36.0 : 42.0;
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-      ),
-      child: Icon(icon, color: color, size: compact ? 18 : 22),
-    );
-  }
-}
-
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({required this.label, required this.color, this.foreground});
-
-  final String label;
-  final Color color;
-  final Color? foreground;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.sm(context),
-        vertical: CoreSpacing.xs(context),
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: foreground == null ? 0.12 : 1),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-      ),
-      child: Text(
-        label,
-        style: CoreTypography.caption(
-          context,
-          foreground ?? color,
-        ).copyWith(fontWeight: FontWeight.w900),
       ),
     );
   }

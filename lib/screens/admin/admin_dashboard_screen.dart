@@ -1,23 +1,36 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:ayletna_restaurant_app/data/models/model_inventory_mock.dart';
 import 'package:ayletna_restaurant_app/data/models/model_list_entry.dart';
 import 'package:ayletna_restaurant_app/data/models/model_order_summary.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/admin_plates_providers.dart';
+import 'package:ayletna_restaurant_app/providers/admin_catalog_providers.dart';
 import 'package:ayletna_restaurant_app/providers/admin_dashboard_providers.dart';
 import 'package:ayletna_restaurant_app/providers/admin_session_providers.dart';
 import 'package:ayletna_restaurant_app/providers/delivery_session_providers.dart';
 import 'package:ayletna_restaurant_app/providers/inventory_session_providers.dart';
+import 'package:ayletna_restaurant_app/providers/marketing_publish_providers.dart';
+import 'package:ayletna_restaurant_app/providers/support_dashboard_providers.dart';
+import 'package:ayletna_restaurant_app/providers/support_session_providers.dart';
+import 'package:ayletna_restaurant_app/data/models/model_audit_event.dart';
+import 'package:ayletna_restaurant_app/providers/audit_log_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_avatar.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_hub_nav_actions.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_hero_metric.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_amount_line.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -33,18 +46,14 @@ class AdminDashboardScreen extends ConsumerWidget {
     final metrics = ref.watch(adminDashboardMetricsProvider);
 
     return WidgetsScaffoldPage(
-      title: l10n.screenAdminDashboard,
+      title: l10n.hubOperator,
       actions: [
         WidgetsIconButton(
           onPressed: () => context.push(AppRoutePaths.notifications),
           icon: Icons.notifications_outlined,
           tooltip: l10n.screenNotifications,
         ),
-        WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.adminReports),
-          icon: Icons.insights_outlined,
-          tooltip: l10n.screenReports,
-        ),
+        ...WidgetsHubNavActions.forContext(context),
       ],
       child: WidgetsRefreshList(
         onRefresh: () async {
@@ -56,13 +65,12 @@ class AdminDashboardScreen extends ConsumerWidget {
             final isWide = constraints.maxWidth >= 840;
             final spacing = CoreSpacing.lg(context);
 
-            return ListView(
-              padding: EdgeInsetsDirectional.only(
-                top: CoreSpacing.md(context),
-                bottom: CoreSpacing.xxl(context),
-              ),
-              children: [
+            final children = <Widget>[
                 _CommandHero(l10n: l10n, isAr: isAr, metrics: metrics),
+                SizedBox(height: spacing),
+                _CampaignApprovalCard(l10n: l10n, isAr: isAr),
+                SizedBox(height: spacing),
+                _SupportEscalationsInboxCard(l10n: l10n, isAr: isAr),
                 SizedBox(height: spacing),
                 if (isWide)
                   Row(
@@ -101,7 +109,11 @@ class AdminDashboardScreen extends ConsumerWidget {
                             SizedBox(height: spacing),
                             _StockoutsCard(l10n: l10n, isAr: isAr),
                             SizedBox(height: spacing),
-                            _DriverDelaysCard(l10n: l10n, isAr: isAr, metrics: metrics),
+                            _DriverDelaysCard(
+                              l10n: l10n,
+                              isAr: isAr,
+                              metrics: metrics,
+                            ),
                             SizedBox(height: spacing),
                             _TeamSnapshotCard(l10n: l10n, isAr: isAr),
                             SizedBox(height: spacing),
@@ -128,7 +140,14 @@ class AdminDashboardScreen extends ConsumerWidget {
                   SizedBox(height: spacing),
                   _AdminQuickControls(l10n: l10n, isAr: isAr),
                 ],
-              ],
+            ];
+            return ListView.builder(
+              padding: EdgeInsetsDirectional.only(
+                top: CoreSpacing.md(context),
+                bottom: CoreSpacing.xxl(context),
+              ),
+              itemCount: children.length,
+              itemBuilder: (context, index) => children[index],
             );
           },
         ),
@@ -153,7 +172,7 @@ class _CommandHero extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(CoreSpacing.lg(context)),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         gradient: LinearGradient(
           colors: [
             CoreColors.brandOlive,
@@ -174,16 +193,14 @@ class _CommandHero extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SoftBadge(
-            label: isAr ? 'مركز القيادة المباشر' : 'Live Command Center',
+          WidgetsSoftBadge(
+            label: l10n.adminCommandCenterBadge,
             color: CoreColors.surfaceLight,
             foreground: CoreColors.brandBrown,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           Text(
-            isAr
-                ? 'الأولوية الآن: الطلبات المتأخرة، نفاد المواد، إغلاق الكاش، وتأخير السائقين.'
-                : 'Priority now: late tickets, stockouts, cash close, and driver delays.',
+            l10n.adminCommandCenterHeadline,
             style: CoreTypography.headlineSmall(
               context,
               CoreColors.surfaceLight,
@@ -191,9 +208,7 @@ class _CommandHero extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.sm(context)),
           Text(
-            isAr
-                ? 'لوحة مصممة لصاحب المطعم: قرارات سريعة، تشغيل واضح، وروابط مباشرة لكل منطقة.'
-                : 'Built for the restaurant owner: fast decisions, clear operations, and direct links into every station.',
+            l10n.adminCommandCenterBody,
             style: CoreTypography.bodyMedium(
               context,
               CoreColors.surfaceLight.withValues(alpha: 0.88),
@@ -204,7 +219,7 @@ class _CommandHero extends StatelessWidget {
             spacing: CoreSpacing.sm(context),
             runSpacing: CoreSpacing.sm(context),
             children: [
-              _HeroMetric(
+              WidgetsHeroMetric(
                 label: l10n.adminRevenueToday,
                 value: UtilityFormatJod.format(
                   metrics.revenueTodayJod,
@@ -212,13 +227,13 @@ class _CommandHero extends StatelessWidget {
                 ),
                 icon: Icons.point_of_sale_outlined,
               ),
-              _HeroMetric(
-                label: isAr ? 'طلبات نشطة' : 'Active orders',
+              WidgetsHeroMetric(
+                label: l10n.adminActiveOrdersMetric,
                 value: '${metrics.activeOrderCount}',
                 icon: Icons.receipt_long_outlined,
               ),
-              _HeroMetric(
-                label: isAr ? 'تنبيهات عاجلة' : 'Urgent alerts',
+              WidgetsHeroMetric(
+                label: l10n.adminUrgentAlertsMetric,
                 value: '${metrics.urgentAlerts}',
                 icon: Icons.priority_high_outlined,
               ),
@@ -230,73 +245,17 @@ class _CommandHero extends StatelessWidget {
             runSpacing: CoreSpacing.sm(context),
             children: [
               WidgetsAppButton(
-                label: isAr ? 'افتح لوحة الطلبات' : 'Open Orders Board',
-                onPressed: () => context.push(AppRoutePaths.adminOrders),
+                label: l10n.adminOpenOrdersBoard,
+                onPressed: () => context.push(AppRoutePaths.operatorOrders),
                 icon: Icons.table_restaurant_outlined,
               ),
               WidgetsAppButton(
-                label: isAr ? 'إغلاق الكاش' : 'Cash Close',
-                onPressed: () => context.push(AppRoutePaths.adminFinancial),
+                label: l10n.adminCashCloseAction,
+                onPressed: () => context.push(AppRoutePaths.operatorFinancial),
                 icon: Icons.payments_outlined,
                 variant: WidgetsAppButtonVariant.secondary,
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _HeroMetric extends StatelessWidget {
-  const _HeroMetric({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
-
-  final String label;
-  final String value;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 184,
-      padding: EdgeInsets.all(CoreSpacing.md(context)),
-      decoration: BoxDecoration(
-        color: CoreColors.surfaceLight.withValues(alpha: 0.16),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-        border: Border.all(
-          color: CoreColors.surfaceLight.withValues(alpha: 0.30),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: CoreColors.surfaceLight),
-          SizedBox(width: CoreSpacing.sm(context)),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  style: CoreTypography.titleMedium(
-                    context,
-                    CoreColors.surfaceLight,
-                  ).copyWith(fontWeight: FontWeight.w900),
-                ),
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: CoreTypography.caption(
-                    context,
-                    CoreColors.surfaceLight.withValues(alpha: 0.82),
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),
@@ -325,20 +284,14 @@ class _ActionQueueCard extends ConsumerWidget {
     final stockAlerts = MockupCatalog.inventoryAlerts.length;
     final platedOnWay =
         metrics.liveOrders
-            .where(
-              (order) =>
-                  order.isPlated && order.statusKey == 'on_way',
-            )
+            .where((order) => order.isPlated && order.statusKey == 'on_way')
             .toList();
     final delayedPlated = platedOnWay.isNotEmpty ? platedOnWay.first : null;
 
     return WidgetsAppCard(
-      title: isAr ? 'يحتاج تدخلك الآن' : 'Needs Your Attention',
-      subtitle:
-          isAr
-              ? 'مرتبة حسب تأثيرها على تجربة الضيف والوردية.'
-              : 'Prioritized by guest impact and shift risk.',
-      leading: const _IconBubble(
+      title: l10n.adminNeedsAttentionTitle,
+      subtitle: l10n.adminNeedsAttentionSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.notifications_active_outlined,
         color: CoreColors.semanticError,
       ),
@@ -346,26 +299,17 @@ class _ActionQueueCard extends ConsumerWidget {
         children: [
           if (lateCount > 0)
             _ActionRow(
-              label:
-                  isAr
-                      ? '$lateCount ${lateCount == 1 ? 'طلب' : 'طلبات'} تأخرت عن وقت التحضير'
-                      : '$lateCount ticket${lateCount == 1 ? '' : 's'} running late',
-              detail:
-                  isAr
-                      ? 'محطة الشاورما والمقالي تحتاج متابعة خلال ٤ دقائق.'
-                      : 'Shawarma and fryer station need attention within 4 minutes.',
+              label: l10n.adminLateTicketsLabel(lateCount),
+              detail: l10n.adminLateTicketsDetail,
               color: CoreColors.semanticError,
               icon: Icons.timer_outlined,
-              actionLabel: isAr ? 'افتح الطلبات' : 'Open orders',
-              onPressed: () => context.push(AppRoutePaths.adminOrders),
+              actionLabel: l10n.adminOpenOrdersAction,
+              onPressed: () => context.push(AppRoutePaths.operatorOrders),
             ),
           if (stockAlerts > 0)
             _ActionRow(
               label: l10n.adminInventoryLowTitle,
-              detail:
-                  isAr
-                      ? '$stockAlerts ${stockAlerts == 1 ? 'مادة' : 'مواد'} تحت الحد الأدنى.'
-                      : '$stockAlerts ingredient${stockAlerts == 1 ? '' : 's'} below threshold.',
+              detail: l10n.adminBelowThresholdDetail(stockAlerts),
               color: CoreColors.brandOlive,
               icon: Icons.inventory_2_outlined,
               actionLabel: l10n.adminRestockAction,
@@ -378,21 +322,19 @@ class _ActionQueueCard extends ConsumerWidget {
               color: CoreColors.semanticTip,
               icon: Icons.volunteer_activism_outlined,
               actionLabel: l10n.adminReviewAction,
-              onPressed: () => context.push(AppRoutePaths.adminTipDistribution),
+              onPressed:
+                  () => context.push(AppRoutePaths.operatorTipDistribution),
             ),
           if (delayedPlated != null)
             _ActionRow(
-              label:
-                  isAr
-                      ? 'مندوب متأخر عن تسليم صواني'
-                      : 'Driver delayed on plated delivery',
-              detail:
-                  isAr
-                      ? 'طلب #${delayedPlated.id} في الطريق — ${delayedPlated.customerLabel}.'
-                      : 'Order #${delayedPlated.id} on the road — ${delayedPlated.customerLabel}.',
+              label: l10n.adminDriverDelayedLabel,
+              detail: l10n.adminDriverDelayedDetail(
+                delayedPlated.id,
+                delayedPlated.customerLabel,
+              ),
               color: CoreColors.orderTypeDelivery,
               icon: Icons.delivery_dining_outlined,
-              actionLabel: isAr ? 'مسار التوصيل' : 'Delivery route',
+              actionLabel: l10n.adminDeliveryRouteAction,
               onPressed: () => context.push(AppRoutePaths.delivery),
             ),
           if (lateCount == 0 &&
@@ -402,9 +344,7 @@ class _ActionQueueCard extends ConsumerWidget {
             Padding(
               padding: EdgeInsets.symmetric(vertical: CoreSpacing.md(context)),
               child: Text(
-                isAr
-                    ? 'لا توجد تنبيهات عاجلة — الوضع مستقر.'
-                    : 'No urgent alerts — operations look stable.',
+                l10n.adminNoUrgentAlerts,
                 style: CoreTypography.bodyMedium(
                   context,
                   Theme.of(context).colorScheme.onSurfaceVariant,
@@ -433,13 +373,10 @@ class _LiveOrdersCard extends StatelessWidget {
     final orders = metrics.liveOrders;
     return WidgetsAppCard(
       title: l10n.adminLiveOrderStatus,
-      subtitle:
-          isAr
-              ? 'كل قناة طلب تظهر مع حالة التحضير والتحصيل.'
-              : 'Every order channel with prep and settlement context.',
+      subtitle: l10n.adminLiveOrdersSubtitle,
       trailing: WidgetsAppButton(
         label: l10n.adminNavOrders,
-        onPressed: () => context.push(AppRoutePaths.adminOrders),
+        onPressed: () => context.push(AppRoutePaths.operatorOrders),
         variant: WidgetsAppButtonVariant.ghost,
       ),
       child: Column(
@@ -489,7 +426,7 @@ class _KitchenLoadCard extends StatelessWidget {
     return WidgetsAppCard(
       title: l10n.adminStationLoad,
       subtitle: l10n.adminMarketInsightBody,
-      leading: const _IconBubble(
+      leading: WidgetsIconBubble(
         icon: Icons.soup_kitchen_outlined,
         color: CoreColors.brandOrange,
       ),
@@ -533,43 +470,43 @@ class _CashCloseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WidgetsAppCard(
-      title: isAr ? 'إغلاق الكاش' : 'Cash Close',
-      subtitle:
-          isAr
-              ? 'تحقق من المبيعات، البقشيش، والمرتجعات.'
-              : 'Verify sales, tips, and refunds.',
-      leading: const _IconBubble(
+      title: l10n.adminCashCloseTitle,
+      subtitle: l10n.adminCashCloseSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.account_balance_wallet_outlined,
         color: CoreColors.semanticRevenue,
       ),
       child: Column(
         children: [
-          _AmountLine(
+          WidgetsAmountLine(
             label: l10n.adminRevenueToday,
             value: UtilityFormatJod.format(
               metrics.revenueTodayJod,
               suffix: l10n.currencyJod,
             ),
+            strong: true,
           ),
-          _AmountLine(
+          WidgetsAmountLine(
             label: l10n.adminTipsCollected,
             value: UtilityFormatJod.format(
               metrics.tipsPoolJod,
               suffix: l10n.currencyJod,
             ),
+            strong: true,
           ),
-          _AmountLine(
+          WidgetsAmountLine(
             label: l10n.adminLossBreakage,
             value: UtilityFormatJod.format(
               metrics.breakageLossJod,
               suffix: l10n.currencyJod,
             ),
             valueColor: CoreColors.semanticError,
+            strong: true,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           WidgetsAppButton(
-            label: isAr ? 'راجع إغلاق الوردية' : 'Review Shift Close',
-            onPressed: () => context.push(AppRoutePaths.adminFinancial),
+            label: l10n.adminReviewShiftClose,
+            onPressed: () => context.push(AppRoutePaths.operatorFinancial),
             icon: Icons.fact_check_outlined,
             fullWidth: true,
           ),
@@ -608,26 +545,25 @@ class _StockoutsCard extends ConsumerWidget {
     final visible = alerts.take(3).toList();
 
     return WidgetsAppCard(
-      title: isAr ? 'نفاد يؤثر على المنيو' : 'Menu Stockout Impact',
-      subtitle:
-          isAr
-              ? 'اربط المواد الناقصة بالأطباق قبل الذروة.'
-              : 'Connect low ingredients to dishes before peak.',
-      leading: const _IconBubble(
+      title: l10n.adminStockoutImpactTitle,
+      subtitle: l10n.adminStockoutImpactSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.eco_outlined,
         color: CoreColors.brandOlive,
       ),
       trailing: WidgetsAppButton(
-        label: isAr ? 'المخزون' : 'Inventory',
+        label: l10n.adminInventoryAction,
         onPressed: () => context.push(AppRoutePaths.inventory),
         variant: WidgetsAppButtonVariant.ghost,
       ),
       child:
           visible.isEmpty
               ? Padding(
-                padding: EdgeInsets.symmetric(vertical: CoreSpacing.md(context)),
+                padding: EdgeInsets.symmetric(
+                  vertical: CoreSpacing.md(context),
+                ),
                 child: Text(
-                  isAr ? 'لا توجد مواد حرجة حالياً.' : 'No critical stock alerts.',
+                  l10n.adminNoCriticalStock,
                   style: CoreTypography.bodyMedium(
                     context,
                     Theme.of(context).colorScheme.onSurfaceVariant,
@@ -674,12 +610,9 @@ class _DriverDelaysCard extends ConsumerWidget {
             .toList();
 
     return WidgetsAppCard(
-      title: isAr ? 'السائقون والإرجاع' : 'Drivers & Returns',
-      subtitle:
-          isAr
-              ? 'توصيل الطعام وإرجاع الصواني في نفس النظرة.'
-              : 'Food delivery and plated returns in one view.',
-      leading: const _IconBubble(
+      title: l10n.adminDriversReturnsTitle,
+      subtitle: l10n.adminDriversReturnsSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.route_outlined,
         color: CoreColors.orderTypeDelivery,
       ),
@@ -689,7 +622,7 @@ class _DriverDelaysCard extends ConsumerWidget {
             Padding(
               padding: EdgeInsets.symmetric(vertical: CoreSpacing.md(context)),
               child: Text(
-                isAr ? 'لا مهام توصيل نشطة.' : 'No active delivery tasks.',
+                l10n.adminNoActiveDelivery,
                 style: CoreTypography.bodyMedium(
                   context,
                   Theme.of(context).colorScheme.onSurfaceVariant,
@@ -698,10 +631,12 @@ class _DriverDelaysCard extends ConsumerWidget {
             ),
           for (final order in activeDeliveries)
             _DriverRow(
-              label: isAr ? 'طلب #${order.id}' : 'Order #${order.id}',
+              label: l10n.adminOrderLabel(order.id),
               detail: '${order.customerLabel} • ${order.statusKey}',
               badge:
-                  order.isPlated ? l10n.orderTypePlated : l10n.orderTypeDelivery,
+                  order.isPlated
+                      ? l10n.orderTypePlated
+                      : l10n.orderTypeDelivery,
               color:
                   order.isPlated
                       ? CoreColors.orderTypePlated
@@ -709,14 +644,14 @@ class _DriverDelaysCard extends ConsumerWidget {
             ),
           for (final task in returnTasks.take(2))
             _DriverRow(
-              label: isAr ? 'إرجاع صواني #${task.id}' : 'Tray return #${task.id}',
+              label: l10n.adminTrayReturnLabel(task.id),
               detail: isAr ? task.statusAr : task.statusEn,
-              badge: isAr ? 'إرجاع' : 'Return',
+              badge: l10n.adminReturnBadge,
               color: CoreColors.brandOlive,
             ),
           SizedBox(height: CoreSpacing.md(context)),
           WidgetsAppButton(
-            label: isAr ? 'افتح مهام التوصيل' : 'Open Delivery Tasks',
+            label: l10n.adminOpenDeliveryTasks,
             onPressed: () => context.push(AppRoutePaths.delivery),
             icon: Icons.delivery_dining_outlined,
             fullWidth: true,
@@ -760,10 +695,10 @@ class _TeamSnapshotCard extends ConsumerWidget {
 
     return WidgetsAppCard(
       title: l10n.adminStaffOnShift,
-      subtitle: isAr ? 'الطاقم الحالي حسب المحطة.' : 'Current team by station.',
+      subtitle: l10n.adminTeamSnapshotSubtitle,
       trailing: WidgetsAppButton(
         label: l10n.adminManageRoster,
-        onPressed: () => context.push(AppRoutePaths.adminStaffHours),
+        onPressed: () => context.push(AppRoutePaths.operatorStaffHours),
         variant: WidgetsAppButtonVariant.ghost,
       ),
       child: Column(
@@ -793,11 +728,8 @@ class _AdminQuickControls extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WidgetsAppCard(
-      title: isAr ? 'تحكم سريع' : 'Quick Controls',
-      subtitle:
-          isAr
-              ? 'روابط إدارية بدون شريط سفلي.'
-              : 'Admin links without bottom navigation.',
+      title: l10n.adminQuickControlsTitle,
+      subtitle: l10n.adminQuickControlsSubtitle,
       child: Wrap(
         spacing: CoreSpacing.sm(context),
         runSpacing: CoreSpacing.sm(context),
@@ -805,22 +737,22 @@ class _AdminQuickControls extends StatelessWidget {
           _ControlChip(
             label: l10n.screenMenuManagement,
             icon: Icons.restaurant_menu_outlined,
-            onPressed: () => context.push(AppRoutePaths.adminMenu),
+            onPressed: () => context.push(AppRoutePaths.operatorMenu),
           ),
           _ControlChip(
             label: l10n.screenSettings,
             icon: Icons.tune_outlined,
-            onPressed: () => context.push(AppRoutePaths.adminSettings),
+            onPressed: () => context.push(AppRoutePaths.operatorSettings),
           ),
           _ControlChip(
             label: l10n.screenReports,
             icon: Icons.analytics_outlined,
-            onPressed: () => context.push(AppRoutePaths.adminReports),
+            onPressed: () => context.push(AppRoutePaths.operatorReports),
           ),
           _ControlChip(
             label: l10n.screenPlatesManagement,
             icon: Icons.room_service_outlined,
-            onPressed: () => context.push(AppRoutePaths.adminPlates),
+            onPressed: () => context.push(AppRoutePaths.operatorPlates),
           ),
         ],
       ),
@@ -852,7 +784,7 @@ class _ActionRow extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
           border: Border.all(color: color.withValues(alpha: 0.20)),
         ),
         child: Padding(
@@ -863,7 +795,12 @@ class _ActionRow extends StatelessWidget {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _IconBubble(icon: icon, color: color, compact: true),
+                  WidgetsIconBubble(
+                    icon: icon,
+                    color: color,
+                    size: UtilitySizer.of(context, 36),
+                    iconSize: CoreContentSizes.orderTypeIcon(context),
+                  ),
                   SizedBox(width: CoreSpacing.sm(context)),
                   Expanded(
                     child: Column(
@@ -922,11 +859,11 @@ class _OrderCountTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 136,
+      width: CoreContentSizes.tipRailTileWidth(context),
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.09),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.20)),
       ),
       child: Column(
@@ -968,14 +905,15 @@ class _OrderTicketRow extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.07),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Row(
         children: [
-          _IconBubble(
+          WidgetsIconBubble(
             icon: _orderIcon(order.orderType),
             color: color,
-            compact: true,
+            size: UtilitySizer.of(context, 36),
+            iconSize: CoreContentSizes.orderTypeIcon(context),
           ),
           SizedBox(width: CoreSpacing.sm(context)),
           Expanded(
@@ -1042,12 +980,12 @@ class _StationLoadRow extends StatelessWidget {
                 ).copyWith(fontWeight: FontWeight.w800),
               ),
             ),
-            _SoftBadge(label: '$percent%', color: color),
+            WidgetsSoftBadge(label: '$percent%', color: color),
           ],
         ),
         SizedBox(height: CoreSpacing.xs(context)),
         ClipRRect(
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
           child: LinearProgressIndicator(
             value: value,
             minHeight: 10,
@@ -1064,45 +1002,6 @@ class _StationLoadRow extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _AmountLine extends StatelessWidget {
-  const _AmountLine({
-    required this.label,
-    required this.value,
-    this.valueColor,
-  });
-
-  final String label;
-  final String value;
-  final Color? valueColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: CoreSpacing.sm(context)),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: CoreTypography.bodyMedium(
-                context,
-                Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-          Text(
-            value,
-            style: CoreTypography.titleMedium(
-              context,
-              valueColor ?? Theme.of(context).colorScheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-        ],
-      ),
     );
   }
 }
@@ -1127,10 +1026,11 @@ class _StockoutRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const _IconBubble(
+          WidgetsIconBubble(
             icon: Icons.warning_amber_outlined,
             color: CoreColors.brandOlive,
-            compact: true,
+            size: UtilitySizer.of(context, 36),
+            iconSize: CoreContentSizes.orderTypeIcon(context),
           ),
           SizedBox(width: CoreSpacing.sm(context)),
           Expanded(
@@ -1200,7 +1100,7 @@ class _DriverRow extends StatelessWidget {
               ],
             ),
           ),
-          _SoftBadge(label: badge, color: color),
+          WidgetsSoftBadge(label: badge, color: color),
         ],
       ),
     );
@@ -1252,7 +1152,7 @@ class _StaffSnapshotRow extends StatelessWidget {
               ],
             ),
           ),
-          _SoftBadge(label: status, color: color),
+          WidgetsSoftBadge(label: status, color: color),
         ],
       ),
     );
@@ -1273,11 +1173,11 @@ class _ControlChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ActionChip(
-      avatar: Icon(icon, size: 18, color: CoreColors.brandOlive),
+      avatar: Icon(icon, size: CoreContentSizes.orderTypeIcon(context), color: CoreColors.brandOlive),
       label: Text(label),
       onPressed: onPressed,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
         side: BorderSide(
           color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.22),
         ),
@@ -1286,56 +1186,148 @@ class _ControlChip extends StatelessWidget {
   }
 }
 
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({
-    required this.icon,
-    required this.color,
-    this.compact = false,
-  });
+class _SupportEscalationsInboxCard extends ConsumerWidget {
+  const _SupportEscalationsInboxCard({required this.l10n, required this.isAr});
 
-  final IconData icon;
-  final Color color;
-  final bool compact;
+  final AppLocalizations l10n;
+  final bool isAr;
 
   @override
-  Widget build(BuildContext context) {
-    final size = compact ? 36.0 : CoreContentSizes.logoCard(context);
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final escalated = ref.watch(supportEscalatedTicketsProvider);
+    if (escalated.isEmpty) return const SizedBox.shrink();
+
+    return WidgetsAppCard(
+      title: l10n.operatorEscalationsInboxTitle,
+      subtitle: l10n.operatorEscalationsInboxSubtitle,
+      child: Column(
+        children: [
+          for (final ticket in escalated) ...[
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: Icon(
+                ticket.escalatedTo == 'cashier'
+                    ? Icons.point_of_sale_outlined
+                    : Icons.support_agent_outlined,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              title: Text(
+                isAr ? ticket.titleAr : ticket.titleEn,
+                style: CoreTypography.titleMedium(context, Theme.of(context).colorScheme.onSurface).copyWith(fontWeight: FontWeight.w800),
+              ),
+              subtitle: Text(
+                '${ticket.id} • ${l10n.operatorEscalationTarget(ticket.escalatedTo ?? '')}',
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      ref
+                          .read(supportTicketsProvider.notifier)
+                          .acknowledgeEscalation(ticket.id);
+                      UtilityMockFeedback.showInfo(
+                        context,
+                        l10n.operatorEscalationAcknowledged,
+                      );
+                    },
+                    child: Text(l10n.operatorEscalationAcknowledge),
+                  ),
+                  FilledButton(
+                    onPressed: () =>
+                        context.push(AppRoutePaths.supportDeskTickets),
+                    child: Text(l10n.operatorEscalationOpenTicket),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+          ],
+        ],
       ),
-      child: Icon(icon, color: color, size: compact ? 19 : 26),
     );
   }
 }
 
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({required this.label, required this.color, this.foreground});
+class _CampaignApprovalCard extends ConsumerWidget {
+  const _CampaignApprovalCard({required this.l10n, required this.isAr});
 
-  final String label;
-  final Color color;
-  final Color? foreground;
+  final AppLocalizations l10n;
+  final bool isAr;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.sm(context),
-        vertical: CoreSpacing.xs(context),
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: foreground == null ? 0.12 : 1),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-      ),
-      child: Text(
-        label,
-        style: CoreTypography.caption(
-          context,
-          foreground ?? color,
-        ).copyWith(fontWeight: FontWeight.w900),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final pending = ref.watch(marketingPendingApprovalProvider);
+    if (pending.isEmpty) return const SizedBox.shrink();
+
+    return WidgetsAppCard(
+      title: l10n.marketingPublishPendingTitle,
+      child: Column(
+        children: [
+          for (final draft in pending) ...[
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                isAr ? draft.titleAr : draft.titleEn,
+                style: CoreTypography.titleMedium(context, Theme.of(context).colorScheme.onSurface).copyWith(fontWeight: FontWeight.w800),
+              ),
+              subtitle: Text(draft.kindKey),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      final rejected = ref
+                          .read(marketingPublishProvider.notifier)
+                          .reject(draft.id);
+                      if (!rejected) return;
+                      final entityId = draft.entityId;
+                      if (draft.kindKey == 'offer' && entityId != null) {
+                        ref
+                            .read(adminCatalogProvider.notifier)
+                            .setOfferActive(entityId, active: false);
+                      }
+                      UtilityMockFeedback.showInfo(
+                        context,
+                        l10n.marketingPublishRejected,
+                      );
+                    },
+                    child: Text(l10n.marketingPublishReject),
+                  ),
+                  FilledButton(
+                    onPressed: () {
+                      final ok = ref
+                          .read(marketingPublishProvider.notifier)
+                          .approve(draft.id);
+                      if (!ok) return;
+                      final entityId = draft.entityId;
+                      if (draft.kindKey == 'offer' && entityId != null) {
+                        ref
+                            .read(adminCatalogProvider.notifier)
+                            .setOfferActive(entityId, active: true);
+                      }
+                      recordAuditEvent(
+                        ref,
+                        type: AuditEventType.offerPublished,
+                        actorRole: AppRole.operator,
+                        summaryEn:
+                            'Published ${draft.kindKey}: ${draft.titleEn}',
+                        summaryAr: 'نشر ${draft.kindKey}: ${draft.titleAr}',
+                        entityId: entityId ?? draft.id,
+                      );
+                      UtilityMockFeedback.showSuccess(
+                        context,
+                        l10n.marketingPublishApproved,
+                      );
+                    },
+                    child: Text(l10n.marketingPublishApprove),
+                  ),
+                ],
+              ),
+            ),
+            const Divider(height: 1),
+          ],
+        ],
       ),
     );
   }

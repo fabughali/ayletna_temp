@@ -50,7 +50,7 @@ class WidgetsProgressBar extends StatelessWidget {
           SizedBox(height: CoreSpacing.xs(context)),
         ],
         ClipRRect(
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
           child: LinearProgressIndicator(
             value: value.clamp(0, 1),
             minHeight: CoreSpacing.sm(context),

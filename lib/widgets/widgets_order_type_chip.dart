@@ -26,7 +26,7 @@ class WidgetsOrderTypeChip extends StatelessWidget {
     return Material(
       color: selected ? color.withValues(alpha: 0.12) : scheme.surface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
         side: BorderSide(
           color: selected ? color : scheme.outline,
           width: selected ? 2 : 1,
@@ -34,7 +34,7 @@ class WidgetsOrderTypeChip extends StatelessWidget {
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: CoreSpacing.md(context),

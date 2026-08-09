@@ -66,26 +66,26 @@ class InventoryWastageLogsNotifier
   }
 }
 
-final inventorySessionWastageProvider =
-    StateNotifierProvider<InventoryWastageLogsNotifier, List<ModelInventoryWastageLog>>(
-      (ref) => InventoryWastageLogsNotifier(),
-    );
+final inventorySessionWastageProvider = StateNotifierProvider<
+  InventoryWastageLogsNotifier,
+  List<ModelInventoryWastageLog>
+>((ref) => InventoryWastageLogsNotifier());
 
 /// Combined wastage list: session first, then catalog baseline.
-final inventoryWastageLogsProvider = Provider<List<ModelInventoryWastageLog>>(
-  (ref) {
-    final session = ref.watch(inventorySessionWastageProvider);
-    return [...session, ...MockupCatalog.inventoryWastageLogs];
-  },
-);
+final inventoryWastageLogsProvider = Provider<List<ModelInventoryWastageLog>>((
+  ref,
+) {
+  final session = ref.watch(inventorySessionWastageProvider);
+  return [...session, ...MockupCatalog.inventoryWastageLogs];
+});
 
 /// Combined audit history for the active item screen.
-final inventoryAuditHistoryProvider = Provider<List<ModelInventoryAuditRow>>(
-  (ref) {
-    final stock = ref.watch(inventoryStockProvider);
-    return [...stock.sessionAuditRows, ...MockupCatalog.inventoryAuditRows];
-  },
-);
+final inventoryAuditHistoryProvider = Provider<List<ModelInventoryAuditRow>>((
+  ref,
+) {
+  final stock = ref.watch(inventoryStockProvider);
+  return [...stock.sessionAuditRows, ...MockupCatalog.inventoryAuditRows];
+});
 
 /// Dashboard ingredient search query.
 final inventorySearchQueryProvider = StateProvider<String>((ref) => '');

@@ -94,3 +94,6 @@ final adminDashboardMetricsProvider = Provider<AdminDashboardMetrics>((ref) {
     liveOrders: orders,
   );
 });
+
+/// Operator hub metrics ([adminDashboardMetricsProvider] is ops-only).
+final operatorDashboardMetricsProvider = adminDashboardMetricsProvider;

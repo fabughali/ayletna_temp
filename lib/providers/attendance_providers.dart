@@ -4,9 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum AttendanceActionMode { coming, leaving }
 
-class AttendanceWifiNotifier extends StateNotifier<AsyncValue<AttendanceWifiStatus>> {
-  AttendanceWifiNotifier(this._readConfig)
-      : super(const AsyncValue.loading());
+class AttendanceWifiNotifier
+    extends StateNotifier<AsyncValue<AttendanceWifiStatus>> {
+  AttendanceWifiNotifier(this._readConfig) : super(const AsyncValue.loading());
 
   final AdminIntegrationConfigState Function() _readConfig;
 
@@ -18,19 +18,17 @@ class AttendanceWifiNotifier extends StateNotifier<AsyncValue<AttendanceWifiStat
   }
 }
 
-final attendanceActionModeProvider = StateProvider<AttendanceActionMode>(
-  (ref) {
-    return AttendanceActionMode.coming;
-  },
-);
+final attendanceActionModeProvider = StateProvider<AttendanceActionMode>((ref) {
+  return AttendanceActionMode.coming;
+});
 
-final attendanceWifiProvider =
-    StateNotifierProvider<AttendanceWifiNotifier, AsyncValue<AttendanceWifiStatus>>(
-      (ref) {
-        final notifier = AttendanceWifiNotifier(
-          () => ref.read(adminIntegrationConfigProvider),
-        );
-        notifier.refresh();
-        return notifier;
-      },
-    );
+final attendanceWifiProvider = StateNotifierProvider<
+  AttendanceWifiNotifier,
+  AsyncValue<AttendanceWifiStatus>
+>((ref) {
+  final notifier = AttendanceWifiNotifier(
+    () => ref.read(adminIntegrationConfigProvider),
+  );
+  notifier.refresh();
+  return notifier;
+});

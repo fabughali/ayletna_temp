@@ -1,4 +1,5 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:flutter/material.dart';
@@ -167,7 +168,7 @@ class WidgetsPackageChecklistRow extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.18)),
       ),
       child: Row(
@@ -265,9 +266,9 @@ class WidgetsIngredientFreshnessCard extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.sm(context)),
           ClipRRect(
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+            borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
             child: LinearProgressIndicator(
-              minHeight: 8,
+              minHeight: UtilitySizer.of(context, 8),
               value: clamped,
               color: color,
               backgroundColor: color.withValues(alpha: 0.12),
@@ -382,7 +383,7 @@ class _OperationsIconBubble extends StatelessWidget {
       height: size,
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Icon(icon, color: color, size: compact ? 18 : 22),
     );
@@ -404,7 +405,7 @@ class _OperationsBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
       ),
       child: Text(
         label,
@@ -430,7 +431,7 @@ class _OperationsNote extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.sm(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Text(
         label,

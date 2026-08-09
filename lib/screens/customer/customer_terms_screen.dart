@@ -4,6 +4,7 @@ import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_cart_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -15,7 +16,6 @@ class CustomerTermsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
 
     return WidgetsScaffoldPage(
       title: l10n.orderTypeTerms,
@@ -30,40 +30,10 @@ class CustomerTermsScreen extends StatelessWidget {
       child: ListView(
         children: [
           SizedBox(height: CoreSpacing.md(context)),
-          WidgetsAppCard(
-            variant: WidgetsAppCardVariant.food,
-            padding: EdgeInsets.all(CoreSpacing.lg(context)),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: scheme.primary.withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(CoreSpacing.md(context)),
-                    child: Icon(Icons.policy_outlined, color: scheme.primary),
-                  ),
-                ),
-                SizedBox(height: CoreSpacing.lg(context)),
-                Text(
-                  l10n.termsHeroTitle,
-                  style: CoreTypography.headlineLarge(
-                    context,
-                    scheme.onSurface,
-                  ).copyWith(fontWeight: FontWeight.w900),
-                ),
-                SizedBox(height: CoreSpacing.sm(context)),
-                Text(
-                  l10n.termsHeroSubtitle,
-                  style: CoreTypography.bodyMedium(
-                    context,
-                    scheme.onSurfaceVariant,
-                  ),
-                ),
-              ],
-            ),
+          WidgetsPageHeader(
+            title: l10n.termsHeroTitle,
+            subtitle: l10n.termsHeroSubtitle,
+            eyebrow: l10n.orderTypeTerms,
           ),
           SizedBox(height: CoreSpacing.lg(context)),
           _TermsCard(

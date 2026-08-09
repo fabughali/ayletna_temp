@@ -9,9 +9,12 @@ import 'package:ayletna_restaurant_app/providers/user_profile_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_error_message.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_media_panel.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_food_tag.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,6 +60,10 @@ class _CustomerRatingReviewScreenState
       child: ListView(
         children: [
           SizedBox(height: CoreSpacing.md(context)),
+          WidgetsPageHeader(
+            title: l10n.ratingHeroTitle,
+            subtitle: l10n.ratingHeroSubtitle,
+          ),
           _RatingHero(
             rating: _rating,
             onChanged: (value) => setState(() => _rating = value),
@@ -155,7 +162,7 @@ class _RatingHero extends StatelessWidget {
         children: [
           WidgetsFoodMediaPanel(
             height: CoreContentSizes.heroImageHeight(context),
-            badge: _FoodTag(
+            badge: WidgetsFoodTag(
               label: l10n.ratingRewardLoop,
               color: CoreColors.brandGold,
             ),
@@ -172,19 +179,6 @@ class _RatingHero extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-          SizedBox(height: CoreSpacing.lg(context)),
-          Text(
-            l10n.ratingHeroTitle,
-            style: CoreTypography.headlineLarge(
-              context,
-              scheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-          SizedBox(height: CoreSpacing.sm(context)),
-          Text(
-            l10n.ratingHeroSubtitle,
-            style: CoreTypography.bodyMedium(context, scheme.onSurfaceVariant),
           ),
           SizedBox(height: CoreSpacing.md(context)),
           _StarSelector(rating: rating, onChanged: onChanged),
@@ -241,7 +235,7 @@ class _OrderSnapshotCard extends ConsumerWidget {
           (_, __) => WidgetsAppCard(
             variant: WidgetsAppCardVariant.form,
             padding: EdgeInsets.all(CoreSpacing.lg(context)),
-            child: Text(l10n.comingSoon),
+            child: WidgetsErrorMessage(message: l10n.ratingOrderLoadError),
           ),
       data:
           (order) => WidgetsAppCard(
@@ -282,7 +276,7 @@ class _OrderSnapshotCard extends ConsumerWidget {
                     ],
                   ),
                 ),
-                _FoodTag(label: '$rating/5', color: CoreColors.brandGold),
+                WidgetsFoodTag(label: '$rating/5', color: CoreColors.brandGold),
               ],
             ),
           ),
@@ -351,11 +345,11 @@ class _FocusChip extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color.withValues(alpha: selected ? 0.14 : 0.08),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
           border: Border.all(color: color.withValues(alpha: 0.22)),
         ),
         child: Padding(
@@ -405,38 +399,6 @@ class _CommentCard extends StatelessWidget {
         hintText: l10n.ratingCommentHint,
         prefixIcon: Icons.chat_bubble_outline,
         maxLines: 3,
-      ),
-    );
-  }
-}
-
-class _FoodTag extends StatelessWidget {
-  const _FoodTag({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Text(
-          label,
-          style: CoreTypography.caption(
-            context,
-            scheme.onSurface,
-          ).copyWith(fontWeight: FontWeight.w800),
-        ),
       ),
     );
   }

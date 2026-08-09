@@ -22,7 +22,7 @@ class WidgetsDepositBanner extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: deposit.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(color: deposit.withValues(alpha: 0.35)),
       ),
       child: Row(

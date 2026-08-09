@@ -6,12 +6,14 @@ class WidgetsActionBar extends StatelessWidget {
   const WidgetsActionBar({
     required this.primary,
     this.secondary,
+    this.leading,
     this.progress,
     super.key,
   });
 
   final Widget primary;
   final Widget? secondary;
+  final Widget? leading;
   final double? progress;
 
   @override
@@ -31,7 +33,7 @@ class WidgetsActionBar extends StatelessWidget {
             children: [
               if (progress != null) ...[
                 ClipRRect(
-                  borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+                  borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
                   child: LinearProgressIndicator(
                     value: progress,
                     minHeight: CoreSpacing.xs(context),
@@ -42,12 +44,17 @@ class WidgetsActionBar extends StatelessWidget {
                 SizedBox(height: CoreSpacing.md(context)),
               ],
               Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  if (leading != null) ...[
+                    leading!,
+                    SizedBox(width: CoreSpacing.md(context)),
+                  ],
                   if (secondary != null) ...[
                     Expanded(child: secondary!),
                     SizedBox(width: CoreSpacing.md(context)),
                   ],
-                  Expanded(flex: secondary == null ? 1 : 2, child: primary),
+                  Expanded(flex: secondary == null && leading == null ? 1 : 2, child: primary),
                 ],
               ),
             ],

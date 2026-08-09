@@ -1,4 +1,5 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
@@ -49,12 +50,12 @@ class _ProductPreviewDialog extends StatelessWidget {
         child: Padding(
           padding: EdgeInsets.all(CoreSpacing.lg(context)),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
+            constraints: BoxConstraints(maxWidth: UtilitySizer.of(context, 480)),
             child: Material(
               color: scheme.surfaceContainerLowest,
               elevation: 12,
               shadowColor: scheme.shadow.withValues(alpha: 0.22),
-              borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+              borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
               clipBehavior: Clip.antiAlias,
               child: Stack(
                 children: [
@@ -239,7 +240,7 @@ class _BaseOption extends StatelessWidget {
             selected
                 ? scheme.primaryContainer.withValues(alpha: 0.08)
                 : scheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(color: color, width: selected ? 2 : 1),
       ),
       child: Padding(
@@ -279,7 +280,7 @@ class _PreviewAddon extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: scheme.surfaceContainerLowest,
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(color: scheme.outlineVariant),
       ),
       child: Padding(
@@ -321,7 +322,7 @@ class _DietaryNote extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: scheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(color: scheme.outlineVariant),
       ),
       child: Padding(

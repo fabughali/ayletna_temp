@@ -21,12 +21,12 @@ class WidgetsLanguageChip extends StatelessWidget {
     return Material(
       color: selected ? scheme.primary : scheme.surface,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
         side: BorderSide(color: selected ? scheme.primary : scheme.outline),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: CoreSpacing.lg(context),

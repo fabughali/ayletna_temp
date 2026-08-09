@@ -12,15 +12,7 @@ ModelOrderSummary _applyOrderOverride(
     return order;
   }
   final status = state.statusOverrides[order.id] ?? order.statusKey;
-  return ModelOrderSummary(
-    id: order.id,
-    orderType: order.orderType,
-    customerLabel: order.customerLabel,
-    totalJod: order.totalJod,
-    depositJod: order.depositJod,
-    statusKey: status,
-    isPlated: order.isPlated,
-  );
+  return order.copyWith(statusKey: status);
 }
 
 /// Admin order board mutations: status, pre-order accept, escalation.
@@ -144,8 +136,7 @@ class AdminSettingsState {
 class AdminSettingsNotifier extends StateNotifier<AdminSettingsState> {
   AdminSettingsNotifier() : super(const AdminSettingsState());
 
-  void setOrdersOpen(bool value) =>
-      state = state.copyWith(ordersOpen: value);
+  void setOrdersOpen(bool value) => state = state.copyWith(ordersOpen: value);
 
   void setDeliveryEnabled(bool value) =>
       state = state.copyWith(deliveryEnabled: value);
@@ -190,7 +181,8 @@ class AdminDepositConfigState {
   }
 }
 
-class AdminDepositConfigNotifier extends StateNotifier<AdminDepositConfigState> {
+class AdminDepositConfigNotifier
+    extends StateNotifier<AdminDepositConfigState> {
   AdminDepositConfigNotifier() : super(const AdminDepositConfigState());
 
   void setReturnWindowHours(double hours) {
@@ -266,10 +258,10 @@ class AdminTipDistributionNotifier
   }
 }
 
-final adminTipDistributionProvider =
-    StateNotifierProvider<AdminTipDistributionNotifier, AdminTipDistributionState>(
-      (ref) => AdminTipDistributionNotifier(),
-    );
+final adminTipDistributionProvider = StateNotifierProvider<
+  AdminTipDistributionNotifier,
+  AdminTipDistributionState
+>((ref) => AdminTipDistributionNotifier());
 
 /// Team invites and permission toggles for user management.
 class AdminUsersState {
@@ -484,6 +476,10 @@ class AdminMenuNotifier extends StateNotifier<AdminMenuState> {
     required String descriptionEn,
     required double priceJod,
     String categoryId = 'custom',
+    List<String> imageUrls = const [],
+    bool isAvailable = true,
+    bool isFeatured = false,
+    PrepStation prepStation = PrepStation.shawarma,
   }) {
     if (nameEn.trim().isEmpty || priceJod <= 0) return null;
     final id = 'menu_custom_${_menuItemSeq++}';
@@ -495,6 +491,11 @@ class AdminMenuNotifier extends StateNotifier<AdminMenuState> {
       priceJod: priceJod,
       descriptionAr: descriptionAr.trim(),
       descriptionEn: descriptionEn.trim(),
+      imageUrls: imageUrls,
+      imageUrl: imageUrls.isNotEmpty ? imageUrls.first : null,
+      isAvailable: isAvailable,
+      isFeatured: isFeatured,
+      prepStation: prepStation,
     );
     state = state.copyWith(
       addedMenuItems: [...state.addedMenuItems, item],
@@ -630,7 +631,8 @@ class AdminGrowthConfigState {
 class AdminGrowthConfigNotifier extends StateNotifier<AdminGrowthConfigState> {
   AdminGrowthConfigNotifier() : super(const AdminGrowthConfigState());
 
-  void update(AdminGrowthConfigState next) => state = next.copyWith(saved: false);
+  void update(AdminGrowthConfigState next) =>
+      state = next.copyWith(saved: false);
 
   void save() => state = state.copyWith(saved: true);
 }
@@ -764,3 +766,39 @@ final adminAuditFilterProvider =
     StateNotifierProvider<AdminAuditFilterNotifier, AdminAuditFilterState>(
       (ref) => AdminAuditFilterNotifier(),
     );
+
+/// Order board type filter for the admin orders management screen.
+class AdminOrdersFilterState {
+  const AdminOrdersFilterState({this.orderTypeFilter = 'all'});
+
+  final String orderTypeFilter;
+
+  AdminOrdersFilterState copyWith({String? orderTypeFilter}) {
+    return AdminOrdersFilterState(
+      orderTypeFilter: orderTypeFilter ?? this.orderTypeFilter,
+    );
+  }
+}
+
+class AdminOrdersFilterNotifier
+    extends StateNotifier<AdminOrdersFilterState> {
+  AdminOrdersFilterNotifier() : super(const AdminOrdersFilterState());
+
+  void setOrderTypeFilter(String filterValue) {
+    state = state.copyWith(orderTypeFilter: filterValue);
+  }
+}
+
+final adminOrdersFilterProvider =
+    StateNotifierProvider<AdminOrdersFilterNotifier, AdminOrdersFilterState>(
+      (ref) => AdminOrdersFilterNotifier(),
+    );
+
+/// Active orders filtered by the current order type filter.
+final adminFilteredActiveOrdersProvider =
+    Provider<List<ModelOrderSummary>>((ref) {
+  final orders = ref.watch(adminActiveOrdersProvider);
+  final filterState = ref.watch(adminOrdersFilterProvider);
+  if (filterState.orderTypeFilter == 'all') return orders;
+  return orders.where((o) => o.orderType.name == filterState.orderTypeFilter).toList();
+});

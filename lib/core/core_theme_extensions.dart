@@ -4,6 +4,7 @@ import 'package:ayletna_restaurant_app/core/core_spacing.dart';
 import 'package:ayletna_restaurant_app/core/core_typography.dart';
 import 'package:ayletna_restaurant_app/core/core_colors.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_responsive_breakpoints.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:flutter/material.dart';
 
 @immutable
@@ -72,16 +73,18 @@ class CoreThemeExtensions extends ThemeExtension<CoreThemeExtensions> {
   }
 
   static CoreThemeExtensions forBand(ContentBand band, bool isDark) {
-    final buttonH = switch (band) {
-      ContentBand.mobile => 48.0,
-      ContentBand.tablet => 50.0,
-      ContentBand.web => 52.0,
+    final width = switch (band) {
+      ContentBand.mobile => UtilitySizer.designWidth,
+      ContentBand.tablet => 768.0,
+      ContentBand.web => 1280.0,
     };
-    final padH = switch (band) {
-      ContentBand.mobile => 20.0,
-      ContentBand.tablet => 24.0,
-      ContentBand.web => 28.0,
-    };
+    return forWidth(width, isDark);
+  }
+
+  /// Viewport-scaled button / icon-button metrics.
+  static CoreThemeExtensions forWidth(double width, bool isDark) {
+    final buttonH = UtilitySizer.bandForWidth(width, 44, 50, 52);
+    final padH = UtilitySizer.bandForWidth(width, 16, 24, 28);
     final iconButtonSize = buttonH;
     if (isDark) {
       return CoreThemeExtensions(
@@ -90,7 +93,7 @@ class CoreThemeExtensions extends ThemeExtension<CoreThemeExtensions> {
         iconButtonSize: iconButtonSize,
         splashGradientTop: CoreColors.surfaceDark,
         splashGradientBottom: CoreColors.cardDark,
-        dividerAccentWidth: 72,
+        dividerAccentWidth: UtilitySizer.ofWidth(width, 72),
       );
     }
     return CoreThemeExtensions(
@@ -99,7 +102,7 @@ class CoreThemeExtensions extends ThemeExtension<CoreThemeExtensions> {
       iconButtonSize: iconButtonSize,
       splashGradientTop: CoreColors.backgroundLight,
       splashGradientBottom: CoreColors.splashGradientBottomLight,
-      dividerAccentWidth: 72,
+      dividerAccentWidth: UtilitySizer.ofWidth(width, 72),
     );
   }
 }
@@ -112,10 +115,13 @@ extension CoreThemeExtensionsX on BuildContext {
 /// Band-aware button metrics (ui_design_prompt).
 abstract final class CoreButtonStyles {
   static double minHeight(ContentBand band) => switch (band) {
-    ContentBand.mobile => 48,
-    ContentBand.tablet => 50,
-    ContentBand.web => 52,
+    ContentBand.mobile => UtilitySizer.bandForWidth(UtilitySizer.designWidth, 44, 50, 52),
+    ContentBand.tablet => UtilitySizer.bandForWidth(768, 44, 50, 52),
+    ContentBand.web => UtilitySizer.bandForWidth(1280, 44, 50, 52),
   };
+
+  static double minHeightOf(BuildContext context) =>
+      UtilitySizer.band(context, 44, 50, 52);
 }
 
 /// Typography aliases for theme layer.
@@ -134,20 +140,50 @@ abstract final class CoreOtpStyle {
     ContentBand.tablet => 48,
     ContentBand.web => 52,
   };
+
+  static double cellSizeOf(BuildContext context) =>
+      UtilitySizer.band(context, 40, 48, 52);
 }
 
 /// Shared Material decorations (inputs, cards).
 abstract final class CoreDecorations {
+  /// Vertical padding so a single-line field matches [CoreThemeExtensions.buttonMinHeight].
+  static EdgeInsets inputContentPadding(BuildContext context) {
+    final controlH = context.coreTheme.buttonMinHeight;
+    final lineH = UtilitySizer.band(context, 20, 22, 24);
+    final vertical = ((controlH - lineH) / 2).clamp(10.0, 18.0);
+    return EdgeInsets.symmetric(
+      horizontal: UtilitySizer.of(context, 16),
+      vertical: vertical,
+    );
+  }
+
   static InputDecoration input(
     BuildContext context, {
     required String label,
     IconData? icon,
+    bool showLabel = true,
+    bool matchControlHeight = true,
   }) {
+    final controlH = context.coreTheme.buttonMinHeight;
     return InputDecoration(
-      labelText: label,
-      prefixIcon: icon != null ? Icon(icon) : null,
+      isDense: true,
+      labelText: showLabel ? label : null,
+      floatingLabelBehavior:
+          showLabel
+              ? FloatingLabelBehavior.auto
+              : FloatingLabelBehavior.never,
+      prefixIcon:
+          icon != null
+              ? Icon(icon, size: UtilitySizer.of(context, 22))
+              : null,
+      contentPadding: inputContentPadding(context),
+      constraints:
+          matchControlHeight
+              ? BoxConstraints(minHeight: controlH)
+              : null,
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusInput),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusInputOf(context)),
       ),
     );
   }

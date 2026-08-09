@@ -8,27 +8,30 @@ class AdminPlatesState {
     this.breakageReports = const [],
     this.stockUnits = 42,
     this.stockCapacity = 100,
+    this.restockRequestCount = 0,
   });
 
   final List<ModelAdminBreakageReport> breakageReports;
   final int stockUnits;
   final int stockCapacity;
+  final int restockRequestCount;
 
   double get totalBreakageLossJod =>
       breakageReports.fold(0, (sum, report) => sum + report.lossJod.abs());
 
-  double get stockRatio =>
-      stockCapacity == 0 ? 0 : stockUnits / stockCapacity;
+  double get stockRatio => stockCapacity == 0 ? 0 : stockUnits / stockCapacity;
 
   AdminPlatesState copyWith({
     List<ModelAdminBreakageReport>? breakageReports,
     int? stockUnits,
     int? stockCapacity,
+    int? restockRequestCount,
   }) {
     return AdminPlatesState(
       breakageReports: breakageReports ?? this.breakageReports,
       stockUnits: stockUnits ?? this.stockUnits,
       stockCapacity: stockCapacity ?? this.stockCapacity,
+      restockRequestCount: restockRequestCount ?? this.restockRequestCount,
     );
   }
 }
@@ -70,6 +73,13 @@ class AdminPlatesNotifier extends StateNotifier<AdminPlatesState> {
   int restock({int units = 20}) {
     final next = (state.stockUnits + units).clamp(0, state.stockCapacity);
     state = state.copyWith(stockUnits: next);
+    return next;
+  }
+
+  /// Plate editor "Order now" — records a restock request and bumps stock.
+  int requestRestock({int units = 20}) {
+    final next = restock(units: units);
+    state = state.copyWith(restockRequestCount: state.restockRequestCount + 1);
     return next;
   }
 }

@@ -2,7 +2,10 @@ import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:ayletna_restaurant_app/data/models/model_list_entry.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
+import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/cashier_session_providers.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_confirm_dialog.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_responsive_breakpoints.dart';
@@ -13,8 +16,10 @@ import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_metric_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_app_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// PRD [CashierTipEntryScreen] — manual/cash tips.
 class CashierTipEntryScreen extends ConsumerStatefulWidget {
@@ -37,11 +42,7 @@ class _CashierTipEntryScreenState extends ConsumerState<CashierTipEntryScreen> {
       title: l10n.screenCashierTipEntry,
       actions: [
         WidgetsIconButton(
-          onPressed:
-              () => UtilityMockFeedback.showInfo(
-                context,
-                l10n.screenNotifications,
-              ),
+          onPressed: () => context.push(AppRoutePaths.notifications),
           icon: Icons.notifications_outlined,
           tooltip: l10n.screenNotifications,
         ),
@@ -84,13 +85,21 @@ class _CashierTipEntryScreenState extends ConsumerState<CashierTipEntryScreen> {
               fullWidth: true,
               onPressed:
                   _amountCents > 0
-                      ? () {
+                      ? () async {
+                        final confirmed = await confirmDestructiveAction(
+                          context,
+                          title: l10n.cashierLogTipEntry,
+                          message: l10n.cashierConfirmLogTip,
+                          confirmLabel: l10n.actionConfirm,
+                          cancelLabel: l10n.actionCancel,
+                        );
+                        if (!context.mounted || !confirmed) return;
                         ref
                             .read(cashierShiftTipsProvider.notifier)
                             .logTip(_amount);
-                        UtilityMockFeedback.showSuccess(
+                        UtilityDemoActions.complete(
                           context,
-                          l10n.cashierLogTipEntry,
+                          successMessage: l10n.cashierLogTipEntry,
                         );
                         setState(() => _amountCents = 0);
                       }
@@ -190,7 +199,7 @@ class _AssignmentHeader extends StatelessWidget {
         ),
         Text(l10n.cashierSharedPool),
         SizedBox(width: CoreSpacing.xs(context)),
-        Switch(value: sharedPool, onChanged: onChanged),
+        WidgetsAppSwitch(value: sharedPool, onChanged: onChanged),
       ],
     );
   }

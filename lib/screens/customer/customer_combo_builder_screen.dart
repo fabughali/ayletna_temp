@@ -8,11 +8,14 @@ import 'package:ayletna_restaurant_app/providers/cart_providers.dart';
 import 'package:ayletna_restaurant_app/providers/menu_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_action_bar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_media_panel.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_food_tag.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_mock_food_image.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_price_badge.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
@@ -37,14 +40,21 @@ class _CustomerComboBuilderScreenState
   String? _dessertId;
 
   List<ModelMenuItem> _menuItems(WidgetRef ref) {
-    return ref.watch(menuAllItemsProvider).maybeWhen(
-      data: (items) => items.isNotEmpty ? items : MockupCatalog.items,
-      orElse: () => MockupCatalog.items,
-    );
+    return ref
+        .watch(menuAllItemsProvider)
+        .maybeWhen(
+          data: (items) => items.isNotEmpty ? items : MockupCatalog.items,
+          orElse: () => MockupCatalog.items,
+        );
   }
 
-  String _stepId(_ComboStep step, String? current, List<ModelMenuItem> items) {
-    final stepItems = _itemsForStep(step, items);
+  String _stepId(
+    _ComboStep step,
+    String? current,
+    List<ModelMenuItem> items,
+    Map<String, String?> categoryMealTypes,
+  ) {
+    final stepItems = _itemsForStep(step, items, categoryMealTypes);
     if (stepItems.isEmpty) return current ?? '';
     if (current != null && stepItems.any((item) => item.id == current)) {
       return current;
@@ -69,10 +79,12 @@ class _CustomerComboBuilderScreenState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final menuItems = _menuItems(ref);
-    final mainId = _stepId(_ComboStep.main, _mainId, menuItems);
-    final sideId = _stepId(_ComboStep.side, _sideId, menuItems);
-    final drinkId = _stepId(_ComboStep.drink, _drinkId, menuItems);
-    final dessertId = _stepId(_ComboStep.dessert, _dessertId, menuItems);
+    final categoryMealTypes = ref.watch(menuCategoriesProvider).valueOrNull
+        ?.fold<Map<String, String?>>({}, (map, c) => map..[c.id] = c.mealType) ?? {};
+    final mainId = _stepId(_ComboStep.main, _mainId, menuItems, categoryMealTypes);
+    final sideId = _stepId(_ComboStep.side, _sideId, menuItems, categoryMealTypes);
+    final drinkId = _stepId(_ComboStep.drink, _drinkId, menuItems, categoryMealTypes);
+    final dessertId = _stepId(_ComboStep.dessert, _dessertId, menuItems, categoryMealTypes);
     final selectedItems =
         [
           _itemById(mainId, menuItems),
@@ -83,9 +95,7 @@ class _CustomerComboBuilderScreenState
     if (selectedItems.length < 4) {
       return WidgetsScaffoldPage(
         title: l10n.screenComboBuilder,
-        child: Center(
-          child: Text(l10n.searchEmptyBody),
-        ),
+        child: Center(child: Text(l10n.searchEmptyBody)),
       );
     }
     final subtotal = selectedItems.fold<double>(
@@ -105,20 +115,38 @@ class _CustomerComboBuilderScreenState
           tooltip: l10n.screenNotifications,
         ),
       ],
+      bottomSheet: WidgetsActionBar(
+        primary: WidgetsAppButton(
+          label: l10n.actionAddToCart,
+          onPressed:
+              () => _addComboToCart(context, selectedItems, discountRate),
+          icon: Icons.shopping_basket_outlined,
+          fullWidth: true,
+        ),
+      ),
       child: WidgetsRefreshList(
         onRefresh: () async {
           ref.invalidate(menuAllItemsProvider);
           ref.invalidate(visibleCombosProvider);
         },
         child: ListView(
+          padding: EdgeInsetsDirectional.only(
+            bottom: CoreSpacing.xxl(context) * 3,
+          ),
           children: [
             SizedBox(height: CoreSpacing.md(context)),
+            WidgetsPageHeader(
+              title: l10n.screenComboBuilder,
+              subtitle: l10n.screenComboBuilderDesc,
+            ),
+            SizedBox(height: CoreSpacing.lg(context)),
             _ComboHero(total: total),
             SizedBox(height: CoreSpacing.lg(context)),
             _ComboStepSection(
               step: _ComboStep.main,
               selectedId: mainId,
               menuItems: menuItems,
+              categoryMealTypes: categoryMealTypes,
               onSelected: (id) => setState(() => _mainId = id),
             ),
             SizedBox(height: CoreSpacing.lg(context)),
@@ -126,6 +154,7 @@ class _CustomerComboBuilderScreenState
               step: _ComboStep.side,
               selectedId: sideId,
               menuItems: menuItems,
+              categoryMealTypes: categoryMealTypes,
               onSelected: (id) => setState(() => _sideId = id),
             ),
             SizedBox(height: CoreSpacing.lg(context)),
@@ -133,6 +162,7 @@ class _CustomerComboBuilderScreenState
               step: _ComboStep.drink,
               selectedId: drinkId,
               menuItems: menuItems,
+              categoryMealTypes: categoryMealTypes,
               onSelected: (id) => setState(() => _drinkId = id),
             ),
             SizedBox(height: CoreSpacing.lg(context)),
@@ -140,6 +170,7 @@ class _CustomerComboBuilderScreenState
               step: _ComboStep.dessert,
               selectedId: dessertId,
               menuItems: menuItems,
+              categoryMealTypes: categoryMealTypes,
               onSelected: (id) => setState(() => _dessertId = id),
             ),
             SizedBox(height: CoreSpacing.lg(context)),
@@ -147,7 +178,6 @@ class _CustomerComboBuilderScreenState
               subtotal: subtotal,
               savings: savings,
               total: total,
-              onProceed: () => _addComboToCart(context, selectedItems, discountRate),
             ),
             SizedBox(height: CoreSpacing.xxl(context)),
           ],
@@ -199,7 +229,7 @@ class _ComboHero extends StatelessWidget {
         children: [
           WidgetsFoodMediaPanel(
             height: CoreContentSizes.heroImageHeight(context),
-            badge: _FoodTag(
+            badge: WidgetsFoodTag(
               label: l10n.guestLimitedOffer,
               color: CoreColors.brandGold,
             ),
@@ -207,19 +237,6 @@ class _ComboHero extends StatelessWidget {
               color: scheme.primary,
               icon: Icons.room_service_outlined,
             ),
-          ),
-          SizedBox(height: CoreSpacing.lg(context)),
-          Text(
-            l10n.screenComboBuilder,
-            style: CoreTypography.headlineLarge(
-              context,
-              scheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-          SizedBox(height: CoreSpacing.sm(context)),
-          Text(
-            l10n.screenComboBuilderDesc,
-            style: CoreTypography.bodyMedium(context, scheme.onSurfaceVariant),
           ),
           SizedBox(height: CoreSpacing.md(context)),
           Align(
@@ -242,12 +259,14 @@ class _ComboStepSection extends StatelessWidget {
     required this.step,
     required this.selectedId,
     required this.menuItems,
+    required this.categoryMealTypes,
     required this.onSelected,
   });
 
   final _ComboStep step;
   final String selectedId;
   final List<ModelMenuItem> menuItems;
+  final Map<String, String?> categoryMealTypes;
   final ValueChanged<String> onSelected;
 
   @override
@@ -268,13 +287,13 @@ class _ComboStepSection extends StatelessWidget {
             ).copyWith(fontWeight: FontWeight.w900),
           ),
           SizedBox(height: CoreSpacing.md(context)),
-          for (final item in _itemsForStep(step, menuItems)) ...[
+          for (final item in _itemsForStep(step, menuItems, categoryMealTypes)) ...[
             _ComboChoiceCard(
               item: item,
               selected: item.id == selectedId,
               onTap: () => onSelected(item.id),
             ),
-            if (item != _itemsForStep(step, menuItems).last)
+            if (item != _itemsForStep(step, menuItems, categoryMealTypes).last)
               SizedBox(height: CoreSpacing.sm(context)),
           ],
         ],
@@ -314,7 +333,7 @@ class _ComboChoiceCard extends StatelessWidget {
           ),
           SizedBox(width: CoreSpacing.md(context)),
           ClipRRect(
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+            borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
             child: SizedBox.square(
               dimension: CoreContentSizes.logoCard(context),
               child: WidgetsMockFoodImage(
@@ -370,13 +389,11 @@ class _ComboSummaryCard extends StatelessWidget {
     required this.subtotal,
     required this.savings,
     required this.total,
-    required this.onProceed,
   });
 
   final double subtotal;
   final double savings;
   final double total;
-  final VoidCallback onProceed;
 
   @override
   Widget build(BuildContext context) {
@@ -429,13 +446,6 @@ class _ComboSummaryCard extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: CoreSpacing.lg(context)),
-          WidgetsAppButton(
-            label: l10n.cartProceedCheckout,
-            onPressed: onProceed,
-            icon: Icons.shopping_basket_outlined,
-            fullWidth: true,
-          ),
         ],
       ),
     );
@@ -472,38 +482,6 @@ class _SummaryLine extends StatelessWidget {
             ).copyWith(fontWeight: FontWeight.w800),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _FoodTag extends StatelessWidget {
-  const _FoodTag({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Text(
-          label,
-          style: CoreTypography.caption(
-            context,
-            scheme.onSurface,
-          ).copyWith(fontWeight: FontWeight.w800),
-        ),
       ),
     );
   }
@@ -569,38 +547,21 @@ class _ComboPainter extends CustomPainter {
   }
 }
 
-List<ModelMenuItem> _itemsForStep(_ComboStep step, List<ModelMenuItem> items) {
-  return switch (step) {
-    _ComboStep.main =>
-      items
-          .where(
-            (item) => {
-              'shawarma',
-              'sandwiches',
-              'pizza',
-              'snacks',
-              'burgers',
-            }.contains(item.categoryId),
-          )
-          .take(4)
-          .toList(),
-    _ComboStep.side =>
-      items
-          .where(
-            (item) => {
-              'hummus_ful',
-              'falafel',
-              'manaqeesh',
-              'pastries',
-            }.contains(item.categoryId),
-          )
-          .take(4)
-          .toList(),
-    _ComboStep.drink =>
-      items.where((item) => item.categoryId == 'drinks').take(4).toList(),
-    _ComboStep.dessert =>
-      items.where((item) => item.categoryId == 'pastries').take(4).toList(),
+List<ModelMenuItem> _itemsForStep(
+  _ComboStep step,
+  List<ModelMenuItem> items,
+  Map<String, String?> categoryMealTypes,
+) {
+  final mealType = switch (step) {
+    _ComboStep.main => 'main',
+    _ComboStep.side => 'side',
+    _ComboStep.drink => 'drink',
+    _ComboStep.dessert => 'dessert',
   };
+  return items
+      .where((item) => categoryMealTypes[item.categoryId] == mealType)
+      .take(4)
+      .toList();
 }
 
 String _stepTitle(BuildContext context, _ComboStep step) {

@@ -1,4 +1,5 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:flutter/material.dart';
 
 /// Mockup-only online menu photo with a local illustrated fallback.
@@ -38,7 +39,7 @@ class WidgetsMockFoodImage extends StatelessWidget {
               child: SizedBox.square(
                 dimension: CoreContentSizes.orderTypeIcon(context),
                 child: CircularProgressIndicator(
-                  strokeWidth: 2,
+                  strokeWidth: UtilitySizer.of(context, 2),
                   color: Theme.of(context).colorScheme.primary,
                 ),
               ),

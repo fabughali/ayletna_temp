@@ -3,13 +3,19 @@ import 'package:ayletna_restaurant_app/data/models/model_order_detail.dart';
 import 'package:ayletna_restaurant_app/data/repositories/repository_providers.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
+import 'package:ayletna_restaurant_app/providers/checkout_draft_providers.dart';
+import 'package:ayletna_restaurant_app/providers/customer_action_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_action_bar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_media_panel.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_food_tag.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_info_banner.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_error_message.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_order_invoice_block.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_price_badge.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,7 +39,9 @@ class CustomerOrderConfirmationScreen extends ConsumerWidget {
       error:
           (error, _) => WidgetsScaffoldPage(
             title: l10n.screenOrderConfirmation,
-            child: Center(child: Text(error.toString())),
+            child: Center(
+              child: WidgetsErrorMessage(message: error.toString()),
+            ),
           ),
       data:
           (order) =>
@@ -42,14 +50,14 @@ class CustomerOrderConfirmationScreen extends ConsumerWidget {
   }
 }
 
-class _ConfirmationBody extends StatelessWidget {
+class _ConfirmationBody extends ConsumerWidget {
   const _ConfirmationBody({required this.orderReference, required this.order});
 
   final String orderReference;
   final ModelOrderDetail order;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final totalText = UtilityFormatJod.format(
       order.totalJod,
@@ -63,13 +71,49 @@ class _ConfirmationBody extends StatelessWidget {
 
     return WidgetsScaffoldPage(
       title: l10n.screenOrderConfirmation,
+      bottomSheet: WidgetsActionBar(
+        primary: WidgetsAppButton(
+          label: l10n.orderConfirmedTrack,
+          onPressed: () {
+            ref.read(activeTrackingOrderIdProvider.notifier).state = order.id;
+            context.go(AppRoutePaths.orderTracking);
+          },
+          icon: Icons.soup_kitchen_outlined,
+          fullWidth: true,
+        ),
+        secondary: WidgetsAppButton(
+          label: l10n.orderConfirmedHome,
+          onPressed: () => context.go(AppRoutePaths.home),
+          icon: Icons.restaurant_menu_outlined,
+          variant: WidgetsAppButtonVariant.outline,
+          fullWidth: true,
+        ),
+      ),
       child: ListView(
+        padding: EdgeInsetsDirectional.only(
+          bottom: CoreSpacing.xxl(context) * 3,
+        ),
         children: [
           SizedBox(height: CoreSpacing.md(context)),
-          _ConfirmationHero(totalText: totalText),
+          WidgetsPageHeader(
+            title: l10n.orderConfirmedThanks,
+            subtitle:
+                '${l10n.orderConfirmedNumberLabel}: $orderReference\n${l10n.orderConfirmedSuccess}',
+            centered: true,
+          ),
+          _ConfirmationHero(totalText: totalText, statusKey: order.statusKey),
           SizedBox(height: CoreSpacing.lg(context)),
           _KitchenHandoffCard(orderReference: orderReference),
           SizedBox(height: CoreSpacing.lg(context)),
+          if (order.depositJod > 0) ...[
+            WidgetsInfoBanner(
+              title: l10n.checkoutDeposit,
+              message: l10n.homeSustainabilityBody,
+              icon: Icons.room_service_outlined,
+              tone: WidgetsInfoBannerTone.warning,
+            ),
+            SizedBox(height: CoreSpacing.lg(context)),
+          ],
           WidgetsOrderInvoiceBlock(
             cart: order.lines,
             sumData: receiptData,
@@ -80,21 +124,6 @@ class _ConfirmationBody extends StatelessWidget {
           SizedBox(height: CoreSpacing.lg(context)),
           _DeliveryDetailsCard(totalText: totalText),
           SizedBox(height: CoreSpacing.lg(context)),
-          WidgetsAppButton(
-            label: l10n.orderConfirmedTrack,
-            onPressed: () => context.go(AppRoutePaths.orderTracking),
-            icon: Icons.soup_kitchen_outlined,
-            fullWidth: true,
-          ),
-          SizedBox(height: CoreSpacing.md(context)),
-          WidgetsAppButton(
-            label: l10n.orderConfirmedHome,
-            onPressed: () => context.go(AppRoutePaths.home),
-            icon: Icons.restaurant_menu_outlined,
-            variant: WidgetsAppButtonVariant.outline,
-            fullWidth: true,
-          ),
-          SizedBox(height: CoreSpacing.xxl(context)),
         ],
       ),
     );
@@ -102,14 +131,26 @@ class _ConfirmationBody extends StatelessWidget {
 }
 
 class _ConfirmationHero extends StatelessWidget {
-  const _ConfirmationHero({required this.totalText});
+  const _ConfirmationHero({required this.totalText, required this.statusKey});
 
   final String totalText;
+  final String statusKey;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final etaMinutes = switch (statusKey) {
+      'delivered' || 'completed' => 0,
+      'on_the_way' || 'out_for_delivery' => 18,
+      _ => 35,
+    };
+    final etaLabel =
+        etaMinutes == 0
+            ? l10n.trackingDelivered
+            : TimeOfDay.fromDateTime(
+              DateTime.now().add(Duration(minutes: etaMinutes)),
+            ).format(context);
 
     return WidgetsAppCard(
       variant: WidgetsAppCardVariant.food,
@@ -119,8 +160,8 @@ class _ConfirmationHero extends StatelessWidget {
         children: [
           WidgetsFoodMediaPanel(
             height: CoreContentSizes.heroImageHeight(context),
-            badge: _FoodTag(
-              label: l10n.orderConfirmedArrival,
+            badge: WidgetsFoodTag(
+              label: etaLabel,
               color: CoreColors.semanticSuccess,
             ),
             child: CustomPaint(
@@ -137,19 +178,6 @@ class _ConfirmationHero extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: CoreSpacing.lg(context)),
-          Text(
-            l10n.orderConfirmedThanks,
-            style: CoreTypography.headlineLarge(
-              context,
-              scheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-          SizedBox(height: CoreSpacing.sm(context)),
-          Text(
-            l10n.orderConfirmedSuccess,
-            style: CoreTypography.bodyMedium(context, scheme.onSurfaceVariant),
-          ),
           SizedBox(height: CoreSpacing.md(context)),
           Align(
             alignment: AlignmentDirectional.centerStart,
@@ -161,15 +189,43 @@ class _ConfirmationHero extends StatelessWidget {
   }
 }
 
-class _KitchenHandoffCard extends StatelessWidget {
+class _KitchenHandoffCard extends ConsumerWidget {
   const _KitchenHandoffCard({required this.orderReference});
 
   final String orderReference;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final draft = ref.watch(checkoutDraftProvider);
+    final addresses =
+        ref.watch(savedAddressesProvider).asData?.value ?? const [];
+    final address = () {
+      final byId =
+          addresses.where((a) => a.id == draft.selectedAddressId).toList();
+      if (byId.isNotEmpty) return byId.first;
+      final defaults = addresses.where((a) => a.isSelected).toList();
+      if (defaults.isNotEmpty) return defaults.first;
+      return addresses.isEmpty ? null : addresses.first;
+    }();
+    final addressLine =
+        address?.addressForLocale(isAr) ?? l10n.orderConfirmedAddress;
+    final fulfillmentLabel = switch (draft.fulfillment) {
+      CheckoutFulfillment.dineIn => l10n.orderTypeDineIn,
+      CheckoutFulfillment.takeaway => l10n.orderTypeTakeaway,
+      CheckoutFulfillment.plated => l10n.orderTypePlated,
+      CheckoutFulfillment.groupDelivery => l10n.orderTypeDelivery,
+      CheckoutFulfillment.delivery => l10n.orderTypeDelivery,
+    };
+    final fulfillmentColor = switch (draft.fulfillment) {
+      CheckoutFulfillment.dineIn => CoreColors.orderTypeDineIn,
+      CheckoutFulfillment.takeaway => CoreColors.orderTypeTakeaway,
+      CheckoutFulfillment.plated => CoreColors.orderTypePlated,
+      CheckoutFulfillment.groupDelivery ||
+      CheckoutFulfillment.delivery => CoreColors.orderTypeDelivery,
+    };
 
     return WidgetsAppCard(
       variant: WidgetsAppCardVariant.form,
@@ -214,16 +270,16 @@ class _KitchenHandoffCard extends StatelessWidget {
                   ],
                 ),
               ),
-              _FoodTag(
-                label: l10n.orderConfirmedType,
-                color: CoreColors.orderTypePlated,
+              WidgetsFoodTag(
+                label: fulfillmentLabel,
+                color: fulfillmentColor,
               ),
             ],
           ),
           SizedBox(height: CoreSpacing.lg(context)),
           WidgetsInfoBanner(
             title: l10n.orderConfirmedAddressLabel,
-            message: l10n.orderConfirmedAddress,
+            message: addressLine,
             icon: Icons.location_on_outlined,
             tone: WidgetsInfoBannerTone.info,
           ),
@@ -352,6 +408,9 @@ class _DeliveryDetailsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final eta = TimeOfDay.fromDateTime(
+      DateTime.now().add(const Duration(minutes: 35)),
+    ).format(context);
 
     return WidgetsAppCard(
       variant: WidgetsAppCardVariant.plain,
@@ -360,7 +419,7 @@ class _DeliveryDetailsCard extends StatelessWidget {
         children: [
           _DetailRow(
             label: l10n.orderConfirmedArrivalLabel,
-            value: l10n.orderConfirmedArrival,
+            value: eta,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           _DetailRow(label: l10n.trackingTotal, value: totalText),
@@ -407,39 +466,6 @@ class _DetailRow extends StatelessWidget {
           ).copyWith(fontWeight: FontWeight.w800),
         ),
       ],
-    );
-  }
-}
-
-class _FoodTag extends StatelessWidget {
-  const _FoodTag({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Text(
-          label,
-          style: CoreTypography.caption(
-            context,
-            scheme.onSurface,
-          ).copyWith(fontWeight: FontWeight.w800),
-        ),
-      ),
     );
   }
 }

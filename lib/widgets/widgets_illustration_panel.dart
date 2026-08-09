@@ -21,7 +21,7 @@ class WidgetsIllustrationPanel extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       child: ColoredBox(
         color: backgroundColor ?? scheme.surfaceContainerHighest,
         child: SizedBox(

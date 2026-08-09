@@ -3,13 +3,16 @@ import 'package:ayletna_restaurant_app/data/models/model_inventory_mock.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/inventory_session_providers.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -27,6 +30,7 @@ class _InventoryStockAdjustmentScreenState
     extends ConsumerState<InventoryStockAdjustmentScreen> {
   String _reason = 'arrival';
   final _quantityController = TextEditingController();
+  final Set<String> _evidenceKeys = {};
 
   @override
   void dispose() {
@@ -54,7 +58,7 @@ class _InventoryStockAdjustmentScreenState
       ],
       child: WidgetsRefreshList(
         onRefresh:
-            () async => UtilityMockFeedback.showSuccess(
+            () async => UtilityMockFeedback.showInfo(
               context,
               l10n.screenStockAdjustment,
             ),
@@ -74,9 +78,22 @@ class _InventoryStockAdjustmentScreenState
                   children: [
                     const _SelectedItemCard(),
                     SizedBox(height: CoreSpacing.lg(context)),
-                    const _EvidenceCard(),
+                    _EvidenceCard(
+                      attachedKeys: _evidenceKeys,
+                      onAttach: (key) {
+                        setState(() => _evidenceKeys.add(key));
+                        UtilityMockFeedback.showSuccess(context, key);
+                      },
+                    ),
                     SizedBox(height: CoreSpacing.lg(context)),
-                    _SubmitCard(reason: _reason, quantityController: _quantityController),
+                    _SubmitCard(
+                      reason: _reason,
+                      quantityController: _quantityController,
+                      evidenceKey:
+                          _evidenceKeys.isEmpty
+                              ? null
+                              : _evidenceKeys.join(','),
+                    ),
                   ],
                 );
 
@@ -125,10 +142,10 @@ class _AdjustmentHero extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.tune_outlined,
                 color: scheme.primary,
-                large: true,
+                size: CoreContentSizes.emptyStateIcon(context), iconSize: CoreContentSizes.kpiIcon(context),
               ),
               SizedBox(width: CoreSpacing.md(context)),
               Expanded(
@@ -160,17 +177,17 @@ class _AdjustmentHero extends StatelessWidget {
             spacing: CoreSpacing.sm(context),
             runSpacing: CoreSpacing.sm(context),
             children: [
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.inventoryArrivalShipment,
                 color: CoreColors.semanticSuccess,
                 icon: Icons.local_shipping_outlined,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.inventoryDamageSpoilage,
                 color: CoreColors.semanticError,
                 icon: Icons.delete_sweep_outlined,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.inventoryCorrection,
                 color: CoreColors.brandGold,
                 icon: Icons.edit_note_outlined,
@@ -207,7 +224,7 @@ class _AdjustmentForm extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.inventory_outlined,
                 color: scheme.primary,
               ),
@@ -300,16 +317,16 @@ class _AdjustmentForm extends StatelessWidget {
             children: [
               Expanded(
                 child: WidgetsAppTextField(
-                  label: 'Batch / lot',
-                  hintText: 'LOT-SAL-042',
+                  label: l10n.inventoryBatchLotLabel,
+                  hintText: l10n.inventoryBatchLotHint,
                   prefixIcon: Icons.qr_code_2_outlined,
                 ),
               ),
               SizedBox(width: CoreSpacing.sm(context)),
               Expanded(
                 child: WidgetsAppTextField(
-                  label: 'Expiry date',
-                  hintText: '2026-06-20',
+                  label: l10n.inventoryExpiryDateLabel,
+                  hintText: l10n.inventoryExpiryDateHint,
                   prefixIcon: Icons.event_outlined,
                 ),
               ),
@@ -339,7 +356,7 @@ class _SelectedItemCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.set_meal_outlined,
                 color: CoreColors.semanticSuccess,
               ),
@@ -353,7 +370,7 @@ class _SelectedItemCard extends ConsumerWidget {
                   ).copyWith(fontWeight: FontWeight.w900),
                 ),
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.inventoryInStock,
                 color: CoreColors.semanticSuccess,
                 icon: Icons.check_circle_outline,
@@ -385,10 +402,17 @@ class _SelectedItemCard extends ConsumerWidget {
 }
 
 class _EvidenceCard extends StatelessWidget {
-  const _EvidenceCard();
+  const _EvidenceCard({
+    required this.attachedKeys,
+    required this.onAttach,
+  });
+
+  final Set<String> attachedKeys;
+  final ValueChanged<String> onAttach;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
 
     return WidgetsAppCard(
@@ -399,14 +423,14 @@ class _EvidenceCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.receipt_long_outlined,
                 color: scheme.primary,
               ),
               SizedBox(width: CoreSpacing.sm(context)),
               Expanded(
                 child: Text(
-                  'Receipt / photo evidence',
+                  l10n.inventoryEvidenceTitle,
                   style: CoreTypography.titleMedium(
                     context,
                     scheme.onSurface,
@@ -417,13 +441,17 @@ class _EvidenceCard extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.md(context)),
           _EvidenceButton(
-            label: 'Attach supplier receipt',
+            label: l10n.inventoryAttachSupplierReceipt,
             icon: Icons.receipt_long_outlined,
+            attached: attachedKeys.contains('supplier_receipt'),
+            onPressed: () => onAttach('supplier_receipt'),
           ),
           SizedBox(height: CoreSpacing.sm(context)),
           _EvidenceButton(
-            label: 'Add shelf photo',
+            label: l10n.inventoryAddShelfPhoto,
             icon: Icons.photo_camera_outlined,
+            attached: attachedKeys.contains('shelf_photo'),
+            onPressed: () => onAttach('shelf_photo'),
           ),
         ],
       ),
@@ -435,10 +463,12 @@ class _SubmitCard extends ConsumerWidget {
   const _SubmitCard({
     required this.reason,
     required this.quantityController,
+    this.evidenceKey,
   });
 
   final String reason;
   final TextEditingController quantityController;
+  final String? evidenceKey;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -457,7 +487,7 @@ class _SubmitCard extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _SoftBadge(
+          WidgetsSoftBadge(
             label: reasonLabel,
             color: _reasonColor(context, reason),
             icon: Icons.edit_note_outlined,
@@ -533,6 +563,7 @@ class _SubmitCard extends ConsumerWidget {
         balanceAr: l10n.inventoryCurrentStock,
         balanceEn: l10n.inventoryCurrentStock,
         isNegative: deltaKg < 0,
+        evidenceKey: evidenceKey,
       ),
     );
 
@@ -555,7 +586,7 @@ class _SubmitCard extends ConsumerWidget {
 
     quantityController.clear();
     if (!context.mounted) return;
-    UtilityMockFeedback.showSuccess(context, l10n.inventoryUpdateInventory);
+    UtilityDemoActions.complete(context, successMessage: l10n.inventoryUpdateInventory);
     context.go(AppRoutePaths.inventory);
   }
 }
@@ -584,11 +615,11 @@ class _ReasonChip extends StatelessWidget {
 
     return InkWell(
       onTap: () => onTap(id),
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: effectiveColor.withValues(alpha: selected ? 0.16 : 0.08),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
           border: Border.all(color: effectiveColor.withValues(alpha: 0.24)),
         ),
         child: Padding(
@@ -621,17 +652,24 @@ class _ReasonChip extends StatelessWidget {
 }
 
 class _EvidenceButton extends StatelessWidget {
-  const _EvidenceButton({required this.label, required this.icon});
+  const _EvidenceButton({
+    required this.label,
+    required this.icon,
+    required this.onPressed,
+    this.attached = false,
+  });
 
   final String label;
   final IconData icon;
+  final VoidCallback onPressed;
+  final bool attached;
 
   @override
   Widget build(BuildContext context) {
     return WidgetsAppButton(
       label: label,
-      onPressed: () => UtilityMockFeedback.showSuccess(context, label),
-      icon: icon,
+      onPressed: onPressed,
+      icon: attached ? Icons.check_circle_outline : icon,
       variant: WidgetsAppButtonVariant.outline,
       fullWidth: true,
     );
@@ -673,82 +711,4 @@ class _DetailLine extends StatelessWidget {
   }
 }
 
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({
-    required this.label,
-    required this.color,
-    required this.icon,
-  });
 
-  final String label;
-  final Color color;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: CoreContentSizes.orderTypeIcon(context),
-              color: color,
-            ),
-            SizedBox(width: CoreSpacing.xs(context)),
-            Text(
-              label,
-              style: CoreTypography.caption(
-                context,
-                color,
-              ).copyWith(fontWeight: FontWeight.w900),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({
-    required this.icon,
-    required this.color,
-    this.large = false,
-  });
-
-  final IconData icon;
-  final Color color;
-  final bool large;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(CoreSpacing.sm(context)),
-        child: Icon(
-          icon,
-          color: color,
-          size:
-              large
-                  ? CoreContentSizes.logoCard(context) * 0.52
-                  : CoreContentSizes.orderTypeIcon(context),
-        ),
-      ),
-    );
-  }
-}

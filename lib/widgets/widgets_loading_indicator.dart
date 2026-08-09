@@ -1,5 +1,6 @@
 import 'package:ayletna_restaurant_app/core/core_colors.dart';
 import 'package:ayletna_restaurant_app/core/core_content_sizes.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:flutter/material.dart';
 
 /// Branded loader — brand gold (ui_design_prompt).
@@ -15,7 +16,7 @@ class WidgetsLoadingIndicator extends StatelessWidget {
       width: size,
       height: size,
       child: CircularProgressIndicator(
-        strokeWidth: 3,
+        strokeWidth: UtilitySizer.of(context, 3),
         color: primary,
         backgroundColor: CoreColors.brandGold.withAlpha20,
       ),

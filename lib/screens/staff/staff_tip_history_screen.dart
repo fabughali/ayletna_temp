@@ -4,14 +4,17 @@ import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/staff_session_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_file_download.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_report_export.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -79,6 +82,13 @@ class StaffTipHistoryScreen extends ConsumerWidget {
               label: l10n.staffDownloadTaxStatement,
               onPressed: () async {
                 final rows = session.filteredTipHistory;
+                if (rows.isEmpty) {
+                  UtilityMockFeedback.showWarning(
+                    context,
+                    l10n.staffTipHistoryNoData,
+                  );
+                  return;
+                }
                 final csv = buildStaffTipStatementCsv(rows);
                 await downloadTextFile(
                   'staff-tip-statement.csv',
@@ -86,9 +96,9 @@ class StaffTipHistoryScreen extends ConsumerWidget {
                   mimeType: 'text/csv',
                 );
                 if (!context.mounted) return;
-                UtilityMockFeedback.showSuccess(
+                UtilityDemoActions.complete(
                   context,
-                  l10n.staffDownloadTaxStatement,
+                  successMessage: l10n.staffDownloadTaxStatement,
                 );
               },
               icon: Icons.download_outlined,
@@ -115,10 +125,10 @@ class _HistoryHero extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _IconBubble(
+          WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
             icon: Icons.history_outlined,
             color: scheme.primary,
-            large: true,
+            size: CoreContentSizes.emptyStateIcon(context), iconSize: CoreContentSizes.kpiIcon(context),
           ),
           SizedBox(width: CoreSpacing.md(context)),
           Expanded(
@@ -143,7 +153,7 @@ class _HistoryHero extends StatelessWidget {
               ],
             ),
           ),
-          _SoftBadge(
+          WidgetsSoftBadge(
             label: l10n.staffNoLatesPeriod,
             color: CoreColors.semanticSuccess,
             icon: Icons.verified_outlined,
@@ -228,7 +238,7 @@ class _SummaryCard extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _IconBubble(icon: icon, color: color),
+        WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), icon: icon, color: color),
         SizedBox(height: CoreSpacing.md(context)),
         Text(
           title,
@@ -252,7 +262,7 @@ class _SummaryCard extends StatelessWidget {
   );
 }
 
-class _RangeRow extends StatelessWidget {
+class _RangeRow extends ConsumerWidget {
   const _RangeRow({
     required this.selectedRange,
     required this.onSelected,
@@ -263,7 +273,7 @@ class _RangeRow extends StatelessWidget {
   final ValueChanged<String> onSelected;
   final VoidCallback onCustomApply;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final filters = [
       ('thisMonth', l10n.staffThisMonth, Icons.calendar_month_outlined),
@@ -282,7 +292,7 @@ class _RangeRow extends StatelessWidget {
               selected: selectedRange == filter.$1,
               onTap: () {
                 onSelected(filter.$1);
-                if (filter.$1 == 'custom') _showRangeSheet(context);
+                if (filter.$1 == 'custom') _showRangeSheet(context, ref);
               },
             ),
             SizedBox(width: CoreSpacing.sm(context)),
@@ -292,23 +302,29 @@ class _RangeRow extends StatelessWidget {
     );
   }
 
-  void _showRangeSheet(BuildContext context) {
+  Future<void> _showRangeSheet(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
-    UtilityMockFeedback.showActionSheet(
+    final now = DateTime.now();
+    final picked = await showDateRangePicker(
       context: context,
-      title: l10n.staffCustomRange,
-      message: l10n.staffPerformanceSummary,
-      actions: [
-        MockSheetAction(
-          label: l10n.actionApply,
-          icon: Icons.date_range_outlined,
-          onSelected: () {
-            onCustomApply();
-            UtilityMockFeedback.showSuccess(context, l10n.staffCustomRange);
-          },
-        ),
-      ],
+      firstDate: now.subtract(const Duration(days: 365)),
+      lastDate: now,
+      initialDateRange: DateTimeRange(
+        start: now.subtract(const Duration(days: 30)),
+        end: now,
+      ),
+      helpText: l10n.staffCustomRange,
+      cancelText: l10n.actionCancel,
+      confirmText: l10n.actionApply,
+      fieldStartHintText: l10n.staffCustomRange,
+      fieldEndHintText: l10n.staffCustomRange,
     );
+    if (picked == null || !context.mounted) return;
+    ref.read(staffSessionProvider.notifier).applyCustomRange(
+      start: picked.start,
+      end: picked.end,
+    );
+    onCustomApply();
   }
 }
 
@@ -333,11 +349,11 @@ class _RangeChip extends StatelessWidget {
             : Theme.of(context).colorScheme.onSurfaceVariant;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color.withValues(alpha: selected ? 0.16 : 0.08),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
           border: Border.all(color: color.withValues(alpha: 0.24)),
         ),
         child: Padding(
@@ -427,14 +443,14 @@ class _ShiftHistoryRow extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.16)),
       ),
       child: Padding(
         padding: EdgeInsets.all(CoreSpacing.sm(context)),
         child: Row(
           children: [
-            _SoftBadge(
+            WidgetsSoftBadge(
               label: isAr ? row.dateAr : row.dateEn,
               color: color,
               icon: Icons.calendar_today_outlined,
@@ -473,7 +489,7 @@ class _ShiftHistoryRow extends StatelessWidget {
                 ),
                 if (badge != null) ...[
                   SizedBox(height: CoreSpacing.xs(context)),
-                  _SoftBadge(
+                  WidgetsSoftBadge(
                     label: badge,
                     color: CoreColors.brandOrange,
                     icon: Icons.star_outline,
@@ -488,74 +504,4 @@ class _ShiftHistoryRow extends StatelessWidget {
   }
 }
 
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({
-    required this.label,
-    required this.color,
-    required this.icon,
-  });
-  final String label;
-  final Color color;
-  final IconData icon;
-  @override
-  Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: color.withValues(alpha: 0.12),
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-      border: Border.all(color: color.withValues(alpha: 0.24)),
-    ),
-    child: Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.sm(context),
-        vertical: CoreSpacing.xs(context),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: CoreContentSizes.orderTypeIcon(context),
-            color: color,
-          ),
-          SizedBox(width: CoreSpacing.xs(context)),
-          Text(
-            label,
-            style: CoreTypography.caption(
-              context,
-              color,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-        ],
-      ),
-    ),
-  );
-}
 
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({
-    required this.icon,
-    required this.color,
-    this.large = false,
-  });
-  final IconData icon;
-  final Color color;
-  final bool large;
-  @override
-  Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: color.withValues(alpha: 0.12),
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
-    ),
-    child: Padding(
-      padding: EdgeInsets.all(CoreSpacing.sm(context)),
-      child: Icon(
-        icon,
-        color: color,
-        size:
-            large
-                ? CoreContentSizes.logoCard(context) * 0.52
-                : CoreContentSizes.orderTypeIcon(context),
-      ),
-    ),
-  );
-}

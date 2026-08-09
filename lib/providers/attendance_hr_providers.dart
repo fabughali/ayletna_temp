@@ -83,9 +83,10 @@ AttendancePayResult calculateAttendancePay({
     );
   }
 
-  final delayMinutes = checkIn.isAfter(record.scheduledStart)
-      ? checkIn.difference(record.scheduledStart).inMinutes
-      : 0;
+  final delayMinutes =
+      checkIn.isAfter(record.scheduledStart)
+          ? checkIn.difference(record.scheduledStart).inMinutes
+          : 0;
 
   if (delayMinutes > config.absenceAfterMinutes) {
     return AttendancePayResult(
@@ -119,8 +120,7 @@ AttendancePayResult calculateAttendancePay({
       Duration(minutes: config.overtimeThresholdMinutes),
     );
     if (checkOut.isAfter(overtimeStart)) {
-      overtimeHours =
-          checkOut.difference(overtimeStart).inMinutes / 60.0;
+      overtimeHours = checkOut.difference(overtimeStart).inMinutes / 60.0;
       final hourly = config.dailyBaseRateJod / 8;
       payable += overtimeHours * hourly * config.overtimeMultiplier;
       outcome = AttendancePayOutcome.overtime;
@@ -144,10 +144,7 @@ AttendancePayResult calculateAttendancePay({
 }
 
 class AttendanceHrReportRow {
-  const AttendanceHrReportRow({
-    required this.record,
-    required this.result,
-  });
+  const AttendanceHrReportRow({required this.record, required this.result});
 
   final AttendanceDayRecord record;
   final AttendancePayResult result;
@@ -207,10 +204,7 @@ class AttendanceHrState {
   double get totalPayableJod =>
       reportRows.fold(0, (sum, row) => sum + row.result.payableJod);
 
-  AttendanceHrState copyWith({
-    AttendancePayRuleConfig? rules,
-    String? period,
-  }) {
+  AttendanceHrState copyWith({AttendancePayRuleConfig? rules, String? period}) {
     return AttendanceHrState(
       rules: rules ?? this.rules,
       period: period ?? this.period,

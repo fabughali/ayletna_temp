@@ -13,7 +13,6 @@ class AdminReportFilterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
 
     return WidgetsScaffoldPage(
       title: l10n.screenReportFilter,
@@ -29,10 +28,7 @@ class AdminReportFilterScreen extends StatelessWidget {
           children: [
             WidgetsAppCard(
               title: l10n.screenReportFilter,
-              subtitle:
-                  isAr
-                      ? 'نفس الفلتر المستخدم داخل مركز التقارير، متاح كصفحة كاملة للمدير.'
-                      : 'The same filter used inside the reports hub, available as a full admin page.',
+              subtitle: l10n.reportFilterPageSubtitle,
               leading: const Icon(Icons.tune_outlined),
               child: const WidgetsReportFilterSheet(
                 embedded: true,

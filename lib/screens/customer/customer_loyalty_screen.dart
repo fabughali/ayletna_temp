@@ -8,9 +8,11 @@ import 'package:ayletna_restaurant_app/providers/app_providers.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_media_panel.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_food_tag.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_progress_bar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -55,6 +57,10 @@ class _CustomerLoyaltyScreenState extends ConsumerState<CustomerLoyaltyScreen> {
         child: ListView(
           children: [
             SizedBox(height: CoreSpacing.md(context)),
+            WidgetsPageHeader(
+              title: l10n.loyaltyTitle,
+              subtitle: l10n.loyaltySubtitle,
+            ),
             _LoyaltyHero(isGuest: isGuest, pointsBalance: pointsBalance),
             SizedBox(height: CoreSpacing.lg(context)),
             _StampCard(isGuest: isGuest, pointsBalance: pointsBalance),
@@ -74,9 +80,7 @@ class _CustomerLoyaltyScreenState extends ConsumerState<CustomerLoyaltyScreen> {
               WidgetsAppCard(
                 padding: EdgeInsets.all(CoreSpacing.lg(context)),
                 child: Text(
-                  Localizations.localeOf(context).languageCode == 'ar'
-                      ? 'لا توجد مكافآت في هذا التصنيف حالياً.'
-                      : 'No rewards in this filter right now.',
+                  l10n.loyaltyNoRewardsInFilter,
                   style: CoreTypography.bodyMedium(
                     context,
                     Theme.of(context).colorScheme.onSurfaceVariant,
@@ -111,7 +115,7 @@ class _LoyaltyHero extends StatelessWidget {
         children: [
           WidgetsFoodMediaPanel(
             height: CoreContentSizes.heroImageHeight(context),
-            badge: _FoodTag(
+            badge: WidgetsFoodTag(
               label:
                   isGuest
                       ? '0 ${l10n.loyaltySavorPoints}'
@@ -182,7 +186,8 @@ class _StampCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final filledStamps = isGuest ? 0 : (pointsBalance ~/ 50).clamp(0, 8);
-    final tierProgress = isGuest ? 0.0 : ((pointsBalance % 400) / 400).clamp(0.0, 1.0);
+    final tierProgress =
+        isGuest ? 0.0 : ((pointsBalance % 400) / 400).clamp(0.0, 1.0);
 
     return WidgetsAppCard(
       variant: WidgetsAppCardVariant.form,
@@ -369,7 +374,7 @@ class _RewardTreatCard extends ConsumerWidget {
               height: CoreContentSizes.categoryMenuImageHeight(context),
               badge:
                   reward.isPopular
-                      ? _FoodTag(label: l10n.loyaltyPopular, color: color)
+                      ? WidgetsFoodTag(label: l10n.loyaltyPopular, color: color)
                       : null,
               child: _RewardMedia(
                 icon: _rewardIcon(reward.artKey),
@@ -559,11 +564,11 @@ class _FoodChip extends StatelessWidget {
     final color = selected ? scheme.primary : scheme.onSurfaceVariant;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color.withValues(alpha: selected ? 0.14 : 0.08),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
           border: Border.all(color: color.withValues(alpha: 0.22)),
         ),
         child: Padding(
@@ -578,38 +583,6 @@ class _FoodChip extends StatelessWidget {
               color,
             ).copyWith(fontWeight: FontWeight.w900),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FoodTag extends StatelessWidget {
-  const _FoodTag({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Text(
-          label,
-          style: CoreTypography.caption(
-            context,
-            scheme.onSurface,
-          ).copyWith(fontWeight: FontWeight.w800),
         ),
       ),
     );

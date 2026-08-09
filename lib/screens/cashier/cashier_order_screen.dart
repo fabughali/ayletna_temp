@@ -1,36 +1,44 @@
 import 'dart:async';
 
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
+import 'package:ayletna_restaurant_app/data/models/model_admin_catalog.dart';
 import 'package:ayletna_restaurant_app/data/models/model_cart_line.dart';
 import 'package:ayletna_restaurant_app/data/models/model_menu_category.dart';
 import 'package:ayletna_restaurant_app/data/models/model_menu_item.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/data/models/model_cashier_postponed_order.dart';
+import 'package:ayletna_restaurant_app/data/models/model_create_address_request.dart';
+import 'package:ayletna_restaurant_app/data/models/model_saved_address.dart';
+import 'package:ayletna_restaurant_app/data/repositories/repository_providers.dart';
 import 'package:ayletna_restaurant_app/data/models/model_order_summary.dart';
+import 'package:ayletna_restaurant_app/data/models/model_kitchen_ready_order.dart';
+import 'package:ayletna_restaurant_app/providers/admin_catalog_providers.dart';
 import 'package:ayletna_restaurant_app/providers/cart_providers.dart';
 import 'package:ayletna_restaurant_app/providers/cashier_postponed_orders_provider.dart';
 import 'package:ayletna_restaurant_app/providers/cashier_session_providers.dart';
+import 'package:ayletna_restaurant_app/providers/customer_offers_providers.dart';
+import 'package:ayletna_restaurant_app/providers/kitchen_session_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_cart_customization_sheet.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_food_media_panel.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_food_catalog_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_mock_food_image.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_price_badge.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_quantity_stepper.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_cashier_virtual_keypad.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_order_invoice_block.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_order_ticket_sum.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:virtual_keypad/virtual_keypad.dart';
 
 /// PRD CashierOrderScreen — restaurant POS, ticket, kitchen send, payment.
 class CashierOrderScreen extends ConsumerStatefulWidget {
@@ -43,26 +51,28 @@ class CashierOrderScreen extends ConsumerStatefulWidget {
 class _CashierOrderScreenState extends ConsumerState<CashierOrderScreen> {
   _CashierFulfillment _fulfillment = _CashierFulfillment.dineIn;
   String _selectedCategoryId = MockupCatalog.categories.first.id;
-  final _searchController = VirtualKeypadController();
-  final _tableNumberController = VirtualKeypadController();
-  final _addressController = VirtualKeypadController();
-  final _customerPhoneController = VirtualKeypadController();
-  final _buildingController = VirtualKeypadController();
-  final _floorController = VirtualKeypadController();
-  final _accessCodeController = VirtualKeypadController();
-  final _contactPersonController = VirtualKeypadController();
-  final _deliveryTimeController = VirtualKeypadController();
-  final _cashPaymentController = VirtualKeypadController();
-  final _visaPaymentController = VirtualKeypadController();
-  final _walletPaymentController = VirtualKeypadController();
-  final _cashReceivedController = VirtualKeypadController();
-  final _customTipController = VirtualKeypadController();
+  final _searchController = TextEditingController();
+  final _tableNumberController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _customerPhoneController = TextEditingController();
+  final _buildingController = TextEditingController();
+  final _floorController = TextEditingController();
+  final _accessCodeController = TextEditingController();
+  final _contactPersonController = TextEditingController();
+  final _deliveryTimeController = TextEditingController();
+  final _cashPaymentController = TextEditingController();
+  final _visaPaymentController = TextEditingController();
+  final _walletPaymentController = TextEditingController();
+  final _cashReceivedController = TextEditingController();
+  final _customTipController = TextEditingController();
   _CashierTicketTab _ticketTab = _CashierTicketTab.order;
   _CashierPaymentTarget? _selectedPaymentTarget;
   bool _fulfillmentSelected = false;
   bool _tipConfigured = false;
   bool _paymentReceivedConfirmed = false;
   bool _kitchenSent = false;
+  bool _receiptPrinted = false;
+  bool _electronicTicketSent = false;
   double _tipJod = 0;
   double _promoSavingsJod = 0;
 
@@ -166,17 +176,17 @@ class _CashierOrderScreenState extends ConsumerState<CashierOrderScreen> {
           tooltip: l10n.screenCashierOrderHistory,
         ),
         WidgetsIconButton(
-          onPressed:
-              () => UtilityMockFeedback.showInfo(
-                context,
-                l10n.screenNotifications,
-              ),
+          onPressed: () => context.push(AppRoutePaths.notifications),
           icon: Icons.notifications_outlined,
           tooltip: l10n.screenNotifications,
         ),
       ],
-      child: CashierVirtualKeypadShell(
-        isAr: isAr,
+      child: WidgetsRefreshList(
+        onRefresh:
+            () async => UtilityMockFeedback.showInfo(
+              context,
+              l10n.screenCashierOrder,
+            ),
         child: LayoutBuilder(
           builder: (context, constraints) {
             final isWide = constraints.maxWidth >= 760;
@@ -193,7 +203,8 @@ class _CashierOrderScreenState extends ConsumerState<CashierOrderScreen> {
                   }),
               onSearchChanged: (_) => setState(() {}),
               onItemSelected: _addItem,
-              onPromoSelected: _applyPromotion,
+              onOfferSelected: _applyOfferPromo,
+              onComboSelected: _applyComboPromo,
             );
             final ticket = _TicketPanel(
               fulfillment: _fulfillment,
@@ -298,7 +309,6 @@ class _CashierOrderScreenState extends ConsumerState<CashierOrderScreen> {
     showWidgetsCartCustomizationSheet(
       context: context,
       item: item,
-      useVirtualKeypad: true,
     );
   }
 
@@ -648,7 +658,6 @@ class _CashierOrderScreenState extends ConsumerState<CashierOrderScreen> {
       item: item,
       initialLine: line,
       replaceLineKey: line.cartKey,
-      useVirtualKeypad: true,
     );
   }
 
@@ -676,7 +685,7 @@ class _CashierOrderScreenState extends ConsumerState<CashierOrderScreen> {
     if (!confirmed || !mounted) return;
     ref.read(cartProvider.notifier).clear();
     _resetCheckoutProgress();
-    UtilityMockFeedback.showSuccess(context, l10n.cashierVoidOrder);
+    UtilityDemoActions.complete(context, successMessage: l10n.cashierVoidOrder);
   }
 
   void _resetCheckoutProgress() {
@@ -687,6 +696,8 @@ class _CashierOrderScreenState extends ConsumerState<CashierOrderScreen> {
       _selectedPaymentTarget = null;
       _paymentReceivedConfirmed = false;
       _kitchenSent = false;
+      _receiptPrinted = false;
+      _electronicTicketSent = false;
       _tipJod = 0;
       _promoSavingsJod = 0;
       _cashPaymentController.clear();
@@ -708,9 +719,7 @@ class _CashierOrderScreenState extends ConsumerState<CashierOrderScreen> {
   void _startNewOrder() {
     ref.read(cartProvider.notifier).clear();
     _resetCheckoutProgress();
-    UtilityMockFeedback.showSuccess(
-      context,
-      AppLocalizations.of(context)!.cashierNewOrder,
+    UtilityDemoActions.complete(context, successMessage: AppLocalizations.of(context)!.cashierNewOrder,
     );
   }
 
@@ -756,17 +765,53 @@ class _CashierOrderScreenState extends ConsumerState<CashierOrderScreen> {
         );
     ref.read(cartProvider.notifier).clear();
     _resetCheckoutProgress();
-    UtilityMockFeedback.showSuccess(context, l10n.cashierPostponeSaved);
+    UtilityDemoActions.complete(context, successMessage: l10n.cashierPostponeSaved);
   }
 
   void _sendToKitchen() {
     final l10n = AppLocalizations.of(context)!;
-    if (ref.read(cartProvider).isEmpty) {
+    final cart = ref.read(cartProvider);
+    if (cart.isEmpty) {
       UtilityMockFeedback.showWarning(context, l10n.cartEmptyMessage);
       return;
     }
+
+    final orderId = 'POS-${DateTime.now().millisecondsSinceEpoch % 100000}';
+    final destinationEn = _fulfillmentSelected
+        ? _fulfillment.label(l10n)
+        : l10n.cashierWalkIn;
+    final destinationAr = destinationEn;
+    final typeKey = switch (_fulfillment) {
+      _CashierFulfillment.dineIn => 'dine_in',
+      _CashierFulfillment.takeaway => 'takeaway',
+      _CashierFulfillment.delivery ||
+      _CashierFulfillment.groupDelivery => 'delivery',
+      _CashierFulfillment.plated => 'plated',
+    };
+
+    ref.read(kitchenBoardProvider.notifier).receiveCashierTicket(
+          orderId: orderId,
+          destinationEn: destinationEn,
+          destinationAr: destinationAr,
+          typeKey: typeKey,
+          itemsEn: [
+            for (final line in cart)
+              ModelKitchenReadyItem(
+                quantity: line.quantity,
+                name: line.nameEn,
+              ),
+          ],
+          itemsAr: [
+            for (final line in cart)
+              ModelKitchenReadyItem(
+                quantity: line.quantity,
+                name: line.nameAr,
+              ),
+          ],
+        );
+
     setState(() => _kitchenSent = true);
-    UtilityMockFeedback.showSuccess(context, l10n.screenOrderPrep);
+    UtilityDemoActions.complete(context, successMessage: l10n.screenOrderPrep);
   }
 
   void _processPayment(num total) {
@@ -800,14 +845,14 @@ class _CashierOrderScreenState extends ConsumerState<CashierOrderScreen> {
                     : 0,
             statusKey: 'completed',
             isPlated: _fulfillment == _CashierFulfillment.plated,
+            receiptPrinted: _receiptPrinted,
+            electronicTicketSent: _electronicTicketSent,
           ),
         );
 
     ref.read(cartProvider.notifier).clear();
     _resetCheckoutProgress();
-    UtilityMockFeedback.showSuccess(
-      context,
-      '${l10n.cashierPaid} • ${UtilityFormatJod.format(total.toDouble(), suffix: l10n.currencyJod)}',
+    UtilityDemoActions.complete(context, successMessage: '${l10n.cashierPaid} • ${UtilityFormatJod.format(total.toDouble(), suffix: l10n.currencyJod)}',
     );
   }
 
@@ -880,20 +925,41 @@ class _CashierOrderScreenState extends ConsumerState<CashierOrderScreen> {
 
   void _printReceipt(double total) {
     final l10n = AppLocalizations.of(context)!;
-    UtilityMockFeedback.showSuccess(
-      context,
-      '${l10n.cashierPrintRollReceipt} • ${UtilityFormatJod.format(total, suffix: l10n.currencyJod)}',
+    setState(() => _receiptPrinted = true);
+    ref.read(cashierSessionOrdersProvider.notifier).markLatestReceiptPrinted();
+    UtilityDemoActions.complete(context, successMessage: '${l10n.cashierPrintRollReceipt} • ${UtilityFormatJod.format(total, suffix: l10n.currencyJod)}',
     );
   }
 
   void _sendElectronicTicket() {
     final l10n = AppLocalizations.of(context)!;
-    UtilityMockFeedback.showSuccess(context, l10n.cashierElectronicTicketSent);
+    setState(() => _electronicTicketSent = true);
+    ref
+        .read(cashierSessionOrdersProvider.notifier)
+        .markLatestElectronicTicketSent();
+    UtilityDemoActions.complete(context, successMessage: l10n.cashierElectronicTicketSent);
   }
 
-  void _applyPromotion(_CashierPromotion promotion) {
-    setState(() => _promoSavingsJod = promotion.savingsJod);
-    UtilityMockFeedback.showSuccess(context, promotion.label);
+  void _applyOfferPromo(ModelCatalogOffer offer) {
+    final l10n = AppLocalizations.of(context)!;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final applied = applyOfferToCart(ref, offer);
+    setState(() => _promoSavingsJod = MockupCatalog.cashierOfferSavingsJod);
+    UtilityDemoActions.complete(
+      context,
+      successMessage:
+          applied
+              ? l10n.cashierOfferAddedToCart
+              : (isAr ? offer.titleAr : offer.titleEn),
+    );
+  }
+
+  void _applyComboPromo(ModelCatalogCombo combo) {
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    addComboToCart(ref, combo);
+    setState(() => _promoSavingsJod = MockupCatalog.cashierComboSavingsJod);
+    UtilityDemoActions.complete(context, successMessage: isAr ? combo.titleAr : combo.titleEn,
+    );
   }
 
   double _fulfillmentCharge(_CashierFulfillment fulfillment, double subtotal) {
@@ -935,7 +1001,8 @@ class _MenuWorkbench extends StatelessWidget {
     required this.onCategorySelected,
     required this.onSearchChanged,
     required this.onItemSelected,
-    required this.onPromoSelected,
+    required this.onOfferSelected,
+    required this.onComboSelected,
   });
 
   final List<ModelMenuCategory> categories;
@@ -946,17 +1013,15 @@ class _MenuWorkbench extends StatelessWidget {
   final ValueChanged<String> onCategorySelected;
   final ValueChanged<String> onSearchChanged;
   final ValueChanged<ModelMenuItem> onItemSelected;
-  final ValueChanged<_CashierPromotion> onPromoSelected;
+  final ValueChanged<ModelCatalogOffer> onOfferSelected;
+  final ValueChanged<ModelCatalogCombo> onComboSelected;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
 
-    return ListView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      children: [
+    final children = <Widget>[
         Text(
           l10n.cashierFind,
           style: CoreTypography.titleMedium(
@@ -965,7 +1030,7 @@ class _MenuWorkbench extends StatelessWidget {
           ).copyWith(fontWeight: FontWeight.w900),
         ),
         SizedBox(height: CoreSpacing.md(context)),
-        CashierTouchTextField(
+        WidgetsAppTextField(
           label: l10n.cashierFind,
           controller: searchController,
           hintText: l10n.cashierMenuSearchHint,
@@ -975,7 +1040,11 @@ class _MenuWorkbench extends StatelessWidget {
           onChanged: onSearchChanged,
         ),
         SizedBox(height: CoreSpacing.md(context)),
-        _CashierPromotionsPanel(onSelected: onPromoSelected, isAr: isAr),
+        _CashierCatalogSections(
+          isAr: isAr,
+          onOfferSelected: onOfferSelected,
+          onComboSelected: onComboSelected,
+        ),
         SizedBox(height: CoreSpacing.lg(context)),
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
@@ -994,26 +1063,42 @@ class _MenuWorkbench extends StatelessWidget {
           ),
         ),
         SizedBox(height: CoreSpacing.lg(context)),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: items.length,
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 260,
-            mainAxisExtent: 340,
-            crossAxisSpacing: CoreSpacing.md(context),
-            mainAxisSpacing: CoreSpacing.md(context),
-          ),
-          itemBuilder: (context, index) {
-            final item = items[index];
-            return _DishButton(
-              item: item,
-              isAr: isAr,
-              onTap: () => onItemSelected(item),
-            );
-          },
+        WidgetsFoodCatalogGrid(
+          minCardWidth: 220,
+          maxCardWidth: 300,
+          children: [
+            for (var index = 0; index < items.length; index++)
+              Builder(
+                builder: (context) {
+                  final item = items[index];
+                  return WidgetsFoodCatalogCard(
+                    title: isAr ? item.nameAr : item.nameEn,
+                    description:
+                        isAr ? item.descriptionAr : item.descriptionEn,
+                    priceLabel: UtilityFormatJod.format(
+                      item.priceJod,
+                      suffix: l10n.currencyJod,
+                    ),
+                    imageUrl: item.primaryImageUrl,
+                    badgeLabel: _categoryLabel(categories, item.categoryId, isAr),
+                    actionLabel: l10n.actionAddToCart,
+                    loyaltyLabel: l10n.loyaltyPointsShort(
+                      '${item.rewardPoints}',
+                    ),
+                    index: index,
+                    onTap: () => onItemSelected(item),
+                    onAction: () => onItemSelected(item),
+                  );
+                },
+              ),
+          ],
         ),
-      ],
+    ];
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: children.length,
+      itemBuilder: (context, index) => children[index],
     );
   }
 }
@@ -1039,7 +1124,7 @@ class _CashierPosLayout extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          SizedBox(height: 680, child: ticket),
+          SizedBox(height: UtilitySizer.of(context, 680), child: ticket),
           SizedBox(height: spacing),
           workbench,
         ],
@@ -1236,11 +1321,11 @@ class _CategoryChip extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color.withValues(alpha: selected ? 0.14 : 0.08),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
           border: Border.all(color: color.withValues(alpha: 0.22)),
         ),
         child: Padding(
@@ -1272,218 +1357,178 @@ class _CategoryChip extends StatelessWidget {
   }
 }
 
-class _CashierPromotionsPanel extends StatelessWidget {
-  const _CashierPromotionsPanel({required this.onSelected, required this.isAr});
+class _CashierCatalogSections extends ConsumerWidget {
+  const _CashierCatalogSections({
+    required this.isAr,
+    required this.onOfferSelected,
+    required this.onComboSelected,
+  });
 
-  final ValueChanged<_CashierPromotion> onSelected;
   final bool isAr;
+  final ValueChanged<ModelCatalogOffer> onOfferSelected;
+  final ValueChanged<ModelCatalogCombo> onComboSelected;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
-    final promotions = _CashierPromotion.available(context);
-    if (promotions.isEmpty) return const SizedBox.shrink();
+    final scheme = Theme.of(context).colorScheme;
+    final offers = ref.watch(visibleOffersProvider);
+    final combos = ref.watch(visibleCombosProvider);
+
+    if (offers.isEmpty && combos.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          l10n.cashierPromotionsTitle,
-          style: CoreTypography.titleMedium(
-            context,
-            Theme.of(context).colorScheme.onSurface,
-          ).copyWith(fontWeight: FontWeight.w900),
-        ),
-        SizedBox(height: CoreSpacing.md(context)),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: promotions.length,
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: 260,
-            mainAxisExtent: 340,
-            crossAxisSpacing: CoreSpacing.md(context),
-            mainAxisSpacing: CoreSpacing.md(context),
+        if (offers.isNotEmpty) ...[
+          _CashierPromoSectionHeader(title: l10n.homeOffers),
+          SizedBox(height: CoreSpacing.md(context)),
+          WidgetsFoodCatalogGrid(
+            minCardWidth: 220,
+            maxCardWidth: 300,
+            children: [
+              for (var index = 0; index < offers.take(3).length; index++)
+                _CashierOfferCard(
+                  offer: offers[index],
+                  index: index,
+                  isAr: isAr,
+                  onSelected: onOfferSelected,
+                ),
+            ],
           ),
-          itemBuilder: (context, index) {
-            final promotion = promotions[index];
-            return _PromotionCard(
-              promotion: promotion,
-              isAr: isAr,
-              onTap: () => onSelected(promotion),
-            );
-          },
-        ),
+          SizedBox(height: CoreSpacing.xl(context)),
+        ],
+        if (combos.isNotEmpty) ...[
+          _CashierPromoSectionHeader(title: l10n.homeCombos),
+          SizedBox(height: CoreSpacing.md(context)),
+          WidgetsFoodCatalogGrid(
+            minCardWidth: 220,
+            maxCardWidth: 300,
+            children: [
+              for (var index = 0; index < combos.take(3).length; index++)
+                _CashierComboCard(
+                  combo: combos[index],
+                  index: index,
+                  isAr: isAr,
+                  onSelected: onComboSelected,
+                ),
+            ],
+          ),
+          SizedBox(height: CoreSpacing.lg(context)),
+        ],
+        if (offers.isNotEmpty || combos.isNotEmpty)
+          Divider(color: scheme.outline.withValues(alpha: 0.2)),
+        SizedBox(height: CoreSpacing.md(context)),
       ],
     );
   }
 }
 
-class _PromotionCard extends StatelessWidget {
-  const _PromotionCard({
-    required this.promotion,
-    required this.isAr,
-    required this.onTap,
-  });
+class _CashierPromoSectionHeader extends StatelessWidget {
+  const _CashierPromoSectionHeader({required this.title});
 
-  final _CashierPromotion promotion;
-  final bool isAr;
-  final VoidCallback onTap;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
-    return WidgetsAppCard(
-      variant: WidgetsAppCardVariant.food,
-      padding: EdgeInsets.all(CoreSpacing.md(context)),
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          WidgetsFoodMediaPanel(
-            height:
-                CoreContentSizes.categoryMenuImageHeight(
-                  context,
-                ).clamp(104, 132).toDouble(),
-            badge: _FoodTag(
-              label: promotion.sectionLabel,
-              color: promotion.color,
-            ),
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    promotion.color.withValues(alpha: 0.28),
-                    promotion.color.withValues(alpha: 0.08),
-                  ],
-                ),
-              ),
-              child: Center(
-                child: Icon(
-                  promotion.icon,
-                  color: promotion.color,
-                  size: CoreContentSizes.buttonIcon(context) * 1.6,
-                ),
-              ),
-            ),
-          ),
-          SizedBox(height: CoreSpacing.sm(context)),
-          Text(
-            promotion.label,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: CoreTypography.bodyMedium(
-              context,
-              scheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-          SizedBox(height: CoreSpacing.xs(context)),
-          Text(
-            promotion.description,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: CoreTypography.caption(context, scheme.onSurfaceVariant),
-          ),
-          const Spacer(),
-          SizedBox(height: CoreSpacing.sm(context)),
-          Row(
-            children: [
-              Flexible(
-                child: WidgetsPriceBadge(
-                  priceLabel: UtilityFormatJod.format(
-                    promotion.savingsJod,
-                    suffix: l10n.currencyJod,
-                  ),
-                  compact: true,
-                ),
-              ),
-              SizedBox(width: CoreSpacing.sm(context)),
-              Icon(Icons.local_offer_outlined, color: promotion.color),
-            ],
-          ),
-        ],
-      ),
+    return Text(
+      title,
+      style: CoreTypography.headlineSmall(
+        context,
+        scheme.onSurface,
+      ).copyWith(fontWeight: FontWeight.w900),
     );
   }
 }
 
-class _DishButton extends StatelessWidget {
-  const _DishButton({
-    required this.item,
+class _CashierOfferCard extends ConsumerWidget {
+  const _CashierOfferCard({
+    required this.offer,
+    required this.index,
     required this.isAr,
-    required this.onTap,
+    required this.onSelected,
   });
 
-  final ModelMenuItem item;
+  final ModelCatalogOffer offer;
+  final int index;
   final bool isAr;
-  final VoidCallback onTap;
+  final ValueChanged<ModelCatalogOffer> onSelected;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final title = isAr ? offer.titleAr : offer.titleEn;
+    final description =
+        isAr
+            ? (offer.subtitleAr ?? offer.titleAr)
+            : (offer.subtitleEn ?? offer.titleEn);
+    final discount = ref.watch(visibleDiscountsProvider).firstOrNull;
+    final priceLabel =
+        discount != null
+            ? '${discount.percentOff.toStringAsFixed(0)}% OFF'
+            : UtilityFormatJod.format(
+              MockupCatalog.cashierOfferSavingsJod,
+              suffix: l10n.currencyJod,
+            );
+    final points = discount != null ? 20 : 15;
+
+    return WidgetsFoodCatalogCard(
+      title: title,
+      description: description,
+      priceLabel: priceLabel,
+      imageUrl: offer.primaryImageUrl,
+      badgeLabel: l10n.homeOffers,
+      actionLabel: l10n.actionAddToCart,
+      loyaltyLabel: l10n.loyaltyPointsShort('$points'),
+      index: index,
+      actionIcon: Icons.local_offer_outlined,
+      onTap: () => onSelected(offer),
+      onAction: () => onSelected(offer),
+    );
+  }
+}
+
+class _CashierComboCard extends StatelessWidget {
+  const _CashierComboCard({
+    required this.combo,
+    required this.index,
+    required this.isAr,
+    required this.onSelected,
+  });
+
+  final ModelCatalogCombo combo;
+  final int index;
+  final bool isAr;
+  final ValueChanged<ModelCatalogCombo> onSelected;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
-    final color = _categoryColor(context, item.categoryId);
+    final title = isAr ? combo.titleAr : combo.titleEn;
+    final description =
+        isAr
+            ? (combo.subtitleAr ?? combo.titleAr)
+            : (combo.subtitleEn ?? combo.titleEn);
+    final points = (combo.priceJod * 10).round();
 
-    return WidgetsAppCard(
-      variant: WidgetsAppCardVariant.food,
-      padding: EdgeInsets.all(CoreSpacing.md(context)),
-      onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          WidgetsFoodMediaPanel(
-            height:
-                CoreContentSizes.categoryMenuImageHeight(
-                  context,
-                ).clamp(104, 132).toDouble(),
-            badge: _FoodTag(label: item.categoryId, color: color),
-            child: WidgetsMockFoodImage(
-              imageUrl: item.imageUrl,
-              fallback: _DishMedia(
-                color: color,
-                icon: _categoryIcon(item.categoryId),
-              ),
-            ),
-          ),
-          SizedBox(height: CoreSpacing.sm(context)),
-          Text(
-            isAr ? item.nameAr : item.nameEn,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: CoreTypography.bodyMedium(
-              context,
-              scheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-          SizedBox(height: CoreSpacing.xs(context)),
-          Text(
-            isAr ? item.descriptionAr : item.descriptionEn,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: CoreTypography.caption(context, scheme.onSurfaceVariant),
-          ),
-          const Spacer(),
-          SizedBox(height: CoreSpacing.sm(context)),
-          Row(
-            children: [
-              Flexible(
-                child: WidgetsPriceBadge(
-                  priceLabel: UtilityFormatJod.format(
-                    item.priceJod,
-                    suffix: l10n.currencyJod,
-                  ),
-                  compact: true,
-                ),
-              ),
-              SizedBox(width: CoreSpacing.sm(context)),
-              Icon(Icons.add_circle_outline, color: scheme.primary),
-            ],
-          ),
-        ],
+    return WidgetsFoodCatalogCard(
+      title: title,
+      description: description,
+      priceLabel: UtilityFormatJod.format(
+        combo.priceJod,
+        suffix: l10n.currencyJod,
       ),
+      imageUrl: combo.primaryImageUrl,
+      badgeLabel: l10n.homeCombos,
+      actionLabel: l10n.actionAddToCart,
+      loyaltyLabel: l10n.loyaltyPointsShort('$points'),
+      index: index,
+      actionIcon: Icons.fastfood_outlined,
+      onTap: () => onSelected(combo),
+      onAction: () => onSelected(combo),
     );
   }
 }
@@ -1677,11 +1722,11 @@ class _CheckoutTabCard extends StatelessWidget {
             : scheme.onSurfaceVariant;
     return InkWell(
       onTap: enabled ? onTap : null,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color.withValues(alpha: selected ? 0.16 : 0.06),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
           border: Border.all(
             color: color.withValues(alpha: selected ? 0.42 : 0.18),
           ),
@@ -1693,7 +1738,7 @@ class _CheckoutTabCard extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, color: color, size: 32),
+                Icon(icon, color: color, size: UtilitySizer.of(context, 32)),
                 SizedBox(height: CoreSpacing.sm(context)),
                 Text(
                   label,
@@ -1791,20 +1836,25 @@ class _OrderTicketTab extends StatelessWidget {
                   ? SingleChildScrollView(
                     child: _EmptyTicket(message: l10n.cashierOrderEmpty),
                   )
-                  : ListView(
-                    children: [
-                      for (final line in cart) ...[
-                        _TicketLine(
-                          line: line,
-                          isAr: isAr,
-                          onQuantityChanged:
-                              (quantity) => onQuantityChanged(line, quantity),
-                          onModifier: () => onModifier(line),
-                          onRemove: () => onRemoveLine(line),
-                        ),
-                        SizedBox(height: CoreSpacing.sm(context)),
-                      ],
-                    ],
+                  : ListView.builder(
+                    itemCount: cart.length,
+                    itemBuilder: (context, index) {
+                      final line = cart[index];
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          _TicketLine(
+                            line: line,
+                            isAr: isAr,
+                            onQuantityChanged:
+                                (quantity) => onQuantityChanged(line, quantity),
+                            onModifier: () => onModifier(line),
+                            onRemove: () => onRemoveLine(line),
+                          ),
+                          SizedBox(height: CoreSpacing.sm(context)),
+                        ],
+                      );
+                    },
                   ),
         ),
         SizedBox(height: CoreSpacing.md(context)),
@@ -1940,11 +1990,11 @@ class _CashierActionCard extends StatelessWidget {
     final color = enabled ? tone : Theme.of(context).colorScheme.outline;
     final card = InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color.withValues(alpha: enabled ? 0.12 : 0.06),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
           border: Border.all(color: color.withValues(alpha: 0.28)),
         ),
         child: ConstrainedBox(
@@ -2037,8 +2087,11 @@ class _WorkbenchDetailsPane extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-      child: child,
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
+      child: SingleChildScrollView(
+        padding: EdgeInsets.zero,
+        child: child,
+      ),
     );
   }
 }
@@ -2099,7 +2152,7 @@ class _FulfillmentDetailsCard extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.md(context)),
           if (fulfillment == _CashierFulfillment.dineIn)
-            CashierTouchTextField(
+            WidgetsAppTextField(
               label: l10n.cashierTableNumber,
               controller: tableNumberController,
               keyboardType: TextInputType.number,
@@ -2244,7 +2297,7 @@ class _TipDetailsCard extends StatelessWidget {
             ),
           ),
           SizedBox(height: CoreSpacing.md(context)),
-          CashierTouchTextField(
+          WidgetsAppTextField(
             label: l10n.tipCustomAmountJod,
             controller: customTipController,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -2520,7 +2573,7 @@ class _PreparationCountdownButtonState
   }
 }
 
-class _DeliveryDetailsSection extends StatelessWidget {
+class _DeliveryDetailsSection extends ConsumerStatefulWidget {
   const _DeliveryDetailsSection({
     required this.addressController,
     required this.customerPhoneController,
@@ -2540,9 +2593,153 @@ class _DeliveryDetailsSection extends StatelessWidget {
   final TextEditingController deliveryTimeController;
 
   @override
+  ConsumerState<_DeliveryDetailsSection> createState() =>
+      _DeliveryDetailsSectionState();
+}
+
+class _DeliveryDetailsSectionState extends ConsumerState<_DeliveryDetailsSection> {
+  final _searchController = TextEditingController();
+  String? _selectedAddressId;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _applyAddress(ModelSavedAddress address, bool isAr) {
+    setState(() => _selectedAddressId = address.id);
+    widget.addressController.text = address.addressForLocale(isAr);
+    if (address.phone != null && address.phone!.isNotEmpty) {
+      widget.customerPhoneController.text = address.phone!;
+    }
+    if (address.contactName != null && address.contactName!.isNotEmpty) {
+      widget.contactPersonController.text = address.contactName!;
+    }
+    if (address.building != null && address.building!.isNotEmpty) {
+      widget.buildingController.text = address.building!;
+    }
+    if (address.floor != null && address.floor!.isNotEmpty) {
+      widget.floorController.text = address.floor!;
+    }
+    if (address.accessCode != null && address.accessCode!.isNotEmpty) {
+      widget.accessCodeController.text = address.accessCode!;
+    }
+  }
+
+  Future<void> _saveAddress({
+    String? attachPhone,
+    String? attachAccountId,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    final addressLine = widget.addressController.text.trim();
+    if (addressLine.isEmpty) {
+      UtilityMockFeedback.showWarning(context, l10n.cashierEnterAddressFirst);
+      return;
+    }
+    final contact = widget.contactPersonController.text.trim();
+    final label =
+        contact.isNotEmpty ? contact : l10n.cashierDeliveryAddressLabel;
+    try {
+      await ref.read(repositoryAddressProvider).createAddress(
+        ModelCreateAddressRequest(
+          label: label,
+          addressLine: addressLine,
+          contactName: contact.isEmpty ? null : contact,
+          phone:
+              (attachPhone ?? widget.customerPhoneController.text.trim()).isEmpty
+                  ? null
+                  : (attachPhone ?? widget.customerPhoneController.text.trim()),
+          building:
+              widget.buildingController.text.trim().isEmpty
+                  ? null
+                  : widget.buildingController.text.trim(),
+          floor:
+              widget.floorController.text.trim().isEmpty
+                  ? null
+                  : widget.floorController.text.trim(),
+          accessCode:
+              widget.accessCodeController.text.trim().isEmpty
+                  ? null
+                  : widget.accessCodeController.text.trim(),
+          customerAccountId: attachAccountId?.trim(),
+        ),
+      );
+      ref.invalidate(savedAddressesProvider);
+      if (!mounted) return;
+      UtilityDemoActions.complete(
+        context,
+        successMessage: l10n.addressSavedSuccess,
+      );
+    } catch (_) {
+      if (!mounted) return;
+      UtilityMockFeedback.showWarning(context, l10n.addressSaveFailed);
+    }
+  }
+
+  Future<void> _showAttachDialog(AppLocalizations l10n) async {
+    final phone = TextEditingController(
+      text: widget.customerPhoneController.text.trim(),
+    );
+    final account = TextEditingController();
+    await showDialog<void>(
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: Text(l10n.cashierAttachAddressTitle),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                WidgetsAppTextField(
+                  controller: phone,
+                  label: l10n.cashierMobileNumber,
+                  keyboardType: TextInputType.phone,
+                  prefixIcon: Icons.phone_outlined,
+                ),
+                SizedBox(height: CoreSpacing.sm(ctx)),
+                WidgetsAppTextField(
+                  controller: account,
+                  label: l10n.cashierAccountIdOptional,
+                  prefixIcon: Icons.account_circle_outlined,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text(l10n.actionCancel),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  await _saveAddress(
+                    attachPhone: phone.text.trim(),
+                    attachAccountId:
+                        account.text.trim().isEmpty ? null : account.text.trim(),
+                  );
+                },
+                child: Text(l10n.cashierSaveAndAttach),
+              ),
+            ],
+          ),
+    );
+    phone.dispose();
+    account.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
     final scheme = Theme.of(context).colorScheme;
+    final addressesAsync = ref.watch(savedAddressesProvider);
+    final query = _searchController.text;
+    final addresses =
+        addressesAsync.valueOrNull
+            ?.where((a) => a.matchesSearch(query))
+            .toList() ??
+        const <ModelSavedAddress>[];
+
     return WidgetsAppCard(
       variant: WidgetsAppCardVariant.dashboard,
       padding: EdgeInsets.all(CoreSpacing.md(context)),
@@ -2554,7 +2751,7 @@ class _DeliveryDetailsSection extends StatelessWidget {
               DecoratedBox(
                 decoration: BoxDecoration(
                   color: scheme.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+                  borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
                 ),
                 child: Padding(
                   padding: EdgeInsets.all(CoreSpacing.sm(context)),
@@ -2578,96 +2775,184 @@ class _DeliveryDetailsSection extends StatelessWidget {
             ],
           ),
           SizedBox(height: CoreSpacing.md(context)),
+          Text(
+            l10n.cashierSavedAddressesTitle,
+            style: CoreTypography.titleMedium(context, scheme.onSurface).copyWith(
+              fontSize: UtilitySizer.of(context, 14),
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          SizedBox(height: CoreSpacing.xs(context)),
+          WidgetsAppTextField(
+            label: l10n.cashierSearchAddressHint,
+            controller: _searchController,
+            prefixIcon: Icons.search,
+            onChanged: (_) => setState(() {}),
+          ),
+          SizedBox(height: CoreSpacing.sm(context)),
+          if (addressesAsync.isLoading)
+            const Padding(
+              padding: EdgeInsets.all(12),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else if (addresses.isEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: CoreSpacing.sm(context)),
+              child: Text(
+                l10n.cashierNoMatchingAddresses,
+                style: CoreTypography.bodyMedium(
+                  context,
+                  scheme.onSurfaceVariant,
+                ),
+              ),
+            )
+          else
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 180),
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: addresses.length,
+                separatorBuilder: (_, __) => SizedBox(height: CoreSpacing.xs(context)),
+                itemBuilder: (context, index) {
+                  final address = addresses[index];
+                  final selected = _selectedAddressId == address.id;
+                  return Material(
+                    color:
+                        selected
+                            ? scheme.primaryContainer.withValues(alpha: 0.45)
+                            : scheme.surfaceContainerHighest.withValues(alpha: 0.35),
+                    borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
+                      onTap: () => _applyAddress(address, isAr),
+                      child: Padding(
+                        padding: EdgeInsets.all(CoreSpacing.sm(context)),
+                        child: Row(
+                          children: [
+                            Icon(
+                              selected ? Icons.check_circle : Icons.place_outlined,
+                              color: selected ? scheme.primary : scheme.onSurfaceVariant,
+                              size: CoreContentSizes.buttonIcon(context),
+                            ),
+                            SizedBox(width: CoreSpacing.sm(context)),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    address.displayLineForLocale(isAr),
+                                    style: CoreTypography.titleMedium(
+                                      context,
+                                      scheme.onSurface,
+                                    ).copyWith(
+                                      fontSize: UtilitySizer.of(context, 13),
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  SizedBox(height: UtilitySizer.of(context, 2)),
+                                  Text(
+                                    address.addressForLocale(isAr),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: CoreTypography.caption(
+                                      context,
+                                      scheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          SizedBox(height: CoreSpacing.md(context)),
           DecoratedBox(
             decoration: BoxDecoration(
               color: scheme.primaryContainer.withValues(alpha: 0.32),
-              borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+              borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
               border: Border.all(color: scheme.primary.withValues(alpha: 0.22)),
             ),
             child: Padding(
               padding: EdgeInsets.all(CoreSpacing.sm(context)),
-              child: CashierTouchTextField(
+              child: WidgetsAppTextField(
                 label: l10n.cashierAddress,
-                controller: addressController,
+                controller: widget.addressController,
                 prefixIcon: Icons.map_outlined,
                 keyboardType: TextInputType.streetAddress,
               ),
             ),
           ),
           SizedBox(height: CoreSpacing.sm(context)),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final spacing = CoreSpacing.sm(context);
-              final useTwoColumns = constraints.maxWidth >= 420;
-              final slotWidth =
-                  useTwoColumns
-                      ? (constraints.maxWidth - spacing) / 2
-                      : constraints.maxWidth;
-              return Wrap(
-                spacing: spacing,
-                runSpacing: spacing,
-                children: [
-                  _DeliveryFieldSlot(
-                    width: slotWidth,
-                    child: CashierTouchTextField(
-                      label: l10n.fieldPhone,
-                      controller: customerPhoneController,
-                      keyboardType: TextInputType.phone,
-                      textDirection: TextDirection.ltr,
-                      prefixIcon: Icons.phone_outlined,
-                    ),
-                  ),
-                  _DeliveryFieldSlot(
-                    width: slotWidth,
-                    child: CashierTouchTextField(
-                      label: l10n.cashierContactPerson,
-                      controller: contactPersonController,
-                      prefixIcon: Icons.person_outline,
-                      keyboardType: TextInputType.name,
-                    ),
-                  ),
-                  _DeliveryFieldSlot(
-                    width: slotWidth,
-                    child: CashierTouchTextField(
-                      label: l10n.cashierBuildingNumber,
-                      controller: buildingController,
-                      prefixIcon: Icons.apartment_outlined,
-                      keyboardType: TextInputType.number,
-                      textDirection: TextDirection.ltr,
-                    ),
-                  ),
-                  _DeliveryFieldSlot(
-                    width: slotWidth,
-                    child: CashierTouchTextField(
-                      label: l10n.cashierFloorNumber,
-                      controller: floorController,
-                      keyboardType: TextInputType.number,
-                      textDirection: TextDirection.ltr,
-                      prefixIcon: Icons.stairs_outlined,
-                    ),
-                  ),
-                  _DeliveryFieldSlot(
-                    width: slotWidth,
-                    child: CashierTouchTextField(
-                      label: l10n.cashierDoorAccessCode,
-                      controller: accessCodeController,
-                      prefixIcon: Icons.lock_outline,
-                      keyboardType: TextInputType.number,
-                      textDirection: TextDirection.ltr,
-                    ),
-                  ),
-                  _DeliveryFieldSlot(
-                    width: slotWidth,
-                    child: CashierTouchTextField(
-                      label: l10n.cashierDeliveryTimeSchedule,
-                      controller: deliveryTimeController,
-                      prefixIcon: Icons.schedule_outlined,
-                      keyboardType: TextInputType.text,
-                    ),
-                  ),
-                ],
-              );
-            },
+          _DeliveryFieldGrid(
+            spacing: CoreSpacing.sm(context),
+            fields: [
+              WidgetsAppTextField(
+                label: l10n.fieldPhone,
+                controller: widget.customerPhoneController,
+                keyboardType: TextInputType.phone,
+                textDirection: TextDirection.ltr,
+                prefixIcon: Icons.phone_outlined,
+              ),
+              WidgetsAppTextField(
+                label: l10n.cashierContactPerson,
+                controller: widget.contactPersonController,
+                prefixIcon: Icons.person_outline,
+                keyboardType: TextInputType.name,
+              ),
+              WidgetsAppTextField(
+                label: l10n.cashierBuildingNumber,
+                controller: widget.buildingController,
+                prefixIcon: Icons.apartment_outlined,
+                keyboardType: TextInputType.number,
+                textDirection: TextDirection.ltr,
+              ),
+              WidgetsAppTextField(
+                label: l10n.cashierFloorNumber,
+                controller: widget.floorController,
+                keyboardType: TextInputType.number,
+                textDirection: TextDirection.ltr,
+                prefixIcon: Icons.stairs_outlined,
+              ),
+              WidgetsAppTextField(
+                label: l10n.cashierDoorAccessCode,
+                controller: widget.accessCodeController,
+                prefixIcon: Icons.lock_outline,
+                keyboardType: TextInputType.number,
+                textDirection: TextDirection.ltr,
+              ),
+              WidgetsAppTextField(
+                label: l10n.cashierDeliveryTimeSchedule,
+                controller: widget.deliveryTimeController,
+                prefixIcon: Icons.schedule_outlined,
+                keyboardType: TextInputType.text,
+              ),
+            ],
+          ),
+          SizedBox(height: CoreSpacing.md(context)),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              WidgetsAppButton(
+                label: l10n.cashierSaveAddressLabel,
+                icon: Icons.save_outlined,
+                variant: WidgetsAppButtonVariant.outline,
+                fullWidth: true,
+                onPressed: () => _saveAddress(),
+              ),
+              SizedBox(height: CoreSpacing.sm(context)),
+              WidgetsAppButton(
+                label: l10n.cashierAttachToAccountLabel,
+                icon: Icons.link_outlined,
+                variant: WidgetsAppButtonVariant.outline,
+                fullWidth: true,
+                onPressed: () => _showAttachDialog(l10n),
+              ),
+            ],
           ),
         ],
       ),
@@ -2675,15 +2960,51 @@ class _DeliveryDetailsSection extends StatelessWidget {
   }
 }
 
-class _DeliveryFieldSlot extends StatelessWidget {
-  const _DeliveryFieldSlot({required this.child, required this.width});
+class _DeliveryFieldGrid extends StatelessWidget {
+  const _DeliveryFieldGrid({
+    required this.fields,
+    required this.spacing,
+  });
 
-  final Widget child;
-  final double width;
+  final List<Widget> fields;
+  final double spacing;
+
+  static const _minColumnWidth = 280.0;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(width: width, child: child);
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maxWidth = constraints.maxWidth;
+        final useTwoColumns = maxWidth >= _minColumnWidth * 2 + spacing;
+        final rows = <Widget>[];
+
+        for (var index = 0; index < fields.length; index += useTwoColumns ? 2 : 1) {
+          if (index > 0) {
+            rows.add(SizedBox(height: spacing));
+          }
+          if (useTwoColumns && index + 1 < fields.length) {
+            rows.add(
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: fields[index]),
+                  SizedBox(width: spacing),
+                  Expanded(child: fields[index + 1]),
+                ],
+              ),
+            );
+          } else {
+            rows.add(fields[index]);
+          }
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: rows,
+        );
+      },
+    );
   }
 }
 
@@ -2840,7 +3161,7 @@ class _PaymentSplitSection extends StatelessWidget {
                           alpha: 0.12,
                         ),
                         borderRadius: BorderRadius.circular(
-                          CoreSpacing.radiusCard,
+                          CoreSpacing.radiusCardOf(context),
                         ),
                         border: Border.all(
                           color: CoreColors.semanticWarning.withValues(
@@ -2899,7 +3220,7 @@ class _PaymentSplitSection extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: scheme.primaryContainer.withValues(alpha: 0.42),
                         borderRadius: BorderRadius.circular(
-                          CoreSpacing.radiusCard,
+                          CoreSpacing.radiusCardOf(context),
                         ),
                         border: Border.all(
                           color: scheme.primary.withValues(alpha: 0.32),
@@ -2926,7 +3247,7 @@ class _PaymentSplitSection extends StatelessWidget {
                           alpha: 0.45,
                         ),
                         borderRadius: BorderRadius.circular(
-                          CoreSpacing.radiusCard,
+                          CoreSpacing.radiusCardOf(context),
                         ),
                       ),
                       child: Padding(
@@ -3014,7 +3335,7 @@ class _PaymentAmountDisplay extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.32)),
       ),
       child: Padding(
@@ -3038,7 +3359,7 @@ class _PaymentAmountDisplay extends StatelessWidget {
               UtilityFormatJod.format(amount, suffix: l10n.currencyJod),
               textAlign: TextAlign.center,
               style: CoreTypography.headlineLarge(context, color).copyWith(
-                fontSize: 52,
+                fontSize: UtilitySizer.of(context, 52),
                 fontWeight: FontWeight.w900,
                 letterSpacing: -0.5,
               ),
@@ -3067,7 +3388,7 @@ class _MoneyField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final field = CashierTouchTextField(
+    final field = WidgetsAppTextField(
       label: label,
       controller: controller,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -3083,7 +3404,7 @@ class _MoneyField extends StatelessWidget {
       return DecoratedBox(
         decoration: BoxDecoration(
           color: scheme.primaryContainer.withValues(alpha: 0.42),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
           border: Border.all(color: scheme.primary.withValues(alpha: 0.32)),
         ),
         child: Padding(
@@ -3095,7 +3416,7 @@ class _MoneyField extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: scheme.primaryContainer.withValues(alpha: 0.42),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(color: scheme.primary.withValues(alpha: 0.32)),
       ),
       child: Padding(
@@ -3162,37 +3483,39 @@ class _PostponeOrderDialogState extends State<_PostponeOrderDialog> {
       title: Text(l10n.cashierPostponeTitle),
       content: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 420),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              l10n.cashierPostponeReason,
-              style: CoreTypography.bodyMedium(
-                context,
-                Theme.of(context).colorScheme.onSurfaceVariant,
-              ).copyWith(fontWeight: FontWeight.w800),
-            ),
-            SizedBox(height: CoreSpacing.sm(context)),
-            for (final reason in reasons)
-              Padding(
-                padding: EdgeInsets.only(bottom: CoreSpacing.xs(context)),
-                child: RadioListTile<String>(
-                  value: reason.$1,
-                  groupValue: _selectedKey,
-                  onChanged: (value) => setState(() => _selectedKey = value),
-                  title: Text(reason.$2),
-                  contentPadding: EdgeInsets.zero,
-                ),
+            child: RadioGroup<String>(
+              groupValue: _selectedKey,
+              onChanged: (value) => setState(() => _selectedKey = value),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    l10n.cashierPostponeReason,
+                    style: CoreTypography.bodyMedium(
+                      context,
+                      Theme.of(context).colorScheme.onSurfaceVariant,
+                    ).copyWith(fontWeight: FontWeight.w800),
+                  ),
+                  SizedBox(height: CoreSpacing.sm(context)),
+                  for (final reason in reasons)
+                    Padding(
+                      padding: EdgeInsets.only(bottom: CoreSpacing.xs(context)),
+                      child: RadioListTile<String>(
+                        value: reason.$1,
+                        title: Text(reason.$2),
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                    ),
+                  SizedBox(height: CoreSpacing.sm(context)),
+                  WidgetsAppTextField(
+                    label: l10n.cashierPostponeNote,
+                    controller: _noteController,
+                    prefixIcon: Icons.notes_outlined,
+                  ),
+                ],
               ),
-            SizedBox(height: CoreSpacing.sm(context)),
-            WidgetsAppTextField(
-              label: l10n.cashierPostponeNote,
-              controller: _noteController,
-              prefixIcon: Icons.notes_outlined,
             ),
-          ],
-        ),
       ),
       actions: [
         TextButton(
@@ -3256,7 +3579,7 @@ class _CashReturnDialog extends StatelessWidget {
             DecoratedBox(
               decoration: BoxDecoration(
                 color: scheme.primary.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+                borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
                 border: Border.all(
                   color: scheme.primary.withValues(alpha: 0.28),
                 ),
@@ -3378,11 +3701,11 @@ class _FulfillmentOptionCard extends StatelessWidget {
     final effectiveColor = selected ? color : scheme.onSurfaceVariant;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: effectiveColor.withValues(alpha: selected ? 0.16 : 0.08),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
           border: Border.all(
             color: effectiveColor.withValues(alpha: selected ? 0.42 : 0.20),
           ),
@@ -3446,7 +3769,7 @@ class _TicketLine extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: scheme.surfaceContainerHighest.withValues(alpha: 0.55),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(color: scheme.outlineVariant),
       ),
       child: Padding(
@@ -3565,106 +3888,6 @@ class _SummaryLine extends StatelessWidget {
         ],
       ),
     );
-  }
-}
-
-class _FoodTag extends StatelessWidget {
-  const _FoodTag({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Text(
-          label,
-          style: CoreTypography.caption(
-            context,
-            scheme.onSurface,
-          ).copyWith(fontWeight: FontWeight.w800),
-        ),
-      ),
-    );
-  }
-}
-
-class _DishMedia extends StatelessWidget {
-  const _DishMedia({required this.color, required this.icon});
-
-  final Color color;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        CustomPaint(
-          painter: _DishPainter(color: color, accent: CoreColors.brandGold),
-        ),
-        Center(
-          child: Icon(
-            icon,
-            color: color,
-            size: CoreContentSizes.categoryMenuImageIcon(context),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _DishPainter extends CustomPainter {
-  const _DishPainter({required this.color, required this.accent});
-
-  final Color color;
-  final Color accent;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final plate = Paint()..color = color.withValues(alpha: 0.12);
-    final rim =
-        Paint()
-          ..color = color.withValues(alpha: 0.25)
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.2;
-    final garnish = Paint()..color = accent.withValues(alpha: 0.34);
-    final center = Offset(size.width * 0.5, size.height * 0.56);
-    final radius = size.shortestSide * 0.30;
-    canvas.drawCircle(center, radius, plate);
-    canvas.drawCircle(center, radius, rim);
-    canvas.drawCircle(
-      Offset(size.width * 0.36, size.height * 0.42),
-      radius * 0.15,
-      garnish,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.62, size.height * 0.43),
-      radius * 0.13,
-      garnish,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.52, size.height * 0.68),
-      radius * 0.15,
-      garnish,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant _DishPainter oldDelegate) {
-    return oldDelegate.color != color || oldDelegate.accent != accent;
   }
 }
 
@@ -3807,77 +4030,17 @@ enum _CashierFulfillment {
   }
 }
 
-class _CashierPromotion {
-  const _CashierPromotion({
-    required this.label,
-    required this.description,
-    required this.sectionLabel,
-    required this.icon,
-    required this.color,
-    required this.savingsJod,
-  });
-
-  final String label;
-  final String description;
-  final String sectionLabel;
-  final IconData icon;
-  final Color color;
-  final double savingsJod;
-
-  static List<_CashierPromotion> available(BuildContext context) {
-    final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    final l10n = AppLocalizations.of(context)!;
-    return [
-      if (MockupCatalog.offers.isNotEmpty)
-        _CashierPromotion(
-          label:
-              isAr
-                  ? MockupCatalog.offers.first.titleAr
-                  : MockupCatalog.offers.first.titleEn,
-          description:
-              isAr
-                  ? (MockupCatalog.offers.first.subtitleAr ?? '')
-                  : (MockupCatalog.offers.first.subtitleEn ?? ''),
-          sectionLabel: l10n.cashierPromotionOffers,
-          icon: Icons.local_offer_outlined,
-          color: CoreColors.semanticRevenue,
-          savingsJod: MockupCatalog.cashierOfferSavingsJod,
-        ),
-      if (MockupCatalog.comboHighlights.isNotEmpty)
-        _CashierPromotion(
-          label:
-              isAr
-                  ? MockupCatalog.comboHighlights.first.titleAr
-                  : MockupCatalog.comboHighlights.first.titleEn,
-          description:
-              isAr
-                  ? (MockupCatalog.comboHighlights.first.subtitleAr ?? '')
-                  : (MockupCatalog.comboHighlights.first.subtitleEn ?? ''),
-          sectionLabel: l10n.cashierPromotionCombos,
-          icon: Icons.fastfood_outlined,
-          color: CoreColors.brandOrange,
-          savingsJod: MockupCatalog.cashierComboSavingsJod,
-        ),
-      if (MockupCatalog.discountedMenuItemIds.isNotEmpty)
-        _CashierPromotion(
-          label: l10n.cashierPromotionDiscounts,
-          description: l10n.cashierPromotionSavings,
-          sectionLabel: l10n.cashierPromotionDiscounts,
-          icon: Icons.percent_outlined,
-          color: CoreColors.brandGold,
-          savingsJod: MockupCatalog.checkoutPromoSavingsJod,
-        ),
-      if (MockupCatalog.subscriptionMenuItemIds.isNotEmpty)
-        _CashierPromotion(
-          label: l10n.cashierPromotionSubscriptions,
-          description: l10n.cashierPromotionSubscriptions,
-          sectionLabel: l10n.cashierPromotionSubscriptions,
-          icon: Icons.calendar_month_outlined,
-          color: CoreColors.brandOlive,
-          savingsJod: MockupCatalog.cashierSubscriptionSavingsJod,
-        ),
-    ];
+String _categoryLabel(
+  List<ModelMenuCategory> categories,
+  String categoryId,
+  bool isAr,
+) {
+  for (final category in categories) {
+    if (category.id == categoryId) {
+      return isAr ? category.nameAr : category.nameEn;
+    }
   }
+  return categoryId;
 }
 
 IconData _categoryIcon(String key) {
@@ -3894,18 +4057,6 @@ IconData _categoryIcon(String key) {
     'burgers' => Icons.lunch_dining,
     'shawarma' => Icons.kebab_dining_outlined,
     _ => Icons.restaurant_menu_outlined,
-  };
-}
-
-Color _categoryColor(BuildContext context, String categoryId) {
-  final scheme = Theme.of(context).colorScheme;
-  return switch (categoryId) {
-    'drinks' => CoreColors.orderTypeDelivery,
-    'hummus_ful' || 'falafel' || 'manaqeesh' || 'pastries' => scheme.secondary,
-    'pizza' => CoreColors.brandGold,
-    'shawarma' => CoreColors.brandOrange,
-    'burgers' => CoreColors.semanticRevenue,
-    _ => scheme.primary,
   };
 }
 

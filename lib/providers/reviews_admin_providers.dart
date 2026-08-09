@@ -34,15 +34,18 @@ class ProductReviewRecord {
   ProductReviewRecord copyWith({
     ReviewModerationStatus? status,
     String? adminNote,
+    int? rating,
+    String? commentEn,
+    String? commentAr,
   }) {
     return ProductReviewRecord(
       id: id,
       productNameEn: productNameEn,
       productNameAr: productNameAr,
       customerName: customerName,
-      rating: rating,
-      commentEn: commentEn,
-      commentAr: commentAr,
+      rating: rating ?? this.rating,
+      commentEn: commentEn ?? this.commentEn,
+      commentAr: commentAr ?? this.commentAr,
       status: status ?? this.status,
       submittedAt: submittedAt,
       orderId: orderId,
@@ -122,6 +125,29 @@ class ReviewsModerationNotifier extends StateNotifier<ReviewsModerationState> {
     final updated = state.reviews[index].copyWith(
       status: status,
       adminNote: note,
+    );
+    final next = [...state.reviews]..[index] = updated;
+    state = state.copyWith(reviews: next);
+    return true;
+  }
+
+  bool updateReview({
+    required String id,
+    int? rating,
+    String? commentEn,
+    String? commentAr,
+    String? adminNote,
+  }) {
+    final index = state.reviews.indexWhere((r) => r.id == id);
+    if (index == -1) return false;
+    final current = state.reviews[index];
+    final nextRating = rating ?? current.rating;
+    if (nextRating < 1 || nextRating > 5) return false;
+    final updated = current.copyWith(
+      rating: nextRating,
+      commentEn: commentEn,
+      commentAr: commentAr,
+      adminNote: adminNote,
     );
     final next = [...state.reviews]..[index] = updated;
     state = state.copyWith(reviews: next);

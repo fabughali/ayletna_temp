@@ -1,0 +1,63 @@
+# Stitch-led redesign v2 (Ayletna)
+
+## Authority order
+
+1. **`docs/prdv1.md`** — product: routes, roles, flows, fields, acceptance
+2. **`color_list_chat_gpt.txt`** + **`DESIGN.md`** — visual tokens for Stitch
+3. **`docs/development_rules.md`** — Flutter implementation (widgets, Riverpod, ARB, drawer nav, sizer, cycle PASS)
+4. **Google Stitch** — visual source of truth for mockups (English UI only)
+5. **`docs/user_roles_permissions_matrix.md`** — RBAC when touching permissions
+
+## Stitch rules
+
+- **New project only** — do not use legacy project `11783570360337788529`
+- **English UI only** in every Stitch prompt: no Arabic text, no bilingual mockups, no RTL in designs
+- **Do not** paste existing Dart file lists into Stitch as the screen catalog — let PRD analysis drive discovery
+- **Small batches** (≈3–5 generations per session) to avoid API timeout (~300s per call)
+- **On timeout:** retry same row; never skip; never mark complete without visual match
+- **One Stitch job at a time** (file-locked registry writes)
+
+## Surface coverage
+
+| Surface | Stitch |
+|---|-----|
+| Main route screen | 1 frame (tab 1 if tabs) |
+| Additional tabs | Separate Stitch row per tab |
+| Bottom sheets, dialogs, major cards | Separate Stitch rows |
+
+## Redesign discipline (critical)
+
+**~90% of the app already exists.** Stitch work is a **visual refresh inside the current codebase**, not a rewrite.
+
+| Rule | Meaning |
+|---|---|
+| **≤25% deviation** | Keep existing layout, flows, providers, and widget structure. Adjust spacing, hierarchy, tokens, and composition — do **not** replace a screen 100% because Stitch looks different. |
+| **Stitch-first** | Prefer Stitch layout/hierarchy when implementing a row — **unless** current Flutter + PRD is more accurate (fields, steps, roles, checkout logic). |
+| **Stitch is not infallible** | Override Stitch when it conflicts with PRD or `docs/development_rules.md` (e.g. auth: no app bar/drawer/avatar; drawer-only nav; stepped checkout default). |
+| **Widgets first** | Change shared `Widgets*` / `CoreColors` before adding files. No `widgets_auth_*` or `widgets_customer_*` shells — generic names only. |
+| **No parallel design systems** | One brand for all roles. Role affects **data and routes**, not separate UI kits. |
+
+**Decision check before editing a screen:** (1) Does PRD require what exists? → keep behavior. (2) Does Stitch improve hierarchy within ~25%? → apply via shared widgets. (3) Does Stitch break PRD or chrome rules? → ignore that part of Stitch.
+
+## Flutter rules
+
+- Edit **existing** route files in place unless PRD says **NEW** or **DELETE** (DELETE needs user OK)
+- **All screens use `WidgetsScaffoldPage`** — no raw `Scaffold`
+- **Pre-auth routes:** `showAppBar: false`, `showDrawer: false` — no app bar, drawer, or profile avatar (Stitch may show these; **ignore on auth**)
+- **All branding via `lib/widgets/`** — generic names only; reuse existing widgets before adding new ones
+- **EN + AR** in `app_en.arb` / `app_ar.arb` — never hardcode UI strings in screens
+- **`CoreColors` / `CoreTypography` / `UtilitySizer`** — no raw hex or literal fontSize in screens
+- Compare Stitch screenshot vs implementation **yourself** (no Playwright requirement)
+
+## Per-row workflow
+
+1. Stitch generate (EN) → record IDs/screenshots as needed
+2. Implement Flutter to match Stitch + PRD (`docs/development_rules.md`)
+3. Unify divergent Stitch chrome into shared widgets
+4. Agent visual compare
+5. Mark complete only when visual + product checklist passes
+
+## Deprecated
+
+- Historical Stitch batch trackers and 97-screen capped audits — removed after UI mock completion
+- Bulk `flutter_complete` without visual pass — do not use

@@ -1,4 +1,5 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
@@ -7,6 +8,8 @@ import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_filter_chip.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
@@ -45,12 +48,26 @@ class _WidgetsAdminGrowthHubState extends ConsumerState<WidgetsAdminGrowthHub> {
       title: _screenTitle(l10n),
       actions: [
         WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.adminSettings),
+          onPressed: () => context.push(
+            switch (_section) {
+              WidgetsAdminGrowthHubSection.staff => AppRoutePaths.operatorStaffHours,
+              WidgetsAdminGrowthHubSection.privacy => AppRoutePaths.appAdminOwnerConfig,
+              WidgetsAdminGrowthHubSection.loyalty => AppRoutePaths.marketingLoyalty,
+              WidgetsAdminGrowthHubSection.offers => AppRoutePaths.marketingOffers,
+            },
+          ),
           icon: Icons.settings_outlined,
           tooltip: l10n.screenSettings,
         ),
         WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.adminReports),
+          onPressed: () => context.push(
+            switch (_section) {
+              WidgetsAdminGrowthHubSection.staff => AppRoutePaths.operatorReports,
+              WidgetsAdminGrowthHubSection.privacy => AppRoutePaths.ownerHub,
+              WidgetsAdminGrowthHubSection.loyalty => AppRoutePaths.marketingHub,
+              WidgetsAdminGrowthHubSection.offers => AppRoutePaths.marketingHub,
+            },
+          ),
           icon: Icons.assessment_outlined,
           tooltip: l10n.screenReports,
         ),
@@ -121,7 +138,13 @@ class _WidgetsAdminGrowthHubState extends ConsumerState<WidgetsAdminGrowthHub> {
       WidgetsAdminGrowthHubSection.loyalty => _LoyaltyPanel(
         doublePoints: _doublePoints,
         birthdayDessert: _birthdayDessert,
-        onDoublePoints: (value) => setState(() => _doublePoints = value),
+        onDoublePoints: (value) {
+          setState(() => _doublePoints = value);
+          final current = ref.read(adminGrowthConfigProvider);
+          ref
+              .read(adminGrowthConfigProvider.notifier)
+              .update(current.copyWith(doublePoints: value));
+        },
         onBirthdayDessert: (value) => setState(() => _birthdayDessert = value),
       ),
       WidgetsAdminGrowthHubSection.offers => _OffersPanel(
@@ -174,7 +197,7 @@ class _HubHero extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(CoreSpacing.lg(context)),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         gradient: const LinearGradient(
           colors: [CoreColors.brandOlive, CoreColors.brandBrown],
           begin: AlignmentDirectional.topStart,
@@ -184,7 +207,7 @@ class _HubHero extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SoftBadge(
+          WidgetsSoftBadge(
             label: l10n.adminGrowthHubBadge,
             color: CoreColors.surfaceLight,
             foreground: CoreColors.brandBrown,
@@ -265,7 +288,7 @@ class _StaffHoursPanel extends StatelessWidget {
     return WidgetsAppCard(
       title: l10n.adminGrowthStaffTitle,
       subtitle: l10n.adminGrowthStaffSubtitle,
-      leading: const _IconBubble(
+      leading: WidgetsIconBubble(
         icon: Icons.groups_2_outlined,
         color: CoreColors.semanticTip,
       ),
@@ -324,7 +347,7 @@ class _PrivacyPanel extends StatelessWidget {
     return WidgetsAppCard(
       title: l10n.screenOwnerViewConfig,
       subtitle: l10n.adminGrowthPrivacySubtitle,
-      leading: const _IconBubble(
+      leading: WidgetsIconBubble(
         icon: Icons.privacy_tip_outlined,
         color: CoreColors.semanticDeposit,
       ),
@@ -377,7 +400,7 @@ class _LoyaltyPanel extends StatelessWidget {
     return WidgetsAppCard(
       title: l10n.screenLoyaltyConfig,
       subtitle: l10n.adminGrowthLoyaltySubtitle,
-      leading: const _IconBubble(
+      leading: WidgetsIconBubble(
         icon: Icons.workspace_premium_outlined,
         color: CoreColors.brandOrange,
       ),
@@ -430,7 +453,7 @@ class _OffersPanel extends StatelessWidget {
     return WidgetsAppCard(
       title: l10n.screenOffersManagement,
       subtitle: l10n.adminGrowthOffersSubtitle,
-      leading: const _IconBubble(
+      leading: WidgetsIconBubble(
         icon: Icons.local_offer_outlined,
         color: CoreColors.semanticRevenue,
       ),
@@ -502,7 +525,7 @@ class _DecisionCard extends StatelessWidget {
     return WidgetsAppCard(
       title: l10n.adminGrowthSuggestedDecision,
       subtitle: decision,
-      leading: const _IconBubble(
+      leading: WidgetsIconBubble(
         icon: Icons.lightbulb_outline,
         color: CoreColors.brandGold,
       ),
@@ -526,7 +549,7 @@ class _ActionCard extends StatelessWidget {
     return WidgetsAppCard(
       title: l10n.adminGrowthActionsTitle,
       subtitle: l10n.adminGrowthActionsSubtitle,
-      leading: const _IconBubble(
+      leading: WidgetsIconBubble(
         icon: Icons.admin_panel_settings_outlined,
         color: CoreColors.brandOlive,
       ),
@@ -541,7 +564,7 @@ class _ActionCard extends StatelessWidget {
           SizedBox(height: CoreSpacing.sm(context)),
           WidgetsAppButton(
             label: l10n.adminGrowthOpenAuditLog,
-            onPressed: () => context.push(AppRoutePaths.adminAudit),
+            onPressed: () => context.push(AppRoutePaths.appAdminAudit),
             icon: Icons.fact_check_outlined,
             variant: WidgetsAppButtonVariant.outline,
           ),
@@ -571,14 +594,15 @@ class _DataRow extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Row(
         children: [
-          _IconBubble(
+          WidgetsIconBubble(
             icon: Icons.insights_outlined,
             color: color,
-            compact: true,
+            size: UtilitySizer.of(context, 36),
+            iconSize: CoreContentSizes.orderTypeIcon(context),
           ),
           SizedBox(width: CoreSpacing.sm(context)),
           Expanded(
@@ -603,7 +627,7 @@ class _DataRow extends StatelessWidget {
             ),
           ),
           SizedBox(width: CoreSpacing.sm(context)),
-          _SoftBadge(label: value, color: color),
+          WidgetsSoftBadge(label: value, color: color),
         ],
       ),
     );
@@ -632,7 +656,7 @@ class _SwitchRow extends StatelessWidget {
         color: Theme.of(
           context,
         ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.36),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Row(
         children: [
@@ -677,7 +701,7 @@ class _PreviewStrip extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: CoreColors.brandOlive.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Row(
         children: [
@@ -717,11 +741,11 @@ class _HeroMetric extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 172,
+      width: UtilitySizer.of(context, 172),
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: CoreColors.surfaceLight.withValues(alpha: 0.16),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(
           color: CoreColors.surfaceLight.withValues(alpha: 0.30),
         ),
@@ -761,57 +785,5 @@ class _HeroMetric extends StatelessWidget {
   }
 }
 
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({
-    required this.icon,
-    required this.color,
-    this.compact = false,
-  });
 
-  final IconData icon;
-  final Color color;
-  final bool compact;
 
-  @override
-  Widget build(BuildContext context) {
-    final size = compact ? 36.0 : 42.0;
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-      ),
-      child: Icon(icon, color: color, size: compact ? 18 : 22),
-    );
-  }
-}
-
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({required this.label, required this.color, this.foreground});
-
-  final String label;
-  final Color color;
-  final Color? foreground;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.sm(context),
-        vertical: CoreSpacing.xs(context),
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: foreground == null ? 0.12 : 1),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-      ),
-      child: Text(
-        label,
-        style: CoreTypography.caption(
-          context,
-          foreground ?? color,
-        ).copyWith(fontWeight: FontWeight.w900),
-      ),
-    );
-  }
-}

@@ -40,7 +40,7 @@ abstract final class UtilityMockFeedback {
           backgroundColor: scheme.surface,
           surfaceTintColor: scheme.surfaceTint,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+            borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
           ),
           icon: Icon(icon, color: scheme.primary),
           title: Text(
