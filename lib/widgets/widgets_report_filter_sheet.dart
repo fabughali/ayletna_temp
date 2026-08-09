@@ -113,13 +113,22 @@ class _WidgetsReportFilterSheetState
                   label: _moduleLabel(module, l10n),
                   selected: selected,
                   onSelected:
-                      (_) => setState(() {
-                        if (selected && _modules.length > 1) {
-                          _modules.remove(module);
-                        } else {
-                          _modules.add(module);
+                      (_) {
+                        if (selected && _modules.length <= 1) {
+                          UtilityMockFeedback.showWarning(
+                            context,
+                            l10n.reportFilterAtLeastOneModule,
+                          );
+                          return;
                         }
-                      }),
+                        setState(() {
+                          if (selected) {
+                            _modules.remove(module);
+                          } else {
+                            _modules.add(module);
+                          }
+                        });
+                      },
                 );
               }).toList(),
         ),
@@ -185,6 +194,10 @@ class _WidgetsReportFilterSheetState
 
   void _apply(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    if (_modules.isEmpty) {
+      UtilityMockFeedback.showWarning(context, l10n.reportFilterAtLeastOneModule);
+      return;
+    }
     ref.read(adminReportFilterProvider.notifier).apply(
       period: _period.name,
       channel: _channel.name,
@@ -262,7 +275,7 @@ class _FilterSummary extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: CoreColors.brandOlive.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(
           color: CoreColors.brandOlive.withValues(alpha: 0.18),
         ),

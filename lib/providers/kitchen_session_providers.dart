@@ -12,6 +12,7 @@ class KitchenBoardState {
     required this.readyOrders,
     required this.delayedOrders,
     this.issueReported = false,
+    this.prepStartedAt,
   });
 
   final String? activePrepOrderId;
@@ -19,8 +20,38 @@ class KitchenBoardState {
   final List<ModelKitchenReadyOrder> readyOrders;
   final List<ModelKitchenReadyOrder> delayedOrders;
   final bool issueReported;
+  final DateTime? prepStartedAt;
 
   int get preparingCount => activePrepOrderId != null ? 1 : 0;
+
+  Duration get elapsedPrepTime {
+    if (prepStartedAt == null) return Duration.zero;
+    return DateTime.now().difference(prepStartedAt!);
+  }
+
+  String get formattedElapsedTime {
+    final d = elapsedPrepTime;
+    final minutes = d.inMinutes.remainder(60);
+    final seconds = d.inSeconds.remainder(60);
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  /// Parse "mm:ss" strings from [ModelKitchenReadyOrder.readyTime] and compute average.
+  String get averageReadyTimeLabel {
+    final orders = [...readyOrders, ...delayedOrders];
+    if (orders.isEmpty) return '0:00';
+    final totalSeconds = orders.fold<int>(0, (sum, order) {
+      final parts = order.readyTime.split(':');
+      if (parts.length != 2) return sum;
+      final mins = int.tryParse(parts[0]) ?? 0;
+      final secs = int.tryParse(parts[1]) ?? 0;
+      return sum + mins * 60 + secs;
+    });
+    final avgSeconds = totalSeconds ~/ orders.length;
+    final avgMins = avgSeconds ~/ 60;
+    final avgSecs = avgSeconds.remainder(60);
+    return '$avgMins:${avgSecs.toString().padLeft(2, '0')}';
+  }
 
   List<ModelKitchenPrepItem> get prepItems => MockupCatalog.kitchenPrepItems;
 
@@ -34,7 +65,9 @@ class KitchenBoardState {
     List<ModelKitchenReadyOrder>? readyOrders,
     List<ModelKitchenReadyOrder>? delayedOrders,
     bool? issueReported,
+    DateTime? prepStartedAt,
     bool clearPrep = false,
+    bool clearPrepStartedAt = false,
   }) {
     return KitchenBoardState(
       activePrepOrderId:
@@ -43,6 +76,7 @@ class KitchenBoardState {
       readyOrders: readyOrders ?? this.readyOrders,
       delayedOrders: delayedOrders ?? this.delayedOrders,
       issueReported: issueReported ?? this.issueReported,
+      prepStartedAt: clearPrepStartedAt ? null : (prepStartedAt ?? this.prepStartedAt),
     );
   }
 
@@ -51,6 +85,7 @@ class KitchenBoardState {
     return KitchenBoardState(
       activePrepOrderId: '1086',
       checkedPrepIndexes: const {0, 1},
+      prepStartedAt: DateTime.now().subtract(const Duration(minutes: 12, seconds: 49)),
       readyOrders: catalog.where((order) => !order.isDelayed).toList(),
       delayedOrders: catalog.where((order) => order.isDelayed).toList(),
     );
@@ -92,21 +127,14 @@ class KitchenBoardNotifier extends StateNotifier<KitchenBoardState> {
       actionIcon: Icons.room_service_outlined,
       isDelayed: state.issueReported,
       noteAr: state.issueReported ? 'تم الإبلاغ عن مشكلة أثناء التحضير.' : null,
-      noteEn:
-          state.issueReported ? 'Issue reported during prep.' : null,
+      noteEn: state.issueReported ? 'Issue reported during prep.' : null,
       itemsAr: [
         for (final item in items)
-          ModelKitchenReadyItem(
-            quantity: item.quantity,
-            name: item.nameAr,
-          ),
+          ModelKitchenReadyItem(quantity: item.quantity, name: item.nameAr),
       ],
       itemsEn: [
         for (final item in items)
-          ModelKitchenReadyItem(
-            quantity: item.quantity,
-            name: item.nameEn,
-          ),
+          ModelKitchenReadyItem(quantity: item.quantity, name: item.nameEn),
       ],
     );
 
@@ -135,6 +163,46 @@ class KitchenBoardNotifier extends StateNotifier<KitchenBoardState> {
       delayedOrders:
           state.delayedOrders.where((order) => order.id != orderId).toList(),
     );
+  }
+
+  /// Cashier POS handoff — ticket appears on kitchen board immediately.
+  void receiveCashierTicket({
+    required String orderId,
+    required String destinationEn,
+    required String destinationAr,
+    required List<ModelKitchenReadyItem> itemsEn,
+    required List<ModelKitchenReadyItem> itemsAr,
+    required String typeKey,
+  }) {
+    final ticket = ModelKitchenReadyOrder(
+      id: orderId,
+      destinationAr: destinationAr,
+      destinationEn: destinationEn,
+      badgeAr: 'كاشير',
+      badgeEn: 'POS',
+      typeKey: typeKey,
+      readyTime: '00:00',
+      actionLabelAr: 'ابدأ التحضير',
+      actionLabelEn: 'Start prep',
+      actionIcon: Icons.soup_kitchen_outlined,
+      itemsAr: itemsAr,
+      itemsEn: itemsEn,
+      noteAr: 'وارد من نقطة البيع',
+      noteEn: 'Received from cashier POS',
+    );
+
+    // Always surface on the ready board so kitchen can see the handoff.
+    if (state.activePrepOrderId == null) {
+      state = state.copyWith(
+        activePrepOrderId: orderId,
+        checkedPrepIndexes: const {},
+        prepStartedAt: DateTime.now(),
+        readyOrders: [ticket, ...state.readyOrders],
+      );
+      return;
+    }
+
+    state = state.copyWith(readyOrders: [ticket, ...state.readyOrders]);
   }
 }
 

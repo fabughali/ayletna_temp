@@ -1,0 +1,638 @@
+{
+  "projectId": "13887639108194892922",
+  "maxPerBatch": 6,
+  "batches": [
+    {
+      "id": "auth-1",
+      "prdSection": "7.1",
+      "title": "Authentication (1/2)",
+      "screens": [
+        {
+          "route": "/",
+          "prompt": "SplashScreen for Ayletna restaurant app route splash. Brand hero logo warm cream and gold. Auto-continue feel. Premium Levantine restaurant."
+        },
+        {
+          "route": "/language",
+          "prompt": "LanguageSelectionScreen gateway. English and Arabic language cards with labels in English only on mockup. Continue button. First-run experience."
+        },
+        {
+          "route": "/login",
+          "prompt": "LoginScreen with phone/email field, password, sign in CTA, link to register and forgot password. Demo role chips for staff testing optional row."
+        },
+        {
+          "route": "/otp",
+          "prompt": "OTPVerificationScreen. Six digit code input boxes, resend timer, verify button, support link."
+        },
+        {
+          "route": "/register",
+          "prompt": "RegisterScreen. Customer vs staff registration type selector. Name phone email password fields. Create account CTA."
+        },
+        {
+          "route": "/forgot-password",
+          "prompt": "ForgotPasswordScreen. Identifier recovery phone or email, send reset link button, back to login."
+        }
+      ]
+    },
+    {
+      "id": "auth-2",
+      "prdSection": "7.1",
+      "title": "Authentication (2/2) + account",
+      "screens": [
+        {
+          "route": "/role-selection",
+          "prompt": "RoleSelectionScreen. Approved role portal cards: App Admin, Operator, Owner, Support, Marketing, Customer. Each card hub accent color icon title metric."
+        },
+        {
+          "route": "/pending-approval",
+          "prompt": "PendingApprovalScreen staff waiting state. Status timeline submitted review activated. Contact support CTA."
+        },
+        {
+          "route": "/account-settings",
+          "prompt": "UserPersonalSettingsScreen shared all roles. Profile summary language theme notifications role switcher sign out."
+        }
+      ]
+    },
+    {
+      "id": "customer-1",
+      "prdSection": "7.2",
+      "title": "Customer storefront (1/6)",
+      "screens": [
+        {
+          "route": "/home",
+          "prompt": "CustomerHomeScreen storefront. Hero banner, category circles, loyalty strip, search entry, featured offers. Premium Levantine restaurant app."
+        },
+        {
+          "route": "/search",
+          "prompt": "CustomerSearchScreen menu search with query field, recent searches, results list with food thumbnails."
+        },
+        {
+          "route": "/category",
+          "prompt": "CustomerCategoryScreen grid of menu items in one category with filters chips and add-to-cart affordance."
+        },
+        {
+          "route": "/product-detail",
+          "prompt": "CustomerProductDetailScreen hero image, title price, customization options, quantity stepper, add to cart CTA."
+        },
+        {
+          "route": "/cart",
+          "prompt": "CustomerCartScreen line items, subtotal, promo code field, proceed to checkout button."
+        },
+        {
+          "route": "/checkout",
+          "prompt": "CustomerCheckoutScreen order type selector dine-in takeaway delivery, address summary, payment method, place order CTA."
+        }
+      ]
+    },
+    {
+      "id": "customer-2",
+      "prdSection": "7.2",
+      "title": "Customer ordering (2/6)",
+      "screens": [
+        {
+          "route": "/order-confirmation",
+          "prompt": "OrderConfirmationScreen success state with order reference, invoice summary lines food tip deposit, continue CTA."
+        },
+        {
+          "route": "/order-tracking",
+          "prompt": "OrderTrackingScreen live map style status timeline driver ETA order items summary."
+        },
+        {
+          "route": "/loyalty",
+          "prompt": "LoyaltyScreen points balance tier progress earn and redeem entry cards."
+        },
+        {
+          "route": "/profile",
+          "prompt": "CustomerProfileScreen avatar name contact shortcuts to orders addresses rewards settings."
+        },
+        {
+          "route": "/addresses",
+          "prompt": "AddressesScreen saved delivery addresses list add new address map picker entry."
+        },
+        {
+          "route": "/order-history",
+          "prompt": "OrderHistoryScreen past orders list reorder CTA status chips date amount."
+        }
+      ]
+    },
+    {
+      "id": "customer-3",
+      "prdSection": "7.2",
+      "title": "Customer engagement (3/6)",
+      "screens": [
+        {
+          "route": "/rewards",
+          "prompt": "RewardsCatalogScreen points balance hero search category chips reward tiles redeem CTA."
+        },
+        {
+          "route": "/notifications",
+          "prompt": "NotificationsScreen category filters clear all recent alerts list order delivery sustainability cards."
+        },
+        {
+          "route": "/support",
+          "prompt": "SupportScreen help hero live chat call whatsapp FAQ ticket form recent tickets list."
+        },
+        {
+          "route": "/offers",
+          "prompt": "OffersScreen featured deal hero offer cards combo builder invite limited time badges."
+        },
+        {
+          "route": "/product-reviews",
+          "prompt": "ProductReviewsScreen approved reviews list star ratings reviewer names food item context."
+        },
+        {
+          "route": "/rating-review",
+          "prompt": "RatingReviewScreen post delivery star rating focus chips kitchen delivery comment submit CTA."
+        }
+      ]
+    },
+    {
+      "id": "customer-4",
+      "prdSection": "7.2",
+      "title": "Customer account & checkout (4/6)",
+      "screens": [
+        {
+          "route": "/payment",
+          "flutterFile": "lib/screens/customer/customer_checkout_payment_screen.dart",
+          "prompt": "CheckoutPaymentScreen stepped checkout step 3. Payment method cards cash card wallet, tip selector chips, order total summary, place order CTA."
+        },
+        {
+          "route": "/redemption",
+          "flutterFile": "lib/screens/customer/customer_redemption_confirm_screen.dart",
+          "prompt": "RedemptionConfirmScreen reward food hero stamp balance summary redeem to basket CTA insufficient points state."
+        },
+        {
+          "route": "/edit-profile",
+          "flutterFile": "lib/screens/customer/customer_edit_profile_screen.dart",
+          "prompt": "EditProfileScreen avatar upload name email phone fields save changes CTA account form card."
+        },
+        {
+          "route": "/map-picker",
+          "flutterFile": "lib/screens/customer/customer_map_picker_screen.dart",
+          "prompt": "MapPickerScreen delivery address map preview pin drag search field address label save address CTA."
+        },
+        {
+          "route": "/plated-return-reminder",
+          "flutterFile": "lib/screens/customer/customer_plated_return_reminder_screen.dart",
+          "prompt": "PlatedReturnReminderScreen deposit return countdown hero schedule pickup self return CTAs refundable deposit card."
+        },
+        {
+          "route": "/discounts",
+          "flutterFile": "lib/screens/customer/customer_discounts_screen.dart",
+          "prompt": "DiscountsScreen discounted menu items hero savings badge food cards add to cart price strike-through."
+        }
+      ]
+    },
+    {
+      "id": "customer-5",
+      "prdSection": "7.2",
+      "title": "Customer support & history (5/6)",
+      "screens": [
+        {
+          "route": "/combo",
+          "flutterFile": "lib/screens/customer/customer_combo_builder_screen.dart",
+          "prompt": "ComboBuilderScreen pick main side drink dessert slots live savings summary add combo to cart CTA."
+        },
+        {
+          "route": "/support-chat",
+          "flutterFile": "lib/screens/customer/customer_support_chat_screen.dart",
+          "prompt": "SupportChatScreen live chat thread message bubbles agent avatar compose field send attachment CTA."
+        },
+        {
+          "route": "/faq",
+          "flutterFile": "lib/screens/customer/customer_faq_screen.dart",
+          "prompt": "FAQScreen searchable accordion help categories order delivery loyalty plated delivery questions."
+        },
+        {
+          "route": "/terms",
+          "flutterFile": "lib/screens/customer/customer_terms_screen.dart",
+          "prompt": "TermsScreen legal sections scroll privacy ordering deposits returns acceptance checkbox continue CTA."
+        },
+        {
+          "route": "/payment-history",
+          "flutterFile": "lib/screens/customer/customer_payment_history_screen.dart",
+          "prompt": "PaymentHistoryScreen transaction list date amount method badge receipt download reorder CTA."
+        },
+        {
+          "route": "/rewards-history",
+          "flutterFile": "lib/screens/customer/customer_rewards_history_screen.dart",
+          "prompt": "RewardsHistoryScreen points earned redeemed ledger filter chips balance summary reward events list."
+        }
+      ]
+    },
+    {
+      "id": "customer-6",
+      "prdSection": "7.2.1",
+      "title": "Customer marketing addendum (6/6)",
+      "screens": [
+        {
+          "route": "/combos",
+          "flutterFile": "lib/screens/customer/customer_combos_screen.dart",
+          "prompt": "CombosScreen browse combo bundles hero savings badges food cards tap to open combo builder."
+        },
+        {
+          "route": "/subscriptions",
+          "flutterFile": "lib/screens/customer/customer_subscriptions_screen.dart",
+          "prompt": "SubscriptionsScreen meal plans recurring offers hero plan cards subscribe CTA weekly monthly badges."
+        },
+        {
+          "route": "/offers/featured",
+          "flutterFile": "lib/screens/customer/customer_promo_detail_screen.dart",
+          "prompt": "PromoDetailScreen offer hero image title discount terms validity claim apply to cart CTA related deals."
+        }
+      ]
+    },
+    {
+      "id": "cashier-1",
+      "prdSection": "7.3",
+      "title": "Cashier operations",
+      "screens": [
+        {
+          "route": "/cashier",
+          "flutterFile": "lib/screens/cashier/cashier_order_screen.dart",
+          "prompt": "CashierOrderScreen restaurant POS workbench category chips menu grid live ticket panel order channel dine-in takeaway delivery plated quantity controls kitchen send payment CTA."
+        },
+        {
+          "route": "/cashier-order-history",
+          "flutterFile": "lib/screens/cashier/cashier_order_history_screen.dart",
+          "prompt": "CashierOrderHistoryScreen shift ledger receipt hero filter chips channel refund badges reprint export postponed orders resume POS."
+        },
+        {
+          "route": "/cashier-tip",
+          "flutterFile": "lib/screens/cashier/cashier_tip_entry_screen.dart",
+          "prompt": "CashierTipEntryScreen shift tips total amount display staff assignment grid numeric keypad preset tip chips log tip CTA."
+        },
+        {
+          "route": "/cashier-deposit-refund",
+          "flutterFile": "lib/screens/cashier/cashier_deposit_refund_screen.dart",
+          "prompt": "CashierDepositRefundScreen plated return assessment damaged items checklist deposit summary settlement refund amount progress CTA."
+        }
+      ]
+    },
+    {
+      "id": "kitchen-1",
+      "prdSection": "7.3",
+      "title": "Kitchen operations",
+      "screens": [
+        {
+          "route": "/kitchen",
+          "flutterFile": "lib/screens/kitchen/kitchen_dashboard_screen.dart",
+          "prompt": "KitchenDashboardScreen restaurant prep lanes preparing ready delayed order-type color chips station load glance timers."
+        },
+        {
+          "route": "/kitchen-prep",
+          "flutterFile": "lib/screens/kitchen/kitchen_order_prep_screen.dart",
+          "prompt": "KitchenOrderPrepScreen order detail prep checklist items status bump actions order-type chip."
+        }
+      ]
+    },
+    {
+      "id": "delivery-1",
+      "prdSection": "7.3",
+      "title": "Delivery operations",
+      "screens": [
+        {
+          "route": "/delivery",
+          "flutterFile": "lib/screens/delivery/delivery_dashboard_screen.dart",
+          "prompt": "DeliveryDashboardScreen active delivery tasks map preview deposit collect chips order list."
+        },
+        {
+          "route": "/delivery-order",
+          "flutterFile": "lib/screens/delivery/delivery_order_screen.dart",
+          "prompt": "DeliveryOrderScreen collect food tip deposit separate lines confirm delivery CTA order summary."
+        },
+        {
+          "route": "/plated-return-task",
+          "flutterFile": "lib/screens/delivery/delivery_plated_return_task_screen.dart",
+          "prompt": "PlatedReturnTaskScreen return queue timer deposit status per customer plated items list collect CTA."
+        },
+        {
+          "route": "/plated-return-process",
+          "flutterFile": "lib/screens/delivery/delivery_plated_return_process_screen.dart",
+          "prompt": "PlatedReturnProcessScreen damage inspection checklist settlement steps deposit refund summary JOD."
+        }
+      ]
+    },
+    {
+      "id": "inventory-1",
+      "prdSection": "7.3",
+      "title": "Inventory operations",
+      "screens": [
+        {
+          "route": "/inventory",
+          "flutterFile": "lib/screens/inventory/inventory_dashboard_screen.dart",
+          "prompt": "InventoryDashboardScreen stock overview low stock alerts categories search item cards quantities."
+        },
+        {
+          "route": "/inventory-item",
+          "flutterFile": "lib/screens/inventory/inventory_item_screen.dart",
+          "prompt": "InventoryItemScreen single item detail stock level history adjust button supplier info."
+        },
+        {
+          "route": "/stock-adjustment",
+          "flutterFile": "lib/screens/inventory/inventory_stock_adjustment_screen.dart",
+          "prompt": "StockAdjustmentScreen add remove stock form item selector quantity reason notes confirm CTA."
+        }
+      ]
+    },
+    {
+      "id": "staff-1",
+      "prdSection": "7.4",
+      "title": "Staff attendance & tips",
+      "screens": [
+        {
+          "route": "/staff-attendance",
+          "flutterFile": "lib/screens/staff/staff_attendance_screen.dart",
+          "prompt": "StaffAttendanceScreen check-in check-out button hour counter today status history list."
+        },
+        {
+          "route": "/staff-tips",
+          "flutterFile": "lib/screens/staff/staff_daily_tips_screen.dart",
+          "prompt": "StaffDailyTipsScreen today tip share amount distribution breakdown worked hours acknowledge CTA."
+        },
+        {
+          "route": "/staff-tip-history",
+          "flutterFile": "lib/screens/staff/staff_tip_history_screen.dart",
+          "prompt": "StaffTipHistoryScreen past tip amounts list date range filter monthly totals chart."
+        }
+      ]
+    },
+    {
+      "id": "app-admin-1",
+      "prdSection": "7.6",
+      "title": "App Admin hub (1/2)",
+      "screens": [
+        {
+          "route": "/app-admin",
+          "flutterFile": "lib/screens/admin/app_admin_dashboard_screen.dart",
+          "prompt": "AppAdminDashboardScreen hub home governance KPIs user count active roles audit summary quick links."
+        },
+        {
+          "route": "/app-admin/roles",
+          "flutterFile": "lib/screens/admin/app_admin_role_permissions_screen.dart",
+          "prompt": "RolePermissionsScreen A role matrix default capabilities per role toggle permissions grid."
+        },
+        {
+          "route": "/app-admin/users",
+          "flutterFile": "lib/screens/admin/app_admin_user_permissions_screen.dart",
+          "prompt": "UserPermissionsScreen B user list search filter role badges approve reject actions."
+        },
+        {
+          "route": "/app-admin/users/:id",
+          "flutterFile": "lib/screens/admin/app_admin_user_detail_permissions_screen.dart",
+          "prompt": "UserDetailPermissionsScreen single user profile role overrides permission switches audit log."
+        },
+        {
+          "route": "/app-admin/audit",
+          "flutterFile": "lib/screens/admin/admin_audit_log_screen.dart",
+          "prompt": "AuditLogScreen timeline filtered events user action target timestamp governance KPIs export."
+        },
+        {
+          "route": "/app-admin/integrations",
+          "flutterFile": "lib/screens/admin/admin_app_integrations_screen.dart",
+          "prompt": "AppIntegrationsScreen OAuth connections payment gateway map provider status toggle configure."
+        }
+      ]
+    },
+    {
+      "id": "app-admin-2",
+      "prdSection": "7.6",
+      "title": "App Admin hub (2/2)",
+      "screens": [
+        {
+          "route": "/app-admin/owner-config",
+          "flutterFile": "lib/screens/admin/admin_owner_view_config_screen.dart",
+          "prompt": "OwnerViewConfigScreen field masking toggles per report area revenue cost tip deposit visibility owner role."
+        },
+        {
+          "route": "/app-admin/settings",
+          "flutterFile": "lib/screens/admin/admin_settings_screen.dart",
+          "prompt": "SettingsScreen app-level configuration toggle flags default values currency locale maintenance mode."
+        }
+      ]
+    },
+    {
+      "id": "operator-1",
+      "prdSection": "7.7",
+      "title": "Operator hub (1/3)",
+      "screens": [
+        {
+          "route": "/operator",
+          "flutterFile": "lib/screens/admin/admin_dashboard_screen.dart",
+          "prompt": "AdminDashboardScreen operator hub live KPIs revenue tips deposits active orders attention queue cards."
+        },
+        {
+          "route": "/operator/orders",
+          "flutterFile": "lib/screens/admin/admin_orders_management_screen.dart",
+          "prompt": "OrdersManagementScreen all orders live board filters order-type chips status columns order cards."
+        },
+        {
+          "route": "/operator/order-detail",
+          "flutterFile": "lib/screens/admin/admin_order_detail_screen.dart",
+          "prompt": "OrderDetailAdminScreen full invoice order status timeline customer info tip deposit lines actions."
+        },
+        {
+          "route": "/operator/menu",
+          "flutterFile": "lib/screens/admin/admin_menu_management_screen.dart",
+          "prompt": "MenuManagementScreen category sections product list with prices availability toggle CRUD actions add."
+        },
+        {
+          "route": "/operator/product-editor",
+          "flutterFile": "lib/screens/admin/admin_product_editor_screen.dart",
+          "prompt": "ProductEditorScreen product form name description price category image options modifiers save CTA."
+        },
+        {
+          "route": "/operator/tips/distribute",
+          "flutterFile": "lib/screens/admin/admin_daily_tip_distribution_screen.dart",
+          "prompt": "DailyTipDistributionScreen tip pool total staff hours breakdown approve distribution CTA per staff share."
+        }
+      ]
+    },
+    {
+      "id": "operator-2",
+      "prdSection": "7.7",
+      "title": "Operator hub (2/3)",
+      "screens": [
+        {
+          "route": "/operator/plates",
+          "flutterFile": "lib/screens/admin/admin_plates_management_screen.dart",
+          "prompt": "PlatesManagementScreen plate assets catalog inventory count in use damaged lost retired status."
+        },
+        {
+          "route": "/operator/plate-editor",
+          "flutterFile": "lib/screens/admin/admin_plate_editor_screen.dart",
+          "prompt": "PlateEditorScreen plate form name description replacement cost image quantity add stock save CTA."
+        },
+        {
+          "route": "/operator/deposit-config",
+          "flutterFile": "lib/screens/admin/admin_deposit_config_screen.dart",
+          "prompt": "DepositConfigScreen default deposit amount JOD per plate type configurable reminder timer range."
+        },
+        {
+          "route": "/operator/pre-orders",
+          "flutterFile": "lib/screens/admin/admin_pre_order_screen.dart",
+          "prompt": "PreOrderScreen scheduled future orders calendar list date customer items status confirm."
+        },
+        {
+          "route": "/operator/attendance",
+          "flutterFile": "lib/screens/admin/admin_attendance_hr_screen.dart",
+          "prompt": "AttendanceHrScreen staff roster today check-in status clock hours per employee filters."
+        },
+        {
+          "route": "/operator/staff-hours",
+          "flutterFile": "lib/screens/admin/admin_staff_hours_report_screen.dart",
+          "prompt": "StaffHoursReportScreen hours worked per staff date range totals weekly monthly summary export."
+        }
+      ]
+    },
+    {
+      "id": "operator-3",
+      "prdSection": "7.7",
+      "title": "Operator hub (3/3)",
+      "screens": [
+        {
+          "route": "/operator/reports",
+          "flutterFile": "lib/screens/admin/admin_reports_screen.dart",
+          "prompt": "ReportsScreen revenue tip deposit charts date range picker export PDF Excel filter presets."
+        },
+        {
+          "route": "/operator/report-filter",
+          "flutterFile": "lib/screens/admin/admin_report_filter_screen.dart",
+          "prompt": "ReportFilterScreen advanced filter sheet date range metrics group comparison custom period apply."
+        },
+        {
+          "route": "/operator/financial-close",
+          "flutterFile": "lib/screens/admin/admin_financial_calculation_screen.dart",
+          "prompt": "FinancialCalculationScreen monthly surplus calculation owner minimum operator salary tip deposit isolation JOD totals."
+        }
+      ]
+    },
+    {
+      "id": "owner-1",
+      "prdSection": "7.8",
+      "title": "Owner hub",
+      "screens": [
+        {
+          "route": "/owner",
+          "flutterFile": "lib/screens/owner/owner_dashboard_screen.dart",
+          "prompt": "OwnerDashboardScreen hub home masked KPIs revenue summary tip total deposit balance quick links reports."
+        },
+        {
+          "route": "/owner/reports",
+          "flutterFile": "lib/screens/owner/owner_dashboard_screen.dart",
+          "prompt": "OwnerReportsScreen read-only reports shell masked financial fields revenue costs surplus charts export."
+        },
+        {
+          "route": "/owner/financial",
+          "flutterFile": "lib/screens/owner/owner_dashboard_screen.dart",
+          "prompt": "OwnerFinancialScreen read-only financial close shell monthly profit owner minimum tip deposit isolation view."
+        },
+        {
+          "route": "/owner/audit",
+          "flutterFile": "lib/screens/owner/owner_dashboard_screen.dart",
+          "prompt": "OwnerAuditScreen read-only audit log shell filtered events user actions timestamps governance view."
+        }
+      ]
+    },
+    {
+      "id": "support-1",
+      "prdSection": "7.9",
+      "title": "Support desk hub",
+      "screens": [
+        {
+          "route": "/support-desk",
+          "flutterFile": "lib/screens/support/support_dashboard_screen.dart",
+          "prompt": "SupportDashboardScreen hub home open tickets count chat queue length order lookup quick actions KPIs."
+        },
+        {
+          "route": "/support-desk/tickets",
+          "flutterFile": "lib/screens/admin/admin_support_tickets_screen.dart",
+          "prompt": "SupportTicketsScreen ticket queue priority SLA status assignee filter create ticket action."
+        },
+        {
+          "route": "/support-desk/chat",
+          "flutterFile": "lib/screens/support/support_chat_queue_screen.dart",
+          "prompt": "SupportChatQueueScreen waiting customers list claim chat open conversations agent view."
+        },
+        {
+          "route": "/support-desk/order-lookup",
+          "flutterFile": "lib/screens/support/support_order_lookup_screen.dart",
+          "prompt": "SupportOrderLookupScreen search order ID customer name phone status invoice display actions."
+        },
+        {
+          "route": "/support-desk/faq",
+          "flutterFile": "lib/screens/support/support_faq_editor_screen.dart",
+          "prompt": "SupportFaqEditorScreen FAQ categories list add edit delete publish search accordion preview."
+        },
+        {
+          "route": "/support-desk/reviews",
+          "flutterFile": "lib/screens/admin/admin_reviews_moderation_screen.dart",
+          "prompt": "ReviewsModerationScreen customer reviews list approve reject flag filter by rating product response."
+        }
+      ]
+    },
+    {
+      "id": "marketing-1",
+      "prdSection": "7.10",
+      "title": "Marketing hub (1/2)",
+      "screens": [
+        {
+          "route": "/marketing",
+          "flutterFile": "lib/screens/marketing/marketing_dashboard_screen.dart",
+          "prompt": "MarketingDashboardScreen hub home campaign KPIs active offers count loyalty stats quick links calendar."
+        },
+        {
+          "route": "/marketing/offers",
+          "flutterFile": "lib/screens/admin/admin_offers_management_screen.dart",
+          "prompt": "OffersManagementScreen offer list create edit publish schedule approval status filter date."
+        },
+        {
+          "route": "/marketing/promotions",
+          "flutterFile": "lib/screens/admin/admin_promotions_management_screen.dart",
+          "prompt": "PromotionsManagementScreen tabs combos discounts subscriptions calendar create edit publish."
+        },
+        {
+          "route": "/marketing/catalog",
+          "flutterFile": "lib/screens/admin/admin_menu_catalog_screen.dart",
+          "prompt": "MenuCatalogScreen full menu catalog view items categories prices images availability toggle for marketing."
+        },
+        {
+          "route": "/marketing/loyalty",
+          "flutterFile": "lib/screens/admin/admin_loyalty_config_screen.dart",
+          "prompt": "LoyaltyConfigScreen tier rules points per JOD multiplier rewards catalog config earn redeem settings."
+        },
+        {
+          "route": "/marketing/rewards",
+          "flutterFile": "lib/screens/admin/admin_rewards_management_screen.dart",
+          "prompt": "RewardsManagementScreen rewards catalog create edit cost points stock image availability publish."
+        }
+      ]
+    },
+    {
+      "id": "marketing-2",
+      "prdSection": "7.10",
+      "title": "Marketing hub (2/2)",
+      "screens": [
+        {
+          "route": "/marketing/calendar",
+          "flutterFile": "lib/screens/marketing/marketing_campaign_calendar_screen.dart",
+          "prompt": "CampaignCalendarScreen marketing campaign calendar month view events schedule create campaign CTA."
+        },
+        {
+          "route": "/marketing/blog",
+          "flutterFile": "lib/screens/marketing/marketing_blog_screen.dart",
+          "prompt": "MarketingBlogScreen blog posts list create edit publish social share image hero tags."
+        },
+        {
+          "route": "/marketing/push-campaigns",
+          "flutterFile": "lib/screens/marketing/marketing_push_campaigns_screen.dart",
+          "prompt": "PushCampaignsScreen push notification campaigns create audience segment title body schedule send."
+        },
+        {
+          "route": "/marketing/social",
+          "flutterFile": "lib/screens/marketing/marketing_dashboard_screen.dart",
+          "prompt": "MarketingSocialIntegrationsScreen social media OAuth connections Facebook Instagram posting schedule analytics."
+        }
+      ]
+    }
+  ]
+}

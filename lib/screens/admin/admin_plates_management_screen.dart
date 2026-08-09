@@ -1,4 +1,5 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:ayletna_restaurant_app/data/models/model_admin_mock.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
@@ -8,9 +9,11 @@ import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -34,7 +37,7 @@ class AdminPlatesManagementScreen extends ConsumerWidget {
           tooltip: l10n.screenNotifications,
         ),
         WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.adminDepositConfig),
+          onPressed: () => context.push(AppRoutePaths.operatorDepositConfig),
           icon: Icons.payments_outlined,
           tooltip: l10n.screenDepositConfig,
         ),
@@ -118,7 +121,7 @@ class _PlateOpsHero extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(CoreSpacing.lg(context)),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         gradient: const LinearGradient(
           colors: [CoreColors.orderTypePlated, CoreColors.brandBrown],
           begin: AlignmentDirectional.topStart,
@@ -128,17 +131,15 @@ class _PlateOpsHero extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SoftBadge(
+          WidgetsSoftBadge(
             label:
-                isAr ? 'إدارة الصواني والعربون' : 'Plate Asset & Deposit Ops',
+                l10n.platesOpsBadge,
             color: CoreColors.surfaceLight,
             foreground: CoreColors.brandBrown,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           Text(
-            isAr
-                ? 'تابع الصواني، الأوعية، الكسر، العربون، والإرجاع من مكان واحد.'
-                : 'Track trays, bowls, breakage, deposits, and returns from one board.',
+l10n.platesOpsHeadline,
             style: CoreTypography.headlineSmall(
               context,
               CoreColors.surfaceLight,
@@ -150,17 +151,17 @@ class _PlateOpsHero extends StatelessWidget {
             runSpacing: CoreSpacing.sm(context),
             children: [
               _HeroStat(
-                label: isAr ? 'في المخزون' : 'In stock',
+                label: l10n.platesInStock,
                 value: '$totalStock',
                 icon: Icons.inventory_2_outlined,
               ),
               _HeroStat(
-                label: isAr ? 'متداول' : 'Circulating',
+                label: l10n.platesCirculating,
                 value: '$circulating',
                 icon: Icons.sync_alt_outlined,
               ),
               _HeroStat(
-                label: isAr ? 'قيمة الأصول' : 'Asset value',
+                label: l10n.platesAssetValue,
                 value: UtilityFormatJod.format(
                   totalValue,
                   suffix: l10n.currencyJod,
@@ -176,12 +177,12 @@ class _PlateOpsHero extends StatelessWidget {
             children: [
               WidgetsAppButton(
                 label: l10n.platesNewComponent,
-                onPressed: () => context.push(AppRoutePaths.adminPlateEditor),
+                onPressed: () => context.push(AppRoutePaths.operatorPlateEditor),
                 icon: Icons.add,
               ),
               WidgetsAppButton(
                 label: l10n.screenDepositConfig,
-                onPressed: () => context.push(AppRoutePaths.adminDepositConfig),
+                onPressed: () => context.push(AppRoutePaths.operatorDepositConfig),
                 icon: Icons.tune_outlined,
                 variant: WidgetsAppButtonVariant.secondary,
               ),
@@ -204,11 +205,8 @@ class _AssetCatalog extends StatelessWidget {
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
     return WidgetsAppCard(
       title: l10n.platesCatalogTitle,
-      subtitle:
-          isAr
-              ? 'أصول فعلية لها كود، قيمة، مخزون، وتداول.'
-              : 'Physical assets with SKU, value, stock, and circulation.',
-      leading: const _IconBubble(
+      subtitle: l10n.platesCatalogSubtitle,
+      leading: WidgetsIconBubble(size: UtilitySizer.of(context, 40), iconSize: CoreContentSizes.buttonIcon(context), 
         icon: Icons.room_service_outlined,
         color: CoreColors.orderTypePlated,
       ),
@@ -241,7 +239,7 @@ class _AssetRow extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.18)),
       ),
       child: Column(
@@ -271,7 +269,7 @@ class _AssetRow extends StatelessWidget {
                   ],
                 ),
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: _assetBadge(l10n, asset.badgeKey),
                 color: color,
               ),
@@ -327,7 +325,7 @@ class _AssetRow extends StatelessWidget {
               ),
               WidgetsAppButton(
                 label: l10n.platesDetails,
-                onPressed: () => context.push(AppRoutePaths.adminPlateEditor),
+                onPressed: () => context.push(AppRoutePaths.operatorPlateEditor),
                 variant: WidgetsAppButtonVariant.ghost,
               ),
             ],
@@ -349,7 +347,7 @@ class _DepositPolicyCard extends StatelessWidget {
     return WidgetsAppCard(
       title: l10n.depositTrayConfiguration,
       subtitle: l10n.depositConfigurationSubtitle,
-      leading: const _IconBubble(
+      leading: WidgetsIconBubble(size: UtilitySizer.of(context, 40), iconSize: CoreContentSizes.buttonIcon(context), 
         icon: Icons.account_balance_wallet_outlined,
         color: CoreColors.semanticDeposit,
       ),
@@ -364,16 +362,16 @@ class _DepositPolicyCard extends StatelessWidget {
           ),
           _PolicyLine(
             label: l10n.depositReturnWindow,
-            value: isAr ? '٤٨ ساعة' : '48 hours',
+            value: l10n.platesReturnWindowValue,
           ),
           _PolicyLine(
-            label: isAr ? 'رسائل تذكير' : 'Return reminders',
+            label: l10n.platesReturnReminders,
             value: l10n.platesEnabled,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           WidgetsAppButton(
             label: l10n.screenDepositConfig,
-            onPressed: () => context.push(AppRoutePaths.adminDepositConfig),
+            onPressed: () => context.push(AppRoutePaths.operatorDepositConfig),
             icon: Icons.settings_outlined,
             fullWidth: true,
           ),
@@ -394,11 +392,8 @@ class _BreakageBoard extends ConsumerWidget {
     final plates = ref.watch(adminPlatesProvider);
     return WidgetsAppCard(
       title: l10n.platesRecentBreakage,
-      subtitle:
-          isAr
-              ? 'تتبع الكسر والنقص قبل التسوية.'
-              : 'Track breakage and missing items before settlement.',
-      leading: const _IconBubble(
+      subtitle: l10n.platesBreakageTrackSubtitle,
+      leading: WidgetsIconBubble(size: UtilitySizer.of(context, 40), iconSize: CoreContentSizes.buttonIcon(context), 
         icon: Icons.heart_broken_outlined,
         color: CoreColors.semanticError,
       ),
@@ -409,7 +404,7 @@ class _BreakageBoard extends ConsumerWidget {
           SizedBox(height: CoreSpacing.md(context)),
           WidgetsAppButton(
             label: l10n.platesViewBreakageLog,
-            onPressed: () => _showBreakageDialog(context, ref, isAr, l10n),
+            onPressed: () => _showBreakageDialog(context, ref, l10n),
             variant: WidgetsAppButtonVariant.outline,
             icon: Icons.fact_check_outlined,
             fullWidth: true,
@@ -422,11 +417,10 @@ class _BreakageBoard extends ConsumerWidget {
   Future<void> _showBreakageDialog(
     BuildContext context,
     WidgetRef ref,
-    bool isAr,
     AppLocalizations l10n,
   ) async {
     final title = TextEditingController(
-      text: isAr ? 'كسر صحن' : 'Plate breakage',
+      text: l10n.platesBreakageDefault,
     );
     final loss = TextEditingController(text: '24');
     final logged = await showDialog<bool>(
@@ -440,14 +434,14 @@ class _BreakageBoard extends ConsumerWidget {
                 TextField(
                   controller: title,
                   decoration: InputDecoration(
-                    labelText: isAr ? 'الوصف' : 'Description',
+                    labelText: l10n.platesBreakageDescription,
                   ),
                 ),
                 TextField(
                   controller: loss,
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: isAr ? 'الخسارة (د.أ)' : 'Loss (JOD)',
+                    labelText: l10n.platesBreakageLossJod,
                   ),
                 ),
               ],
@@ -455,7 +449,7 @@ class _BreakageBoard extends ConsumerWidget {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: Text(isAr ? 'إلغاء' : 'Cancel'),
+                child: Text(l10n.actionCancel),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(dialogContext, true),
@@ -501,7 +495,7 @@ class _RestockBoard extends ConsumerWidget {
     return WidgetsAppCard(
       title: l10n.platesRestockAlert,
       subtitle: l10n.platesRestockBody,
-      leading: const _IconBubble(
+      leading: WidgetsIconBubble(size: UtilitySizer.of(context, 40), iconSize: CoreContentSizes.buttonIcon(context), 
         icon: Icons.inventory_2_outlined,
         color: CoreColors.brandOlive,
       ),
@@ -509,11 +503,11 @@ class _RestockBoard extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+            borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
             child: LinearProgressIndicator(
               value: plates.stockRatio,
               minHeight: 10,
-              backgroundColor: const Color(0xFFE9E0CE),
+              backgroundColor: CoreColors.plateProgressTrack,
               valueColor: const AlwaysStoppedAnimation<Color>(CoreColors.brandOlive),
             ),
           ),
@@ -532,7 +526,7 @@ class _RestockBoard extends ConsumerWidget {
               final next = ref.read(adminPlatesProvider.notifier).restock(units: 20);
               UtilityMockFeedback.showSuccess(
                 context,
-                isAr ? 'المخزون الآن $next' : 'Stock now $next units',
+                l10n.platesStockNowUnits(next),
               );
             },
             icon: Icons.shopping_cart_checkout_outlined,
@@ -562,11 +556,11 @@ class _BreakageRow extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: CoreColors.semanticError.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Row(
         children: [
-          const _IconBubble(
+          WidgetsIconBubble(size: UtilitySizer.of(context, 40), iconSize: CoreContentSizes.buttonIcon(context), 
             icon: Icons.broken_image_outlined,
             color: CoreColors.semanticError,
           ),
@@ -622,7 +616,7 @@ class _MiniStat extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.sm(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -697,11 +691,11 @@ class _HeroStat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 172,
+      width: UtilitySizer.of(context, 172),
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: CoreColors.surfaceLight.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(
           color: CoreColors.surfaceLight.withValues(alpha: 0.30),
         ),
@@ -750,63 +744,14 @@ class _PlateSketch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 58,
-      height: 58,
+      width: UtilitySizer.of(context, 58),
+      height: UtilitySizer.of(context, 58),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: CustomPaint(
         painter: _PlateSketchPainter(kind: kind, color: color),
-      ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({required this.icon, required this.color});
-
-  final IconData icon;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-      ),
-      child: Icon(icon, color: color, size: 21),
-    );
-  }
-}
-
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({required this.label, required this.color, this.foreground});
-
-  final String label;
-  final Color color;
-  final Color? foreground;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.sm(context),
-        vertical: CoreSpacing.xs(context),
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: foreground == null ? 0.12 : 1),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-      ),
-      child: Text(
-        label,
-        style: CoreTypography.caption(
-          context,
-          foreground ?? color,
-        ).copyWith(fontWeight: FontWeight.w900),
       ),
     );
   }

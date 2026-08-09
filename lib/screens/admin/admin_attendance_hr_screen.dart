@@ -3,6 +3,7 @@ import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/attendance_hr_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_file_download.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_report_export.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
@@ -18,7 +19,10 @@ import 'package:go_router/go_router.dart';
 
 /// HR attendance report with delay fees, absence, and overtime pay rules.
 class AdminAttendanceHrScreen extends ConsumerWidget {
-  const AdminAttendanceHrScreen({super.key});
+  const AdminAttendanceHrScreen({this.staffHoursReport = false, super.key});
+
+  /// When true, shows staff-hours report title (PRD `/operator/staff-hours` route).
+  final bool staffHoursReport;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -29,12 +33,12 @@ class AdminAttendanceHrScreen extends ConsumerWidget {
     final rules = hrState.rules;
 
     return WidgetsScaffoldPage(
-      title: isAr ? 'تقرير الحضور والرواتب' : 'Attendance & Payroll',
+      title: staffHoursReport ? l10n.screenStaffHoursReport : l10n.hrAttendancePayrollTitle,
       actions: [
         WidgetsIconButton(
           onPressed: () => context.push(AppRoutePaths.staffAttendance),
           icon: Icons.fingerprint_outlined,
-          tooltip: isAr ? 'حضور الموظفين' : 'Staff attendance',
+          tooltip: l10n.hrStaffAttendanceTooltip,
         ),
       ],
       child: WidgetsRefreshList(
@@ -45,20 +49,20 @@ class AdminAttendanceHrScreen extends ConsumerWidget {
         child: ListView(
           children: [
             SizedBox(height: CoreSpacing.md(context)),
-            _RulesHero(isAr: isAr, rules: rules),
+            _RulesHero(l10n: l10n, isAr: isAr, rules: rules),
             SizedBox(height: CoreSpacing.lg(context)),
             Wrap(
               spacing: CoreSpacing.sm(context),
               children: [
                 WidgetsFilterChip(
-                  label: isAr ? 'يومي' : 'Daily',
+                  label: l10n.hrPeriodDaily,
                   selected: hrState.period == 'daily',
                   onSelected:
                       (_) =>
                           ref.read(attendanceHrProvider.notifier).setPeriod('daily'),
                 ),
                 WidgetsFilterChip(
-                  label: isAr ? 'شهري' : 'Monthly',
+                  label: l10n.hrPeriodMonthly,
                   selected: hrState.period == 'monthly',
                   onSelected:
                       (_) =>
@@ -68,7 +72,7 @@ class AdminAttendanceHrScreen extends ConsumerWidget {
             ),
             SizedBox(height: CoreSpacing.lg(context)),
             WidgetsAppCard(
-              title: isAr ? 'إجمالي المستحق' : 'Total payable',
+              title: l10n.hrTotalPayable,
               child: Text(
                 UtilityFormatJod.format(
                   hrState.totalPayableJod,
@@ -87,7 +91,7 @@ class AdminAttendanceHrScreen extends ConsumerWidget {
             ],
             SizedBox(height: CoreSpacing.lg(context)),
             WidgetsAppButton(
-              label: isAr ? 'تصدير CSV' : 'Export CSV',
+              label: l10n.hrExportCsv,
               onPressed: () async {
                 final csv = buildHrPayrollCsv(hr: hrState, rows: rows);
                 await downloadTextFile(
@@ -95,6 +99,9 @@ class AdminAttendanceHrScreen extends ConsumerWidget {
                   csv,
                   mimeType: 'text/csv',
                 );
+                if (context.mounted) {
+                  UtilityMockFeedback.showInfo(context, l10n.hrExportCsvSuccess);
+                }
               },
               icon: Icons.download_outlined,
               variant: WidgetsAppButtonVariant.outline,
@@ -109,8 +116,9 @@ class AdminAttendanceHrScreen extends ConsumerWidget {
 }
 
 class _RulesHero extends StatelessWidget {
-  const _RulesHero({required this.isAr, required this.rules});
+  const _RulesHero({required this.l10n, required this.isAr, required this.rules});
 
+  final AppLocalizations l10n;
   final bool isAr;
   final AttendancePayRuleConfig rules;
 
@@ -123,7 +131,7 @@ class _RulesHero extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            isAr ? 'قواعد الرواتب' : 'Payroll rules',
+            l10n.hrPayrollRulesTitle,
             style: CoreTypography.titleMedium(
               context,
               Theme.of(context).colorScheme.onSurface,
@@ -131,29 +139,26 @@ class _RulesHero extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.md(context)),
           _RuleLine(
-            isAr
-                ? 'في الوقت (≤ ${rules.onTimeGraceMinutes} د) → 100% من الراتب'
-                : 'On time (≤ ${rules.onTimeGraceMinutes} min) → 100% salary',
+            l10n.hrPayrollOnTimeRule(rules.onTimeGraceMinutes),
           ),
           _RuleLine(
-            isAr
-                ? 'تأخير > ${rules.onTimeGraceMinutes} د → خصم ${rules.delayFeeJod} ${isAr ? 'د.أ' : 'JOD'}'
-                : 'Late > ${rules.onTimeGraceMinutes} min → ${rules.delayFeeJod} JOD delay fee',
+            l10n.hrPayrollDelayRule(
+              rules.onTimeGraceMinutes,
+              rules.delayFeeJod.toString(),
+              l10n.currencyJod,
+            ),
           ),
           _RuleLine(
-            isAr
-                ? 'تأخير > ${rules.onTimeGraceMinutes + 15} د → خصم ×2'
-                : 'Late > ${rules.onTimeGraceMinutes + 15} min → fee ×2',
+            l10n.hrPayrollDelayDoubleRule(rules.onTimeGraceMinutes + 15),
           ),
           _RuleLine(
-            isAr
-                ? 'تأخير > ${rules.absenceAfterMinutes} د → غياب (0% حتى مع الحضور)'
-                : 'Late > ${rules.absenceAfterMinutes} min → absence (0% even if present)',
+            l10n.hrPayrollAbsenceRule(rules.absenceAfterMinutes),
           ),
           _RuleLine(
-            isAr
-                ? 'عمل > ${rules.overtimeThresholdMinutes} د إضافية → ${rules.overtimeMultiplier}× للساعات الإضافية'
-                : 'Work > ${rules.overtimeThresholdMinutes} min beyond schedule → ${rules.overtimeMultiplier}× extra hours pay',
+            l10n.hrPayrollOvertimeRule(
+              rules.overtimeThresholdMinutes,
+              rules.overtimeMultiplier.toString(),
+            ),
           ),
         ],
       ),
@@ -173,7 +178,7 @@ class _RuleLine extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.check_circle_outline, size: 16, color: CoreColors.brandOlive),
+          Icon(Icons.check_circle_outline, size: CoreContentSizes.chipIcon(context), color: CoreColors.brandOlive),
           SizedBox(width: CoreSpacing.sm(context)),
           Expanded(
             child: Text(
@@ -225,7 +230,7 @@ class _PayrollRow extends StatelessWidget {
                 ),
               ),
               WidgetsStatusPill(
-                label: _outcomeLabel(result.outcome, isAr),
+                label: _outcomeLabel(result.outcome),
                 color: _outcomeColor(result.outcome),
               ),
             ],
@@ -239,24 +244,24 @@ class _PayrollRow extends StatelessWidget {
           Row(
             children: [
               _Metric(
-                label: isAr ? 'التأخير' : 'Delay',
-                value: '${result.delayMinutes} ${isAr ? 'د' : 'min'}',
+                label: l10n.hrDelayLabel,
+                value: '${result.delayMinutes} ${l10n.hrMinutesShort}',
               ),
               SizedBox(width: CoreSpacing.lg(context)),
               _Metric(
-                label: isAr ? 'إضافي' : 'Overtime',
-                value: '${result.overtimeHours.toStringAsFixed(1)} ${isAr ? 'س' : 'h'}',
+                label: l10n.hrOvertimeLabel,
+                value: '${result.overtimeHours.toStringAsFixed(1)} ${l10n.hrHoursShort}',
               ),
               SizedBox(width: CoreSpacing.lg(context)),
               _Metric(
-                label: isAr ? 'النسبة' : 'Percent',
+                label: l10n.hrPercentLabel,
                 value: '${result.salaryPercent.round()}%',
               ),
             ],
           ),
           SizedBox(height: CoreSpacing.sm(context)),
           Text(
-            '${isAr ? 'المستحق' : 'Payable'}: ${UtilityFormatJod.format(result.payableJod, suffix: l10n.currencyJod)}',
+            '${l10n.hrPayableLabel}: ${UtilityFormatJod.format(result.payableJod, suffix: l10n.currencyJod)}',
             style: CoreTypography.bodyMedium(
               context,
               CoreColors.semanticRevenue,
@@ -267,12 +272,12 @@ class _PayrollRow extends StatelessWidget {
     );
   }
 
-  String _outcomeLabel(AttendancePayOutcome outcome, bool isAr) => switch (outcome) {
-    AttendancePayOutcome.fullPay => isAr ? 'كامل' : 'Full pay',
-    AttendancePayOutcome.delayFee => isAr ? 'خصم تأخير' : 'Delay fee',
-    AttendancePayOutcome.delayFeeDouble => isAr ? 'خصم ×2' : 'Fee ×2',
-    AttendancePayOutcome.absence => isAr ? 'غياب' : 'Absence',
-    AttendancePayOutcome.overtime => isAr ? 'إضافي' : 'Overtime',
+  String _outcomeLabel(AttendancePayOutcome outcome) => switch (outcome) {
+    AttendancePayOutcome.fullPay => l10n.hrOutcomeFullPay,
+    AttendancePayOutcome.delayFee => l10n.hrOutcomeDelayFee,
+    AttendancePayOutcome.delayFeeDouble => l10n.hrOutcomeDelayFeeDouble,
+    AttendancePayOutcome.absence => l10n.hrOutcomeAbsence,
+    AttendancePayOutcome.overtime => l10n.hrOutcomeOvertime,
   };
 
   Color _outcomeColor(AttendancePayOutcome outcome) => switch (outcome) {

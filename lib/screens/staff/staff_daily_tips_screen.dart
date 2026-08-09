@@ -4,13 +4,17 @@ import 'package:ayletna_restaurant_app/data/models/model_staff_mock.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/staff_session_providers.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_amount_line.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -38,11 +42,10 @@ class StaffDailyTipsScreen extends ConsumerWidget {
         ),
       ],
       child: WidgetsRefreshList(
-        onRefresh:
-            () async => UtilityMockFeedback.showSuccess(
-              context,
-              l10n.screenStaffDailyTips,
-            ),
+        onRefresh: () async {
+          ref.invalidate(staffSessionProvider);
+          UtilityMockFeedback.showInfo(context, l10n.opsStaffTipsRefreshed);
+        },
         child: ListView(
           children: [
             _TipsHero(session: session),
@@ -121,10 +124,10 @@ class _TipsHero extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.volunteer_activism_outlined,
                 color: CoreColors.brandOrange,
-                large: true,
+                size: CoreContentSizes.emptyStateIcon(context), iconSize: CoreContentSizes.kpiIcon(context),
               ),
               SizedBox(width: CoreSpacing.md(context)),
               Expanded(
@@ -149,7 +152,7 @@ class _TipsHero extends StatelessWidget {
                   ],
                 ),
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: ackLabel,
                 color: ackColor,
                 icon:
@@ -172,17 +175,17 @@ class _TipsHero extends StatelessWidget {
             spacing: CoreSpacing.sm(context),
             runSpacing: CoreSpacing.sm(context),
             children: [
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.staffTipsVsYesterday,
                 color: CoreColors.semanticSuccess,
                 icon: Icons.trending_up,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.staffTipsLastEntry,
                 color: scheme.primary,
                 icon: Icons.schedule_outlined,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.staffFinalTotalAmount,
                 color: CoreColors.brandGold,
                 icon: Icons.payments_outlined,
@@ -208,7 +211,7 @@ class _ShiftPayoutCard extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       child: Row(
         children: [
-          _IconBubble(
+          WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
             icon:
                 shift.iconKey == 'lunch'
                     ? Icons.wb_sunny_outlined
@@ -248,7 +251,7 @@ class _ShiftPayoutCard extends StatelessWidget {
                 ).copyWith(fontWeight: FontWeight.w900),
               ),
               SizedBox(height: CoreSpacing.xs(context)),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.staffVerified,
                 color: CoreColors.semanticSuccess,
                 icon: Icons.check_circle_outline,
@@ -283,7 +286,7 @@ class _PayoutPolicyCard extends ConsumerWidget {
       );
       if (!context.mounted || !confirmed) return;
       ref.read(staffSessionProvider.notifier).acknowledgeTips();
-      UtilityMockFeedback.showSuccess(context, l10n.staffAcknowledgeReceipt);
+      UtilityDemoActions.complete(context, successMessage: l10n.staffAcknowledgeReceipt);
     }
 
     Future<void> dispute() async {
@@ -310,7 +313,7 @@ class _PayoutPolicyCard extends ConsumerWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.policy_outlined,
                 color: CoreColors.brandOrange,
               ),
@@ -332,11 +335,11 @@ class _PayoutPolicyCard extends ConsumerWidget {
             style: CoreTypography.bodyMedium(context, scheme.onSurfaceVariant),
           ),
           SizedBox(height: CoreSpacing.md(context)),
-          _AmountLine(
+          WidgetsAmountLine(
             label: l10n.staffCashTips,
             value: l10n.staffCashTipsAmount,
           ),
-          _AmountLine(
+          WidgetsAmountLine(
             label: l10n.staffDigitalTips,
             value: l10n.staffDigitalTipsAmount,
           ),
@@ -344,9 +347,10 @@ class _PayoutPolicyCard extends ConsumerWidget {
             height: CoreSpacing.lg(context),
             color: scheme.outlineVariant,
           ),
-          _AmountLine(
+          WidgetsAmountLine(
             label: l10n.staffFinalTotal,
             value: l10n.staffFinalTotalAmount,
+            valueColor: CoreColors.brandOrange,
             strong: true,
           ),
           SizedBox(height: CoreSpacing.md(context)),
@@ -367,7 +371,7 @@ class _PayoutPolicyCard extends ConsumerWidget {
             ),
           ] else ...[
             SizedBox(height: CoreSpacing.sm(context)),
-            _SoftBadge(
+            WidgetsSoftBadge(
               label:
                   session.tipAckStatus == StaffTipAckStatus.acknowledged
                       ? l10n.staffVerified
@@ -451,13 +455,13 @@ class _TransactionRow extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
       ),
       child: Padding(
         padding: EdgeInsets.all(CoreSpacing.sm(context)),
         child: Row(
           children: [
-            _IconBubble(icon: Icons.receipt_long_outlined, color: color),
+            WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), icon: Icons.receipt_long_outlined, color: color),
             SizedBox(width: CoreSpacing.sm(context)),
             Expanded(
               child: Column(
@@ -480,7 +484,7 @@ class _TransactionRow extends StatelessWidget {
                 ],
               ),
             ),
-            _SoftBadge(
+            WidgetsSoftBadge(
               label:
                   isAr ? transaction.amountLabelAr : transaction.amountLabelEn,
               color: color,
@@ -493,111 +497,6 @@ class _TransactionRow extends StatelessWidget {
   }
 }
 
-class _AmountLine extends StatelessWidget {
-  const _AmountLine({
-    required this.label,
-    required this.value,
-    this.strong = false,
-  });
-  final String label;
-  final String value;
-  final bool strong;
-  @override
-  Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.only(bottom: CoreSpacing.sm(context)),
-    child: Row(
-      children: [
-        Expanded(
-          child: Text(
-            label,
-            style: CoreTypography.bodyMedium(
-              context,
-              Theme.of(context).colorScheme.onSurfaceVariant,
-            ),
-          ),
-        ),
-        Text(
-          value,
-          style: CoreTypography.bodyMedium(
-            context,
-            strong
-                ? CoreColors.brandOrange
-                : Theme.of(context).colorScheme.onSurface,
-          ).copyWith(fontWeight: strong ? FontWeight.w900 : FontWeight.w800),
-        ),
-      ],
-    ),
-  );
-}
 
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({
-    required this.label,
-    required this.color,
-    required this.icon,
-  });
-  final String label;
-  final Color color;
-  final IconData icon;
-  @override
-  Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: color.withValues(alpha: 0.12),
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-      border: Border.all(color: color.withValues(alpha: 0.24)),
-    ),
-    child: Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.sm(context),
-        vertical: CoreSpacing.xs(context),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: CoreContentSizes.orderTypeIcon(context),
-            color: color,
-          ),
-          SizedBox(width: CoreSpacing.xs(context)),
-          Text(
-            label,
-            style: CoreTypography.caption(
-              context,
-              color,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-        ],
-      ),
-    ),
-  );
-}
 
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({
-    required this.icon,
-    required this.color,
-    this.large = false,
-  });
-  final IconData icon;
-  final Color color;
-  final bool large;
-  @override
-  Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: color.withValues(alpha: 0.12),
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
-    ),
-    child: Padding(
-      padding: EdgeInsets.all(CoreSpacing.sm(context)),
-      child: Icon(
-        icon,
-        color: color,
-        size:
-            large
-                ? CoreContentSizes.logoCard(context) * 0.52
-                : CoreContentSizes.orderTypeIcon(context),
-      ),
-    ),
-  );
-}
+

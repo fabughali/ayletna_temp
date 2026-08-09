@@ -1,4 +1,5 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:ayletna_restaurant_app/data/models/model_inventory_mock.dart';
 import 'package:ayletna_restaurant_app/data/models/model_list_entry.dart';
@@ -15,16 +16,22 @@ import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_report_export.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_hub_nav_actions.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_read_only_hub_banner.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// PRD [AuditLogScreen].
 class AdminAuditLogScreen extends ConsumerWidget {
-  const AdminAuditLogScreen({super.key});
+  const AdminAuditLogScreen({this.readOnly = false, super.key});
+
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,18 +40,16 @@ class AdminAuditLogScreen extends ConsumerWidget {
 
     return WidgetsScaffoldPage(
       title: l10n.screenAuditLog,
-      actions: [
-        WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.notifications),
-          icon: Icons.notifications_outlined,
-          tooltip: l10n.screenNotifications,
-        ),
-        WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.adminSettings),
-          icon: Icons.tune_outlined,
-          tooltip: l10n.screenSettings,
-        ),
-      ],
+      actions: readOnly
+          ? WidgetsHubNavActions.forContext(context, readOnlyOwner: true)
+          : [
+              WidgetsIconButton(
+                onPressed: () => context.push(AppRoutePaths.notifications),
+                icon: Icons.notifications_outlined,
+                tooltip: l10n.screenNotifications,
+              ),
+              ...WidgetsHubNavActions.forContext(context),
+            ],
       child: WidgetsRefreshList(
         onRefresh: () async {
           ref.read(supportTicketsProvider.notifier).refreshQueue();
@@ -58,7 +63,7 @@ class AdminAuditLogScreen extends ConsumerWidget {
               children: [
                 _AuditFiltersCard(l10n: l10n, isAr: isAr),
                 SizedBox(height: CoreSpacing.lg(context)),
-                _SecuritySnapshotCard(isAr: isAr),
+                _SecuritySnapshotCard(l10n: l10n, isAr: isAr),
                 SizedBox(height: CoreSpacing.lg(context)),
                 _InventoryAuditCard(l10n: l10n, isAr: isAr),
               ],
@@ -70,6 +75,7 @@ class AdminAuditLogScreen extends ConsumerWidget {
                 bottom: CoreSpacing.xxl(context),
               ),
               children: [
+                if (readOnly) const WidgetsReadOnlyHubBanner(),
                 _AuditHero(l10n: l10n, isAr: isAr),
                 SizedBox(height: CoreSpacing.lg(context)),
                 if (isWide)
@@ -77,14 +83,18 @@ class AdminAuditLogScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(flex: 6, child: timeline),
-                      SizedBox(width: CoreSpacing.lg(context)),
-                      Expanded(flex: 4, child: controls),
+                      if (!readOnly) ...[
+                        SizedBox(width: CoreSpacing.lg(context)),
+                        Expanded(flex: 4, child: controls),
+                      ],
                     ],
                   )
                 else ...[
                   timeline,
-                  SizedBox(height: CoreSpacing.lg(context)),
-                  controls,
+                  if (!readOnly) ...[
+                    SizedBox(height: CoreSpacing.lg(context)),
+                    controls,
+                  ],
                 ],
               ],
             );
@@ -126,7 +136,7 @@ class _AuditHero extends ConsumerWidget {
     return Container(
       padding: EdgeInsets.all(CoreSpacing.lg(context)),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         gradient: const LinearGradient(
           colors: [CoreColors.brandBrown, CoreColors.brandOlive],
           begin: AlignmentDirectional.topStart,
@@ -136,16 +146,14 @@ class _AuditHero extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SoftBadge(
-            label: isAr ? 'سجل تدقيق حقيقي' : 'True Audit Trail',
+          WidgetsSoftBadge(
+            label: l10n.auditLogTrueTrailBadge,
             color: CoreColors.surfaceLight,
             foreground: CoreColors.brandBrown,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           Text(
-            isAr
-                ? 'تتبع من غيّر ماذا، متى، ومن أي منطقة تشغيلية.'
-                : 'Track who changed what, when, and from which operational area.',
+l10n.auditLogHeroHeadline,
             style: CoreTypography.headlineSmall(
               context,
               CoreColors.surfaceLight,
@@ -157,17 +165,17 @@ class _AuditHero extends ConsumerWidget {
             runSpacing: CoreSpacing.sm(context),
             children: [
               _HeroChip(
-                label: isAr ? 'أحداث اليوم' : 'Today events',
+                label: l10n.auditLogTodayEvents,
                 value: '$todayEvents',
                 icon: Icons.fact_check_outlined,
               ),
               _HeroChip(
-                label: isAr ? 'تغييرات حساسة' : 'Sensitive changes',
+                label: l10n.auditLogSensitiveChanges,
                 value: '$sensitiveChanges',
                 icon: Icons.privacy_tip_outlined,
               ),
               _HeroChip(
-                label: isAr ? 'بحاجة مراجعة' : 'Needs review',
+                label: l10n.auditLogNeedsReview,
                 value: '$needsReview',
                 icon: Icons.priority_high_outlined,
               ),
@@ -188,9 +196,7 @@ class _AuditHero extends ConsumerWidget {
                             context: context,
                             title: l10n.ownerRequestAudit,
                             message:
-                                isAr
-                                    ? 'سيتم تسجيل طلب تدقيق مفصل للمراجعة.'
-                                    : 'A detailed audit request will be logged for review.',
+l10n.auditLogRequestConfirmMessage,
                             confirmLabel: l10n.actionConfirm,
                             cancelLabel: l10n.actionCancel,
                             icon: Icons.assignment_outlined,
@@ -207,7 +213,7 @@ class _AuditHero extends ConsumerWidget {
                 icon: Icons.assignment_outlined,
               ),
               WidgetsAppButton(
-                label: isAr ? 'تصدير السجل' : 'Export log',
+                label: l10n.auditLogExportLog,
                 onPressed: () async {
                   final filter = ref.read(adminAuditFilterProvider);
                   ref.read(adminFinancialProvider.notifier).recordAuditExport();
@@ -223,7 +229,7 @@ class _AuditHero extends ConsumerWidget {
                   if (!context.mounted) return;
                   UtilityMockFeedback.showSuccess(
                     context,
-                    isAr ? 'تم تنزيل ملف التصدير' : 'Export file downloaded',
+                    l10n.auditLogExportDownloaded,
                   );
                 },
                 icon: Icons.ios_share_outlined,
@@ -269,10 +275,8 @@ class _AuditTimeline extends ConsumerWidget {
     return WidgetsAppCard(
       title: l10n.screenAuditLog,
       subtitle:
-          isAr
-              ? 'خط زمني للأحداث الإدارية والتشغيلية.'
-              : 'Timeline of administrative and operational events.',
-      leading: const _IconBubble(
+l10n.auditLogTimelineSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.history_edu_outlined,
         color: CoreColors.brandBrown,
       ),
@@ -281,9 +285,7 @@ class _AuditTimeline extends ConsumerWidget {
               ? Padding(
                 padding: EdgeInsets.symmetric(vertical: CoreSpacing.md(context)),
                 child: Text(
-                  isAr
-                      ? 'لا أحداث في هذا النطاق.'
-                      : 'No events in this scope.',
+l10n.auditLogNoEventsInScope,
                   style: CoreTypography.bodyMedium(
                     context,
                     Theme.of(context).colorScheme.onSurfaceVariant,
@@ -318,14 +320,12 @@ List<_AuditEvent> _buildAuditEvents({
     events.add(
       _AuditEvent(
         category: 'finance',
-        title: isAr ? 'طلب تدقيق مفصل' : 'Detailed audit requested',
-        actor: isAr ? 'المالك' : 'Owner',
-        area: isAr ? 'الحوكمة' : 'Governance',
+        title: l10n.auditLogDetailedAuditRequested,
+        actor: l10n.auditLogActorOwner,
+        area: l10n.auditLogAreaGovernance,
         time: DateFormat.jm().format(financial.auditRequestedAt!),
         detail:
-            isAr
-                ? 'تم تسجيل الطلب للمراجعة قبل نهاية الوردية.'
-                : 'Request logged for review before shift close.',
+l10n.auditLogAuditRequestDetail,
         color: CoreColors.semanticTip,
         icon: Icons.assignment_outlined,
       ),
@@ -335,14 +335,12 @@ List<_AuditEvent> _buildAuditEvents({
     events.add(
       _AuditEvent(
         category: 'finance',
-        title: isAr ? 'تصدير سجل التدقيق' : 'Audit log exported',
-        actor: isAr ? 'المشغل' : 'Operator',
-        area: isAr ? 'التقارير' : 'Reports',
+        title: l10n.auditLogAuditExported,
+        actor: l10n.auditLogActorOperator,
+        area: l10n.auditLogAreaReports,
         time: DateFormat.jm().format(financial.lastAuditExportAt!),
         detail:
-            isAr
-                ? 'تم تنزيل ملف CSV للسجل.'
-                : 'CSV audit file downloaded.',
+l10n.auditLogAuditExportDetail,
         color: CoreColors.brandBrown,
         icon: Icons.ios_share_outlined,
       ),
@@ -352,14 +350,12 @@ List<_AuditEvent> _buildAuditEvents({
     events.add(
       _AuditEvent(
         category: 'finance',
-        title: isAr ? 'اعتماد إغلاق الوردية' : 'Shift close approved',
-        actor: isAr ? 'المالية' : 'Finance',
-        area: isAr ? 'إغلاق الكاش' : 'Cash close',
-        time: isAr ? 'اليوم' : 'Today',
+        title: l10n.auditLogShiftCloseApproved,
+        actor: l10n.auditLogActorFinance,
+        area: l10n.auditLogAreaCashClose,
+        time: l10n.auditLogToday,
         detail:
-            isAr
-                ? 'تم اعتماد الإيراد والبقشيش والمرتجعات.'
-                : 'Revenue, tips, and refunds approved.',
+l10n.auditLogShiftCloseDetail,
         color: CoreColors.semanticRevenue,
         icon: Icons.point_of_sale_outlined,
       ),
@@ -374,14 +370,14 @@ List<_AuditEvent> _buildAuditEvents({
         category: 'users',
         title:
             entry.value
-                ? (isAr ? 'تفعيل مستخدم' : 'User activated')
-                : (isAr ? 'تعطيل مستخدم' : 'User deactivated'),
-        actor: isAr ? 'المشغل' : 'Operator',
+                ? l10n.auditLogUserActivated
+                : l10n.auditLogUserDeactivated,
+        actor: l10n.auditLogActorOperator,
         area:
             member == null
                 ? entry.key
                 : (isAr ? member.nameAr : member.nameEn),
-        time: isAr ? 'اليوم' : 'Today',
+        time: l10n.auditLogToday,
         detail: entry.key,
         color: CoreColors.orderTypeDelivery,
         icon: Icons.admin_panel_settings_outlined,
@@ -392,14 +388,12 @@ List<_AuditEvent> _buildAuditEvents({
     events.add(
       _AuditEvent(
         category: 'plates',
-        title: isAr ? 'حفظ إعدادات العربون' : 'Deposit settings saved',
-        actor: isAr ? 'المالك' : 'Owner',
+        title: l10n.auditLogDepositSettingsSaved,
+        actor: l10n.auditLogActorOwner,
         area: l10n.screenDepositConfig,
-        time: isAr ? 'اليوم' : 'Today',
+        time: l10n.auditLogToday,
         detail:
-            isAr
-                ? 'عربون ${deposit.globalDepositJod.toStringAsFixed(2)} د.أ · ${deposit.returnWindowHours.round()} ساعة'
-                : 'Deposit ${deposit.globalDepositJod.toStringAsFixed(2)} JOD · ${deposit.returnWindowHours.round()}h window',
+l10n.auditLogDepositSavedDetail(deposit.globalDepositJod.toStringAsFixed(2), '${deposit.returnWindowHours.round()}'),
         color: CoreColors.semanticDeposit,
         icon: Icons.room_service_outlined,
       ),
@@ -410,8 +404,8 @@ List<_AuditEvent> _buildAuditEvents({
       _AuditEvent(
         category: 'plates',
         title: isAr ? report.titleAr : report.titleEn,
-        actor: isAr ? 'المخزون' : 'Logistics',
-        area: isAr ? 'كسر صواني' : 'Tray breakage',
+        actor: l10n.auditLogActorLogistics,
+        area: l10n.auditLogTrayBreakageArea,
         time: isAr ? report.timeAr : report.timeEn,
         detail: isAr ? report.metaAr : report.metaEn,
         color: CoreColors.semanticError,
@@ -425,7 +419,7 @@ List<_AuditEvent> _buildAuditEvents({
         category: 'inventory',
         title: isAr ? row.typeAr : row.typeEn,
         actor: isAr ? row.userAr : row.userEn,
-        area: isAr ? 'المخزون' : 'Inventory',
+        area: l10n.auditLogInventoryArea,
         time: isAr ? row.dateAr : row.dateEn,
         detail: isAr ? row.balanceAr : row.balanceEn,
         color:
@@ -438,36 +432,32 @@ List<_AuditEvent> _buildAuditEvents({
   events.addAll([
     _AuditEvent(
       category: 'users',
-      title: isAr ? 'تغيير صلاحية مستخدم' : 'User role changed',
-      actor: isAr ? 'المشغل أحمد' : 'Operator Ahmad',
-      area: isAr ? 'الأدوار والخصوصية' : 'Roles & Privacy',
-      time: isAr ? 'اليوم 09:42' : 'Today 09:42',
+      title: l10n.auditLogUserRoleChanged,
+      actor: l10n.auditLogActorOperatorAhmad,
+      area: l10n.auditLogAreaRolesPrivacy,
+      time: l10n.auditLogToday0942,
       detail:
-          isAr
-              ? 'تم نقل سارة من مطبخ إلى مشرفة محطة.'
-              : 'Sara moved from Kitchen to Station Supervisor.',
+l10n.auditLogRoleChangeDetail,
       color: CoreColors.orderTypeDelivery,
       icon: Icons.admin_panel_settings_outlined,
     ),
     _AuditEvent(
       category: 'finance',
-      title: isAr ? 'إغلاق وردية الكاشير' : 'Cashier shift closed',
-      actor: isAr ? 'الكاشير ليلى' : 'Cashier Layla',
-      area: isAr ? 'المالية' : 'Finance',
-      time: isAr ? 'اليوم 08:58' : 'Today 08:58',
+      title: l10n.auditLogCashierShiftClosed,
+      actor: l10n.auditLogActorCashierLayla,
+      area: l10n.auditLogAreaFinance,
+      time: l10n.auditLogToday0858,
       detail:
-          isAr
-              ? 'تم اعتماد الإيراد، البقشيش، والمرتجعات.'
-              : 'Revenue, tips, and refunds were approved.',
+l10n.auditLogCashierCloseDetail,
       color: CoreColors.semanticRevenue,
       icon: Icons.point_of_sale_outlined,
     ),
     _AuditEvent(
       category: 'plates',
-      title: isAr ? 'تعديل عربون الصواني' : 'Tray deposit policy edited',
-      actor: isAr ? 'المالك' : 'Owner',
+      title: l10n.auditLogTrayDepositEdited,
+      actor: l10n.auditLogActorOwner,
       area: l10n.screenDepositConfig,
-      time: isAr ? 'أمس 18:20' : 'Yesterday 18:20',
+      time: l10n.auditLogYesterday1820,
       detail:
           isAr
               ? 'تم تغيير نافذة الإرجاع إلى ٤٨ ساعة.'
@@ -476,7 +466,7 @@ List<_AuditEvent> _buildAuditEvents({
       icon: Icons.room_service_outlined,
     ),
     for (final entry in MockupCatalog.auditLogs)
-      _AuditEvent.fromEntry(entry: entry, isAr: isAr),
+      _AuditEvent.fromEntry(entry: entry, isAr: isAr, l10n: l10n),
   ]);
 
   return events;
@@ -501,9 +491,9 @@ class _AuditFiltersCard extends ConsumerWidget {
     final selected = ref.watch(adminAuditFilterProvider).category;
 
     return WidgetsAppCard(
-      title: isAr ? 'فلاتر التدقيق' : 'Audit Filters',
-      subtitle: isAr ? 'اختر نطاق التدقيق بسرعة.' : 'Scope the log quickly.',
-      leading: const _IconBubble(
+      title: l10n.auditLogFiltersTitle,
+      subtitle: l10n.auditLogFiltersSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.filter_list,
         color: CoreColors.brandOlive,
       ),
@@ -528,8 +518,9 @@ class _AuditFiltersCard extends ConsumerWidget {
 }
 
 class _SecuritySnapshotCard extends ConsumerWidget {
-  const _SecuritySnapshotCard({required this.isAr});
+  const _SecuritySnapshotCard({required this.l10n, required this.isAr});
 
+  final AppLocalizations l10n;
   final bool isAr;
 
   @override
@@ -544,29 +535,29 @@ class _SecuritySnapshotCard extends ConsumerWidget {
         (financial.auditRequestedAt != null ? 1 : 0);
 
     return WidgetsAppCard(
-      title: isAr ? 'حالة الحوكمة' : 'Governance Snapshot',
+      title: l10n.auditLogGovernanceTitle,
       subtitle:
           isAr
               ? 'ملخص لما يحتاج مراجعة قبل نهاية اليوم.'
               : 'What needs review before end of day.',
-      leading: const _IconBubble(
+      leading: WidgetsIconBubble(
         icon: Icons.security_outlined,
         color: CoreColors.semanticTip,
       ),
       child: Column(
         children: [
           _SnapshotLine(
-            label: isAr ? 'محاولات دخول فاشلة' : 'Failed login attempts',
+            label: l10n.auditLogFailedLogins,
             value: '0',
             color: CoreColors.semanticSuccess,
           ),
           _SnapshotLine(
-            label: isAr ? 'تغييرات صلاحية' : 'Permission changes',
+            label: l10n.auditLogPermissionChanges,
             value: '$permissionChanges',
             color: CoreColors.orderTypeDelivery,
           ),
           _SnapshotLine(
-            label: isAr ? 'تعديلات مالية' : 'Financial edits',
+            label: l10n.auditLogFinancialEdits,
             value: '$financialEdits',
             color: CoreColors.semanticRevenue,
           ),
@@ -592,14 +583,14 @@ class _InventoryAuditCard extends ConsumerWidget {
           isAr
               ? 'آخر تغيرات المخزون كجزء من التدقيق.'
               : 'Recent stock changes as part of the audit trail.',
-      leading: const _IconBubble(
+      leading: WidgetsIconBubble(
         icon: Icons.inventory_2_outlined,
         color: CoreColors.brandOlive,
       ),
       child:
           rows.isEmpty
               ? Text(
-                isAr ? 'لا تغييرات مخزون بعد.' : 'No stock changes yet.',
+                l10n.auditLogNoStockChanges,
                 style: CoreTypography.bodyMedium(
                   context,
                   Theme.of(context).colorScheme.onSurfaceVariant,
@@ -628,11 +619,11 @@ class _AuditTimelineRow extends StatelessWidget {
       children: [
         Column(
           children: [
-            _IconBubble(icon: event.icon, color: event.color),
+            WidgetsIconBubble(icon: event.icon, color: event.color),
             if (!isLast)
               Container(
                 width: 2,
-                height: 72,
+                height: UtilitySizer.of(context, 72),
                 color: event.color.withValues(alpha: 0.20),
               ),
           ],
@@ -656,7 +647,7 @@ class _AuditTimelineRow extends StatelessWidget {
                         ).copyWith(fontWeight: FontWeight.w900),
                       ),
                     ),
-                    _SoftBadge(label: event.time, color: event.color),
+                    WidgetsSoftBadge(label: event.time, color: event.color),
                   ],
                 ),
                 SizedBox(height: CoreSpacing.xs(context)),
@@ -699,14 +690,14 @@ class _InventoryAuditRow extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Row(
         children: [
-          _IconBubble(
+          WidgetsIconBubble(
             icon: Icons.inventory_outlined,
             color: color,
-            compact: true,
+            size: UtilitySizer.of(context, 36), iconSize: CoreContentSizes.orderTypeIcon(context),
           ),
           SizedBox(width: CoreSpacing.sm(context)),
           Expanded(
@@ -721,7 +712,8 @@ class _InventoryAuditRow extends StatelessWidget {
                   ).copyWith(fontWeight: FontWeight.w900),
                 ),
                 Text(
-                  '${isAr ? row.dateAr : row.dateEn} · ${isAr ? row.userAr : row.userEn}',
+                  '${isAr ? row.dateAr : row.dateEn} · ${isAr ? row.userAr : row.userEn}'
+                  '${row.evidenceKey != null && row.evidenceKey!.isNotEmpty ? ' · ${row.evidenceKey}' : ''}',
                   style: CoreTypography.caption(
                     context,
                     Theme.of(context).colorScheme.onSurfaceVariant,
@@ -769,7 +761,7 @@ class _SnapshotLine extends StatelessWidget {
               ),
             ),
           ),
-          _SoftBadge(label: value, color: color),
+          WidgetsSoftBadge(label: value, color: color),
         ],
       ),
     );
@@ -793,11 +785,11 @@ class _FilterChip extends StatelessWidget {
       label: Text(label),
       avatar:
           selected
-              ? const Icon(Icons.check, size: 18, color: CoreColors.brandOlive)
+              ? Icon(Icons.check, size: CoreContentSizes.orderTypeIcon(context), color: CoreColors.brandOlive)
               : null,
       onPressed: onSelected,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
         side: BorderSide(
           color:
               selected
@@ -825,11 +817,11 @@ class _HeroChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 168,
+      width: UtilitySizer.of(context, 168),
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: CoreColors.surfaceLight.withValues(alpha: 0.16),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(
           color: CoreColors.surfaceLight.withValues(alpha: 0.30),
         ),
@@ -867,61 +859,6 @@ class _HeroChip extends StatelessWidget {
   }
 }
 
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({
-    required this.icon,
-    required this.color,
-    this.compact = false,
-  });
-
-  final IconData icon;
-  final Color color;
-  final bool compact;
-
-  @override
-  Widget build(BuildContext context) {
-    final size = compact ? 36.0 : 42.0;
-    return Container(
-      width: size,
-      height: size,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-      ),
-      child: Icon(icon, color: color, size: compact ? 18 : 22),
-    );
-  }
-}
-
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({required this.label, required this.color, this.foreground});
-
-  final String label;
-  final Color color;
-  final Color? foreground;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.sm(context),
-        vertical: CoreSpacing.xs(context),
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: foreground == null ? 0.12 : 1),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-      ),
-      child: Text(
-        label,
-        style: CoreTypography.caption(
-          context,
-          foreground ?? color,
-        ).copyWith(fontWeight: FontWeight.w900),
-      ),
-    );
-  }
-}
-
 class _AuditEvent {
   const _AuditEvent({
     required this.category,
@@ -937,6 +874,7 @@ class _AuditEvent {
   factory _AuditEvent.fromEntry({
     required ModelListEntry entry,
     required bool isAr,
+    required AppLocalizations l10n,
   }) {
     final category = switch (entry.id) {
       'log1' => 'users',
@@ -946,13 +884,10 @@ class _AuditEvent {
     return _AuditEvent(
       category: category,
       title: isAr ? entry.titleAr : entry.titleEn,
-      actor: isAr ? 'النظام' : 'System',
-      area: isAr ? 'سجل الإدارة' : 'Admin log',
+      actor: l10n.auditLogActorSystem,
+      area: l10n.auditLogAreaAdminLog,
       time: isAr ? entry.subtitleAr ?? '' : entry.subtitleEn ?? '',
-      detail:
-          isAr
-              ? 'تم تسجيل الحدث في سجل التدقيق الإداري.'
-              : 'Event recorded in the administrative audit trail.',
+      detail: l10n.auditLogSystemEntryDetail,
       color: CoreColors.brandBrown,
       icon: Icons.fact_check_outlined,
     );

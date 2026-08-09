@@ -41,7 +41,7 @@ class WidgetsChoiceCard extends StatelessWidget {
             DecoratedBox(
               decoration: BoxDecoration(
                 color: accent.withValues(alpha: selected ? 0.18 : 0.10),
-                borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+                borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
               ),
               child: SizedBox.square(
                 dimension: CoreContentSizes.logoCard(context),

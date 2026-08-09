@@ -1,12 +1,8 @@
-import 'package:ayletna_restaurant_app/core/app_config.dart';
-import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
-import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_demo_mode_banner.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-/// Primary action on demo / ops screens — shows info feedback instead of fake success.
+/// Primary action button with success feedback (works with in-memory or API).
 class WidgetsMockActionButton extends StatelessWidget {
   const WidgetsMockActionButton({
     required this.label,
@@ -29,24 +25,14 @@ class WidgetsMockActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final path = GoRouterState.of(context).uri.path;
-    final isDemo =
-        AppConfig.demoModeEnabled && WidgetsDemoModeBanner.showsForPath(path);
-    final displayLabel = isDemo ? '$label · ${l10n.demoActionTag}' : label;
-
     return WidgetsAppButton(
-      label: displayLabel,
+      label: label,
       icon: icon,
-      variant: isDemo ? WidgetsAppButtonVariant.outline : variant,
+      variant: variant,
       fullWidth: fullWidth,
       onPressed:
           enabled
               ? () {
-                if (isDemo) {
-                  UtilityMockFeedback.showInfo(context, l10n.demoModeBanner);
-                  return;
-                }
                 UtilityMockFeedback.showSuccess(context, message);
                 onAfterAction?.call();
               }

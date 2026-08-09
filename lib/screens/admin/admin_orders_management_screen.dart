@@ -1,4 +1,5 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:ayletna_restaurant_app/data/models/model_order_summary.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
@@ -8,9 +9,12 @@ import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_filter_chip.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_hub_nav_actions.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -23,42 +27,14 @@ class AdminOrdersManagementScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final isAr = Localizations.localeOf(context).languageCode == 'ar';
-    final activeOrders = ref.watch(adminActiveOrdersProvider);
+    final activeOrders = ref.watch(adminFilteredActiveOrdersProvider);
+    final filterState = ref.watch(adminOrdersFilterProvider);
     final completedOrders = MockupCatalog.orderHistory;
 
     return WidgetsScaffoldPage(
       title: l10n.screenOrdersManagement,
       actions: [
-        WidgetsIconButton(
-          onPressed:
-              () => UtilityMockFeedback.showActionSheet(
-                context: context,
-                title: isAr ? 'فلترة لوحة الطلبات' : 'Filter order board',
-                message:
-                    isAr
-                        ? 'فلترة حسب القناة، المحطة، أو حالة التأخير.'
-                        : 'Filter by channel, station, or delay status.',
-                actions: [
-                  MockSheetAction(
-                    label: l10n.orderTypeDineIn,
-                    icon: Icons.table_restaurant_outlined,
-                    onSelected: () {},
-                  ),
-                  MockSheetAction(
-                    label: l10n.orderTypeDelivery,
-                    icon: Icons.delivery_dining_outlined,
-                    onSelected: () {},
-                  ),
-                ],
-              ),
-          icon: Icons.tune_outlined,
-          tooltip: isAr ? 'فلترة' : 'Filter',
-        ),
-        WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.admin),
-          icon: Icons.dashboard_outlined,
-          tooltip: l10n.screenAdminDashboard,
-        ),
+        ...WidgetsHubNavActions.forContext(context),
       ],
       child: WidgetsRefreshList(
         onRefresh: () async {
@@ -79,17 +55,22 @@ class AdminOrdersManagementScreen extends ConsumerWidget {
                   activeOrders: activeOrders,
                 ),
                 SizedBox(height: CoreSpacing.lg(context)),
+                _OrderTypeFilters(
+                  l10n: l10n,
+                  currentFilter: filterState.orderTypeFilter,
+                  onFilterChanged: (value) =>
+                      ref.read(adminOrdersFilterProvider.notifier).setOrderTypeFilter(value),
+                ),
+                SizedBox(height: CoreSpacing.md(context)),
                 if (isWide)
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: _OrderLane(
-                          title: isAr ? 'بانتظار القرار' : 'Needs Decision',
+                          title: l10n.ordersMgmtLaneNeedsDecision,
                           subtitle:
-                              isAr
-                                  ? 'تأخير أو نقص أو تصعيد'
-                                  : 'Late, missing, or escalated',
+l10n.ordersMgmtLaneNeedsDecisionSub,
                           orders:
                               activeOrders
                                   .where(
@@ -104,11 +85,8 @@ class AdminOrdersManagementScreen extends ConsumerWidget {
                       SizedBox(width: CoreSpacing.md(context)),
                       Expanded(
                         child: _OrderLane(
-                          title: isAr ? 'في التحضير' : 'Preparing',
-                          subtitle:
-                              isAr
-                                  ? 'تحت متابعة المطبخ'
-                                  : 'Kitchen in progress',
+                          title: l10n.ordersMgmtLanePreparing,
+                          subtitle: l10n.ordersMgmtLanePreparingSub,
                           orders:
                               activeOrders
                                   .where(
@@ -123,11 +101,8 @@ class AdminOrdersManagementScreen extends ConsumerWidget {
                       SizedBox(width: CoreSpacing.md(context)),
                       Expanded(
                         child: _OrderLane(
-                          title: isAr ? 'جاهز / في الطريق' : 'Ready / On Route',
-                          subtitle:
-                              isAr
-                                  ? 'جاهز للتسليم أو خرج'
-                                  : 'Ready to handoff or on the road',
+                          title: l10n.ordersMgmtLaneReadyRoute,
+                          subtitle: l10n.ordersMgmtLaneReadyRouteSub,
                           orders:
                               activeOrders
                                   .where(
@@ -145,11 +120,8 @@ class AdminOrdersManagementScreen extends ConsumerWidget {
                   )
                 else ...[
                   _OrderLane(
-                    title: isAr ? 'بانتظار القرار' : 'Needs Decision',
-                    subtitle:
-                        isAr
-                            ? 'تأخير أو نقص أو تصعيد'
-                            : 'Late, missing, or escalated',
+                    title: l10n.ordersMgmtLaneNeedsDecision,
+                    subtitle: l10n.ordersMgmtLaneNeedsDecisionSub,
                     orders:
                         activeOrders
                             .where((order) => order.statusKey == 'pending')
@@ -160,9 +132,9 @@ class AdminOrdersManagementScreen extends ConsumerWidget {
                   ),
                   SizedBox(height: CoreSpacing.lg(context)),
                   _OrderLane(
-                    title: isAr ? 'في التحضير' : 'Preparing',
+                    title: l10n.ordersMgmtLanePreparing,
                     subtitle:
-                        isAr ? 'تحت متابعة المطبخ' : 'Kitchen in progress',
+                        l10n.ordersMgmtLanePreparingSub,
                     orders:
                         activeOrders
                             .where((order) => order.statusKey == 'preparing')
@@ -173,11 +145,8 @@ class AdminOrdersManagementScreen extends ConsumerWidget {
                   ),
                   SizedBox(height: CoreSpacing.lg(context)),
                   _OrderLane(
-                    title: isAr ? 'جاهز / في الطريق' : 'Ready / On Route',
-                    subtitle:
-                        isAr
-                            ? 'جاهز للتسليم أو خرج'
-                            : 'Ready to handoff or on the road',
+                    title: l10n.ordersMgmtLaneReadyRoute,
+                    subtitle: l10n.ordersMgmtLaneReadyRouteSub,
                     orders:
                         activeOrders
                             .where(
@@ -226,7 +195,7 @@ class _OrdersBoardHero extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(CoreSpacing.lg(context)),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         gradient: const LinearGradient(
           colors: [CoreColors.brandOlive, CoreColors.brandBrown],
           begin: AlignmentDirectional.topStart,
@@ -236,16 +205,14 @@ class _OrdersBoardHero extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SoftBadge(
-            label: isAr ? 'لوحة الطلبات الحية' : 'Live Order Board',
+          WidgetsSoftBadge(
+            label: l10n.ordersMgmtHeroBadge,
             color: CoreColors.surfaceLight,
             foreground: CoreColors.brandBrown,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           Text(
-            isAr
-                ? 'تابع كل طلب من الكاشير إلى المطبخ ثم التسليم.'
-                : 'Track every order from POS to kitchen to handoff.',
+            l10n.ordersMgmtHeroHeadline,
             style: CoreTypography.headlineSmall(
               context,
               CoreColors.surfaceLight,
@@ -257,12 +224,12 @@ class _OrdersBoardHero extends StatelessWidget {
             runSpacing: CoreSpacing.sm(context),
             children: [
               _HeroStat(
-                label: isAr ? 'طلبات مفتوحة' : 'Open orders',
+                label: l10n.ordersMgmtOpenOrders,
                 value: activeOrders.length.toString(),
                 icon: Icons.receipt_long_outlined,
               ),
               _HeroStat(
-                label: isAr ? 'قيمة نشطة' : 'Active value',
+                label: l10n.ordersMgmtActiveValue,
                 value: UtilityFormatJod.format(
                   activeRevenue,
                   suffix: l10n.currencyJod,
@@ -270,7 +237,7 @@ class _OrdersBoardHero extends StatelessWidget {
                 icon: Icons.payments_outlined,
               ),
               _HeroStat(
-                label: isAr ? 'طلبات صواني' : 'Plated orders',
+                label: l10n.ordersMgmtPlatedOrders,
                 value:
                     activeOrders
                         .where((order) => order.isPlated)
@@ -312,7 +279,7 @@ class _OrderLane extends StatelessWidget {
       child: Column(
         children: [
           if (orders.isEmpty)
-            _EmptyLane(message: isAr ? 'لا توجد طلبات هنا' : 'No orders here')
+            _EmptyLane(message: l10n.ordersMgmtEmptyLane)
           else
             for (final order in orders)
               _AdminOrderCard(order: order, l10n: l10n, isAr: isAr),
@@ -344,7 +311,7 @@ class _AdminOrderCard extends ConsumerWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.18)),
       ),
       child: Column(
@@ -353,7 +320,7 @@ class _AdminOrderCard extends ConsumerWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _IconBubble(icon: _typeIcon(order.orderType), color: color),
+              WidgetsIconBubble(size: UtilitySizer.of(context, 38), iconSize: CoreContentSizes.buttonIcon(context), icon: _typeIcon(order.orderType), color: color),
               SizedBox(width: CoreSpacing.sm(context)),
               Expanded(
                 child: Column(
@@ -371,16 +338,16 @@ class _AdminOrderCard extends ConsumerWidget {
                       spacing: CoreSpacing.xs(context),
                       runSpacing: CoreSpacing.xs(context),
                       children: [
-                        _SoftBadge(
+                        WidgetsSoftBadge(
                           label: _typeLabel(l10n, order.orderType),
                           color: color,
                         ),
-                        _SoftBadge(
+                        WidgetsSoftBadge(
                           label: _statusLabel(l10n, order.statusKey),
                           color: _statusColor(order.statusKey),
                         ),
                         if (order.isPlated)
-                          _SoftBadge(
+                          WidgetsSoftBadge(
                             label: l10n.orderTypePlated,
                             color: CoreColors.semanticDeposit,
                           ),
@@ -399,16 +366,16 @@ class _AdminOrderCard extends ConsumerWidget {
             ],
           ),
           SizedBox(height: CoreSpacing.md(context)),
-          _OrderOperationalLine(order: order, isAr: isAr),
+          _OrderOperationalLine(order: order, l10n: l10n),
           SizedBox(height: CoreSpacing.md(context)),
           Row(
             children: [
               Expanded(
                 child: WidgetsAppButton(
-                  label: isAr ? 'افتح التفاصيل' : 'Open detail',
+                  label: l10n.ordersMgmtOpenDetail,
                   onPressed:
                       () => context.push(
-                        '${AppRoutePaths.adminOrderDetail}?id=${order.id}',
+                        '${AppRoutePaths.operatorOrderDetail}?id=${order.id}',
                       ),
                   variant: WidgetsAppButtonVariant.secondary,
                   icon: Icons.timeline_outlined,
@@ -416,7 +383,7 @@ class _AdminOrderCard extends ConsumerWidget {
               ),
               SizedBox(width: CoreSpacing.sm(context)),
               WidgetsAppButton(
-                label: isAr ? 'تصعيد' : 'Escalate',
+                label: l10n.ordersMgmtEscalate,
                 onPressed:
                     escalated
                         ? null
@@ -426,7 +393,7 @@ class _AdminOrderCard extends ConsumerWidget {
                               .escalateOrder(order.id);
                           UtilityMockFeedback.showWarning(
                             context,
-                            isAr ? 'تم تسجيل التصعيد' : 'Escalation logged',
+                            l10n.ordersMgmtEscalationLogged,
                           );
                         },
                 variant: WidgetsAppButtonVariant.outline,
@@ -440,30 +407,18 @@ class _AdminOrderCard extends ConsumerWidget {
 }
 
 class _OrderOperationalLine extends StatelessWidget {
-  const _OrderOperationalLine({required this.order, required this.isAr});
+  const _OrderOperationalLine({required this.order, required this.l10n});
 
   final ModelOrderSummary order;
-  final bool isAr;
+  final AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
     final message = switch (order.statusKey) {
-      'pending' =>
-        isAr
-            ? 'بانتظار تأكيد المطبخ أو توفر المادة.'
-            : 'Waiting for kitchen confirmation or item availability.',
-      'ready' =>
-        isAr
-            ? 'جاهز للتسليم، تحقق من التغليف.'
-            : 'Ready for handoff, verify packaging.',
-      'on_way' =>
-        isAr
-            ? 'خرج للتوصيل، راقب وقت الوصول.'
-            : 'On route, monitor arrival time.',
-      _ =>
-        isAr
-            ? 'قيد التحضير، راقب وقت المحطة.'
-            : 'In preparation, watch station timing.',
+      'pending' => l10n.ordersMgmtOpPending,
+      'ready' => l10n.ordersMgmtOpReady,
+      'on_way' => l10n.ordersMgmtOpOnWay,
+      _ => l10n.ordersMgmtOpPreparing,
     };
     return Text(
       message,
@@ -489,13 +444,10 @@ class _RecentlyClosedOrders extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WidgetsAppCard(
-      title: isAr ? 'أغلقت مؤخراً' : 'Recently Closed',
-      subtitle:
-          isAr
-              ? 'طلبات مكتملة أو مسلمة للتدقيق السريع.'
-              : 'Completed or delivered orders for quick audit.',
+      title: l10n.ordersMgmtRecentlyClosed,
+      subtitle: l10n.ordersMgmtRecentlyClosedSub,
       trailing: WidgetsAppButton(
-        label: isAr ? 'السجل' : 'History',
+        label: l10n.ordersMgmtHistory,
         onPressed: () => context.push(AppRoutePaths.cashierOrderHistory),
         variant: WidgetsAppButtonVariant.ghost,
       ),
@@ -526,7 +478,7 @@ class _ClosedOrderRow extends StatelessWidget {
       padding: EdgeInsets.only(bottom: CoreSpacing.sm(context)),
       child: Row(
         children: [
-          _IconBubble(
+          WidgetsIconBubble(size: UtilitySizer.of(context, 38), iconSize: CoreContentSizes.buttonIcon(context), 
             icon: _typeIcon(order.orderType),
             color: order.orderType.color,
           ),
@@ -543,7 +495,7 @@ class _ClosedOrderRow extends StatelessWidget {
                   ).copyWith(fontWeight: FontWeight.w800),
                 ),
                 Text(
-                  '${_typeLabel(l10n, order.orderType)} · ${isAr ? 'تم التسليم' : 'Delivered'}',
+                  '${_typeLabel(l10n, order.orderType)} · ${l10n.ordersMgmtDeliveredStatus}',
                   style: CoreTypography.caption(
                     context,
                     Theme.of(context).colorScheme.onSurfaceVariant,
@@ -579,11 +531,11 @@ class _HeroStat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 168,
+      width: UtilitySizer.of(context, 168),
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: CoreColors.surfaceLight.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(
           color: CoreColors.surfaceLight.withValues(alpha: 0.28),
         ),
@@ -635,7 +587,7 @@ class _EmptyLane extends StatelessWidget {
         color: Theme.of(
           context,
         ).colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Text(
         message,
@@ -644,55 +596,6 @@ class _EmptyLane extends StatelessWidget {
           context,
           Theme.of(context).colorScheme.onSurfaceVariant,
         ),
-      ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({required this.icon, required this.color});
-
-  final IconData icon;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 38,
-      height: 38,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-      ),
-      child: Icon(icon, color: color, size: 20),
-    );
-  }
-}
-
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({required this.label, required this.color, this.foreground});
-
-  final String label;
-  final Color color;
-  final Color? foreground;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.sm(context),
-        vertical: CoreSpacing.xs(context),
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: foreground == null ? 0.12 : 1),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-      ),
-      child: Text(
-        label,
-        style: CoreTypography.caption(
-          context,
-          foreground ?? color,
-        ).copyWith(fontWeight: FontWeight.w900),
       ),
     );
   }
@@ -733,4 +636,54 @@ IconData _typeIcon(OrderType type) {
     OrderType.delivery => Icons.delivery_dining_outlined,
     OrderType.platedDelivery => Icons.room_service_outlined,
   };
+}
+
+class _OrderTypeFilters extends StatelessWidget {
+  const _OrderTypeFilters({
+    required this.l10n,
+    required this.currentFilter,
+    required this.onFilterChanged,
+  });
+
+  final AppLocalizations l10n;
+  final String currentFilter;
+  final ValueChanged<String> onFilterChanged;
+
+  static const _filterOptions = [
+    ('all', null),
+    ('dineIn', Icons.table_restaurant_outlined),
+    ('takeaway', Icons.shopping_bag_outlined),
+    ('delivery', Icons.delivery_dining_outlined),
+    ('platedDelivery', Icons.room_service_outlined),
+  ];
+
+  String _label(String key) => switch (key) {
+    'all' => l10n.filterAll,
+    'dineIn' => l10n.orderTypeDineIn,
+    'takeaway' => l10n.orderTypeTakeaway,
+    'delivery' => l10n.orderTypeDelivery,
+    'platedDelivery' => l10n.orderTypePlated,
+    _ => key,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (final option in _filterOptions)
+            Padding(
+              padding: EdgeInsetsDirectional.only(end: CoreSpacing.sm(context)),
+              child: WidgetsFilterChip(
+                label: _label(option.$1),
+                selected: currentFilter == option.$1,
+                onSelected: (_) => onFilterChanged(option.$1),
+                icon: option.$2,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }

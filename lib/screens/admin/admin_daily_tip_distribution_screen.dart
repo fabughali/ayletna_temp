@@ -159,6 +159,14 @@ class _StaffBreakdownCard extends ConsumerWidget {
                       approved
                           ? null
                           : () async {
+                            final tipState = ref.read(adminTipDistributionProvider);
+                            if (tipState.poolJod <= 0) {
+                              UtilityMockFeedback.showError(
+                                context,
+                                l10n.adminTipPoolEmpty,
+                              );
+                              return;
+                            }
                             final confirmed = await UtilityMockFeedback.confirm(
                               context: context,
                               title: l10n.adminApproveAllDistributions,
@@ -181,15 +189,10 @@ class _StaffBreakdownCard extends ConsumerWidget {
             ],
           ),
           SizedBox(height: CoreSpacing.md(context)),
-          ...staffRows.map((row) => _StaffRow(row: row)),
+          ...staffRows.map((row) => _StaffRow(row: row, l10n: l10n)),
           if (MockupCatalog.adminTipDistributionRows.length > 5)
             WidgetsAppButton(
-              label:
-                  showAllStaff
-                      ? (Localizations.localeOf(context).languageCode == 'ar'
-                          ? 'عرض أقل'
-                          : 'Show less')
-                      : l10n.adminShowAllStaff,
+              label: showAllStaff ? l10n.adminShowLess : l10n.adminShowAllStaff,
               onPressed:
                   () =>
                       ref
@@ -205,15 +208,19 @@ class _StaffBreakdownCard extends ConsumerWidget {
 }
 
 class _StaffRow extends StatelessWidget {
-  const _StaffRow({required this.row});
+  const _StaffRow({required this.row, required this.l10n});
 
   final ModelAdminTipDistributionRow row;
+  final AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
     return WidgetsListItem(
       title: row.name,
-      subtitle: 'ID: ${row.orderId} - ${row.hours.toStringAsFixed(1)} hrs',
+      subtitle: l10n.adminTipRowSubtitle(
+        row.orderId,
+        row.hours.toStringAsFixed(1),
+      ),
       leading: WidgetsAvatar(initials: row.initials),
       trailing: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -221,7 +228,7 @@ class _StaffRow extends StatelessWidget {
           _RoleBadge(role: row.role),
           SizedBox(height: CoreSpacing.xs(context)),
           Text(
-            UtilityFormatJod.format(row.tipShareJod, suffix: 'JOD'),
+            UtilityFormatJod.format(row.tipShareJod, suffix: l10n.currencyJod),
             style: CoreTypography.caption(
               context,
               Theme.of(context).colorScheme.primary,
@@ -264,9 +271,9 @@ class _CalculationCard extends StatelessWidget {
       accentColor: CoreColors.semanticTip,
       child: Column(
         children: [
-          _CalcRow(label: l10n.adminNetSalesTips, value: 2112.67),
-          _CalcRow(label: l10n.adminDirectServicePremium, value: 248.55),
-          _CalcRow(label: l10n.adminCarryOver, value: 124.28),
+          _CalcRow(label: l10n.adminNetSalesTips, value: 2112.67, l10n: l10n),
+          _CalcRow(label: l10n.adminDirectServicePremium, value: 248.55, l10n: l10n),
+          _CalcRow(label: l10n.adminCarryOver, value: 124.28, l10n: l10n),
           Divider(height: CoreSpacing.xl(context)),
           WidgetsListItem(
             title: l10n.adminCalculatedPointRate,
@@ -284,10 +291,15 @@ class _CalculationCard extends StatelessWidget {
 }
 
 class _CalcRow extends StatelessWidget {
-  const _CalcRow({required this.label, required this.value});
+  const _CalcRow({
+    required this.label,
+    required this.value,
+    required this.l10n,
+  });
 
   final String label;
   final double value;
+  final AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
@@ -296,7 +308,7 @@ class _CalcRow extends StatelessWidget {
     return WidgetsListItem(
       title: label,
       trailing: Text(
-        UtilityFormatJod.format(value, suffix: 'JOD'),
+        UtilityFormatJod.format(value, suffix: l10n.currencyJod),
         style: CoreTypography.caption(
           context,
           scheme.onSurface,
@@ -358,7 +370,7 @@ class _ShareDistributionCard extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: colorForRole(entry.key),
                             borderRadius: BorderRadius.vertical(
-                              top: Radius.circular(CoreSpacing.radiusInput),
+                              top: Radius.circular(CoreSpacing.radiusInputOf(context)),
                             ),
                           ),
                         ),

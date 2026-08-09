@@ -9,24 +9,23 @@ import 'package:ayletna_restaurant_app/providers/cart_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_cart_option_labels.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_cashier_virtual_keypad.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_media_panel.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_food_tag.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_mock_food_image.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_price_badge.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_quantity_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:virtual_keypad/virtual_keypad.dart';
 
 Future<void> showWidgetsCartCustomizationSheet({
   required BuildContext context,
   required ModelMenuItem item,
   ModelCartLine? initialLine,
   String? replaceLineKey,
-  bool useVirtualKeypad = false,
 }) {
   return showModalBottomSheet<void>(
     context: context,
@@ -38,7 +37,6 @@ Future<void> showWidgetsCartCustomizationSheet({
           item: item,
           initialLine: initialLine,
           replaceLineKey: replaceLineKey,
-          useVirtualKeypad: useVirtualKeypad,
         ),
   );
 }
@@ -48,14 +46,12 @@ class WidgetsCartCustomizationSheet extends ConsumerStatefulWidget {
     required this.item,
     this.initialLine,
     this.replaceLineKey,
-    this.useVirtualKeypad = false,
     super.key,
   });
 
   final ModelMenuItem item;
   final ModelCartLine? initialLine;
   final String? replaceLineKey;
-  final bool useVirtualKeypad;
 
   @override
   ConsumerState<WidgetsCartCustomizationSheet> createState() =>
@@ -87,10 +83,7 @@ class _WidgetsCartCustomizationSheetState
   @override
   void initState() {
     super.initState();
-    _remarksController =
-        widget.useVirtualKeypad
-            ? VirtualKeypadController()
-            : TextEditingController();
+    _remarksController = TextEditingController();
     final initial = widget.initialLine;
     if (initial == null) return;
 
@@ -127,21 +120,18 @@ class _WidgetsCartCustomizationSheetState
 
     return Padding(
       padding: EdgeInsets.only(
-        bottom:
-            widget.useVirtualKeypad
-                ? 0
-                : MediaQuery.viewInsetsOf(context).bottom,
+        bottom: MediaQuery.viewInsetsOf(context).bottom,
       ),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: scheme.surface,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(CoreSpacing.radiusCard * 1.35),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(CoreSpacing.radiusCardOf(context) * 1.35),
           ),
           boxShadow: [
             BoxShadow(
               color: scheme.shadow.withValues(alpha: 0.16),
-              blurRadius: 28,
+              blurRadius: UtilitySizer.of(context, 28),
               offset: const Offset(0, -10),
             ),
           ],
@@ -150,162 +140,118 @@ class _WidgetsCartCustomizationSheetState
           constraints: BoxConstraints(
             maxHeight: MediaQuery.sizeOf(context).height * 0.90,
           ),
-          child: _buildSheetBody(
-            context: context,
-            l10n: l10n,
-            isAr: isAr,
-            scheme: scheme,
-            item: item,
-            totalText: totalText,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSheetBody({
-    required BuildContext context,
-    required AppLocalizations l10n,
-    required bool isAr,
-    required ColorScheme scheme,
-    required ModelMenuItem item,
-    required String totalText,
-  }) {
-    final content = Column(
-      children: [
-        Padding(
-          padding: EdgeInsetsDirectional.fromSTEB(
-            CoreSpacing.lg(context),
-            CoreSpacing.md(context),
-            CoreSpacing.lg(context),
-            CoreSpacing.sm(context),
-          ),
           child: Column(
             children: [
-              const _SheetHandle(),
-              SizedBox(height: CoreSpacing.md(context)),
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              Padding(
+                padding: EdgeInsetsDirectional.fromSTEB(
+                  CoreSpacing.lg(context),
+                  CoreSpacing.md(context),
+                  CoreSpacing.lg(context),
+                  CoreSpacing.sm(context),
+                ),
+                child: Column(
+                  children: [
+                    const _SheetHandle(),
+                    SizedBox(height: CoreSpacing.md(context)),
+                    Row(
                       children: [
-                        Text(
-                          l10n.screenCustomizationModal,
-                          style: CoreTypography.headlineSmall(
-                            context,
-                            scheme.onSurface,
-                          ).copyWith(fontWeight: FontWeight.w900),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.screenCustomizationModal,
+                                style: CoreTypography.headlineSmall(
+                                  context,
+                                  scheme.onSurface,
+                                ).copyWith(fontWeight: FontWeight.w900),
+                              ),
+                              SizedBox(height: CoreSpacing.xs(context)),
+                              Text(
+                                isAr ? item.nameAr : item.nameEn,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: CoreTypography.bodyMedium(
+                                  context,
+                                  scheme.onSurfaceVariant,
+                                ).copyWith(fontWeight: FontWeight.w800),
+                              ),
+                            ],
+                          ),
                         ),
-                        SizedBox(height: CoreSpacing.xs(context)),
-                        Text(
-                          isAr ? item.nameAr : item.nameEn,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: CoreTypography.bodyMedium(
-                            context,
-                            scheme.onSurfaceVariant,
-                          ).copyWith(fontWeight: FontWeight.w800),
+                        SizedBox(width: CoreSpacing.md(context)),
+                        WidgetsPriceBadge(
+                          priceLabel: UtilityFormatJod.format(
+                            item.priceJod,
+                            suffix: l10n.currencyJod,
+                          ),
+                          compact: true,
                         ),
                       ],
                     ),
-                  ),
-                  SizedBox(width: CoreSpacing.md(context)),
-                  WidgetsPriceBadge(
-                    priceLabel: UtilityFormatJod.format(
-                      item.priceJod,
-                      suffix: l10n.currencyJod,
-                    ),
-                    compact: true,
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        Divider(color: scheme.outlineVariant, height: 1),
-        Expanded(
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              ListView(
-                padding: EdgeInsetsDirectional.fromSTEB(
-                  CoreSpacing.lg(context),
-                  CoreSpacing.lg(context),
-                  CoreSpacing.lg(context),
-                  widget.useVirtualKeypad
-                      ? CoreSpacing.xxl(context) * 2
-                      : CoreSpacing.xl(context),
+                  ],
                 ),
-                children: [
-                  _ItemSummary(item: item, isAr: isAr),
-                  SizedBox(height: CoreSpacing.xl(context)),
-                  _QuantitySection(
-                    quantity: _quantity,
-                    onMinus:
-                        () => setState(() {
-                          if (_quantity > 1) _quantity--;
-                        }),
-                    onPlus: () => setState(() => _quantity++),
+              ),
+              Divider(color: scheme.outlineVariant, height: 1),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsetsDirectional.fromSTEB(
+                    CoreSpacing.lg(context),
+                    CoreSpacing.lg(context),
+                    CoreSpacing.lg(context),
+                    CoreSpacing.xl(context),
                   ),
-                  SizedBox(height: CoreSpacing.xl(context)),
-                  _PortionSection(
-                    selectedKey: _portionKey,
-                    onChanged:
-                        (portionKey) =>
-                            setState(() => _portionKey = portionKey),
-                  ),
-                  SizedBox(height: CoreSpacing.xl(context)),
-                  _AddonsSection(
-                    selectedKeys: _addonKeys,
-                    addonOptions: _addonOptions,
-                    onChanged:
-                        (key, selected) => setState(() {
-                          if (selected) {
-                            _addonKeys.add(key);
-                          } else {
-                            _addonKeys.remove(key);
-                          }
-                        }),
-                  ),
-                  SizedBox(height: CoreSpacing.xl(context)),
-                  if (widget.useVirtualKeypad)
-                    CashierTouchTextField(
-                      label: l10n.productSpecialInstructions,
-                      controller: _remarksController,
-                      maxLines: 3,
-                      hintText: l10n.productInstructionsHint,
-                      keyboardType: TextInputType.multiline,
-                      textInputAction: TextInputAction.newline,
-                    )
-                  else
+                  children: [
+                    _ItemSummary(item: item, isAr: isAr),
+                    SizedBox(height: CoreSpacing.xl(context)),
+                    _QuantitySection(
+                      quantity: _quantity,
+                      onMinus:
+                          () => setState(() {
+                            if (_quantity > 1) _quantity--;
+                          }),
+                      onPlus: () => setState(() => _quantity++),
+                    ),
+                    SizedBox(height: CoreSpacing.xl(context)),
+                    _PortionSection(
+                      selectedKey: _portionKey,
+                      onChanged:
+                          (portionKey) =>
+                              setState(() => _portionKey = portionKey),
+                    ),
+                    SizedBox(height: CoreSpacing.xl(context)),
+                    _AddonsSection(
+                      selectedKeys: _addonKeys,
+                      addonOptions: _addonOptions,
+                      onChanged:
+                          (key, selected) => setState(() {
+                            if (selected) {
+                              _addonKeys.add(key);
+                            } else {
+                              _addonKeys.remove(key);
+                            }
+                          }),
+                    ),
+                    SizedBox(height: CoreSpacing.xl(context)),
                     WidgetsAppTextField(
                       label: l10n.productSpecialInstructions,
                       controller: _remarksController,
                       maxLines: 3,
                       hintText: l10n.productInstructionsHint,
                     ),
-                ],
-              ),
-              if (widget.useVirtualKeypad)
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: CashierVirtualKeypadPanel(isAr: isAr, height: 240),
+                  ],
                 ),
+              ),
+              _SheetFooter(
+                totalText: totalText,
+                onCancel: () => Navigator.of(context).pop(),
+                onAdd: _addToCart,
+              ),
             ],
           ),
         ),
-        _SheetFooter(
-          totalText: totalText,
-          onCancel: () => Navigator.of(context).pop(),
-          onAdd: _addToCart,
-        ),
-      ],
+      ),
     );
-
-    if (!widget.useVirtualKeypad) return content;
-
-    return VirtualKeypadScope(child: content);
   }
 
   double _calculateTotal(double basePrice) {
@@ -371,9 +317,12 @@ class _SheetHandle extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.outlineVariant,
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
       ),
-      child: const SizedBox(width: 44, height: 4),
+      child: SizedBox(
+        width: CoreContentSizes.sheetGrabberWidth(context),
+        height: CoreContentSizes.sheetGrabberHeight(context),
+      ),
     );
   }
 }
@@ -394,8 +343,8 @@ class _ItemSummary extends StatelessWidget {
       child: Row(
         children: [
           SizedBox(
-            width: 96,
-            height: 82,
+            width: UtilitySizer.of(context, 96),
+            height: UtilitySizer.of(context, 82),
             child: WidgetsFoodMediaPanel(
               expand: true,
               child: WidgetsMockFoodImage(
@@ -467,11 +416,15 @@ class _QuantitySection extends StatelessWidget {
             ).copyWith(fontWeight: FontWeight.w900),
           ),
         ),
-        WidgetsQuantityStepper(
-          value: quantity,
-          min: 1,
-          onIncrement: onPlus,
-          onDecrement: onMinus,
+        SizedBox(width: CoreSpacing.md(context)),
+        Expanded(
+          child: WidgetsQuantityStepper(
+            value: quantity,
+            min: 1,
+            expanded: true,
+            onIncrement: onPlus,
+            onDecrement: onMinus,
+          ),
         ),
       ],
     );
@@ -504,7 +457,7 @@ class _PortionSection extends ConsumerWidget {
                 ).copyWith(fontWeight: FontWeight.w900),
               ),
             ),
-            _FoodTag(label: l10n.productRequired, color: scheme.primary),
+            WidgetsFoodTag(label: l10n.productRequired, color: scheme.primary),
           ],
         ),
         SizedBox(height: CoreSpacing.md(context)),
@@ -688,7 +641,7 @@ class _SheetFooter extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: scheme.shadow.withValues(alpha: 0.08),
-            blurRadius: 18,
+            blurRadius: UtilitySizer.of(context, 18),
             offset: const Offset(0, -8),
           ),
         ],
@@ -720,37 +673,3 @@ class _SheetFooter extends StatelessWidget {
     );
   }
 }
-
-class _FoodTag extends StatelessWidget {
-  const _FoodTag({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Text(
-          label,
-          style: CoreTypography.caption(
-            context,
-            color == scheme.primary ? scheme.primary : color,
-          ).copyWith(fontWeight: FontWeight.w900),
-        ),
-      ),
-    );
-  }
-}
-

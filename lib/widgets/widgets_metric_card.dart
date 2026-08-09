@@ -11,6 +11,7 @@ class WidgetsMetricCard extends StatelessWidget {
     this.icon,
     this.accentColor,
     this.compact = false,
+    this.onTap,
     super.key,
   });
 
@@ -20,6 +21,7 @@ class WidgetsMetricCard extends StatelessWidget {
   final IconData? icon;
   final Color? accentColor;
   final bool compact;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +29,7 @@ class WidgetsMetricCard extends StatelessWidget {
     final accent = accentColor ?? scheme.primary;
 
     return WidgetsAppCard(
+      onTap: onTap,
       accentColor: compact ? null : accent,
       padding: EdgeInsets.all(
         compact ? CoreSpacing.md(context) : CoreSpacing.lg(context),

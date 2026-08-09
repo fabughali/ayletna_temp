@@ -9,6 +9,9 @@ class UserProfile {
     required this.phone,
     required this.email,
     this.employeeId,
+    this.ownershipPercentage,
+    this.ownerViewConfigId,
+    this.avatarUrl,
     this.orderAlerts = true,
     this.shiftAlerts = true,
     this.marketing = false,
@@ -19,6 +22,9 @@ class UserProfile {
   final String phone;
   final String email;
   final String? employeeId;
+  final double? ownershipPercentage;
+  final String? ownerViewConfigId;
+  final String? avatarUrl;
   final bool orderAlerts;
   final bool shiftAlerts;
   final bool marketing;
@@ -31,9 +37,15 @@ class UserProfile {
     String? phone,
     String? email,
     String? employeeId,
+    double? ownershipPercentage,
+    String? ownerViewConfigId,
+    String? avatarUrl,
     bool? orderAlerts,
     bool? shiftAlerts,
     bool? marketing,
+    bool clearOwnership = false,
+    bool clearOwnerViewConfig = false,
+    bool clearAvatarUrl = false,
   }) {
     return UserProfile(
       displayNameAr: displayNameAr ?? this.displayNameAr,
@@ -41,6 +53,12 @@ class UserProfile {
       phone: phone ?? this.phone,
       email: email ?? this.email,
       employeeId: employeeId ?? this.employeeId,
+      ownershipPercentage:
+          clearOwnership ? null : (ownershipPercentage ?? this.ownershipPercentage),
+      ownerViewConfigId: clearOwnerViewConfig
+          ? null
+          : (ownerViewConfigId ?? this.ownerViewConfigId),
+      avatarUrl: clearAvatarUrl ? null : (avatarUrl ?? this.avatarUrl),
       orderAlerts: orderAlerts ?? this.orderAlerts,
       shiftAlerts: shiftAlerts ?? this.shiftAlerts,
       marketing: marketing ?? this.marketing,
@@ -70,6 +88,38 @@ class UserProfile {
         orderAlerts: false,
         shiftAlerts: false,
         marketing: false,
+      ),
+      AppRole.admin => const UserProfile(
+        displayNameAr: 'مدير التطبيق',
+        displayNameEn: 'App Administrator',
+        phone: MockupCatalog.staffPhone,
+        email: 'admin@ayletna.test',
+      ),
+      AppRole.operator => const UserProfile(
+        displayNameAr: 'مشغّل المطعم',
+        displayNameEn: 'Restaurant Operator',
+        phone: MockupCatalog.staffPhone,
+        email: 'operator@ayletna.test',
+      ),
+      AppRole.owner => const UserProfile(
+        displayNameAr: 'مالك مساهم',
+        displayNameEn: 'Shareholder Owner',
+        phone: MockupCatalog.staffPhone,
+        email: 'owner@ayletna.test',
+        ownershipPercentage: 35,
+        ownerViewConfigId: 'cfg-standard',
+      ),
+      AppRole.support => const UserProfile(
+        displayNameAr: 'موظف الدعم',
+        displayNameEn: 'Support Agent',
+        phone: MockupCatalog.staffPhone,
+        email: 'support@ayletna.test',
+      ),
+      AppRole.marketing => const UserProfile(
+        displayNameAr: 'مسؤول التسويق',
+        displayNameEn: 'Marketing Lead',
+        phone: MockupCatalog.staffPhone,
+        email: 'marketing@ayletna.test',
       ),
       _ => const UserProfile(
         displayNameAr: MockupCatalog.staffDisplayNameAr,

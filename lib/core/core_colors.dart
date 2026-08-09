@@ -9,6 +9,18 @@ abstract final class CoreColors {
   static const Color brandOliveLight = Color(0xFFA6A16A);
   static const Color brandOrange = Color(0xFFD88A52);
 
+  // Hub role accents (role selection cards — not theme primaries)
+  static const Color hubAdminAccent = Color(0xFF546E7A);
+  static const Color hubAdminAccentDark = Color(0xFF37474F);
+  static const Color hubMarketingAccent = Color(0xFF8E24AA);
+
+  // Social platform brand (marketing OAuth cards)
+  static const Color socialMetaBlue = Color(0xFF1877F2);
+  static const Color socialInstagramPink = Color(0xFFE4405F);
+
+  // Plates / inventory mock surfaces
+  static const Color plateProgressTrack = Color(0xFFE9E0CE);
+
   // Light surfaces
   static const Color backgroundLight = Color(0xFFF9F6F0);
   static const Color surfaceLight = Color(0xFFFFFFFF);

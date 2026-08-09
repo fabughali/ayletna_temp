@@ -24,48 +24,55 @@ class WidgetsListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: dense ? CoreSpacing.sm(context) : CoreSpacing.md(context),
-          vertical: dense ? CoreSpacing.sm(context) : CoreSpacing.md(context),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (leading != null) ...[
-              leading!,
-              SizedBox(width: CoreSpacing.md(context)),
-            ],
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: CoreTypography.bodyMedium(
-                      context,
-                      scheme.onSurface,
-                    ).copyWith(fontWeight: FontWeight.w800),
-                  ),
-                  if (subtitle != null)
+    return Semantics(
+      button: onTap != null,
+      enabled: onTap != null,
+      label: title,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal:
+                dense ? CoreSpacing.sm(context) : CoreSpacing.md(context),
+            vertical:
+                dense ? CoreSpacing.sm(context) : CoreSpacing.md(context),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (leading != null) ...[
+                leading!,
+                SizedBox(width: CoreSpacing.md(context)),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      subtitle!,
-                      style: CoreTypography.caption(
+                      title,
+                      style: CoreTypography.bodyMedium(
                         context,
-                        scheme.onSurfaceVariant,
-                      ),
+                        scheme.onSurface,
+                      ).copyWith(fontWeight: FontWeight.w800),
                     ),
-                ],
+                    if (subtitle != null)
+                      Text(
+                        subtitle!,
+                        style: CoreTypography.caption(
+                          context,
+                          scheme.onSurfaceVariant,
+                        ),
+                      ),
+                  ],
+                ),
               ),
-            ),
-            if (trailing != null) ...[
-              SizedBox(width: CoreSpacing.md(context)),
-              trailing!,
+              if (trailing != null) ...[
+                SizedBox(width: CoreSpacing.md(context)),
+                trailing!,
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

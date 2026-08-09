@@ -209,13 +209,6 @@ class _CustomerCartScreenState extends ConsumerState<CustomerCartScreen> {
 
     return WidgetsScaffoldPage(
       title: l10n.screenCart,
-      actions: [
-        WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.notifications),
-          icon: Icons.notifications_outlined,
-          tooltip: l10n.screenNotifications,
-        ),
-      ],
       bottomSheet:
           hasItems
               ? _StickyCartBar(

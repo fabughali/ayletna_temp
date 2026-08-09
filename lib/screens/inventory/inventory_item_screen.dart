@@ -1,13 +1,16 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:ayletna_restaurant_app/data/models/model_inventory_mock.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/inventory_session_providers.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_url_actions.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_avatar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_illustration_panel.dart';
@@ -22,14 +25,41 @@ import 'package:go_router/go_router.dart';
 
 /// PRD [InventoryItemScreen].
 class InventoryItemScreen extends ConsumerWidget {
-  const InventoryItemScreen({super.key});
+  const InventoryItemScreen({super.key, this.itemKey});
+
+  /// Stable key from alert/level `nameEn` (query `?item=`).
+  final String? itemKey;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final isAr = Localizations.localeOf(context).languageCode == 'ar';
+    final key = itemKey?.trim();
+    final alert = _resolveAlert(key);
+
+    if (alert == null) {
+      return WidgetsScaffoldPage(
+        title: l10n.screenInventoryItem,
+        child: ListView(
+          children: [
+            SizedBox(height: CoreSpacing.md(context)),
+            WidgetsAsyncStateCard.empty(
+              title: l10n.inventoryItemSelectTitle,
+              message: l10n.inventoryItemSelectBody,
+              actionLabel: l10n.inventoryItemOpenDashboard,
+              onAction: () => context.go(AppRoutePaths.inventory),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final title = isAr ? alert.nameAr : alert.nameEn;
+    final detail = isAr ? alert.detailAr : alert.detailEn;
+    final remaining = isAr ? alert.remainingAr : alert.remainingEn;
 
     return WidgetsScaffoldPage(
-      title: l10n.inventoryItemAtlanticSalmon,
+      title: title,
       actions: [
         WidgetsIconButton(
           onPressed: () => context.push(AppRoutePaths.notifications),
@@ -38,13 +68,18 @@ class InventoryItemScreen extends ConsumerWidget {
         ),
       ],
       child: WidgetsRefreshList(
-        onRefresh:
-            () async =>
-                UtilityMockFeedback.showInfo(context, l10n.screenInventoryItem),
+        onRefresh: () async {
+          ref.invalidate(inventoryStockProvider);
+          UtilityMockFeedback.showInfo(context, l10n.opsInventoryItemRefreshed);
+        },
         child: ListView(
           children: [
             SizedBox(height: CoreSpacing.md(context)),
-            _HeroSummary(l10n: l10n),
+            _HeroSummary(
+              l10n: l10n,
+              title: title,
+              subtitle: '$detail · $remaining',
+            ),
             SizedBox(height: CoreSpacing.lg(context)),
             _StockCard(l10n: l10n),
             SizedBox(height: CoreSpacing.lg(context)),
@@ -61,12 +96,43 @@ class InventoryItemScreen extends ConsumerWidget {
       ),
     );
   }
+
+  ModelInventoryAlert? _resolveAlert(String? key) {
+    if (key == null || key.isEmpty) return null;
+    final normalized = key.toLowerCase();
+    for (final alert in MockupCatalog.inventoryAlerts) {
+      if (alert.nameEn.toLowerCase() == normalized || alert.nameAr == key) {
+        return alert;
+      }
+    }
+    for (final level in MockupCatalog.inventoryLevels) {
+      if (level.nameEn.toLowerCase() == normalized || level.nameAr == key) {
+        return ModelInventoryAlert(
+          categoryAr: '',
+          categoryEn: '',
+          nameAr: level.nameAr,
+          nameEn: level.nameEn,
+          remainingAr: level.capacity,
+          remainingEn: level.capacity,
+          detailAr: '${level.percent}%',
+          detailEn: '${level.percent}%',
+        );
+      }
+    }
+    return null;
+  }
 }
 
 class _HeroSummary extends StatelessWidget {
-  const _HeroSummary({required this.l10n});
+  const _HeroSummary({
+    required this.l10n,
+    required this.title,
+    required this.subtitle,
+  });
 
   final AppLocalizations l10n;
+  final String title;
+  final String subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -98,7 +164,7 @@ class _HeroSummary extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  l10n.inventoryItemPremiumFillet,
+                  title,
                   style: CoreTypography.headlineSmall(
                     context,
                     scheme.onPrimary,
@@ -106,7 +172,7 @@ class _HeroSummary extends StatelessWidget {
                 ),
                 SizedBox(height: CoreSpacing.xs(context)),
                 Text(
-                  l10n.inventoryItemSku,
+                  subtitle,
                   style: CoreTypography.bodyMedium(
                     context,
                     scheme.onPrimary.withValues(alpha: 0.90),
@@ -293,7 +359,7 @@ class _AdjustStockCardState extends ConsumerState<_AdjustStockCard> {
     );
 
     _quantityController.clear();
-    UtilityMockFeedback.showSuccess(context, l10n.inventoryUpdateInventory);
+    UtilityDemoActions.complete(context, successMessage: l10n.inventoryUpdateInventory);
   }
 }
 
@@ -327,9 +393,7 @@ class _SupplierCard extends StatelessWidget {
               final launched = await UtilityUrlActions.launchExternalUri(uri);
               if (!context.mounted) return;
               if (launched) {
-                UtilityMockFeedback.showSuccess(
-                  context,
-                  l10n.inventoryContactRepresentative,
+                UtilityDemoActions.complete(context, successMessage: l10n.inventoryContactRepresentative,
                 );
               } else {
                 UtilityMockFeedback.showInfo(context, l10n.inventorySupplierName);
@@ -518,7 +582,7 @@ class _SalmonPainter extends CustomPainter {
         width: size.width * 0.34,
         height: size.height * 0.16,
       ),
-      const Radius.circular(CoreSpacing.radiusCard),
+      Radius.circular(CoreSpacing.radiusCard),
     );
     canvas.drawRRect(salmon, salmonPaint);
     for (var i = 0; i < 5; i++) {

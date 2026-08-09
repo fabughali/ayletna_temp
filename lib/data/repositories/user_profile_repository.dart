@@ -21,6 +21,9 @@ class UserProfileRepository {
   void setMarketing(bool value) =>
       _ref.read(userProfileProvider.notifier).setMarketing(value);
 
+  void setAvatarUrl(String? value) =>
+      _ref.read(userProfileProvider.notifier).setAvatarUrl(value);
+
   void reset() => _ref.read(userProfileProvider.notifier).reset();
 }
 

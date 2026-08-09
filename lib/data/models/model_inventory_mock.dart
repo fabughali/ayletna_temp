@@ -92,6 +92,7 @@ class ModelInventoryAuditRow {
     required this.balanceAr,
     required this.balanceEn,
     this.isNegative = false,
+    this.evidenceKey,
   });
 
   final String dateAr;
@@ -105,4 +106,5 @@ class ModelInventoryAuditRow {
   final String balanceAr;
   final String balanceEn;
   final bool isNegative;
+  final String? evidenceKey;
 }

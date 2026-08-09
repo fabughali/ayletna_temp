@@ -28,6 +28,10 @@ class SupportTicketsNotifier extends StateNotifier<SupportTicketsState> {
               createdAt: DateTime.now().subtract(const Duration(hours: 2)),
               updatedAt: DateTime.now().subtract(const Duration(minutes: 12)),
               orderId: 'ORD-1001',
+              priority: SupportTicketPriority.high,
+              slaTargetMinutes: 120,
+              customerPhone: '+962 79 123 4567',
+              customerAddress: 'Amman · Abdoun · Bldg 12, Floor 3',
               messages: [
                 SupportTicketMessage(
                   authorKey: 'customer',
@@ -49,11 +53,31 @@ class SupportTicketsNotifier extends StateNotifier<SupportTicketsState> {
               titleAr: 'استفسار عن نقاط الولاء',
               titleEn: 'Loyalty points question',
               bodyAr: 'تم توضيح طريقة احتساب النقاط للطلب السابق.',
-              bodyEn: 'Explained how points were calculated for the last order.',
+              bodyEn:
+                  'Explained how points were calculated for the last order.',
               status: SupportTicketStatus.resolved,
               createdAt: DateTime.now().subtract(const Duration(days: 1)),
               updatedAt: DateTime.now().subtract(const Duration(hours: 20)),
               messages: const [],
+              priority: SupportTicketPriority.low,
+              customerPhone: '+962 78 555 0192',
+              customerAddress: 'Amman · Jabal Amman · 4th Circle',
+            ),
+            ModelSupportTicketRecord(
+              id: 'AYL-2033',
+              titleAr: 'تأخر في استرداد المبلغ',
+              titleEn: 'Refund delay',
+              bodyAr: 'العميل ينتظر استرداداً منذ أمس.',
+              bodyEn: 'Customer waiting for refund since yesterday.',
+              status: SupportTicketStatus.open,
+              createdAt: DateTime.now().subtract(const Duration(hours: 5)),
+              updatedAt: DateTime.now().subtract(const Duration(hours: 5)),
+              priority: SupportTicketPriority.normal,
+              slaTargetMinutes: 180,
+              customerPhone: '+962 77 901 2233',
+              customerAddress: 'Amman · Sweifieh · Villa 8',
+              orderId: '4821',
+              escalatedTo: 'operator',
             ),
           ],
         ),
@@ -92,6 +116,25 @@ class SupportTicketsNotifier extends StateNotifier<SupportTicketsState> {
     );
     state = state.copyWith(tickets: [ticket, ...state.tickets]);
     return ticket;
+  }
+
+  bool updateTicketDetails(String ticketId, {
+    String? customerPhone,
+    String? customerAddress,
+    int? slaTargetMinutes,
+    SupportTicketPriority? priority,
+  }) {
+    final index = state.tickets.indexWhere((t) => t.id == ticketId);
+    if (index == -1) return false;
+    final updated = state.tickets[index].copyWith(
+      customerPhone: customerPhone,
+      customerAddress: customerAddress,
+      slaTargetMinutes: slaTargetMinutes,
+      priority: priority,
+    );
+    final next = [...state.tickets]..[index] = updated;
+    state = state.copyWith(tickets: next);
+    return true;
   }
 
   bool updateStatus(String ticketId, SupportTicketStatus status) {
@@ -259,6 +302,34 @@ class SupportTicketsNotifier extends StateNotifier<SupportTicketsState> {
       ],
     );
   }
+
+  bool escalateTicket(String ticketId, String target) {
+    final index = state.tickets.indexWhere((t) => t.id == ticketId);
+    if (index == -1) return false;
+    final ticket = state.tickets[index];
+    final updated = ticket.copyWith(
+      escalatedTo: target,
+      status: SupportTicketStatus.inProgress,
+      updatedAt: DateTime.now(),
+    );
+    final next = [...state.tickets]..[index] = updated;
+    state = state.copyWith(tickets: next);
+    return true;
+  }
+
+  bool acknowledgeEscalation(String ticketId) {
+    final index = state.tickets.indexWhere((t) => t.id == ticketId);
+    if (index == -1) return false;
+    final ticket = state.tickets[index];
+    if (ticket.escalatedTo == null) return false;
+    final updated = ticket.copyWith(
+      clearEscalation: true,
+      updatedAt: DateTime.now(),
+    );
+    final next = [...state.tickets]..[index] = updated;
+    state = state.copyWith(tickets: next);
+    return true;
+  }
 }
 
 final supportTicketsProvider =
@@ -266,15 +337,13 @@ final supportTicketsProvider =
       (ref) => SupportTicketsNotifier(),
     );
 
-final supportTicketByIdProvider = Provider.family<ModelSupportTicketRecord?, String>((
-  ref,
-  id,
-) {
-  for (final ticket in ref.watch(supportTicketsProvider).tickets) {
-    if (ticket.id == id) return ticket;
-  }
-  return null;
-});
+final supportTicketByIdProvider =
+    Provider.family<ModelSupportTicketRecord?, String>((ref, id) {
+      for (final ticket in ref.watch(supportTicketsProvider).tickets) {
+        if (ticket.id == id) return ticket;
+      }
+      return null;
+    });
 
 class SupportChatMessage {
   const SupportChatMessage({

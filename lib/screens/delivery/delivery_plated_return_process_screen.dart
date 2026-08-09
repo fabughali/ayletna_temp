@@ -3,14 +3,19 @@ import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/delivery_session_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_price_badge.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_amount_line.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -42,37 +47,44 @@ class _DeliveryPlatedReturnProcessScreenState
           tooltip: l10n.screenNotifications,
         ),
       ],
-      child: ListView(
-        children: [
-          if (draft == null)
-            WidgetsAsyncStateCard.empty(
-              title: l10n.screenPlatedReturnProcess,
-              message: l10n.deliveryReturnTasks,
-              actionLabel: l10n.screenPlatedReturnTask,
-              onAction: () => context.go(AppRoutePaths.platedReturnTask),
-            )
-          else if (_confirmed)
-            _ReturnSettlementStep(
-              draft: draft,
-              signatureAcknowledged: _signatureAcknowledged,
-              onBack: () => setState(() => _confirmed = false),
-              onFinalize: () => _finalizeReturn(draft),
-              onClearSignature:
-                  () => setState(() => _signatureAcknowledged = false),
-              onAcknowledgeSignature:
-                  () => setState(() => _signatureAcknowledged = true),
-            )
-          else
-            _ReturnChecklistStep(
-              draft: draft,
-              onChanged:
-                  (itemKey, missing) => ref
-                      .read(deliveryActiveReturnProvider.notifier)
-                      .setItemMissing(itemKey, missing),
-              onContinue: () => setState(() => _confirmed = true),
+      child: WidgetsRefreshList(
+        onRefresh:
+            () async => UtilityMockFeedback.showInfo(
+              context,
+              l10n.deliveryReturnProcessRefreshed,
             ),
-          SizedBox(height: CoreSpacing.xxl(context)),
-        ],
+        child: ListView(
+          children: [
+            if (draft == null)
+              WidgetsAsyncStateCard.empty(
+                title: l10n.screenPlatedReturnProcess,
+                message: l10n.deliveryReturnTasks,
+                actionLabel: l10n.screenPlatedReturnTask,
+                onAction: () => context.go(AppRoutePaths.platedReturnTask),
+              )
+            else if (_confirmed)
+              _ReturnSettlementStep(
+                draft: draft,
+                signatureAcknowledged: _signatureAcknowledged,
+                onBack: () => setState(() => _confirmed = false),
+                onFinalize: () => _finalizeReturn(draft),
+                onClearSignature:
+                    () => setState(() => _signatureAcknowledged = false),
+                onAcknowledgeSignature:
+                    () => setState(() => _signatureAcknowledged = true),
+              )
+            else
+              _ReturnChecklistStep(
+                draft: draft,
+                onChanged:
+                    (itemKey, missing) => ref
+                        .read(deliveryActiveReturnProvider.notifier)
+                        .setItemMissing(itemKey, missing),
+                onContinue: () => setState(() => _confirmed = true),
+              ),
+            SizedBox(height: CoreSpacing.xxl(context)),
+          ],
+        ),
       ),
     );
   }
@@ -100,7 +112,7 @@ class _DeliveryPlatedReturnProcessScreenState
         .recordRefund(draft.netRefundJod);
     ref.read(deliveryActiveReturnProvider.notifier).clear();
 
-    UtilityMockFeedback.showSuccess(context, l10n.returnFinalizeReturn);
+    UtilityDemoActions.complete(context, successMessage: l10n.returnFinalizeReturn);
     context.go(AppRoutePaths.delivery);
   }
 }
@@ -142,7 +154,7 @@ class _ReturnChecklistStep extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _IconBubble(
+                  WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                     icon: Icons.fact_check_outlined,
                     color: scheme.primary,
                   ),
@@ -293,10 +305,10 @@ class _ProcessHero extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.assignment_return_outlined,
                 color: scheme.primary,
-                large: true,
+                size: CoreContentSizes.emptyStateIcon(context), iconSize: CoreContentSizes.kpiIcon(context),
               ),
               SizedBox(width: CoreSpacing.md(context)),
               Expanded(
@@ -325,7 +337,7 @@ class _ProcessHero extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.lg(context)),
           ClipRRect(
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+            borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
             child: LinearProgressIndicator(
               value: value,
               minHeight: CoreSpacing.xs(context),
@@ -357,7 +369,7 @@ class _ReturnOrderCard extends StatelessWidget {
       accentColor: CoreColors.semanticSuccess,
       child: Row(
         children: [
-          _IconBubble(
+          WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
             icon: Icons.receipt_long_outlined,
             color: CoreColors.semanticSuccess,
           ),
@@ -384,7 +396,7 @@ class _ReturnOrderCard extends StatelessWidget {
               ],
             ),
           ),
-          _SoftBadge(
+          WidgetsSoftBadge(
             label: l10n.returnActiveReturn,
             color: CoreColors.semanticSuccess,
             icon: Icons.inventory_2_outlined,
@@ -424,7 +436,7 @@ class _ConditionItemCard extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.20)),
       ),
       child: Padding(
@@ -434,7 +446,7 @@ class _ConditionItemCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                _IconBubble(icon: icon, color: color),
+                WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), icon: icon, color: color),
                 SizedBox(width: CoreSpacing.sm(context)),
                 Expanded(
                   child: Column(
@@ -457,7 +469,7 @@ class _ConditionItemCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                _SoftBadge(
+                WidgetsSoftBadge(
                   label: deposit,
                   color: color,
                   icon: Icons.savings_outlined,
@@ -515,11 +527,11 @@ class _ConditionButton extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color.withValues(alpha: selected ? 0.16 : 0.04),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
           border: Border.all(
             color: color.withValues(alpha: selected ? 0.32 : 0.12),
           ),
@@ -574,7 +586,7 @@ class _SettlementSummaryCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.account_balance_wallet_outlined,
                 color: CoreColors.semanticSuccess,
               ),
@@ -597,38 +609,38 @@ class _SettlementSummaryCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: CoreSpacing.md(context)),
-          _AmountLine(
+          WidgetsAmountLine(
             label: l10n.returnOriginalDeposit,
             value: UtilityFormatJod.format(
               DeliveryActiveReturnDraft.originalDepositJod,
               suffix: l10n.currencyJod,
             ),
-            color: scheme.onSurface,
+            valueColor: scheme.onSurface,
           ),
-          _AmountLine(
+          WidgetsAmountLine(
             label: breakageLabel,
             value:
                 draft.missingCount == 0
                     ? l10n.returnWaived
                     : '- ${UtilityFormatJod.format(draft.breakageTotalJod, suffix: l10n.currencyJod)}',
-            color: CoreColors.semanticError,
+            valueColor: CoreColors.semanticError,
           ),
-          _AmountLine(
+          WidgetsAmountLine(
             label: l10n.returnProcessingFee,
             value: l10n.returnWaived,
-            color: CoreColors.semanticSuccess,
+            valueColor: CoreColors.semanticSuccess,
           ),
           Divider(
             height: CoreSpacing.lg(context),
             color: scheme.outlineVariant,
           ),
-          _AmountLine(
+          WidgetsAmountLine(
             label: l10n.returnFinalRefund,
             value: UtilityFormatJod.format(
               draft.netRefundJod,
               suffix: l10n.currencyJod,
             ),
-            color: CoreColors.semanticSuccess,
+            valueColor: CoreColors.semanticSuccess,
             strong: true,
           ),
           SizedBox(height: CoreSpacing.md(context)),
@@ -663,7 +675,7 @@ class _SignatureCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.draw_outlined,
                 color: CoreColors.brandBrown,
               ),
@@ -682,14 +694,14 @@ class _SignatureCard extends StatelessWidget {
           SizedBox(height: CoreSpacing.md(context)),
           InkWell(
             onTap: onAcknowledge,
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+            borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
             child: DecoratedBox(
               decoration: BoxDecoration(
                 color:
                     acknowledged
                         ? CoreColors.semanticSuccess.withValues(alpha: 0.08)
                         : scheme.surfaceContainerHighest.withValues(alpha: 0.36),
-                borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+                borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
                 border: Border.all(
                   color:
                       acknowledged
@@ -756,7 +768,7 @@ class _WarningPanel extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.20)),
       ),
       child: Padding(
@@ -782,124 +794,6 @@ class _WarningPanel extends StatelessWidget {
   }
 }
 
-class _AmountLine extends StatelessWidget {
-  const _AmountLine({
-    required this.label,
-    required this.value,
-    required this.color,
-    this.strong = false,
-  });
 
-  final String label;
-  final String value;
-  final Color color;
-  final bool strong;
 
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: EdgeInsets.only(bottom: CoreSpacing.sm(context)),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: CoreTypography.bodyMedium(
-                context,
-                scheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-          Text(
-            value,
-            style: CoreTypography.bodyMedium(
-              context,
-              color,
-            ).copyWith(fontWeight: strong ? FontWeight.w900 : FontWeight.w800),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({
-    required this.label,
-    required this.color,
-    required this.icon,
-  });
-
-  final String label;
-  final Color color;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: CoreContentSizes.orderTypeIcon(context),
-              color: color,
-            ),
-            SizedBox(width: CoreSpacing.xs(context)),
-            Text(
-              label,
-              style: CoreTypography.caption(
-                context,
-                color,
-              ).copyWith(fontWeight: FontWeight.w900),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({
-    required this.icon,
-    required this.color,
-    this.large = false,
-  });
-
-  final IconData icon;
-  final Color color;
-  final bool large;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(CoreSpacing.sm(context)),
-        child: Icon(
-          icon,
-          color: color,
-          size:
-              large
-                  ? CoreContentSizes.logoCard(context) * 0.52
-                  : CoreContentSizes.orderTypeIcon(context),
-        ),
-      ),
-    );
-  }
-}

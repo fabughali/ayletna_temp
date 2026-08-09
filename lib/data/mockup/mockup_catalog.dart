@@ -481,6 +481,12 @@ abstract final class MockupCatalog {
       addressEn: 'Villa 42, Al-Reem Street, Sweifieh, Amman, Jordan',
       iconKey: 'home',
       isSelected: true,
+      contactName: 'Ahmad Al-Khatib',
+      phone: '0791234567',
+      building: '42',
+      floor: '1',
+      accessCode: '1234',
+      customerAccountId: 'cust_1001',
     ),
     ModelSavedAddress(
       id: 'work',
@@ -491,6 +497,23 @@ abstract final class MockupCatalog {
           'The Business Park, Building 5, 3rd Floor, King Hussein Business Park, Amman',
       iconKey: 'work',
       canRemove: false,
+      contactName: 'Sara Office',
+      phone: '0787654321',
+      building: '5',
+      floor: '3',
+      customerAccountId: 'cust_2044',
+    ),
+    ModelSavedAddress(
+      id: 'family',
+      labelAr: 'بيت العائلة',
+      labelEn: 'Family house',
+      addressAr: 'شارع مكة، جبل الحسين، عمان',
+      addressEn: 'Mecca Street, Jabal Al Hussein, Amman',
+      iconKey: 'home',
+      contactName: 'Omar Family',
+      phone: '0771122334',
+      building: '12',
+      floor: '2',
     ),
   ];
 
@@ -1138,6 +1161,9 @@ abstract final class MockupCatalog {
     String? descriptionAr,
     String? descriptionEn,
     String? imageUrl,
+    bool isFeatured = false,
+    bool isAvailable = true,
+    int sortOrder = 0,
   }) {
     return ModelMenuItem(
       id: id,
@@ -1148,6 +1174,9 @@ abstract final class MockupCatalog {
       descriptionAr: descriptionAr ?? 'صنف من قائمة عيلتنا الفعلية.',
       descriptionEn: descriptionEn ?? 'Item from the real Ayletna menu.',
       imageUrl: imageUrl ?? _menuImageUrlForItem(id, categoryId),
+      isFeatured: isFeatured,
+      isAvailable: isAvailable,
+      sortOrder: sortOrder,
     );
   }
 
@@ -1225,66 +1254,99 @@ abstract final class MockupCatalog {
       nameAr: 'الشاورما',
       nameEn: 'Shawarma',
       iconKey: 'shawarma',
+      descriptionAr: 'شاورما الدجاج اللذيذة على الفحم',
+      descriptionEn: 'Delicious charcoal-grilled chicken shawarma',
+      mealType: 'main',
     ),
     ModelMenuCategory(
       id: 'qalayat',
       nameAr: 'القلايات',
       nameEn: 'Skillets',
       iconKey: 'skillet',
+      descriptionAr: 'مقليات ساخنة وشهية',
+      descriptionEn: 'Hot and tasty skillet dishes',
+      mealType: 'main',
     ),
     ModelMenuCategory(
       id: 'hummus_ful',
       nameAr: 'حمص وفول',
       nameEn: 'Hummus & Ful',
       iconKey: 'hummus',
+      descriptionAr: 'حمص طري وفول مدمس بزيت الزيتون',
+      descriptionEn: 'Smooth hummus and fava beans with olive oil',
+      mealType: 'side',
     ),
     ModelMenuCategory(
       id: 'drinks',
       nameAr: 'المشروبات',
       nameEn: 'Drinks',
       iconKey: 'drink',
+      descriptionAr: 'مشروبات باردة وساخنة منعشة',
+      descriptionEn: 'Refreshing cold and hot beverages',
+      mealType: 'drink',
     ),
     ModelMenuCategory(
       id: 'sandwiches',
       nameAr: 'السندويشات',
       nameEn: 'Sandwiches',
       iconKey: 'sandwich',
+      descriptionAr: 'سندويشات طازجة ومتنوعة',
+      descriptionEn: 'Fresh and varied sandwiches',
+      mealType: 'main',
     ),
     ModelMenuCategory(
       id: 'falafel',
       nameAr: 'الفلافل',
       nameEn: 'Falafel',
       iconKey: 'falafel',
+      descriptionAr: 'فلافل مقرمشة وحمص طري',
+      descriptionEn: 'Crispy falafel with smooth hummus',
+      mealType: 'main',
     ),
     ModelMenuCategory(
       id: 'pizza',
       nameAr: 'البيتزا',
       nameEn: 'Pizza',
       iconKey: 'pizza',
+      descriptionAr: 'بيتزا طازجة بالجبنة والصلصة',
+      descriptionEn: 'Fresh pizza with cheese and sauce',
+      mealType: 'main',
     ),
     ModelMenuCategory(
       id: 'snacks',
       nameAr: 'السناك',
       nameEn: 'Snacks',
       iconKey: 'snack',
+      descriptionAr: 'وجبات خفيفة ومقبلات',
+      descriptionEn: 'Light snacks and appetizers',
+      mealType: 'side',
     ),
     ModelMenuCategory(
       id: 'manaqeesh',
       nameAr: 'المناقيش',
       nameEn: 'Manaqeesh',
       iconKey: 'manaqeesh',
+      descriptionAr: 'مناقيش زعتر وجبنة على الساج',
+      descriptionEn: 'Zaatar and cheese manaqeesh on saj',
+      mealType: 'main',
     ),
     ModelMenuCategory(
       id: 'pastries',
       nameAr: 'المعجنات',
       nameEn: 'Pastries',
       iconKey: 'pastry',
+      descriptionAr: 'معجنات طازجة ومحشية',
+      descriptionEn: 'Fresh stuffed pastries',
+      mealType: 'dessert',
     ),
     ModelMenuCategory(
       id: 'burgers',
       nameAr: 'البرجر',
       nameEn: 'Burgers',
       iconKey: 'burger',
+      descriptionAr: 'برجر لحم ودجاج مع البطاطا',
+      descriptionEn: 'Beef and chicken burgers with fries',
+      mealType: 'main',
     ),
   ];
 
@@ -1316,6 +1378,7 @@ abstract final class MockupCatalog {
       'وجبة شاورما سوبر',
       'Super shawarma meal',
       2.75,
+      isFeatured: true,
     ),
     _realMenuItem(
       'shawarma_meal_double',
@@ -1422,6 +1485,7 @@ abstract final class MockupCatalog {
       'صحن حمص وسط',
       'Medium hummus plate',
       1.00,
+      isFeatured: true,
     ),
     _realMenuItem(
       'hummus_large',
@@ -1832,6 +1896,7 @@ abstract final class MockupCatalog {
       'بيتزا الفريدو وسط',
       'Alfredo pizza - medium',
       4.00,
+      isFeatured: true,
     ),
     _realMenuItem(
       'pizza_alfredo_large',
@@ -2114,6 +2179,7 @@ abstract final class MockupCatalog {
       'برغر عيلتنا 150 غم',
       'Ayletna burger 150g',
       3.00,
+      isFeatured: true,
     ),
     _realMenuItem(
       'burger_ayletna_200',
@@ -2126,6 +2192,24 @@ abstract final class MockupCatalog {
 
   static List<ModelMenuItem> itemsForCategory(String categoryId) =>
       items.where((i) => i.categoryId == categoryId).toList();
+
+  /// Default promo/combo/offer image when admin has not uploaded one yet.
+  static String promoImageUrlFor(String promoId) {
+    final linkedItemId = switch (promoId) {
+      'combo_family_shawarma' => 'shawarma_meal_super',
+      'combo_pizza_night' => 'pizza_alfredo_medium',
+      'o1' => 'hummus_medium',
+      'o2' => 'shawarma_meal_super',
+      _ => null,
+    };
+    if (linkedItemId != null) {
+      final item = itemById(linkedItemId);
+      if (item?.primaryImageUrl != null) {
+        return item!.primaryImageUrl!;
+      }
+    }
+    return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80';
+  }
 
   static ModelMenuItem? itemById(String id) {
     for (final i in items) {

@@ -26,8 +26,10 @@ class PlaceOrderNotifier extends StateNotifier<PlaceOrderState> {
           .placeOrder(ModelPlaceOrderRequest(lines: lines, draft: draft));
 
       ref.read(placedOrderIdProvider.notifier).state = result.orderId;
+      ref.read(activeTrackingOrderIdProvider.notifier).state = result.orderId;
       ref.read(cartProvider.notifier).clear();
       ref.read(checkoutDraftProvider.notifier).reset();
+      ref.invalidate(customerOrderHistoryProvider);
 
       state = AsyncData(result);
       return result;
@@ -64,9 +66,8 @@ final ratingOrderDetailProvider = FutureProvider((ref) async {
   return repo.fetchCheckoutOrderDetail();
 });
 
-final reorderLinesProvider = FutureProvider.family<List<ModelCartLine>, String>((
-  ref,
-  orderId,
-) async {
-  return ref.read(repositoryOrderProvider).buildReorderLines(orderId);
-});
+final reorderLinesProvider = FutureProvider.family<List<ModelCartLine>, String>(
+  (ref, orderId) async {
+    return ref.read(repositoryOrderProvider).buildReorderLines(orderId);
+  },
+);

@@ -7,12 +7,16 @@ import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/customer_action_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_url_actions.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_media_panel.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_food_tag.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_info_banner.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_price_badge.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_error_message.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,6 +34,7 @@ class CustomerOrderTrackingScreen extends ConsumerWidget {
     final effectiveId =
         orderId ??
         ref.watch(activeTrackingOrderIdProvider) ??
+        ref.watch(placedOrderIdProvider) ??
         MockupCatalog.checkoutOrderDetail.id;
     final orderAsync = ref.watch(orderDetailByIdProvider(effectiveId));
 
@@ -46,14 +51,26 @@ class CustomerOrderTrackingScreen extends ConsumerWidget {
         loading:
             () => const Center(child: CircularProgressIndicator()),
         error:
-            (_, __) => Center(child: Text(l10n.comingSoon)),
+            (_, __) => Center(
+              child: WidgetsErrorMessage(message: l10n.orderTrackingLoadError),
+            ),
         data:
             (order) => ListView(
               children: [
                 SizedBox(height: CoreSpacing.md(context)),
-                _TrackingHeroCard(orderReference: order.reference),
+                WidgetsPageHeader(
+                  title: l10n.trackingEstimatedArrival,
+                  subtitle: l10n.trackingFromRestaurant,
+                ),
+                _TrackingHeroCard(
+                  orderReference: order.reference,
+                  statusKey: order.statusKey,
+                ),
                 SizedBox(height: CoreSpacing.lg(context)),
-                const _KitchenProgressCard(),
+                _KitchenProgressCard(
+                  orderReference: order.reference,
+                  statusKey: order.statusKey,
+                ),
                 SizedBox(height: CoreSpacing.lg(context)),
                 _OrderSummaryCard(lines: order.lines, totalJod: order.totalJod),
                 SizedBox(height: CoreSpacing.lg(context)),
@@ -71,14 +88,35 @@ class CustomerOrderTrackingScreen extends ConsumerWidget {
 }
 
 class _TrackingHeroCard extends StatelessWidget {
-  const _TrackingHeroCard({required this.orderReference});
+  const _TrackingHeroCard({
+    required this.orderReference,
+    required this.statusKey,
+  });
 
   final String orderReference;
+  final String statusKey;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final etaMinutes = switch (statusKey) {
+      'delivered' || 'completed' => 0,
+      'on_the_way' || 'out_for_delivery' => 18,
+      'ready' || 'quality' => 28,
+      _ => 35,
+    };
+    final etaLabel =
+        etaMinutes == 0
+            ? l10n.trackingDelivered
+            : TimeOfDay.fromDateTime(
+              DateTime.now().add(Duration(minutes: etaMinutes)),
+            ).format(context);
+    final statusBadge = switch (statusKey) {
+      'delivered' || 'completed' => l10n.trackingDelivered,
+      'on_the_way' || 'out_for_delivery' => l10n.trackingOnTheWay,
+      _ => l10n.trackingPreparingKitchen,
+    };
 
     return WidgetsAppCard(
       variant: WidgetsAppCardVariant.food,
@@ -88,8 +126,8 @@ class _TrackingHeroCard extends StatelessWidget {
         children: [
           WidgetsFoodMediaPanel(
             height: CoreContentSizes.heroImageHeight(context),
-            badge: _FoodTag(
-              label: l10n.trackingOnTheWay,
+            badge: WidgetsFoodTag(
+              label: statusBadge,
               color: CoreColors.semanticSuccess,
             ),
             child: CustomPaint(
@@ -122,7 +160,7 @@ class _TrackingHeroCard extends StatelessWidget {
                     ),
                     SizedBox(height: CoreSpacing.xs(context)),
                     Text(
-                      l10n.trackingArrivalTime,
+                      etaLabel,
                       style: CoreTypography.headlineLarge(
                         context,
                         scheme.primary,
@@ -146,12 +184,25 @@ class _TrackingHeroCard extends StatelessWidget {
 }
 
 class _KitchenProgressCard extends StatelessWidget {
-  const _KitchenProgressCard();
+  const _KitchenProgressCard({
+    required this.orderReference,
+    required this.statusKey,
+  });
+
+  final String orderReference;
+  final String statusKey;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final stepIndex = switch (statusKey) {
+      'delivered' || 'completed' => 4,
+      'on_the_way' || 'out_for_delivery' => 3,
+      'ready' || 'quality' => 2,
+      'preparing' || 'kitchen' => 1,
+      _ => 0,
+    };
 
     return WidgetsAppCard(
       variant: WidgetsAppCardVariant.form,
@@ -160,7 +211,7 @@ class _KitchenProgressCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            l10n.trackingOrderNumber,
+            l10n.adminOrderLabel(orderReference),
             style: CoreTypography.titleMedium(
               context,
               scheme.onSurface,
@@ -173,29 +224,37 @@ class _KitchenProgressCard extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.lg(context)),
           _TimelineStep(
-            completed: true,
+            completed: stepIndex > 0,
+            active: stepIndex == 0,
             icon: Icons.receipt_long_outlined,
             title: l10n.trackingOrderReceived,
             body: l10n.trackingOrderReceivedBody,
           ),
           _TimelineStep(
-            active: true,
+            completed: stepIndex > 1,
+            active: stepIndex == 1,
             icon: Icons.soup_kitchen_outlined,
             title: l10n.trackingPreparingKitchen,
             body: l10n.trackingPreparingBody,
           ),
           _TimelineStep(
+            completed: stepIndex > 2,
+            active: stepIndex == 2,
             icon: Icons.verified_outlined,
             title: l10n.trackingQualityAssured,
             body: l10n.trackingQualityBody,
           ),
           _TimelineStep(
+            completed: stepIndex > 3,
+            active: stepIndex == 3,
             icon: Icons.delivery_dining_outlined,
             title: l10n.trackingOnWayTitle,
             body: l10n.trackingOnWayBody,
             actionLabel: l10n.trackingCallMarcus,
           ),
           _TimelineStep(
+            completed: stepIndex >= 4,
+            active: stepIndex == 4,
             icon: Icons.home_outlined,
             title: l10n.trackingDelivered,
             body: l10n.trackingDeliveredBody,
@@ -287,11 +346,19 @@ class _TimelineStep extends StatelessWidget {
                     SizedBox(height: CoreSpacing.sm(context)),
                     WidgetsAppButton(
                       label: actionLabel!,
-                      onPressed:
-                          () => UtilityMockFeedback.showInfo(
+                      onPressed: () async {
+                        final launched = await UtilityUrlActions.launchExternalUri(
+                          Uri.parse('tel:+962790000123'),
+                        );
+                        if (!launched && context.mounted) {
+                          UtilityMockFeedback.showInfo(
                             context,
-                            AppLocalizations.of(context)!.comingSoon,
-                          ),
+                            AppLocalizations.of(
+                              context,
+                            )!.orderHistoryDriverContactBody,
+                          );
+                        }
+                      },
                       icon: Icons.phone_outlined,
                       variant: WidgetsAppButtonVariant.secondary,
                     ),
@@ -373,7 +440,7 @@ class _OrderLine extends StatelessWidget {
         DecoratedBox(
           decoration: BoxDecoration(
             color: scheme.primary.withValues(alpha: 0.10),
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+            borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
           ),
           child: Padding(
             padding: EdgeInsets.symmetric(
@@ -584,39 +651,6 @@ class _AssuranceCard extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _FoodTag extends StatelessWidget {
-  const _FoodTag({required this.label, required this.color});
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Text(
-          label,
-          style: CoreTypography.caption(
-            context,
-            scheme.onSurface,
-          ).copyWith(fontWeight: FontWeight.w800),
-        ),
       ),
     );
   }

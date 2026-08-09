@@ -2,15 +2,13 @@ import 'package:ayletna_restaurant_app/core/core_router.dart';
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/providers/app_providers.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:virtual_keypad/virtual_keypad.dart';
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  initializeKeyboardLayouts();
   runApp(const ProviderScope(child: AyletnaRestaurantApp()));
 }
 
@@ -21,6 +19,7 @@ class AyletnaRestaurantApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final role = ref.watch(appRoleProvider);
     final locale = ref.watch(appLocaleProvider);
+    final themeMode = ref.watch(appThemeModeProvider);
     final router = ref.watch(goRouterProvider);
 
     return MaterialApp.router(
@@ -44,13 +43,13 @@ class AyletnaRestaurantApp extends ConsumerWidget {
       ],
       theme: CoreTheme.themeFor(role, Brightness.light),
       darkTheme: CoreTheme.themeFor(role, Brightness.dark),
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       routerConfig: router,
       builder: (context, child) {
-        final width = MediaQuery.sizeOf(context).width;
+        final layoutWidth = UtilitySizer.layoutWidthOf(context);
         final brightness = Theme.of(context).brightness;
         return Theme(
-          data: CoreTheme.themeFor(role, brightness, width: width),
+          data: CoreTheme.themeFor(role, brightness, width: layoutWidth),
           child: child ?? const SizedBox.shrink(),
         );
       },

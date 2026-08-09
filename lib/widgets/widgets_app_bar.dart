@@ -22,10 +22,14 @@ class WidgetsAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool centerTitle;
 
   @override
+  Size get preferredSize => Size.fromHeight(56);
+
+  @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
 
     return AppBar(
+      toolbarHeight: CoreContentSizes.appBarHeight(context),
       leading: leading,
       centerTitle: centerTitle,
       title: Column(
@@ -57,7 +61,4 @@ class WidgetsAppBar extends StatelessWidget implements PreferredSizeWidget {
       ],
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

@@ -1,14 +1,15 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
+import 'package:ayletna_restaurant_app/providers/customer_action_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_app_bar.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_action_bar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_illustration_panel.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_info_banner.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_screen_layout.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_status_pill.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,77 +22,90 @@ class CustomerPlatedReturnReminderScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final plan = ref.watch(platedReturnPlanProvider);
 
-    return Scaffold(
-      appBar: WidgetsAppBar(
-        title: l10n.screenPlatedReturnReminder,
-        leading: WidgetsIconButton(
-          onPressed: () => context.go(AppRoutePaths.orderHistory),
-          icon: Icons.arrow_back,
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+    return WidgetsScaffoldPage(
+      title: l10n.screenPlatedReturnReminder,
+      actions: [
+        WidgetsIconButton(
+          onPressed: () => context.push(AppRoutePaths.notifications),
+          icon: Icons.notifications_outlined,
+          tooltip: l10n.screenNotifications,
         ),
-        actions: [
-          WidgetsIconButton(
-            onPressed: () => context.push(AppRoutePaths.notifications),
-            icon: Icons.notifications_outlined,
-            tooltip: l10n.screenNotifications,
-          ),
-        ],
-        showAvatar: true,
+      ],
+      bottomSheet: WidgetsActionBar(
+        primary: WidgetsAppButton(
+          label: l10n.platedReturnSchedulePickup,
+          onPressed:
+              () => UtilityMockFeedback.showActionSheet(
+                context: context,
+                title: l10n.platedReturnSchedulePickup,
+                message: l10n.platedReturnReadyBody,
+                actions: [
+                  MockSheetAction(
+                    label: l10n.actionConfirm,
+                    icon: Icons.delivery_dining_outlined,
+                    onSelected: () {
+                      ref.read(platedReturnPlanProvider.notifier).state =
+                          PlatedReturnPlan.pickupScheduled;
+                      UtilityMockFeedback.showSuccess(
+                        context,
+                        l10n.platedReturnPickupScheduled,
+                      );
+                    },
+                  ),
+                ],
+              ),
+          icon: Icons.delivery_dining_outlined,
+          variant: WidgetsAppButtonVariant.secondary,
+          fullWidth: true,
+        ),
+        secondary: WidgetsAppButton(
+          label: l10n.platedReturnSelfReturn,
+          onPressed: () {
+            ref.read(platedReturnPlanProvider.notifier).state =
+                PlatedReturnPlan.selfReturnLogged;
+            UtilityMockFeedback.showSuccess(
+              context,
+              l10n.platedReturnSelfReturnLogged,
+            );
+          },
+          icon: Icons.directions_walk_outlined,
+          variant: WidgetsAppButtonVariant.outline,
+          fullWidth: true,
+        ),
       ),
-      body: WidgetsScreenLayout(
-        child: ListView(
-          padding: EdgeInsetsDirectional.only(
-            top: CoreSpacing.xl(context),
-            bottom: CoreSpacing.xxl(context),
-          ),
-          children: [
-            const _PlatedHeroCard(),
-            SizedBox(height: CoreSpacing.xxl(context)),
-            WidgetsPageHeader(
-              title: l10n.platedReturnReadyTitle,
-              subtitle: l10n.platedReturnReadyBody,
-            ),
-            SizedBox(height: CoreSpacing.xxl(context)),
-            const _RefundableDepositCard(),
-            SizedBox(height: CoreSpacing.xxl(context)),
-            WidgetsAppButton(
-              label: l10n.platedReturnSchedulePickup,
-              onPressed:
-                  () => UtilityMockFeedback.showActionSheet(
-                    context: context,
-                    title: l10n.platedReturnSchedulePickup,
-                    message: l10n.platedReturnReadyBody,
-                    actions: [
-                      MockSheetAction(
-                        label: l10n.actionConfirm,
-                        icon: Icons.delivery_dining_outlined,
-                        onSelected:
-                            () => UtilityMockFeedback.showSuccess(
-                              context,
-                              l10n.platedReturnSchedulePickup,
-                            ),
-                      ),
-                    ],
-                  ),
-              icon: Icons.delivery_dining_outlined,
-              variant: WidgetsAppButtonVariant.secondary,
-              fullWidth: true,
-            ),
-            SizedBox(height: CoreSpacing.md(context)),
-            WidgetsAppButton(
-              label: l10n.platedReturnSelfReturn,
-              onPressed:
-                  () => UtilityMockFeedback.showInfo(
-                    context,
-                    l10n.platedReturnDepositBody,
-                  ),
-              icon: Icons.directions_walk_outlined,
-              variant: WidgetsAppButtonVariant.outline,
-              fullWidth: true,
-            ),
-          ],
+      child: ListView(
+        padding: EdgeInsetsDirectional.only(
+          top: CoreSpacing.md(context),
+          bottom: CoreSpacing.xxl(context) * 3,
         ),
+        children: [
+          WidgetsPageHeader(
+            title: l10n.platedReturnReadyTitle,
+            subtitle: l10n.platedReturnReadyBody,
+            eyebrow: l10n.screenPlatedReturnReminder,
+          ),
+          if (plan != PlatedReturnPlan.none) ...[
+            WidgetsInfoBanner(
+              title:
+                  plan == PlatedReturnPlan.pickupScheduled
+                      ? l10n.platedReturnPickupScheduled
+                      : l10n.platedReturnSelfReturnLogged,
+              message: l10n.platedReturnReadyBody,
+              icon:
+                  plan == PlatedReturnPlan.pickupScheduled
+                      ? Icons.delivery_dining_outlined
+                      : Icons.directions_walk_outlined,
+              tone: WidgetsInfoBannerTone.info,
+            ),
+            SizedBox(height: CoreSpacing.lg(context)),
+          ],
+          SizedBox(height: CoreSpacing.lg(context)),
+          const _PlatedHeroCard(),
+          SizedBox(height: CoreSpacing.xxl(context)),
+          const _RefundableDepositCard(),
+        ],
       ),
     );
   }

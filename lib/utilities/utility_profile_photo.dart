@@ -135,8 +135,8 @@ abstract final class UtilityProfilePhoto {
     return NetworkImage(imageUrl);
   }
 
-  /// Starts the platform picker while the button gesture is still active
-  /// (required on web), then closes the sheet.
+  /// Starts the platform picker after an in-app permission prompt.
+  /// The Allow action supplies the user gesture needed for web file/camera.
   static Future<void> _pickFromSheet({
     required BuildContext hostContext,
     required BuildContext sheetContext,
@@ -145,15 +145,27 @@ abstract final class UtilityProfilePhoto {
   }) async {
     final l10n = AppLocalizations.of(hostContext)!;
 
-    // Kick off pickImage immediately so web's <input>.click() stays inside
-    // the user-activation window. Pop the sheet afterward.
-    final pickFuture = _pickDataUri(source);
     if (sheetContext.mounted) {
       Navigator.of(sheetContext).pop();
     }
+    if (!hostContext.mounted) return;
+
+    final allowed = await _requestMediaPermission(hostContext, source);
+    if (!allowed) {
+      if (hostContext.mounted) {
+        UtilityMockFeedback.showInfo(
+          hostContext,
+          source == ImageSource.camera
+              ? l10n.profileCameraPermissionDenied
+              : l10n.profileGalleryPermissionDenied,
+        );
+      }
+      return;
+    }
+    if (!hostContext.mounted) return;
 
     try {
-      final dataUri = await pickFuture;
+      final dataUri = await _pickDataUri(source);
       if (dataUri == null || !hostContext.mounted) return;
       onAvatarChanged(dataUri);
       UtilityMockFeedback.showSuccess(hostContext, l10n.profilePhotoUpdated);
@@ -163,6 +175,19 @@ abstract final class UtilityProfilePhoto {
 
       // Desktop / some web builds reject camera — fall back to gallery once.
       if (source == ImageSource.camera) {
+        final galleryAllowed = await _requestMediaPermission(
+          hostContext,
+          ImageSource.gallery,
+        );
+        if (!galleryAllowed || !hostContext.mounted) {
+          if (hostContext.mounted && !galleryAllowed) {
+            UtilityMockFeedback.showInfo(
+              hostContext,
+              l10n.profileGalleryPermissionDenied,
+            );
+          }
+          return;
+        }
         try {
           final fallback = await _pickDataUri(ImageSource.gallery);
           if (fallback == null || !hostContext.mounted) return;
@@ -184,6 +209,31 @@ abstract final class UtilityProfilePhoto {
         UtilityMockFeedback.showError(hostContext, l10n.profilePhotoPickFailed);
       }
     }
+  }
+
+  static Future<bool> _requestMediaPermission(
+    BuildContext context,
+    ImageSource source,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final isCamera = source == ImageSource.camera;
+    return UtilityMockFeedback.confirm(
+      context: context,
+      title:
+          isCamera
+              ? l10n.profileCameraPermissionTitle
+              : l10n.profileGalleryPermissionTitle,
+      message:
+          isCamera
+              ? l10n.profileCameraPermissionBody
+              : l10n.profileGalleryPermissionBody,
+      confirmLabel: l10n.profilePermissionAllow,
+      cancelLabel: l10n.profilePermissionDeny,
+      icon:
+          isCamera
+              ? Icons.photo_camera_outlined
+              : Icons.photo_library_outlined,
+    );
   }
 
   static Future<String?> _pickDataUri(ImageSource source) async {

@@ -9,15 +9,18 @@ import 'package:ayletna_restaurant_app/providers/cashier_session_providers.dart'
 import 'package:ayletna_restaurant_app/utilities/utility_file_download.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_report_export.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_price_badge.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -80,18 +83,16 @@ class _CashierOrderHistoryScreenState
           tooltip: l10n.screenCashierOrder,
         ),
         WidgetsIconButton(
-          onPressed:
-              () => UtilityMockFeedback.showInfo(
-                context,
-                l10n.screenNotifications,
-              ),
+          onPressed: () => context.push(AppRoutePaths.notifications),
           icon: Icons.notifications_outlined,
           tooltip: l10n.screenNotifications,
         ),
       ],
       child: WidgetsRefreshList(
         onRefresh: () async {
-          UtilityMockFeedback.showSuccess(context, l10n.cashierRecentTransactions);
+          ref.invalidate(cashierSessionOrdersProvider);
+          ref.invalidate(cashierPostponedOrdersProvider);
+          UtilityMockFeedback.showInfo(context, l10n.opsCashierHistoryRefreshed);
         },
         child: ListView(
           children: [
@@ -133,7 +134,7 @@ class _CashierOrderHistoryScreenState
               ],
               SizedBox(height: CoreSpacing.lg(context)),
             ],
-            _SectionHeader(
+            WidgetsSectionHeader(
               title: l10n.cashierRecentTransactions,
               actionLabel: l10n.reportsExportCsv,
               onAction: () async {
@@ -144,7 +145,7 @@ class _CashierOrderHistoryScreenState
                   mimeType: 'text/csv',
                 );
                 if (!context.mounted) return;
-                UtilityMockFeedback.showSuccess(context, l10n.reportsExportCsv);
+                UtilityDemoActions.complete(context, successMessage: l10n.reportsExportCsv);
               },
             ),
             SizedBox(height: CoreSpacing.sm(context)),
@@ -207,7 +208,7 @@ class _LedgerHero extends StatelessWidget {
           DecoratedBox(
             decoration: BoxDecoration(
               color: scheme.primary.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+              borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
             ),
             child: Padding(
               padding: EdgeInsets.all(CoreSpacing.md(context)),
@@ -346,7 +347,7 @@ class _ShiftSummaryCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(icon: icon, color: color),
+              WidgetsIconBubble(circular: true, icon: icon, color: color),
               SizedBox(width: CoreSpacing.sm(context)),
               Expanded(
                 child: Text(
@@ -428,11 +429,11 @@ class _LedgerFilterChip extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color.withValues(alpha: selected ? 0.16 : 0.08),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
           border: Border.all(color: color.withValues(alpha: 0.24)),
         ),
         child: Padding(
@@ -453,37 +454,6 @@ class _LedgerFilterChip extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title, required this.actionLabel, required this.onAction});
-
-  final String title;
-  final String actionLabel;
-  final VoidCallback onAction;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            title,
-            style: CoreTypography.titleMedium(
-              context,
-              scheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w900),
-          ),
-        ),
-        TextButton.icon(
-          onPressed: onAction,
-          icon: const Icon(Icons.download_outlined),
-          label: Text(actionLabel),
-        ),
-      ],
     );
   }
 }
@@ -514,7 +484,7 @@ class _LedgerReceiptCard extends ConsumerWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _IconBubble(icon: _typeIcon(order.orderType), color: color),
+              WidgetsIconBubble(circular: true, icon: _typeIcon(order.orderType), color: color),
               SizedBox(width: CoreSpacing.md(context)),
               Expanded(
                 child: Column(
@@ -556,6 +526,18 @@ class _LedgerReceiptCard extends ConsumerWidget {
                   label: l10n.orderTypePlated,
                   color: CoreColors.orderTypePlated,
                   icon: Icons.room_service_outlined,
+                ),
+              if (order.receiptPrinted)
+                _LedgerBadge(
+                  label: l10n.cashierPrintRollReceipt,
+                  color: CoreColors.brandOlive,
+                  icon: Icons.print_outlined,
+                ),
+              if (order.electronicTicketSent)
+                _LedgerBadge(
+                  label: l10n.cashierElectronicTicketSent,
+                  color: CoreColors.orderTypeDelivery,
+                  icon: Icons.confirmation_number_outlined,
                 ),
               if (order.depositJod > 0)
                 _LedgerBadge(
@@ -636,7 +618,7 @@ class _LedgerReceiptCard extends ConsumerWidget {
                     mimeType: 'text/csv',
                   );
                   if (!context.mounted) return;
-                  UtilityMockFeedback.showSuccess(context, l10n.reportsExportCsv);
+                  UtilityDemoActions.complete(context, successMessage: l10n.reportsExportCsv);
                 },
                 variant: WidgetsAppButtonVariant.outline,
               ),
@@ -662,7 +644,7 @@ class _LedgerReceiptCard extends ConsumerWidget {
     );
     if (confirmed && context.mounted) {
       onRefundConfirmed();
-      UtilityMockFeedback.showSuccess(context, l10n.cashierRefunded);
+      UtilityDemoActions.complete(context, successMessage: l10n.cashierRefunded);
       context.push(AppRoutePaths.cashierDepositRefund);
     }
   }
@@ -762,7 +744,7 @@ class _LedgerBadge extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.24)),
       ),
       child: Padding(
@@ -780,23 +762,4 @@ class _LedgerBadge extends StatelessWidget {
   }
 }
 
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({required this.icon, required this.color});
 
-  final IconData icon;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        shape: BoxShape.circle,
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(CoreSpacing.sm(context)),
-        child: Icon(icon, color: color, size: CoreContentSizes.orderTypeIcon(context)),
-      ),
-    );
-  }
-}

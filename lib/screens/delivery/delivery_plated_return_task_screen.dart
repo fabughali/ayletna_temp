@@ -3,14 +3,18 @@ import 'package:ayletna_restaurant_app/data/models/model_delivery_return_task.da
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/delivery_session_providers.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_confirm_dialog.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_url_actions.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -44,7 +48,7 @@ class DeliveryPlatedReturnTaskScreen extends ConsumerWidget {
       ],
       child: WidgetsRefreshList(
         onRefresh:
-            () async => UtilityMockFeedback.showSuccess(
+            () async => UtilityMockFeedback.showInfo(
               context,
               l10n.platedPickupsTitle,
             ),
@@ -92,10 +96,10 @@ class _ReturnsHero extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.inventory_2_outlined,
                 color: scheme.primary,
-                large: true,
+                size: CoreContentSizes.emptyStateIcon(context), iconSize: CoreContentSizes.kpiIcon(context),
               ),
               SizedBox(width: CoreSpacing.md(context)),
               Expanded(
@@ -127,17 +131,17 @@ class _ReturnsHero extends StatelessWidget {
             spacing: CoreSpacing.sm(context),
             runSpacing: CoreSpacing.sm(context),
             children: [
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: '$taskCount ${l10n.deliveryReturnTasks}',
                 color: scheme.primary,
                 icon: Icons.route_outlined,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.deliveryActiveCollections,
                 color: CoreColors.semanticSuccess,
                 icon: Icons.assignment_turned_in_outlined,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.deliveryDepositsRefunded,
                 color: CoreColors.brandGold,
                 icon: Icons.savings_outlined,
@@ -176,7 +180,7 @@ class _ReturnRouteCard extends ConsumerWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _IconBubble(icon: _taskIcon(task.iconKey), color: color),
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), icon: _taskIcon(task.iconKey), color: color),
               SizedBox(width: CoreSpacing.md(context)),
               Expanded(
                 child: Column(
@@ -200,7 +204,7 @@ class _ReturnRouteCard extends ConsumerWidget {
                   ],
                 ),
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: status,
                 color: color,
                 icon:
@@ -245,11 +249,19 @@ class _ReturnRouteCard extends ConsumerWidget {
               Expanded(
                 child: WidgetsAppButton(
                   label: l10n.platedConfirmCollection,
-                  onPressed: () {
-                    ref.read(deliveryActiveReturnProvider.notifier).beginTask(task);
-                    UtilityMockFeedback.showSuccess(
+                  onPressed: () async {
+                    final confirmed = await confirmDestructiveAction(
                       context,
-                      l10n.platedConfirmCollection,
+                      title: l10n.platedConfirmCollection,
+                      message: l10n.platedConfirmCollectionBody,
+                      confirmLabel: l10n.actionConfirm,
+                      cancelLabel: l10n.actionCancel,
+                    );
+                    if (!context.mounted || !confirmed) return;
+                    ref.read(deliveryActiveReturnProvider.notifier).beginTask(task);
+                    UtilityDemoActions.complete(
+                      context,
+                      successMessage: l10n.platedConfirmCollection,
                     );
                     context.push(AppRoutePaths.platedReturnProcess);
                   },
@@ -272,7 +284,7 @@ class _ReturnRouteCard extends ConsumerWidget {
     final launched = await UtilityUrlActions.launchExternalUri(uri);
     if (!context.mounted) return;
     if (launched) {
-      UtilityMockFeedback.showSuccess(context, l10n.platedOpenMaps);
+      UtilityDemoActions.complete(context, successMessage: l10n.platedOpenMaps);
     } else {
       UtilityMockFeedback.showError(context, l10n.platedOpenMaps);
     }
@@ -308,7 +320,7 @@ class _SustainabilityCard extends StatelessWidget {
       accentColor: scheme.primary,
       child: Row(
         children: [
-          _IconBubble(icon: Icons.eco_outlined, color: scheme.primary),
+          WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), icon: Icons.eco_outlined, color: scheme.primary),
           SizedBox(width: CoreSpacing.md(context)),
           Expanded(
             child: Column(
@@ -357,7 +369,7 @@ class _ConditionStrip extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.18)),
       ),
       child: Padding(
@@ -398,82 +410,4 @@ class _ConditionStrip extends StatelessWidget {
   }
 }
 
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({
-    required this.label,
-    required this.color,
-    required this.icon,
-  });
 
-  final String label;
-  final Color color;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: CoreContentSizes.orderTypeIcon(context),
-              color: color,
-            ),
-            SizedBox(width: CoreSpacing.xs(context)),
-            Text(
-              label,
-              style: CoreTypography.caption(
-                context,
-                color,
-              ).copyWith(fontWeight: FontWeight.w900),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({
-    required this.icon,
-    required this.color,
-    this.large = false,
-  });
-
-  final IconData icon;
-  final Color color;
-  final bool large;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(CoreSpacing.sm(context)),
-        child: Icon(
-          icon,
-          color: color,
-          size:
-              large
-                  ? CoreContentSizes.logoCard(context) * 0.52
-                  : CoreContentSizes.orderTypeIcon(context),
-        ),
-      ),
-    );
-  }
-}

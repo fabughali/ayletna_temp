@@ -1,4 +1,5 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_food_media_panel.dart';
@@ -17,7 +18,9 @@ class WidgetsFoodCard extends StatelessWidget {
     required this.loyaltyLabel,
     this.badges = const [],
     this.badgeLabel,
-    this.ratingLabel = '4.8',
+    this.ratingLabel,
+    this.actionIcon = Icons.add_shopping_cart_outlined,
+    this.descriptionMaxLines = 2,
     this.onTap,
     this.fillHeight = false,
     super.key,
@@ -31,8 +34,10 @@ class WidgetsFoodCard extends StatelessWidget {
   final VoidCallback onAction;
   final List<Widget> badges;
   final String? badgeLabel;
-  final String ratingLabel;
+  final String? ratingLabel;
   final String loyaltyLabel;
+  final IconData actionIcon;
+  final int descriptionMaxLines;
   final VoidCallback? onTap;
   final bool fillHeight;
 
@@ -55,8 +60,8 @@ class WidgetsFoodCard extends StatelessWidget {
                     flex: 13,
                     child: WidgetsFoodMediaPanel(
                       expand: true,
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(CoreSpacing.radiusCard),
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(CoreSpacing.radiusCardOf(context)),
                       ),
                       child: Stack(
                         fit: StackFit.expand,
@@ -71,9 +76,8 @@ class WidgetsFoodCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(height: CoreSpacing.sm(context)),
                   Expanded(
-                    flex: 7,
+                    flex: 8,
                     child: Padding(
                       padding: EdgeInsetsDirectional.fromSTEB(
                         CoreSpacing.md(context),
@@ -132,7 +136,7 @@ class WidgetsFoodCard extends StatelessWidget {
                       SizedBox(height: CoreSpacing.xs(context)),
                       Text(
                         description,
-                        maxLines: 2,
+                        maxLines: fillHeight ? 1 : descriptionMaxLines,
                         overflow: TextOverflow.ellipsis,
                         style: CoreTypography.caption(
                           context,
@@ -160,8 +164,9 @@ class WidgetsFoodCard extends StatelessWidget {
             WidgetsAppButton(
               label: actionLabel,
               onPressed: onAction,
-              icon: Icons.add_shopping_cart_outlined,
+              icon: actionIcon,
               fullWidth: true,
+              iconAlignment: IconAlignment.start,
             ),
           ],
         );
@@ -179,27 +184,31 @@ class _MediaTags extends StatelessWidget {
 
   final String priceLabel;
   final String? badgeLabel;
-  final String ratingLabel;
+  final String? ratingLabel;
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final inset = CoreSpacing.sm(context);
-        final tagMaxWidth = (constraints.maxWidth * 0.52).clamp(84.0, 170.0);
+        final tagMaxWidth = (constraints.maxWidth * 0.52).clamp(
+          UtilitySizer.of(context, 84),
+          UtilitySizer.of(context, 170),
+        );
 
         return Stack(
           children: [
-            Positioned(
-              top: inset,
-              left: inset,
-              child: _MediaTag(
-                label: ratingLabel,
-                icon: Icons.star_rounded,
-                emphasized: true,
-                maxWidth: tagMaxWidth,
+            if (ratingLabel != null && ratingLabel!.isNotEmpty)
+              Positioned(
+                top: inset,
+                left: inset,
+                child: _MediaTag(
+                  label: ratingLabel!,
+                  icon: Icons.star_rounded,
+                  emphasized: true,
+                  maxWidth: tagMaxWidth,
+                ),
               ),
-            ),
             if (badgeLabel != null)
               Positioned(
                 top: inset,
@@ -234,7 +243,7 @@ class _LoyaltyPill extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: CoreColors.brandOlive.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
         border: Border.all(
           color: CoreColors.brandOlive.withValues(alpha: 0.28),
         ),
@@ -247,7 +256,11 @@ class _LoyaltyPill extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.stars_rounded, size: 15, color: CoreColors.brandOlive),
+            Icon(
+              Icons.stars_rounded,
+              size: CoreContentSizes.mediaTagIcon(context),
+              color: CoreColors.brandOlive,
+            ),
             SizedBox(width: CoreSpacing.xs(context) * 0.7),
             Text(
               label,
@@ -286,7 +299,7 @@ class _MediaTag extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: scheme.surface.withValues(alpha: 0.88),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(
           color:
               emphasized
@@ -296,20 +309,30 @@ class _MediaTag extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: scheme.shadow.withValues(alpha: 0.12),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            blurRadius: UtilitySizer.of(context, 12),
+            offset: Offset(0, UtilitySizer.of(context, 4)),
           ),
         ],
       ),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: maxWidth, minHeight: 30),
+        constraints: BoxConstraints(
+          maxWidth: maxWidth,
+          minHeight: UtilitySizer.of(context, 30),
+        ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          padding: EdgeInsets.symmetric(
+            horizontal: CoreSpacing.sm(context),
+            vertical: CoreSpacing.xs(context),
+          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               if (icon != null) ...[
-                Icon(icon, color: CoreColors.brandGold, size: 15),
+                Icon(
+                  icon,
+                  color: CoreColors.brandGold,
+                  size: CoreContentSizes.mediaTagIcon(context),
+                ),
                 SizedBox(width: CoreSpacing.xs(context)),
               ],
               Flexible(

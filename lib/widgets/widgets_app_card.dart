@@ -1,4 +1,5 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:flutter/material.dart';
 
 enum WidgetsAppCardVariant {
@@ -13,6 +14,9 @@ enum WidgetsAppCardVariant {
 }
 
 /// Default Ayletna card shell for reusable screen content.
+///
+/// [accentColor] tints the shell border, glow, and background wash.
+/// Pass it only for selected or semantic emphasis — not on idle cards.
 class WidgetsAppCard extends StatelessWidget {
   const WidgetsAppCard({
     required this.child,
@@ -90,25 +94,7 @@ class WidgetsAppCard extends StatelessWidget {
               : child,
     );
 
-    final content =
-        accentColor == null
-            ? body
-            : IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  DecoratedBox(
-                    decoration: BoxDecoration(color: accentColor),
-                    child: SizedBox(
-                      width: CoreContentSizes.financialIndicatorWidth(context),
-                    ),
-                  ),
-                  Expanded(child: body),
-                ],
-              ),
-            );
-
-    final innerRadius = BorderRadius.circular(CoreSpacing.radiusCard);
+    final innerRadius = BorderRadius.circular(CoreSpacing.radiusCardOf(context));
     final card = Material(
       color: _background(scheme),
       shape: RoundedRectangleBorder(
@@ -116,7 +102,7 @@ class WidgetsAppCard extends StatelessWidget {
         side: _side(scheme),
       ),
       clipBehavior: Clip.antiAlias,
-      child: InkWell(onTap: onTap, borderRadius: innerRadius, child: content),
+      child: InkWell(onTap: onTap, borderRadius: innerRadius, child: body),
     );
 
     if (variant == WidgetsAppCardVariant.transparent) {
@@ -124,9 +110,9 @@ class WidgetsAppCard extends StatelessWidget {
     }
 
     return Padding(
-      padding: EdgeInsets.all(_outerMargin),
+      padding: EdgeInsets.all(_outerMargin(context)),
       child: DecoratedBox(
-        decoration: _shellDecoration(scheme),
+        decoration: _shellDecoration(context, scheme),
         child: Padding(padding: EdgeInsets.all(_shellInset), child: card),
       ),
     );
@@ -136,7 +122,7 @@ class WidgetsAppCard extends StatelessWidget {
       title != null || subtitle != null || leading != null || trailing != null;
 
   Color _background(ColorScheme scheme) {
-    return switch (variant) {
+    final base = switch (variant) {
       WidgetsAppCardVariant.food => Color.alphaBlend(
         CoreColors.brandGold.withValues(alpha: 0.06),
         scheme.surface,
@@ -153,23 +139,18 @@ class WidgetsAppCard extends StatelessWidget {
       WidgetsAppCardVariant.transparent => scheme.surface.withValues(alpha: 0),
       _ => scheme.surface,
     };
+
+    if (accentColor == null) {
+      return base;
+    }
+
+    return Color.alphaBlend(accentColor!.withValues(alpha: 0.08), base);
   }
 
   BorderSide _side(ColorScheme scheme) {
+    // The outer shell already draws the visible border; an inner Material
+    // border stacks on top and reads as a duplicated frame.
     return switch (variant) {
-      WidgetsAppCardVariant.food => BorderSide(
-        color: CoreColors.brandGold.withValues(alpha: 0.24),
-      ),
-      WidgetsAppCardVariant.form => BorderSide(
-        color: scheme.primary.withValues(alpha: 0.18),
-      ),
-      WidgetsAppCardVariant.dashboard => BorderSide(
-        color: scheme.outlineVariant,
-      ),
-      WidgetsAppCardVariant.plain => BorderSide.none,
-      WidgetsAppCardVariant.outlined => BorderSide(
-        color: scheme.outlineVariant,
-      ),
       WidgetsAppCardVariant.transparent => BorderSide(
         color: scheme.outlineVariant,
       ),
@@ -177,53 +158,85 @@ class WidgetsAppCard extends StatelessWidget {
     };
   }
 
-  double get _outerMargin {
+  double _outerMargin(BuildContext context) {
     return switch (variant) {
       WidgetsAppCardVariant.plain => 0,
-      _ => 4,
+      _ => UtilitySizer.of(context, 4),
     };
   }
 
   double get _shellInset {
     return switch (variant) {
       WidgetsAppCardVariant.plain => 0,
-      WidgetsAppCardVariant.dashboard => 1,
-      _ => 2,
+      _ => 0,
     };
   }
 
-  BoxDecoration _shellDecoration(ColorScheme scheme) {
-    final radius = BorderRadius.circular(CoreSpacing.radiusCard + 7);
-    final glowColor = _glowColor(scheme);
+  BoxDecoration _shellDecoration(BuildContext context, ColorScheme scheme) {
+    final radius = BorderRadius.circular(
+      CoreSpacing.radiusCardOf(context) + UtilitySizer.of(context, 7),
+    );
+    final glowColor = _resolvedGlowColor(scheme);
+    final useGlow = variant == WidgetsAppCardVariant.food ||
+        variant == WidgetsAppCardVariant.elevated;
 
     return BoxDecoration(
       borderRadius: radius,
-      gradient: LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          _shellTint(scheme).withValues(alpha: 0.22),
-          scheme.surface.withValues(alpha: 0.74),
-          glowColor.withValues(alpha: 0.10),
-        ],
-      ),
-      border: Border.all(color: _shellBorder(scheme)),
+      // Quiet shells: border + surface. Glow reserved for food / selected / elevated.
+      color: useGlow ? null : scheme.surface,
+      gradient: useGlow
+          ? LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                _resolvedShellTint(scheme).withValues(
+                  alpha: variant == WidgetsAppCardVariant.food ? 0.18 : 0.08,
+                ),
+                scheme.surface.withValues(alpha: 0.88),
+                glowColor.withValues(
+                  alpha: variant == WidgetsAppCardVariant.food ? 0.08 : 0.03,
+                ),
+              ],
+            )
+          : null,
+      border: Border.all(color: _resolvedShellBorder(scheme)),
       boxShadow: [
-        if (variant != WidgetsAppCardVariant.plain)
+        if (useGlow)
           BoxShadow(
             color: glowColor.withValues(alpha: _shadowAlpha),
-            blurRadius: _shadowBlur,
-            spreadRadius: -8,
-            offset: const Offset(0, 14),
+            blurRadius: _shadowBlur(context),
+            spreadRadius: -UtilitySizer.of(context, 8),
+            offset: Offset(0, UtilitySizer.of(context, 10)),
           ),
         BoxShadow(
-          color: scheme.shadow.withValues(alpha: 0.035),
-          blurRadius: 18,
-          spreadRadius: -12,
-          offset: const Offset(0, 8),
+          color: scheme.shadow.withValues(alpha: useGlow ? 0.04 : 0.025),
+          blurRadius: UtilitySizer.of(context, useGlow ? 16 : 10),
+          spreadRadius: -UtilitySizer.of(context, 10),
+          offset: Offset(0, UtilitySizer.of(context, 4)),
         ),
       ],
     );
+  }
+
+  Color _resolvedShellTint(ColorScheme scheme) {
+    if (accentColor != null) {
+      return accentColor!;
+    }
+    return _shellTint(scheme);
+  }
+
+  Color _resolvedGlowColor(ColorScheme scheme) {
+    if (accentColor != null) {
+      return accentColor!;
+    }
+    return _glowColor(scheme);
+  }
+
+  Color _resolvedShellBorder(ColorScheme scheme) {
+    if (accentColor != null) {
+      return accentColor!.withValues(alpha: 0.40);
+    }
+    return _shellBorder(scheme);
   }
 
   Color _shellTint(ColorScheme scheme) {
@@ -265,21 +278,25 @@ class WidgetsAppCard extends StatelessWidget {
   }
 
   double get _shadowAlpha {
+    if (accentColor != null) {
+      return 0.06;
+    }
     return switch (variant) {
-      WidgetsAppCardVariant.food => 0.16,
-      WidgetsAppCardVariant.form => 0.12,
-      WidgetsAppCardVariant.dashboard => 0.10,
-      WidgetsAppCardVariant.elevated => 0.14,
-      _ => 0.07,
+      WidgetsAppCardVariant.food => 0.14,
+      WidgetsAppCardVariant.form => 0.05,
+      WidgetsAppCardVariant.dashboard => 0.04,
+      WidgetsAppCardVariant.elevated => 0.06,
+      _ => 0.03,
     };
   }
 
-  double get _shadowBlur {
-    return switch (variant) {
-      WidgetsAppCardVariant.food => 34,
-      WidgetsAppCardVariant.elevated => 32,
-      WidgetsAppCardVariant.form => 26,
-      _ => 22,
+  double _shadowBlur(BuildContext context) {
+    final design = switch (variant) {
+      WidgetsAppCardVariant.food => 28.0,
+      WidgetsAppCardVariant.elevated => 22.0,
+      WidgetsAppCardVariant.form => 18.0,
+      _ => 16.0,
     };
+    return UtilitySizer.of(context, design);
   }
 }

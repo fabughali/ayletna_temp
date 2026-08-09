@@ -6,6 +6,7 @@ class ModelListEntry {
     required this.titleEn,
     this.subtitleAr,
     this.subtitleEn,
+    this.imageUrl,
   });
 
   final String id;
@@ -13,4 +14,7 @@ class ModelListEntry {
   final String titleEn;
   final String? subtitleAr;
   final String? subtitleEn;
+
+  /// Optional hero/thumbnail for offers, combos, and promos.
+  final String? imageUrl;
 }

@@ -3,15 +3,18 @@ import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:ayletna_restaurant_app/data/models/model_admin_mock.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
+import 'package:ayletna_restaurant_app/providers/admin_plates_providers.dart';
 import 'package:ayletna_restaurant_app/providers/admin_session_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -31,7 +34,7 @@ class AdminPlateEditorScreen extends ConsumerWidget {
       title: l10n.screenPlateEditor,
       actions: [
         WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.adminPlates),
+          onPressed: () => context.push(AppRoutePaths.operatorPlates),
           icon: Icons.inventory_2_outlined,
           tooltip: l10n.screenPlatesManagement,
         ),
@@ -45,9 +48,9 @@ class AdminPlateEditorScreen extends ConsumerWidget {
             final isWide = constraints.maxWidth >= 840;
             final identity = Column(
               children: [
-                _AssetIdentityCard(asset: asset, l10n: l10n, isAr: isAr),
+                _AssetIdentityCard(asset: asset, l10n: l10n),
                 SizedBox(height: CoreSpacing.lg(context)),
-                _StockControlCard(asset: asset, l10n: l10n, isAr: isAr),
+                _StockControlCard(asset: asset, l10n: l10n),
               ],
             );
             final policy = Column(
@@ -55,7 +58,6 @@ class AdminPlateEditorScreen extends ConsumerWidget {
                 _DepositRulesCard(
                   asset: asset,
                   l10n: l10n,
-                  isAr: isAr,
                   requiresDeposit: plateConfig.requiresDeposit,
                   allowDelivery: plateConfig.allowDelivery,
                   autoRestock: plateConfig.autoRestock,
@@ -76,9 +78,9 @@ class AdminPlateEditorScreen extends ConsumerWidget {
                               .setAutoRestock(value),
                 ),
                 SizedBox(height: CoreSpacing.lg(context)),
-                _ConditionAndFeesCard(asset: asset, l10n: l10n, isAr: isAr),
+                _ConditionAndFeesCard(asset: asset, l10n: l10n),
                 SizedBox(height: CoreSpacing.lg(context)),
-                _SaveActionsCard(l10n: l10n, isAr: isAr),
+                _SaveActionsCard(l10n: l10n),
               ],
             );
             return ListView(
@@ -128,7 +130,7 @@ class _EditorHero extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(CoreSpacing.lg(context)),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         gradient: const LinearGradient(
           colors: [CoreColors.semanticDeposit, CoreColors.brandBrown],
           begin: AlignmentDirectional.topStart,
@@ -138,16 +140,14 @@ class _EditorHero extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SoftBadge(
-            label: isAr ? 'محرر أصل وعربون' : 'Asset & Deposit Editor',
+          WidgetsSoftBadge(
+            label: l10n.plateEditorBadge,
             color: CoreColors.surfaceLight,
             foreground: CoreColors.brandBrown,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           Text(
-            isAr
-                ? 'حدد قيمة الأصل، مخزونه، عربونه، ورسوم الكسر.'
-                : 'Set asset value, stock, deposit, and breakage fees.',
+            l10n.plateEditorHeadline,
             style: CoreTypography.headlineSmall(
               context,
               CoreColors.surfaceLight,
@@ -171,47 +171,42 @@ class _AssetIdentityCard extends StatelessWidget {
   const _AssetIdentityCard({
     required this.asset,
     required this.l10n,
-    required this.isAr,
   });
 
   final ModelAdminPlateAsset asset;
   final AppLocalizations l10n;
-  final bool isAr;
 
   @override
   Widget build(BuildContext context) {
     return WidgetsAppCard(
-      title: isAr ? 'بيانات الأصل' : 'Asset Identity',
-      subtitle:
-          isAr
-              ? 'معلومات تستخدم في المخزون والإرجاع.'
-              : 'Used by inventory, delivery, and returns.',
-      leading: const _IconBubble(
+      title: l10n.plateEditorAssetIdentityTitle,
+      subtitle: l10n.plateEditorAssetIdentitySubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.qr_code_2_outlined,
         color: CoreColors.orderTypePlated,
       ),
       child: Column(
         children: [
           WidgetsAppTextField(
-            label: isAr ? 'الاسم بالعربية' : 'Arabic asset name',
+            label: l10n.plateEditorAssetNameAr,
             initialValue: asset.titleAr,
             prefixIcon: Icons.language_outlined,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           WidgetsAppTextField(
-            label: isAr ? 'الاسم بالإنجليزية' : 'English asset name',
+            label: l10n.plateEditorAssetNameEn,
             initialValue: asset.titleEn,
             prefixIcon: Icons.abc_outlined,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           WidgetsAppTextField(
-            label: isAr ? 'كود الأصل / SKU' : 'Asset SKU',
+            label: l10n.plateEditorAssetSku,
             initialValue: asset.sku,
             prefixIcon: Icons.tag_outlined,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           WidgetsAppTextField(
-            label: isAr ? 'قيمة الاستبدال' : 'Replacement value',
+            label: l10n.plateEditorReplacementValue,
             initialValue: UtilityFormatJod.format(
               asset.priceJod,
               suffix: l10n.currencyJod,
@@ -225,42 +220,45 @@ class _AssetIdentityCard extends StatelessWidget {
   }
 }
 
-class _StockControlCard extends StatelessWidget {
+class _StockControlCard extends ConsumerWidget {
   const _StockControlCard({
     required this.asset,
     required this.l10n,
-    required this.isAr,
   });
 
   final ModelAdminPlateAsset asset;
   final AppLocalizations l10n;
-  final bool isAr;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final plates = ref.watch(adminPlatesProvider);
     return WidgetsAppCard(
-      title: isAr ? 'المخزون والتداول' : 'Stock & Circulation',
-      subtitle:
-          isAr
-              ? 'الأرقام الأساسية للعمليات اليومية.'
-              : 'Operational counts used by the return flow.',
-      leading: const _IconBubble(
+      title: l10n.plateEditorStockTitle,
+      subtitle: l10n.plateEditorStockSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.inventory_2_outlined,
         color: CoreColors.brandOlive,
       ),
       child: Column(
         children: [
-          _CountRow(label: l10n.platesInStock, value: asset.stock),
+          _CountRow(label: l10n.platesInStock, value: plates.stockUnits),
           _CountRow(label: l10n.platesCirculating, value: asset.circulating),
-          _CountRow(label: l10n.platesReplacementsPending, value: 24),
+          _CountRow(
+            label: l10n.platesReplacementsPending,
+            value: plates.restockRequestCount,
+          ),
           SizedBox(height: CoreSpacing.md(context)),
           WidgetsAppButton(
             label: l10n.platesOrderNow,
-            onPressed:
-                () => UtilityMockFeedback.showSuccess(
-                  context,
-                  l10n.platesOrderNow,
-                ),
+            onPressed: () {
+              final next = ref
+                  .read(adminPlatesProvider.notifier)
+                  .requestRestock(units: 20);
+              UtilityMockFeedback.showSuccess(
+                context,
+                '${l10n.platesOrderNow} · $next',
+              );
+            },
             icon: Icons.shopping_cart_checkout_outlined,
             variant: WidgetsAppButtonVariant.outline,
             fullWidth: true,
@@ -275,7 +273,6 @@ class _DepositRulesCard extends StatelessWidget {
   const _DepositRulesCard({
     required this.asset,
     required this.l10n,
-    required this.isAr,
     required this.requiresDeposit,
     required this.allowDelivery,
     required this.autoRestock,
@@ -286,7 +283,6 @@ class _DepositRulesCard extends StatelessWidget {
 
   final ModelAdminPlateAsset asset;
   final AppLocalizations l10n;
-  final bool isAr;
   final bool requiresDeposit;
   final bool allowDelivery;
   final bool autoRestock;
@@ -298,27 +294,20 @@ class _DepositRulesCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return WidgetsAppCard(
       title: l10n.depositTrayConfiguration,
-      subtitle:
-          isAr
-              ? 'قواعد العربون لهذا النوع من الصواني.'
-              : 'Deposit rules for this asset type.',
-      leading: const _IconBubble(
+      subtitle: l10n.plateEditorDepositRulesSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.account_balance_wallet_outlined,
         color: CoreColors.semanticDeposit,
       ),
       child: Column(
         children: [
           _SwitchLine(
-            label:
-                isAr
-                    ? 'يتطلب عربون عند التوصيل'
-                    : 'Requires deposit on delivery',
+            label: l10n.plateEditorRequiresDeposit,
             value: requiresDeposit,
             onChanged: onRequiresDepositChanged,
           ),
           _SwitchLine(
-            label:
-                isAr ? 'متاح لطلبات التوصيل' : 'Available for delivery orders',
+            label: l10n.plateEditorAvailableDelivery,
             value: allowDelivery,
             onChanged: onAllowDeliveryChanged,
           ),
@@ -345,29 +334,24 @@ class _ConditionAndFeesCard extends StatelessWidget {
   const _ConditionAndFeesCard({
     required this.asset,
     required this.l10n,
-    required this.isAr,
   });
 
   final ModelAdminPlateAsset asset;
   final AppLocalizations l10n;
-  final bool isAr;
 
   @override
   Widget build(BuildContext context) {
     return WidgetsAppCard(
-      title: isAr ? 'الحالة ورسوم الكسر' : 'Condition & Fees',
-      subtitle:
-          isAr
-              ? 'تظهر في عملية إرجاع الصواني.'
-              : 'Used during plated return processing.',
-      leading: const _IconBubble(
+      title: l10n.plateEditorConditionFeesTitle,
+      subtitle: l10n.plateEditorConditionFeesSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.fact_check_outlined,
         color: CoreColors.semanticError,
       ),
       child: Column(
         children: [
           _FeeRow(
-            label: isAr ? 'رسوم كسر كاملة' : 'Full breakage fee',
+            label: l10n.plateEditorFeeFullBreakage,
             value: UtilityFormatJod.format(
               asset.priceJod,
               suffix: l10n.currencyJod,
@@ -375,7 +359,7 @@ class _ConditionAndFeesCard extends StatelessWidget {
             color: CoreColors.semanticError,
           ),
           _FeeRow(
-            label: isAr ? 'خدش / تلف بسيط' : 'Scratch / minor damage',
+            label: l10n.plateEditorFeeScratch,
             value: UtilityFormatJod.format(
               asset.priceJod * 0.25,
               suffix: l10n.currencyJod,
@@ -383,7 +367,7 @@ class _ConditionAndFeesCard extends StatelessWidget {
             color: CoreColors.brandOrange,
           ),
           _FeeRow(
-            label: isAr ? 'مفقود عند الإرجاع' : 'Missing on return',
+            label: l10n.plateEditorFeeMissing,
             value: UtilityFormatJod.format(
               asset.priceJod,
               suffix: l10n.currencyJod,
@@ -397,19 +381,15 @@ class _ConditionAndFeesCard extends StatelessWidget {
 }
 
 class _SaveActionsCard extends ConsumerWidget {
-  const _SaveActionsCard({required this.l10n, required this.isAr});
+  const _SaveActionsCard({required this.l10n});
 
   final AppLocalizations l10n;
-  final bool isAr;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return WidgetsAppCard(
-      title: isAr ? 'حفظ الأصل' : 'Save Asset',
-      subtitle:
-          isAr
-              ? 'واجهة فقط، بدون ربط خلفي.'
-              : 'Front-end only, no backend write.',
+      title: l10n.plateEditorSaveTitle,
+      subtitle: l10n.plateEditorSaveSubtitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -419,15 +399,15 @@ class _SaveActionsCard extends ConsumerWidget {
               ref.read(adminPlateConfigProvider.notifier).save();
               UtilityMockFeedback.showSuccess(
                 context,
-                isAr ? 'تم حفظ إعدادات الأصل' : 'Asset settings saved',
+                l10n.plateEditorSavedSuccess,
               );
             },
             icon: Icons.save_outlined,
           ),
           SizedBox(height: CoreSpacing.sm(context)),
           WidgetsAppButton(
-            label: isAr ? 'رجوع لإدارة الصواني' : 'Back to plates',
-            onPressed: () => context.push(AppRoutePaths.adminPlates),
+            label: l10n.plateEditorBackToPlates,
+            onPressed: () => context.push(AppRoutePaths.operatorPlates),
             icon: Icons.arrow_back,
             variant: WidgetsAppButtonVariant.outline,
           ),
@@ -450,7 +430,7 @@ class _CountRow extends StatelessWidget {
       child: Row(
         children: [
           Expanded(child: Text(label)),
-          _SoftBadge(label: '$value', color: CoreColors.brandOlive),
+          WidgetsSoftBadge(label: '$value', color: CoreColors.brandOlive),
         ],
       ),
     );
@@ -480,7 +460,7 @@ class _SwitchLine extends StatelessWidget {
         ).copyWith(fontWeight: FontWeight.w800),
       ),
       value: value,
-      activeColor: CoreColors.brandOlive,
+      activeThumbColor: CoreColors.brandOlive,
       onChanged: onChanged,
     );
   }
@@ -535,7 +515,7 @@ class _FeeRow extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Row(
         children: [
@@ -553,51 +533,5 @@ class _FeeRow extends StatelessWidget {
   }
 }
 
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({required this.icon, required this.color});
 
-  final IconData icon;
-  final Color color;
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 42,
-      height: 42,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-      ),
-      child: Icon(icon, color: color, size: 22),
-    );
-  }
-}
-
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({required this.label, required this.color, this.foreground});
-
-  final String label;
-  final Color color;
-  final Color? foreground;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.sm(context),
-        vertical: CoreSpacing.xs(context),
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: foreground == null ? 0.12 : 1),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-      ),
-      child: Text(
-        label,
-        style: CoreTypography.caption(
-          context,
-          foreground ?? color,
-        ).copyWith(fontWeight: FontWeight.w900),
-      ),
-    );
-  }
-}

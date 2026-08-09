@@ -1,5 +1,6 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:flutter/material.dart';
 
 /// Horizontal checkout progress for the unified cart screen.
@@ -38,7 +39,7 @@ class WidgetsCheckoutStepStrip extends StatelessWidget {
             if (index > 0)
               Expanded(
                 child: Container(
-                  height: 2,
+                  height: CoreContentSizes.timelineLineWidth(context),
                   color:
                       index <= completedThrough
                           ? theme.colorScheme.primary
@@ -85,19 +86,23 @@ class _StepDot extends StatelessWidget {
         isActive
             ? theme.colorScheme.primary
             : theme.colorScheme.onSurfaceVariant;
+    final dotSize =
+        isActive
+            ? CoreContentSizes.checkoutStepDot(context)
+            : CoreContentSizes.checkoutStepDotActive(context);
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 200),
-              width: isActive ? 28 : 22,
-              height: isActive ? 28 : 22,
+              width: dotSize,
+              height: dotSize,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color:
@@ -106,34 +111,36 @@ class _StepDot extends StatelessWidget {
                         : isActive
                         ? dotColor.withValues(alpha: 0.15)
                         : theme.colorScheme.surfaceContainerHighest,
-                border: Border.all(color: dotColor, width: isActive ? 2 : 1),
+                border: Border.all(
+                  color: dotColor,
+                  width: isActive ? UtilitySizer.of(context, 2) : 1,
+                ),
               ),
               alignment: Alignment.center,
               child:
                   isComplete && !isActive
                       ? Icon(
                         Icons.check,
-                        size: 14,
+                        size: CoreContentSizes.chipIcon(context),
                         color: theme.colorScheme.onPrimary,
                       )
                       : Text(
                         '${index + 1}',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: isActive ? dotColor : textColor,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: CoreTypography.caption(
+                          context,
+                          isActive ? dotColor : textColor,
+                        ).copyWith(fontWeight: FontWeight.w700),
                       ),
             ),
             SizedBox(height: CoreSpacing.xs(context)),
             SizedBox(
-              width: 72,
+              width: UtilitySizer.of(context, 72),
               child: Text(
                 label,
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: textColor,
+                style: CoreTypography.caption(context, textColor).copyWith(
                   fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
                   height: 1.15,
                 ),

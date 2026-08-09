@@ -1,9 +1,11 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/data/models/model_order_summary.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
+import 'package:ayletna_restaurant_app/providers/cashier_session_providers.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_action_bar.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_app_bar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_avatar.dart';
@@ -14,7 +16,8 @@ import 'package:ayletna_restaurant_app/widgets/widgets_info_banner.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_list_item.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_phone_text.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_progress_bar.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_screen_layout.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_status_pill.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -38,61 +41,59 @@ class _CashierDepositRefundScreenState
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      appBar: WidgetsAppBar(
+    return PopScope(
+      canPop: !_showSettlement,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && _showSettlement) {
+          setState(() => _showSettlement = false);
+        }
+      },
+      child: WidgetsScaffoldPage(
         title: _showSettlement ? l10n.refundStep3Title : l10n.refundStep2Title,
-        leading: WidgetsIconButton(
-          onPressed:
-              _showSettlement
-                  ? () => setState(() => _showSettlement = false)
-                  : () => context.go(AppRoutePaths.cashier),
-          icon: Icons.arrow_back,
-          tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-        ),
         actions: [
           WidgetsIconButton(
-            onPressed:
-                () => UtilityMockFeedback.showInfo(
-                  context,
-                  l10n.screenNotifications,
-                ),
+            onPressed: () => context.push(AppRoutePaths.notifications),
             icon: Icons.notifications_outlined,
             tooltip: l10n.screenNotifications,
           ),
         ],
-        showAvatar: true,
-      ),
-      body: WidgetsScreenLayout(
-        child: ListView(
-          padding: EdgeInsetsDirectional.only(
-            top: CoreSpacing.lg(context),
-            bottom: CoreSpacing.xxl(context),
-          ),
-          children: [
-            if (_showSettlement)
-              _RefundSettlementView(
-                onModify: () => setState(() => _showSettlement = false),
-              )
-            else
-              _RefundAssessmentView(
-                damagedItems: _damagedItems,
-                onChanged:
-                    (item, damaged) => setState(() {
-                      if (damaged) {
-                        _damagedItems.add(item);
-                      } else {
-                        _damagedItems.remove(item);
-                      }
-                    }),
-              ),
-            if (!_showSettlement) ...[
-              SizedBox(height: CoreSpacing.lg(context)),
-              _RefundAssessmentActions(
-                onCancel: () => context.go(AppRoutePaths.cashier),
-                onReview: () => setState(() => _showSettlement = true),
-              ),
+        child: WidgetsRefreshList(
+          onRefresh: () async {
+            await Future<void>.delayed(const Duration(milliseconds: 300));
+            if (!context.mounted) return;
+            UtilityMockFeedback.showInfo(context, l10n.refundStep2Title);
+          },
+          child: ListView(
+            padding: EdgeInsetsDirectional.only(
+              top: CoreSpacing.lg(context),
+              bottom: CoreSpacing.xxl(context),
+            ),
+            children: [
+              if (_showSettlement)
+                _RefundSettlementView(
+                  onModify: () => setState(() => _showSettlement = false),
+                )
+              else
+                _RefundAssessmentView(
+                  damagedItems: _damagedItems,
+                  onChanged:
+                      (item, damaged) => setState(() {
+                        if (damaged) {
+                          _damagedItems.add(item);
+                        } else {
+                          _damagedItems.remove(item);
+                        }
+                      }),
+                ),
+              if (!_showSettlement) ...[
+                SizedBox(height: CoreSpacing.lg(context)),
+                _RefundAssessmentActions(
+                  onCancel: () => context.go(AppRoutePaths.cashier),
+                  onReview: () => setState(() => _showSettlement = true),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -291,13 +292,13 @@ class _RefundAssessmentActions extends StatelessWidget {
   }
 }
 
-class _RefundSettlementView extends StatelessWidget {
+class _RefundSettlementView extends ConsumerWidget {
   const _RefundSettlementView({required this.onModify});
 
   final VoidCallback onModify;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
 
     return Column(
@@ -353,7 +354,33 @@ class _RefundSettlementView extends StatelessWidget {
               icon: Icons.keyboard_return_outlined,
             );
             if (confirmed && context.mounted) {
-              UtilityMockFeedback.showSuccess(context, l10n.refundReadyForPayout);
+              final sessions = ref.read(cashierSessionOrdersProvider);
+              ModelOrderSummary? plated;
+              for (final order in sessions) {
+                if (order.isPlated && order.statusKey != 'refunded') {
+                  plated = order;
+                  break;
+                }
+              }
+              if (plated != null) {
+                ref
+                    .read(cashierSessionOrdersProvider.notifier)
+                    .markRefunded(plated.id);
+              } else {
+                ref.read(cashierSessionOrdersProvider.notifier).recordOrder(
+                  ModelOrderSummary(
+                    id:
+                        'DEP-${DateTime.now().millisecondsSinceEpoch % 100000}',
+                    orderType: OrderType.platedDelivery,
+                    customerLabel: l10n.cashierWalkIn,
+                    totalJod: 0,
+                    depositJod: 15,
+                    statusKey: 'refunded',
+                    isPlated: true,
+                  ),
+                );
+              }
+              UtilityDemoActions.complete(context, successMessage: l10n.refundReadyForPayout);
               context.go(AppRoutePaths.cashierOrderHistory);
             }
           },
@@ -542,7 +569,7 @@ class _VerifiedTransactionArt extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return ClipRRect(
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       child: SizedBox(
         height: CoreContentSizes.heroImageHeight(context) * 0.62,
         child: CustomPaint(

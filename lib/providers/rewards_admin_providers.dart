@@ -4,18 +4,104 @@ import 'package:ayletna_restaurant_app/providers/customer_action_providers.dart'
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class RewardsCatalogState {
-  const RewardsCatalogState({this.rewards = const [], this.pointsPerJod = 1.5});
+  const RewardsCatalogState({
+    this.rewards = const [],
+    this.pointsPerJod = 1.5,
+    this.tiers = const [
+      LoyaltyPointsTier(
+        id: 'tier_starter',
+        minPoints: 0,
+        maxPoints: 99,
+        earnPerJod: 1.0,
+        redeemFactor: 1.0,
+      ),
+      LoyaltyPointsTier(
+        id: 'tier_regular',
+        minPoints: 100,
+        maxPoints: 299,
+        earnPerJod: 1.5,
+        redeemFactor: 0.9,
+      ),
+      LoyaltyPointsTier(
+        id: 'tier_gold',
+        minPoints: 300,
+        maxPoints: null,
+        earnPerJod: 2.0,
+        redeemFactor: 0.8,
+      ),
+    ],
+  });
 
   final List<ModelCustomerReward> rewards;
+
+  /// Legacy single rate — kept as fallback; prefer [earnRateForBalance].
   final double pointsPerJod;
+  final List<LoyaltyPointsTier> tiers;
+
+  double earnRateForBalance(int balance) {
+    for (final tier in tiers) {
+      if (tier.contains(balance)) return tier.earnPerJod;
+    }
+    return pointsPerJod;
+  }
+
+  double redeemFactorForBalance(int balance) {
+    for (final tier in tiers) {
+      if (tier.contains(balance)) return tier.redeemFactor;
+    }
+    return 1.0;
+  }
 
   RewardsCatalogState copyWith({
     List<ModelCustomerReward>? rewards,
     double? pointsPerJod,
+    List<LoyaltyPointsTier>? tiers,
   }) {
     return RewardsCatalogState(
       rewards: rewards ?? this.rewards,
       pointsPerJod: pointsPerJod ?? this.pointsPerJod,
+      tiers: tiers ?? this.tiers,
+    );
+  }
+}
+
+class LoyaltyPointsTier {
+  const LoyaltyPointsTier({
+    required this.id,
+    required this.minPoints,
+    required this.maxPoints,
+    required this.earnPerJod,
+    required this.redeemFactor,
+  });
+
+  final String id;
+  final int minPoints;
+  final int? maxPoints;
+  final double earnPerJod;
+
+  /// Multiplier on catalog reward points cost (lower = cheaper redeem).
+  final double redeemFactor;
+
+  bool contains(int balance) {
+    if (balance < minPoints) return false;
+    if (maxPoints == null) return true;
+    return balance <= maxPoints!;
+  }
+
+  LoyaltyPointsTier copyWith({
+    String? id,
+    int? minPoints,
+    int? maxPoints,
+    bool clearMax = false,
+    double? earnPerJod,
+    double? redeemFactor,
+  }) {
+    return LoyaltyPointsTier(
+      id: id ?? this.id,
+      minPoints: minPoints ?? this.minPoints,
+      maxPoints: clearMax ? null : (maxPoints ?? this.maxPoints),
+      earnPerJod: earnPerJod ?? this.earnPerJod,
+      redeemFactor: redeemFactor ?? this.redeemFactor,
     );
   }
 }
@@ -23,9 +109,11 @@ class RewardsCatalogState {
 class RewardsCatalogNotifier extends StateNotifier<RewardsCatalogState> {
   RewardsCatalogNotifier()
     : super(
-        RewardsCatalogState(rewards: List<ModelCustomerReward>.from(
-          MockupCatalog.customerRewards,
-        )),
+        RewardsCatalogState(
+          rewards: List<ModelCustomerReward>.from(
+            MockupCatalog.customerRewards,
+          ),
+        ),
       );
 
   bool addReward(ModelCustomerReward reward) {
@@ -52,6 +140,23 @@ class RewardsCatalogNotifier extends StateNotifier<RewardsCatalogState> {
   void setPointsPerJod(double value) {
     state = state.copyWith(pointsPerJod: value);
   }
+
+  void upsertTier(LoyaltyPointsTier tier) {
+    final index = state.tiers.indexWhere((t) => t.id == tier.id);
+    if (index == -1) {
+      state = state.copyWith(tiers: [...state.tiers, tier]);
+      return;
+    }
+    final next = [...state.tiers]..[index] = tier;
+    state = state.copyWith(tiers: next);
+  }
+
+  void removeTier(String id) {
+    if (state.tiers.length <= 1) return;
+    state = state.copyWith(
+      tiers: state.tiers.where((t) => t.id != id).toList(),
+    );
+  }
 }
 
 final rewardsCatalogProvider =
@@ -77,10 +182,7 @@ final selectedRewardProvider = Provider<ModelCustomerReward?>((ref) {
 });
 
 class LoyaltyPointsState {
-  const LoyaltyPointsState({
-    this.balance = 420,
-    this.transactions = const [],
-  });
+  const LoyaltyPointsState({this.balance = 420, this.transactions = const []});
 
   final int balance;
   final List<LoyaltyTransactionRecord> transactions;
@@ -159,6 +261,8 @@ final loyaltyPointsProvider =
       (ref) => LoyaltyPointsNotifier(),
     );
 
-final loyaltyTransactionsProvider = Provider<List<LoyaltyTransactionRecord>>((ref) {
+final loyaltyTransactionsProvider = Provider<List<LoyaltyTransactionRecord>>((
+  ref,
+) {
   return ref.watch(loyaltyPointsProvider).transactions;
 });

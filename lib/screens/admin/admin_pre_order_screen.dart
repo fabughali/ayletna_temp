@@ -8,9 +8,13 @@ import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_hero_metric.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_hub_nav_actions.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -27,18 +31,16 @@ class AdminPreOrderScreen extends ConsumerWidget {
 
     return WidgetsScaffoldPage(
       title: l10n.screenPreOrder,
-      actions: [
-        WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.adminOrders),
-          icon: Icons.receipt_long_outlined,
-          tooltip: l10n.adminNavOrders,
-        ),
-        WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.adminSettings),
-          icon: Icons.settings_outlined,
-          tooltip: l10n.screenSettings,
-        ),
-      ],
+      actions: WidgetsHubNavActions.forContext(
+        context,
+        leading: [
+          WidgetsIconButton(
+            onPressed: () => context.push(AppRoutePaths.operatorOrders),
+            icon: Icons.receipt_long_outlined,
+            tooltip: l10n.adminNavOrders,
+          ),
+        ],
+      ),
       child: WidgetsRefreshList(
         onRefresh: () async {
           ref.invalidate(adminPreOrdersProvider);
@@ -49,15 +51,14 @@ class AdminPreOrderScreen extends ConsumerWidget {
             bottom: CoreSpacing.xxl(context),
           ),
           children: [
-            _PreOrderHero(isAr: isAr, count: scheduledOrders.length),
+            _PreOrderHero(l10n: l10n, count: scheduledOrders.length),
             SizedBox(height: CoreSpacing.lg(context)),
             if (scheduledOrders.isEmpty)
               WidgetsAsyncStateCard.empty(
                 title: l10n.screenPreOrder,
-                message:
-                    isAr ? 'لا توجد طلبات مسبقة' : 'No pre-orders pending',
+                message: l10n.preOrderOpsEmptyMessage,
                 actionLabel: l10n.adminNavOrders,
-                onAction: () => context.push(AppRoutePaths.adminOrders),
+                onAction: () => context.push(AppRoutePaths.operatorOrders),
               )
             else
               LayoutBuilder(
@@ -70,9 +71,9 @@ class AdminPreOrderScreen extends ConsumerWidget {
                 );
                 final rules = Column(
                   children: [
-                    _CapacityCard(isAr: isAr),
+                    _CapacityCard(l10n: l10n),
                     SizedBox(height: CoreSpacing.lg(context)),
-                    _RulesCard(isAr: isAr),
+                    _RulesCard(l10n: l10n),
                   ],
                 );
 
@@ -103,9 +104,9 @@ class AdminPreOrderScreen extends ConsumerWidget {
 }
 
 class _PreOrderHero extends StatelessWidget {
-  const _PreOrderHero({required this.isAr, required this.count});
+  const _PreOrderHero({required this.l10n, required this.count});
 
-  final bool isAr;
+  final AppLocalizations l10n;
   final int count;
 
   @override
@@ -113,7 +114,7 @@ class _PreOrderHero extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(CoreSpacing.lg(context)),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         gradient: const LinearGradient(
           colors: [CoreColors.brandOlive, CoreColors.brandBrown],
           begin: AlignmentDirectional.topStart,
@@ -123,16 +124,14 @@ class _PreOrderHero extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SoftBadge(
-            label: isAr ? 'لوحة الطلبات المسبقة' : 'Pre-order Operations',
+          WidgetsSoftBadge(
+            label: l10n.preOrderOpsBadge,
             color: CoreColors.surfaceLight,
             foreground: CoreColors.brandBrown,
           ),
           SizedBox(height: CoreSpacing.md(context)),
           Text(
-            isAr
-                ? 'راجع طلبات الغد، الطاقة التحضيرية، الصواني، ومواعيد الاستلام قبل قبول أي طلب مسبق.'
-                : 'Review tomorrow orders, prep capacity, trays, and pickup windows before accepting pre-orders.',
+            l10n.preOrderOpsHeadline,
             style: CoreTypography.headlineSmall(
               context,
               CoreColors.surfaceLight,
@@ -143,18 +142,18 @@ class _PreOrderHero extends StatelessWidget {
             spacing: CoreSpacing.sm(context),
             runSpacing: CoreSpacing.sm(context),
             children: [
-              _HeroMetric(
-                label: isAr ? 'بانتظار القرار' : 'Need decision',
+              WidgetsHeroMetric(
+                label: l10n.preOrderOpsNeedDecision,
                 value: '$count',
                 icon: Icons.pending_actions_outlined,
               ),
-              _HeroMetric(
-                label: isAr ? 'نوافذ الاستلام' : 'Pickup windows',
+              WidgetsHeroMetric(
+                label: l10n.preOrderOpsPickupWindows,
                 value: '6',
                 icon: Icons.schedule_outlined,
               ),
-              _HeroMetric(
-                label: isAr ? 'صواني محجوزة' : 'Reserved trays',
+              WidgetsHeroMetric(
+                label: l10n.preOrderOpsReservedTrays,
                 value: '12',
                 icon: Icons.room_service_outlined,
               ),
@@ -180,12 +179,9 @@ class _PreOrderQueue extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WidgetsAppCard(
-      title: isAr ? 'قائمة المراجعة' : 'Review Queue',
-      subtitle:
-          isAr
-              ? 'كل طلب مسبق يحتاج قراراً واضحاً قبل التحضير.'
-              : 'Each pre-order needs a clear decision before prep.',
-      leading: const _IconBubble(
+      title: l10n.preOrderOpsReviewQueue,
+      subtitle: l10n.preOrderOpsReviewQueueSub,
+      leading: WidgetsIconBubble(
         icon: Icons.event_note_outlined,
         color: CoreColors.brandOlive,
       ),
@@ -220,7 +216,7 @@ class _PreOrderRow extends ConsumerWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(color: color.withValues(alpha: 0.18)),
       ),
       child: Column(
@@ -228,7 +224,7 @@ class _PreOrderRow extends ConsumerWidget {
         children: [
           Row(
             children: [
-              _IconBubble(icon: _typeIcon(order.orderType), color: color),
+              WidgetsIconBubble(icon: _typeIcon(order.orderType), color: color),
               SizedBox(width: CoreSpacing.sm(context)),
               Expanded(
                 child: Column(
@@ -251,7 +247,7 @@ class _PreOrderRow extends ConsumerWidget {
                   ],
                 ),
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: UtilityFormatJod.format(
                   order.totalJod + order.depositJod,
                   suffix: l10n.currencyJod,
@@ -265,14 +261,14 @@ class _PreOrderRow extends ConsumerWidget {
             children: [
               Expanded(
                 child: WidgetsAppButton(
-                  label: isAr ? 'قبول' : 'Accept',
+                  label: l10n.preOrderOpsAccept,
                   onPressed: () {
                     ref
                         .read(adminOrdersProvider.notifier)
                         .acceptPreOrder(order.id);
                     UtilityMockFeedback.showSuccess(
                       context,
-                      isAr ? 'تم قبول الطلب المسبق' : 'Pre-order accepted',
+                      l10n.preOrderOpsAccepted,
                     );
                   },
                   icon: Icons.check,
@@ -281,11 +277,11 @@ class _PreOrderRow extends ConsumerWidget {
               SizedBox(width: CoreSpacing.sm(context)),
               Expanded(
                 child: WidgetsAppButton(
-                  label: isAr ? 'تعديل الوقت' : 'Adjust time',
+                  label: l10n.preOrderOpsAdjustTime,
                   onPressed: () async {
                     final confirmed = await UtilityMockFeedback.confirm(
                       context: context,
-                      title: isAr ? 'تعديل الوقت' : 'Adjust time',
+                      title: l10n.preOrderOpsAdjustTime,
                       message: '#${order.id}',
                       confirmLabel: l10n.actionConfirm,
                       cancelLabel: l10n.actionCancel,
@@ -297,7 +293,7 @@ class _PreOrderRow extends ConsumerWidget {
                         .adjustPreOrderTime(order.id, '18:30');
                     UtilityMockFeedback.showSuccess(
                       context,
-                      isAr ? 'تم تحديث وقت الاستلام' : 'Pickup time updated',
+                      l10n.preOrderOpsPickupUpdated,
                     );
                   },
                   icon: Icons.schedule,
@@ -313,36 +309,33 @@ class _PreOrderRow extends ConsumerWidget {
 }
 
 class _CapacityCard extends StatelessWidget {
-  const _CapacityCard({required this.isAr});
+  const _CapacityCard({required this.l10n});
 
-  final bool isAr;
+  final AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
     return WidgetsAppCard(
-      title: isAr ? 'طاقة التحضير' : 'Prep Capacity',
-      subtitle:
-          isAr
-              ? 'اضبط قبول الطلبات حسب المحطات المتاحة.'
-              : 'Accept orders based on available stations.',
-      leading: const _IconBubble(
+      title: l10n.preOrderOpsPrepCapacity,
+      subtitle: l10n.preOrderOpsPrepCapacitySub,
+      leading: WidgetsIconBubble(
         icon: Icons.restaurant_menu_outlined,
         color: CoreColors.brandOrange,
       ),
       child: Column(
         children: [
           _CapacityLine(
-            label: isAr ? 'الشاورما' : 'Shawarma',
+            label: l10n.preOrderOpsStationShawarma,
             value: '78%',
             color: CoreColors.brandOrange,
           ),
           _CapacityLine(
-            label: isAr ? 'البيتزا' : 'Pizza',
+            label: l10n.preOrderOpsStationPizza,
             value: '64%',
             color: CoreColors.semanticRevenue,
           ),
           _CapacityLine(
-            label: isAr ? 'الصواني' : 'Plated trays',
+            label: l10n.preOrderOpsStationPlated,
             value: '12/20',
             color: CoreColors.orderTypePlated,
           ),
@@ -353,35 +346,24 @@ class _CapacityCard extends StatelessWidget {
 }
 
 class _RulesCard extends StatelessWidget {
-  const _RulesCard({required this.isAr});
+  const _RulesCard({required this.l10n});
 
-  final bool isAr;
+  final AppLocalizations l10n;
 
   @override
   Widget build(BuildContext context) {
     return WidgetsAppCard(
-      title: isAr ? 'قواعد الطلب المسبق' : 'Pre-order Rules',
-      subtitle:
-          isAr
-              ? 'قواعد واجهة وهمية قابلة للتعديل لاحقاً.'
-              : 'UI-only rules ready for later data wiring.',
-      leading: const _IconBubble(
+      title: l10n.preOrderOpsRulesTitle,
+      subtitle: l10n.preOrderOpsRulesSubtitle,
+      leading: WidgetsIconBubble(
         icon: Icons.rule_outlined,
         color: CoreColors.semanticDeposit,
       ),
       child: Column(
         children: [
-          _RuleLine(label: isAr ? 'آخر وقت قبول: ٩ مساءً' : 'Cutoff: 9 PM'),
-          _RuleLine(
-            label:
-                isAr ? 'الحد الأدنى للتحضير: ساعتان' : 'Minimum prep: 2 hours',
-          ),
-          _RuleLine(
-            label:
-                isAr
-                    ? 'تأكيد الصواني قبل الدفع'
-                    : 'Confirm trays before payment',
-          ),
+          _RuleLine(label: l10n.preOrderOpsRuleCutoff),
+          _RuleLine(label: l10n.preOrderOpsRuleMinPrep),
+          _RuleLine(label: l10n.preOrderOpsRuleTraysBeforePay),
         ],
       ),
     );
@@ -414,7 +396,7 @@ class _CapacityLine extends StatelessWidget {
               ).copyWith(fontWeight: FontWeight.w900),
             ),
           ),
-          _SoftBadge(label: value, color: color),
+          WidgetsSoftBadge(label: value, color: color),
         ],
       ),
     );
@@ -444,111 +426,6 @@ class _RuleLine extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _HeroMetric extends StatelessWidget {
-  const _HeroMetric({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
-
-  final String label;
-  final String value;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 172,
-      padding: EdgeInsets.all(CoreSpacing.md(context)),
-      decoration: BoxDecoration(
-        color: CoreColors.surfaceLight.withValues(alpha: 0.16),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-        border: Border.all(
-          color: CoreColors.surfaceLight.withValues(alpha: 0.30),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(icon, color: CoreColors.surfaceLight),
-          SizedBox(width: CoreSpacing.sm(context)),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  style: CoreTypography.titleMedium(
-                    context,
-                    CoreColors.surfaceLight,
-                  ).copyWith(fontWeight: FontWeight.w900),
-                ),
-                Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: CoreTypography.caption(
-                    context,
-                    CoreColors.surfaceLight.withValues(alpha: 0.84),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({required this.icon, required this.color});
-
-  final IconData icon;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 42,
-      height: 42,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-      ),
-      child: Icon(icon, color: color, size: 22),
-    );
-  }
-}
-
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({required this.label, required this.color, this.foreground});
-
-  final String label;
-  final Color color;
-  final Color? foreground;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.sm(context),
-        vertical: CoreSpacing.xs(context),
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: foreground == null ? 0.12 : 1),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-      ),
-      child: Text(
-        label,
-        style: CoreTypography.caption(
-          context,
-          foreground ?? color,
-        ).copyWith(fontWeight: FontWeight.w900),
       ),
     );
   }

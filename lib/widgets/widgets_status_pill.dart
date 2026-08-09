@@ -32,40 +32,44 @@ class WidgetsStatusPill extends StatelessWidget {
     final foreground =
         variant == WidgetsStatusPillVariant.filled ? scheme.onPrimary : accent;
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: _background(scheme, accent),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border:
-            variant == WidgetsStatusPillVariant.outlined
-                ? Border.all(color: accent)
-                : null,
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal:
-              compact ? CoreSpacing.sm(context) : CoreSpacing.md(context),
-          vertical: compact ? CoreSpacing.xs(context) : CoreSpacing.sm(context),
+    return Semantics(
+      label: label,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: _background(scheme, accent),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
+          border:
+              variant == WidgetsStatusPillVariant.outlined
+                  ? Border.all(color: accent)
+                  : null,
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (icon != null) ...[
-              Icon(
-                icon,
-                size: CoreContentSizes.orderTypeIcon(context),
-                color: foreground,
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal:
+                compact ? CoreSpacing.sm(context) : CoreSpacing.md(context),
+            vertical:
+                compact ? CoreSpacing.xs(context) : CoreSpacing.sm(context),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon != null) ...[
+                Icon(
+                  icon,
+                  size: CoreContentSizes.orderTypeIcon(context),
+                  color: foreground,
+                ),
+                SizedBox(width: CoreSpacing.xs(context)),
+              ],
+              Text(
+                label,
+                style: CoreTypography.caption(context, foreground).copyWith(
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: compact ? 0 : 0.4,
+                ),
               ),
-              SizedBox(width: CoreSpacing.xs(context)),
             ],
-            Text(
-              label,
-              style: CoreTypography.caption(context, foreground).copyWith(
-                fontWeight: FontWeight.w900,
-                letterSpacing: compact ? 0 : 0.4,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

@@ -1,11 +1,23 @@
 /// Support ticket lifecycle for customer ↔ admin workflows.
-enum SupportTicketStatus {
-  open,
-  inProgress,
-  waitingCustomer,
-  resolved,
-  closed,
+enum SupportTicketStatus { open, inProgress, waitingCustomer, resolved, closed }
+
+enum SupportTicketPriority { low, normal, high }
+
+extension SupportTicketPriorityLabels on SupportTicketPriority {
+  String labelEn() => switch (this) {
+    SupportTicketPriority.low => 'Low',
+    SupportTicketPriority.normal => 'Normal',
+    SupportTicketPriority.high => 'High',
+  };
+
+  String labelAr() => switch (this) {
+    SupportTicketPriority.low => 'منخفض',
+    SupportTicketPriority.normal => 'عادي',
+    SupportTicketPriority.high => 'عاجل',
+  };
 }
+
+enum SupportSlaState { onTrack, atRisk, breached }
 
 class SupportTicketMessage {
   const SupportTicketMessage({
@@ -37,6 +49,11 @@ class ModelSupportTicketRecord {
     this.customerRating,
     this.customerFeedback,
     this.orderId,
+    this.priority = SupportTicketPriority.normal,
+    this.slaTargetMinutes = 240,
+    this.customerPhone,
+    this.customerAddress,
+    this.escalatedTo,
   });
 
   final String id;
@@ -51,6 +68,30 @@ class ModelSupportTicketRecord {
   final int? customerRating;
   final String? customerFeedback;
   final String? orderId;
+  final SupportTicketPriority priority;
+  final int slaTargetMinutes;
+  final String? customerPhone;
+  final String? customerAddress;
+
+  /// `operator` or `cashier` when escalated.
+  final String? escalatedTo;
+
+  SupportSlaState slaState({DateTime? now}) {
+    if (status == SupportTicketStatus.resolved ||
+        status == SupportTicketStatus.closed) {
+      return SupportSlaState.onTrack;
+    }
+    final elapsed = (now ?? DateTime.now()).difference(createdAt).inMinutes;
+    if (elapsed >= slaTargetMinutes) return SupportSlaState.breached;
+    if (elapsed >= (slaTargetMinutes * 0.75).round()) {
+      return SupportSlaState.atRisk;
+    }
+    return SupportSlaState.onTrack;
+  }
+
+  String priorityLabelEn() => priority.labelEn();
+
+  String priorityLabelAr() => priority.labelAr();
 
   String statusLabelEn() => switch (status) {
     SupportTicketStatus.open => 'Open',
@@ -69,8 +110,7 @@ class ModelSupportTicketRecord {
   };
 
   bool get canCustomerRate =>
-      status == SupportTicketStatus.resolved &&
-      customerRating == null;
+      status == SupportTicketStatus.resolved && customerRating == null;
 
   ModelSupportTicketRecord copyWith({
     String? id,
@@ -85,6 +125,12 @@ class ModelSupportTicketRecord {
     int? customerRating,
     String? customerFeedback,
     String? orderId,
+    SupportTicketPriority? priority,
+    int? slaTargetMinutes,
+    String? customerPhone,
+    String? customerAddress,
+    String? escalatedTo,
+    bool clearEscalation = false,
     bool clearRating = false,
     bool clearFeedback = false,
   }) {
@@ -98,10 +144,16 @@ class ModelSupportTicketRecord {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       messages: messages ?? this.messages,
-      customerRating: clearRating ? null : (customerRating ?? this.customerRating),
+      customerRating:
+          clearRating ? null : (customerRating ?? this.customerRating),
       customerFeedback:
           clearFeedback ? null : (customerFeedback ?? this.customerFeedback),
       orderId: orderId ?? this.orderId,
+      priority: priority ?? this.priority,
+      slaTargetMinutes: slaTargetMinutes ?? this.slaTargetMinutes,
+      customerPhone: customerPhone ?? this.customerPhone,
+      customerAddress: customerAddress ?? this.customerAddress,
+      escalatedTo: clearEscalation ? null : (escalatedTo ?? this.escalatedTo),
     );
   }
 }

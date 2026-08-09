@@ -1,4 +1,5 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/app_providers.dart';
@@ -11,7 +12,7 @@ import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_filter_chip.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_screen_layout.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -78,22 +79,30 @@ class _AuthRegisterScreenState extends ConsumerState<AuthRegisterScreen> {
       return;
     }
 
-    ref.read(authSessionProvider.notifier).submitRegisterStep1(
-      accountType: _accountType,
-      fullName: _fullNameController.text,
-      phone: _phoneController.text,
-      email: _emailController.text,
-      password: _passwordController.text,
-      confirmPassword: _confirmPasswordController.text,
-      termsAccepted: _terms,
-    );
+    ref
+        .read(authSessionProvider.notifier)
+        .submitRegisterStep1(
+          accountType: _accountType,
+          fullName: _fullNameController.text,
+          phone: _phoneController.text,
+          email: _emailController.text,
+          password: _passwordController.text,
+          confirmPassword: _confirmPasswordController.text,
+          termsAccepted: _terms,
+        );
     setState(() => _step = 2);
   }
 
   Future<void> _completeRegistration() async {
     final authState = ref.read(authSessionProvider);
     if (authState.isOperationalRegistration) {
-      ref.read(sessionProvider.notifier).signInPendingApproval();
+      ref
+          .read(sessionProvider.notifier)
+          .signInPendingApproval(
+            requestedRoles: approvedRolesForRegistration(
+              authState.registerAccountType,
+            ),
+          );
       ref.read(authSessionProvider.notifier).reset();
       context.go(AppRoutePaths.pendingApproval);
       return;
@@ -101,7 +110,9 @@ class _AuthRegisterScreenState extends ConsumerState<AuthRegisterScreen> {
 
     ref
         .read(sessionProvider.notifier)
-        .signIn(roles: approvedRolesForRegistration(authState.registerAccountType));
+        .signIn(
+          roles: approvedRolesForRegistration(authState.registerAccountType),
+        );
     ref.read(appRoleProvider.notifier).state = AppRole.customer;
     ref.read(authSessionProvider.notifier).reset();
     context.go(AppRoutePaths.home);
@@ -109,107 +120,100 @@ class _AuthRegisterScreenState extends ConsumerState<AuthRegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return Scaffold(
-      body: DecoratedBox(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            center: AlignmentDirectional.topStart,
-            radius: 1.3,
-            colors: [scheme.primary.withValues(alpha: 0.08), scheme.surface],
-          ),
+    return WidgetsScaffoldPage(
+      showAppBar: false,
+      showDrawer: false,
+      child: ListView(
+        padding: EdgeInsetsDirectional.only(
+          top: CoreSpacing.xl(context),
+          bottom: CoreSpacing.xxl(context),
         ),
-        child: SafeArea(
-          child: WidgetsScreenLayout(
-            child: ListView(
-              padding: EdgeInsetsDirectional.only(
-                top: CoreSpacing.xl(context),
-                bottom: CoreSpacing.xxl(context),
+        children: [
+          if (_step > 1) ...[
+            Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Padding(
+                padding: EdgeInsetsDirectional.only(
+                  start: CoreSpacing.lg(context),
+                  bottom: CoreSpacing.md(context),
+                ),
+                child: WidgetsIconButton(
+                  onPressed: _goBackFromStep,
+                  icon: Icons.arrow_back,
+                  tooltip:
+                      MaterialLocalizations.of(context).backButtonTooltip,
+                ),
               ),
-              children: [
-                if (_step > 1) ...[
-                  Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: WidgetsIconButton(
-                      onPressed: _goBackFromStep,
-                      icon: Icons.arrow_back,
-                      tooltip:
-                          MaterialLocalizations.of(context).backButtonTooltip,
-                    ),
-                  ),
-                  SizedBox(height: CoreSpacing.lg(context)),
-                ],
-                if (_step == 1)
-                  _RegisterCard(
-                    accountType: _accountType,
-                    onAccountTypeChanged:
-                        (type) => setState(() => _accountType = type),
-                    terms: _terms,
-                    onTermsChanged: (value) => setState(() => _terms = value),
-                    fullNameController: _fullNameController,
-                    phoneController: _phoneController,
-                    emailController: _emailController,
-                    passwordController: _passwordController,
-                    confirmPasswordController: _confirmPasswordController,
-                    onRegister: _advanceFromStep1,
-                  )
-                else if (_step == 2)
-                  AuthOtpCard(
-                    source: AuthOtpFlowSource.register,
-                    onVerify: (code) async {
-                      final l10n = AppLocalizations.of(context)!;
-                      final verified = await ref
-                          .read(authSessionProvider.notifier)
-                          .verifyOtp(code);
-                      if (!context.mounted) {
-                        return;
-                      }
-                      if (!verified) {
-                        UtilityMockFeedback.showError(
-                          context,
-                          l10n.authOtpInvalid,
-                        );
-                        return;
-                      }
-                      if (!context.mounted) {
-                        return;
-                      }
-                      if (ref
-                          .read(authSessionProvider)
-                          .isOperationalRegistration) {
-                        ref.read(sessionProvider.notifier).signInPendingApproval();
-                        ref.read(authSessionProvider.notifier).reset();
-                        if (!context.mounted) {
-                          return;
-                        }
-                        context.go(AppRoutePaths.pendingApproval);
-                        return;
-                      }
-                      setState(() => _step = 3);
-                    },
-                    showBackButton: false,
-                    showSignupProgress: false,
-                  )
-                else
-                  _RegisterPreferencesStep(
-                    dietaryPreferences: _dietaryPreferences,
-                    onDietarySelected:
-                        (preference, selected) => setState(() {
-                          if (selected) {
-                            _dietaryPreferences.add(preference);
-                          } else {
-                            _dietaryPreferences.remove(preference);
-                          }
-                        }),
-                    onComplete: _completeRegistration,
-                  ),
-                SizedBox(height: CoreSpacing.xl(context)),
-                _ProgressMarks(step: _step),
-              ],
             ),
-          ),
-        ),
+          ],
+          if (_step == 1)
+            _RegisterCard(
+              accountType: _accountType,
+              onAccountTypeChanged:
+                  (type) => setState(() => _accountType = type),
+              terms: _terms,
+              onTermsChanged: (value) => setState(() => _terms = value),
+              fullNameController: _fullNameController,
+              phoneController: _phoneController,
+              emailController: _emailController,
+              passwordController: _passwordController,
+              confirmPasswordController: _confirmPasswordController,
+              onRegister: _advanceFromStep1,
+            )
+          else if (_step == 2)
+            AuthOtpCard(
+              source: AuthOtpFlowSource.register,
+              onVerify: (code) async {
+                final l10n = AppLocalizations.of(context)!;
+                final verified = await ref
+                    .read(authSessionProvider.notifier)
+                    .verifyOtp(code);
+                if (!context.mounted) {
+                  return;
+                }
+                if (!verified) {
+                  UtilityMockFeedback.showError(context, l10n.authOtpInvalid);
+                  return;
+                }
+                if (!context.mounted) {
+                  return;
+                }
+                if (ref.read(authSessionProvider).isOperationalRegistration) {
+                  ref
+                      .read(sessionProvider.notifier)
+                      .signInPendingApproval(
+                        requestedRoles: approvedRolesForRegistration(
+                          ref.read(authSessionProvider).registerAccountType,
+                        ),
+                      );
+                  ref.read(authSessionProvider.notifier).reset();
+                  if (!context.mounted) {
+                    return;
+                  }
+                  context.go(AppRoutePaths.pendingApproval);
+                  return;
+                }
+                setState(() => _step = 3);
+              },
+              showBackButton: true,
+              showSignupProgress: false,
+            )
+          else
+            _RegisterPreferencesStep(
+              dietaryPreferences: _dietaryPreferences,
+              onDietarySelected:
+                  (preference, selected) => setState(() {
+                    if (selected) {
+                      _dietaryPreferences.add(preference);
+                    } else {
+                      _dietaryPreferences.remove(preference);
+                    }
+                  }),
+              onComplete: _completeRegistration,
+            ),
+          SizedBox(height: CoreSpacing.xl(context)),
+          _ProgressMarks(step: _step),
+        ],
       ),
     );
   }
@@ -289,12 +293,19 @@ class _RegisterCard extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.sm(context)),
           _AccountTypeOption(
-            title: l10n.registerRoleAdminOwner,
-            body: l10n.registerRoleAdminOwnerBody,
-            icon: Icons.admin_panel_settings_outlined,
-            selected: accountType == AuthRegisterAccountType.adminOwner,
-            onTap:
-                () => onAccountTypeChanged(AuthRegisterAccountType.adminOwner),
+            title: l10n.registerRoleOperator,
+            body: l10n.registerRoleOperatorBody,
+            icon: Icons.storefront_outlined,
+            selected: accountType == AuthRegisterAccountType.operator,
+            onTap: () => onAccountTypeChanged(AuthRegisterAccountType.operator),
+          ),
+          SizedBox(height: CoreSpacing.sm(context)),
+          _AccountTypeOption(
+            title: l10n.registerRoleOwner,
+            body: l10n.registerRoleOwnerBody,
+            icon: Icons.account_balance_outlined,
+            selected: accountType == AuthRegisterAccountType.owner,
+            onTap: () => onAccountTypeChanged(AuthRegisterAccountType.owner),
           ),
           SizedBox(height: CoreSpacing.xl(context)),
           _RegisterField(
@@ -337,7 +348,11 @@ class _RegisterCard extends StatelessWidget {
             controller: confirmPasswordController,
           ),
           SizedBox(height: CoreSpacing.lg(context)),
-          _TermsRow(value: terms, onChanged: onTermsChanged),
+          _TermsRow(
+            value: terms,
+            onChanged: onTermsChanged,
+            onLegalTap: () => context.push(AppRoutePaths.terms),
+          ),
           SizedBox(height: CoreSpacing.lg(context)),
           WidgetsAppButton(
             label: l10n.actionRegister,
@@ -393,7 +408,7 @@ class _AccountTypeOption extends StatelessWidget {
 
     return WidgetsAppCard(
       onTap: onTap,
-      accentColor: selected ? scheme.primary : scheme.outlineVariant,
+      accentColor: selected ? scheme.primary : null,
       variant:
           selected
               ? WidgetsAppCardVariant.filled
@@ -401,7 +416,10 @@ class _AccountTypeOption extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       child: Row(
         children: [
-          Icon(icon, color: selected ? scheme.primary : scheme.onSurfaceVariant),
+          Icon(
+            icon,
+            color: selected ? scheme.primary : scheme.onSurfaceVariant,
+          ),
           SizedBox(width: CoreSpacing.md(context)),
           Expanded(
             child: Column(
@@ -412,11 +430,14 @@ class _AccountTypeOption extends StatelessWidget {
                   style: CoreTypography.titleMedium(
                     context,
                     selected ? scheme.primary : scheme.onSurface,
-                  ).copyWith(fontWeight: FontWeight.w900, fontSize: 14),
+                  ).copyWith(fontWeight: FontWeight.w900, fontSize: UtilitySizer.of(context, 14)),
                 ),
                 Text(
                   body,
-                  style: CoreTypography.caption(context, scheme.onSurfaceVariant),
+                  style: CoreTypography.caption(
+                    context,
+                    scheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -616,15 +637,24 @@ class _RegisterField extends StatelessWidget {
 }
 
 class _TermsRow extends StatelessWidget {
-  const _TermsRow({required this.value, required this.onChanged});
+  const _TermsRow({
+    required this.value,
+    required this.onChanged,
+    required this.onLegalTap,
+  });
 
   final bool value;
   final ValueChanged<bool> onChanged;
+  final VoidCallback onLegalTap;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
+    final linkStyle = CoreTypography.bodyMedium(
+      context,
+      scheme.primary,
+    ).copyWith(fontWeight: FontWeight.w900);
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -633,31 +663,32 @@ class _TermsRow extends StatelessWidget {
         Expanded(
           child: Padding(
             padding: EdgeInsets.only(top: CoreSpacing.sm(context)),
-            child: Text.rich(
-              TextSpan(
-                style: CoreTypography.bodyMedium(
-                  context,
-                  scheme.onSurfaceVariant,
+            child: Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text(
+                  '${l10n.registerAgreePrefix} ',
+                  style: CoreTypography.bodyMedium(
+                    context,
+                    scheme.onSurfaceVariant,
+                  ),
                 ),
-                children: [
-                  TextSpan(text: '${l10n.registerAgreePrefix} '),
-                  TextSpan(
-                    text: l10n.registerTermsService,
-                    style: TextStyle(
-                      color: scheme.primary,
-                      fontWeight: FontWeight.w900,
-                    ),
+                GestureDetector(
+                  onTap: onLegalTap,
+                  child: Text(l10n.registerTermsService, style: linkStyle),
+                ),
+                Text(
+                  ' ${l10n.registerAnd} ',
+                  style: CoreTypography.bodyMedium(
+                    context,
+                    scheme.onSurfaceVariant,
                   ),
-                  TextSpan(text: ' ${l10n.registerAnd} '),
-                  TextSpan(
-                    text: l10n.registerPrivacyPolicy,
-                    style: TextStyle(
-                      color: scheme.primary,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                ],
-              ),
+                ),
+                GestureDetector(
+                  onTap: onLegalTap,
+                  child: Text(l10n.registerPrivacyPolicy, style: linkStyle),
+                ),
+              ],
             ),
           ),
         ),
@@ -767,7 +798,7 @@ class _ProgressMark extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: color,
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
       ),
       child: SizedBox(height: CoreContentSizes.splashDividerHeight(context)),
     );

@@ -13,6 +13,8 @@ class StaffSessionState {
     this.tipAckStatus = StaffTipAckStatus.pending,
     this.tipHistoryRange = 'thisMonth',
     this.customRangeApplied = false,
+    this.customRangeStart,
+    this.customRangeEnd,
     this.sessionHistoryRows = const [],
     this.recordedWifiSsid,
     this.recordedWifiBssid,
@@ -26,6 +28,8 @@ class StaffSessionState {
   final StaffTipAckStatus tipAckStatus;
   final String tipHistoryRange;
   final bool customRangeApplied;
+  final DateTime? customRangeStart;
+  final DateTime? customRangeEnd;
   final List<ModelStaffTipHistory> sessionHistoryRows;
 
   Duration? get shiftDuration {
@@ -45,7 +49,24 @@ class StaffSessionState {
         '${seconds.toString().padLeft(2, '0')}';
   }
 
+  /// Parse a date string like "Jun 12" into a DateTime.
+  static DateTime? _parseDate(String dateStr) {
+    try {
+      return DateTime.tryParse('2026 $dateStr');
+    } catch (_) {
+      return null;
+    }
+  }
+
   List<ModelStaffTipHistory> get filteredTipHistory {
+    if (tipHistoryRange == 'custom' && customRangeStart != null && customRangeEnd != null) {
+      final base = MockupCatalog.staffTipHistory.where((row) {
+        final rowDate = _parseDate(row.dateEn);
+        if (rowDate == null) return false;
+        return !rowDate.isBefore(customRangeStart!) && !rowDate.isAfter(customRangeEnd!);
+      }).toList();
+      return [...sessionHistoryRows, ...base];
+    }
     final baseline = switch (tipHistoryRange) {
       'lastMonth' =>
         MockupCatalog.staffTipHistory
@@ -66,11 +87,15 @@ class StaffSessionState {
     StaffTipAckStatus? tipAckStatus,
     String? tipHistoryRange,
     bool? customRangeApplied,
+    DateTime? customRangeStart,
+    DateTime? customRangeEnd,
     List<ModelStaffTipHistory>? sessionHistoryRows,
     String? recordedWifiSsid,
     String? recordedWifiBssid,
     bool clearCheckIn = false,
     bool clearCheckOut = false,
+    bool clearCustomRangeStart = false,
+    bool clearCustomRangeEnd = false,
   }) {
     return StaffSessionState(
       isOnShift: isOnShift ?? this.isOnShift,
@@ -81,6 +106,8 @@ class StaffSessionState {
       tipAckStatus: tipAckStatus ?? this.tipAckStatus,
       tipHistoryRange: tipHistoryRange ?? this.tipHistoryRange,
       customRangeApplied: customRangeApplied ?? this.customRangeApplied,
+      customRangeStart: clearCustomRangeStart ? null : (customRangeStart ?? this.customRangeStart),
+      customRangeEnd: clearCustomRangeEnd ? null : (customRangeEnd ?? this.customRangeEnd),
       sessionHistoryRows: sessionHistoryRows ?? this.sessionHistoryRows,
     );
   }
@@ -155,10 +182,12 @@ class StaffSessionNotifier extends StateNotifier<StaffSessionState> {
     );
   }
 
-  void applyCustomRange() {
+  void applyCustomRange({DateTime? start, DateTime? end}) {
     state = state.copyWith(
       tipHistoryRange: 'custom',
       customRangeApplied: true,
+      customRangeStart: start,
+      customRangeEnd: end,
     );
   }
 }

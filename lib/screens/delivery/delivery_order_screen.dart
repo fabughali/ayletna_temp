@@ -3,16 +3,21 @@ import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:ayletna_restaurant_app/data/models/model_delivery_pickup_item.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
+import 'package:ayletna_restaurant_app/providers/admin_session_providers.dart';
 import 'package:ayletna_restaurant_app/providers/delivery_session_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_price_badge.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_amount_line.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -38,21 +43,16 @@ class _DeliveryOrderScreenState extends ConsumerState<DeliveryOrderScreen> {
       title: l10n.deliveryOrderTitle(MockupCatalog.deliveryPickupOrderId),
       actions: [
         WidgetsIconButton(
-          onPressed:
-              () => UtilityMockFeedback.showInfo(
-                context,
-                l10n.screenNotifications,
-              ),
+          onPressed: () => context.push(AppRoutePaths.notifications),
           icon: Icons.notifications_outlined,
           tooltip: l10n.screenNotifications,
         ),
       ],
       child: WidgetsRefreshList(
-        onRefresh:
-            () async => UtilityMockFeedback.showInfo(
-              context,
-              l10n.deliveryOrderTitle(MockupCatalog.deliveryPickupOrderId),
-            ),
+        onRefresh: () async {
+          ref.invalidate(deliveryReturnTasksProvider);
+          UtilityMockFeedback.showInfo(context, l10n.opsDeliveryOrderRefreshed);
+        },
         child: ListView(
           children: [
             _PickupHero(checked: _checkedIndexes.length, total: items.length),
@@ -138,7 +138,7 @@ class _DeliveryOrderScreenState extends ConsumerState<DeliveryOrderScreen> {
     ref.read(deliveryShiftEarningsProvider.notifier).recordDelivery(totalToCollect);
     ref.read(deliveryOrderNoteProvider.notifier).state = '';
 
-    UtilityMockFeedback.showSuccess(context, l10n.deliveryConfirmPickup);
+    UtilityDemoActions.complete(context, successMessage: l10n.deliveryConfirmPickup);
     context.go(AppRoutePaths.delivery);
   }
 }
@@ -164,10 +164,10 @@ class _PickupHero extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.storefront_outlined,
                 color: CoreColors.orderTypeTakeaway,
-                large: true,
+                size: CoreContentSizes.emptyStateIcon(context), iconSize: CoreContentSizes.kpiIcon(context),
               ),
               SizedBox(width: CoreSpacing.md(context)),
               Expanded(
@@ -192,7 +192,7 @@ class _PickupHero extends StatelessWidget {
                   ],
                 ),
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.deliveryReadyForPickup,
                 color: CoreColors.semanticSuccess,
                 icon: Icons.check_circle_outline,
@@ -204,17 +204,17 @@ class _PickupHero extends StatelessWidget {
             spacing: CoreSpacing.sm(context),
             runSpacing: CoreSpacing.sm(context),
             children: [
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.deliveryBagCount,
                 color: CoreColors.orderTypeTakeaway,
                 icon: Icons.shopping_bag_outlined,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: l10n.deliveryReusableBagDeposit,
                 color: CoreColors.orderTypePlated,
                 icon: Icons.recycling_outlined,
               ),
-              _SoftBadge(
+              WidgetsSoftBadge(
                 label: '$checked / $total',
                 color: scheme.primary,
                 icon: Icons.checklist_rtl_outlined,
@@ -223,7 +223,7 @@ class _PickupHero extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.lg(context)),
           ClipRRect(
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+            borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
             child: LinearProgressIndicator(
               value: progress,
               minHeight: CoreSpacing.xs(context),
@@ -263,7 +263,7 @@ class _PackageChecklist extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.inventory_2_outlined,
                 color: scheme.primary,
               ),
@@ -335,11 +335,11 @@ class _PickupTargetCard extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color.withValues(alpha: checked ? 0.10 : 0.06),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
           border: Border.all(
             color: color.withValues(alpha: checked ? 0.28 : 0.18),
           ),
@@ -367,7 +367,7 @@ class _PickupTargetCard extends StatelessWidget {
                             ).copyWith(fontWeight: FontWeight.w900),
                           ),
                         ),
-                        _SoftBadge(
+                        WidgetsSoftBadge(
                           label: 'x${item.quantity}',
                           color: color,
                           icon: Icons.close,
@@ -383,7 +383,7 @@ class _PickupTargetCard extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: CoreSpacing.sm(context)),
-                    _SoftBadge(
+                    WidgetsSoftBadge(
                       label: zone == _PackageZone.hot ? 'Hot bag' : 'Cold bag',
                       color: _zoneColor(context, zone),
                       icon:
@@ -425,7 +425,7 @@ class _PackageSeparationCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.thermostat_outlined,
                 color: CoreColors.brandOrange,
               ),
@@ -485,7 +485,7 @@ class _CashToCollectCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.payments_outlined,
                 color: CoreColors.orderTypeTakeaway,
               ),
@@ -502,14 +502,14 @@ class _CashToCollectCard extends StatelessWidget {
             ],
           ),
           SizedBox(height: CoreSpacing.md(context)),
-          _AmountLine(
+          WidgetsAmountLine(
             label: l10n.deliveryOrderTotal,
             value: UtilityFormatJod.format(
               MockupCatalog.deliveryPickupOrderTotalJod,
               suffix: l10n.currencyJod,
             ),
           ),
-          _AmountLine(
+          WidgetsAmountLine(
             label: l10n.deliveryReusableBagDeposit,
             value: UtilityFormatJod.format(
               MockupCatalog.deliveryPickupBagDepositJod,
@@ -558,33 +558,52 @@ class _MissingItemCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final orderId = MockupCatalog.deliveryPickupOrderId;
+    final flagged = ref.watch(deliveryMissingItemFlagsProvider).contains(orderId);
 
     return WidgetsAppCard(
       variant: WidgetsAppCardVariant.plain,
       padding: EdgeInsets.all(CoreSpacing.lg(context)),
-      child: WidgetsAppButton(
-        label: l10n.deliveryReportMissingItem,
-        onPressed: () async {
-          final confirmed = await UtilityMockFeedback.confirm(
-            context: context,
-            title: l10n.deliveryReportMissingItem,
-            message: l10n.deliveryVerifyAllItems(
-              MockupCatalog.deliveryPickupItems.length,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (flagged) ...[
+            WidgetsSoftBadge(
+              label: l10n.deliveryReportMissingItem,
+              color: CoreColors.semanticError,
+              icon: Icons.report_gmailerrorred_outlined,
             ),
-            confirmLabel: l10n.deliveryReportMissingItem,
-            cancelLabel: MaterialLocalizations.of(context).cancelButtonLabel,
+            SizedBox(height: CoreSpacing.sm(context)),
+          ],
+          WidgetsAppButton(
+            label: l10n.deliveryReportMissingItem,
+            onPressed: () async {
+              final confirmed = await UtilityMockFeedback.confirm(
+                context: context,
+                title: l10n.deliveryReportMissingItem,
+                message: l10n.deliveryVerifyAllItems(
+                  MockupCatalog.deliveryPickupItems.length,
+                ),
+                confirmLabel: l10n.deliveryReportMissingItem,
+                cancelLabel: MaterialLocalizations.of(context).cancelButtonLabel,
+                icon: Icons.help_outline,
+              );
+              if (confirmed && context.mounted) {
+                ref
+                    .read(deliveryMissingItemFlagsProvider.notifier)
+                    .reportMissing(orderId);
+                ref.read(adminOrdersProvider.notifier).escalateOrder(orderId);
+                UtilityMockFeedback.showWarning(
+                  context,
+                  l10n.deliveryReportMissingItem,
+                );
+              }
+            },
             icon: Icons.help_outline,
-          );
-          if (confirmed && context.mounted) {
-            UtilityMockFeedback.showWarning(
-              context,
-              l10n.deliveryReportMissingItem,
-            );
-          }
-        },
-        icon: Icons.help_outline,
-        variant: WidgetsAppButtonVariant.outline,
-        fullWidth: true,
+            variant: WidgetsAppButtonVariant.outline,
+            fullWidth: true,
+          ),
+        ],
       ),
     );
   }
@@ -631,117 +650,6 @@ class _CheckRow extends StatelessWidget {
   }
 }
 
-class _AmountLine extends StatelessWidget {
-  const _AmountLine({required this.label, required this.value});
 
-  final String label;
-  final String value;
 
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Padding(
-      padding: EdgeInsets.only(bottom: CoreSpacing.sm(context)),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: CoreTypography.bodyMedium(
-                context,
-                scheme.onSurfaceVariant,
-              ),
-            ),
-          ),
-          Text(
-            value,
-            style: CoreTypography.bodyMedium(
-              context,
-              scheme.onSurface,
-            ).copyWith(fontWeight: FontWeight.w800),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({
-    required this.label,
-    required this.color,
-    required this.icon,
-  });
-
-  final String label;
-  final Color color;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: CoreContentSizes.orderTypeIcon(context),
-              color: color,
-            ),
-            SizedBox(width: CoreSpacing.xs(context)),
-            Text(
-              label,
-              style: CoreTypography.caption(
-                context,
-                color,
-              ).copyWith(fontWeight: FontWeight.w900),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({
-    required this.icon,
-    required this.color,
-    this.large = false,
-  });
-
-  final IconData icon;
-  final Color color;
-  final bool large;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(CoreSpacing.sm(context)),
-        child: Icon(
-          icon,
-          color: color,
-          size:
-              large
-                  ? CoreContentSizes.logoCard(context) * 0.52
-                  : CoreContentSizes.orderTypeIcon(context),
-        ),
-      ),
-    );
-  }
-}

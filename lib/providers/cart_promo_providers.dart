@@ -3,21 +3,13 @@ import 'package:ayletna_restaurant_app/providers/admin_catalog_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CartPromoState {
-  const CartPromoState({
-    this.code,
-    this.applied = false,
-    this.discountJod = 0,
-  });
+  const CartPromoState({this.code, this.applied = false, this.discountJod = 0});
 
   final String? code;
   final bool applied;
   final double discountJod;
 
-  CartPromoState copyWith({
-    String? code,
-    bool? applied,
-    double? discountJod,
-  }) {
+  CartPromoState copyWith({String? code, bool? applied, double? discountJod}) {
     return CartPromoState(
       code: code ?? this.code,
       applied: applied ?? this.applied,
@@ -31,6 +23,13 @@ class CartPromoNotifier extends StateNotifier<CartPromoState> {
 
   final Ref ref;
 
+  /// Records a promo code that was already baked into a discounted cart line.
+  void markAppliedCode(String rawCode) {
+    final code = rawCode.trim();
+    if (code.isEmpty) return;
+    state = CartPromoState(code: code, applied: true, discountJod: 0);
+  }
+
   bool applyCode(String rawCode, double orderSubtotal) {
     final code = rawCode.trim().toUpperCase();
     if (code.isEmpty || orderSubtotal <= 0) return false;
@@ -41,9 +40,20 @@ class CartPromoNotifier extends StateNotifier<CartPromoState> {
     } else if (code == 'WELCOME') {
       discount = MockupCatalog.checkoutPromoSavingsJod;
     } else {
-      final discounts = ref.read(visibleDiscountsProvider);
-      if (discounts.isNotEmpty) {
-        discount = orderSubtotal * (discounts.first.percentOff / 100);
+      final offers = ref.read(visibleOffersProvider);
+      for (final offer in offers) {
+        final offerCode = offer.promoCode?.trim().toUpperCase();
+        if (offerCode != null && offerCode == code) {
+          final percent = (offer.discountPercent ?? 10).clamp(0, 100);
+          discount = orderSubtotal * (percent / 100);
+          break;
+        }
+      }
+      if (discount <= 0) {
+        final discounts = ref.read(visibleDiscountsProvider);
+        if (discounts.isNotEmpty) {
+          discount = orderSubtotal * (discounts.first.percentOff / 100);
+        }
       }
     }
 

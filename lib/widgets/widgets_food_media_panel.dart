@@ -9,6 +9,7 @@ class WidgetsFoodMediaPanel extends StatelessWidget {
     this.badge,
     this.expand = false,
     this.borderRadius,
+    this.showBorder = false,
     super.key,
   });
 
@@ -18,11 +19,15 @@ class WidgetsFoodMediaPanel extends StatelessWidget {
   final bool expand;
   final BorderRadiusGeometry? borderRadius;
 
+  /// When true, draws a subtle edge. Off by default because parent cards
+  /// already provide the frame and stacking borders looks duplicated.
+  final bool showBorder;
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final radius =
-        borderRadius ?? BorderRadius.circular(CoreSpacing.radiusCard);
+        borderRadius ?? BorderRadius.circular(CoreSpacing.radiusCardOf(context));
 
     return ClipRRect(
       borderRadius: radius,
@@ -41,14 +46,15 @@ class WidgetsFoodMediaPanel extends StatelessWidget {
             fit: StackFit.expand,
             children: [
               child,
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: scheme.primary.withValues(alpha: 0.12),
+              if (showBorder)
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: scheme.primary.withValues(alpha: 0.12),
+                    ),
+                    borderRadius: radius,
                   ),
-                  borderRadius: radius,
                 ),
-              ),
               if (badge != null)
                 PositionedDirectional(
                   top: CoreSpacing.sm(context),

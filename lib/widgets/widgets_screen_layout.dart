@@ -58,7 +58,7 @@ class _WidgetsScreenLayoutState extends State<WidgetsScreenLayout> {
           child: RawScrollbar(
             controller: _primaryScrollController,
             interactive: true,
-            radius: Radius.circular(CoreSpacing.radiusChip),
+            radius: Radius.circular(CoreSpacing.radiusChipOf(context)),
             thickness: 6,
             child: ScrollConfiguration(
               behavior: ScrollConfiguration.of(

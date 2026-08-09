@@ -18,7 +18,7 @@ class WidgetsPriceBadge extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: CoreColors.brandGold.withValues(alpha: 0.14),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
         border: Border.all(color: CoreColors.brandGold.withValues(alpha: 0.28)),
       ),
       child: Padding(

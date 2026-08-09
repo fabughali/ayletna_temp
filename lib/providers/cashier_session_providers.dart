@@ -31,25 +31,50 @@ class CashierSessionOrdersNotifier
     state = [
       for (final order in state)
         if (order.id == orderId)
-          ModelOrderSummary(
-            id: order.id,
-            orderType: order.orderType,
-            customerLabel: order.customerLabel,
-            totalJod: order.totalJod,
-            depositJod: order.depositJod,
-            statusKey: 'refunded',
-            isPlated: order.isPlated,
-          )
+          order.copyWith(statusKey: 'refunded')
         else
           order,
     ];
   }
+
+  void markReceiptPrinted(String orderId) {
+    state = [
+      for (final order in state)
+        if (order.id == orderId)
+          order.copyWith(receiptPrinted: true)
+        else
+          order,
+    ];
+  }
+
+  void markElectronicTicketSent(String orderId) {
+    state = [
+      for (final order in state)
+        if (order.id == orderId)
+          order.copyWith(electronicTicketSent: true)
+        else
+          order,
+    ];
+  }
+
+  /// Marks the newest session ticket when print/e-ticket fires after payment.
+  bool markLatestReceiptPrinted() {
+    if (state.isEmpty) return false;
+    markReceiptPrinted(state.first.id);
+    return true;
+  }
+
+  bool markLatestElectronicTicketSent() {
+    if (state.isEmpty) return false;
+    markElectronicTicketSent(state.first.id);
+    return true;
+  }
 }
 
-final cashierSessionOrdersProvider =
-    StateNotifierProvider<CashierSessionOrdersNotifier, List<ModelOrderSummary>>(
-      (ref) => CashierSessionOrdersNotifier(),
-    );
+final cashierSessionOrdersProvider = StateNotifierProvider<
+  CashierSessionOrdersNotifier,
+  List<ModelOrderSummary>
+>((ref) => CashierSessionOrdersNotifier());
 
 OrderType cashierFulfillmentToOrderType(String fulfillmentKey) {
   return switch (fulfillmentKey) {

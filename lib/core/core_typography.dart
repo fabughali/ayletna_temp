@@ -1,12 +1,12 @@
 import 'package:ayletna_restaurant_app/core/core_fonts.dart';
 import 'package:ayletna_restaurant_app/core/core_colors.dart';
-import 'package:ayletna_restaurant_app/utilities/utility_responsive_breakpoints.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:flutter/material.dart';
 
-/// Band-aware text styles.
+/// Viewport-scaled text styles.
 abstract final class CoreTypography {
   static TextStyle headlineLarge(BuildContext context, Color color) {
-    final size = _band(context, 30, 36, 42);
+    final size = UtilitySizer.band(context, 30, 36, 42);
     return _base(
       fontSize: size,
       fontWeight: FontWeight.w800,
@@ -17,7 +17,7 @@ abstract final class CoreTypography {
   }
 
   static TextStyle headlineSmall(BuildContext context, Color color) {
-    final size = _band(context, 22, 24, 27);
+    final size = UtilitySizer.band(context, 22, 24, 27);
     return _base(
       fontSize: size,
       fontWeight: FontWeight.w700,
@@ -28,7 +28,7 @@ abstract final class CoreTypography {
   }
 
   static TextStyle titleMedium(BuildContext context, Color color) {
-    final size = _band(context, 16, 18, 20);
+    final size = UtilitySizer.band(context, 16, 18, 20);
     return _base(
       fontSize: size,
       fontWeight: FontWeight.w600,
@@ -38,7 +38,7 @@ abstract final class CoreTypography {
   }
 
   static TextStyle bodyMedium(BuildContext context, Color color) {
-    final size = _band(context, 14, 15, 16);
+    final size = UtilitySizer.band(context, 14, 15, 16);
     return _base(
       fontSize: size,
       fontWeight: FontWeight.w400,
@@ -48,7 +48,7 @@ abstract final class CoreTypography {
   }
 
   static TextStyle caption(BuildContext context, Color color) {
-    final size = _band(context, 11.5, 12, 13);
+    final size = UtilitySizer.band(context, 11.5, 12, 13);
     return _base(
       fontSize: size,
       fontWeight: FontWeight.w500,
@@ -88,16 +88,4 @@ abstract final class CoreTypography {
     );
   }
 
-  static double _band(
-    BuildContext context,
-    double mobile,
-    double tablet,
-    double web,
-  ) {
-    return switch (UtilityResponsiveBreakpoints.contentBandOf(context)) {
-      ContentBand.mobile => mobile,
-      ContentBand.tablet => tablet,
-      ContentBand.web => web,
-    };
-  }
 }

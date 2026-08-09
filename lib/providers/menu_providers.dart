@@ -36,9 +36,9 @@ final selectedCategoryIdProvider = StateProvider<String>((ref) {
 
 final menuItemsProvider = FutureProvider((ref) async {
   final catId = ref.watch(selectedCategoryIdProvider);
-  return _mergeVisibleMenuItems(ref)
-      .where((item) => item.categoryId == catId)
-      .toList();
+  return _mergeVisibleMenuItems(
+    ref,
+  ).where((item) => item.categoryId == catId).toList();
 });
 
 final menuAllItemsProvider = FutureProvider((ref) async {
@@ -63,13 +63,15 @@ final selectedMenuItemProvider = Provider<ModelMenuItem?>((ref) {
 });
 
 final menuItemByIdProvider = Provider.family<ModelMenuItem?, String>((ref, id) {
-  return ref.watch(menuAllItemsProvider).maybeWhen(
-    data: (items) {
-      for (final item in items) {
-        if (item.id == id) return item;
-      }
-      return MockupCatalog.itemById(id);
-    },
-    orElse: () => MockupCatalog.itemById(id),
-  );
+  return ref
+      .watch(menuAllItemsProvider)
+      .maybeWhen(
+        data: (items) {
+          for (final item in items) {
+            if (item.id == id) return item;
+          }
+          return MockupCatalog.itemById(id);
+        },
+        orElse: () => MockupCatalog.itemById(id),
+      );
 });

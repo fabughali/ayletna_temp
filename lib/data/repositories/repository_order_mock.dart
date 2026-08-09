@@ -14,6 +14,7 @@ class RepositoryOrderMock implements RepositoryOrder {
   static final RepositoryOrderMock instance = RepositoryOrderMock._();
 
   final Map<String, ModelOrderDetail> _placedOrders = {};
+  final List<ModelCustomerOrderHistory> _placedHistory = [];
   String? _lastPlacedOrderId;
 
   String? get lastPlacedOrderId => _lastPlacedOrderId;
@@ -33,7 +34,7 @@ class RepositoryOrderMock implements RepositoryOrder {
   @override
   Future<List<ModelCustomerOrderHistory>> fetchCustomerOrderHistory() async {
     await Future<void>.delayed(const Duration(milliseconds: 120));
-    return MockupCatalog.customerOrderHistory;
+    return [..._placedHistory, ...MockupCatalog.customerOrderHistory];
   }
 
   @override
@@ -95,8 +96,32 @@ class RepositoryOrderMock implements RepositoryOrder {
 
     _placedOrders[orderId] = detail;
     _lastPlacedOrderId = orderId;
+    _placedHistory.insert(0, _historyRowFromDetail(detail, request));
 
     return ModelPlaceOrderResult(orderId: orderId, detail: detail);
+  }
+
+  ModelCustomerOrderHistory _historyRowFromDetail(
+    ModelOrderDetail detail,
+    ModelPlaceOrderRequest request,
+  ) {
+    final now = DateTime.now();
+    final dateEn =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    final dateAr = dateEn;
+    final fulfillmentKey = request.draft.fulfillment.name;
+    return ModelCustomerOrderHistory(
+      id: detail.id,
+      labelAr: 'طلب $fulfillmentKey',
+      labelEn: 'Order · $fulfillmentKey',
+      dateAr: dateAr,
+      dateEn: dateEn,
+      totalJod: detail.totalJod,
+      itemsAr: detail.lines.map((l) => l.nameAr).toList(),
+      itemsEn: detail.lines.map((l) => l.nameEn).toList(),
+      isActive: true,
+      currentStepIndex: 0,
+    );
   }
 
   @override

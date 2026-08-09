@@ -1,4 +1,5 @@
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:ayletna_restaurant_app/data/models/model_order_detail.dart';
 import 'package:ayletna_restaurant_app/data/models/model_order_summary.dart';
@@ -11,10 +12,12 @@ import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_url_actions.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_order_invoice_block.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_soft_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -49,15 +52,7 @@ class AdminOrderDetailScreen extends ConsumerWidget {
           (order) {
             final statusKey =
                 session.statusOverrides[order.id] ?? order.statusKey;
-            final mergedOrder = ModelOrderSummary(
-              id: order.id,
-              orderType: order.orderType,
-              customerLabel: order.customerLabel,
-              totalJod: order.totalJod,
-              depositJod: order.depositJod,
-              statusKey: statusKey,
-              isPlated: order.isPlated,
-            );
+            final mergedOrder = order.copyWith(statusKey: statusKey);
             return receiptAsync.when(
             loading:
                 () => WidgetsScaffoldPage(
@@ -108,15 +103,15 @@ class _AdminOrderDetailBody extends ConsumerWidget {
       title: l10n.screenOrderDetailAdmin,
       actions: [
         WidgetsIconButton(
-          onPressed: () => context.push(AppRoutePaths.adminOrders),
+          onPressed: () => context.push(AppRoutePaths.operatorOrders),
           icon: Icons.view_kanban_outlined,
           tooltip: l10n.screenOrdersManagement,
         ),
         WidgetsIconButton(
           onPressed:
-              () => _sendGuestUpdate(context, ref, order, isAr),
+              () => _sendGuestUpdate(context, ref, order, l10n),
           icon: Icons.sms_outlined,
-          tooltip: isAr ? 'إرسال تحديث' : 'Send update',
+          tooltip: l10n.orderDetailAdminSendUpdate,
         ),
       ],
       child: WidgetsRefreshList(
@@ -193,7 +188,7 @@ class _DetailHero extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(CoreSpacing.lg(context)),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         gradient: LinearGradient(
           colors: [color, CoreColors.brandBrown],
           begin: AlignmentDirectional.topStart,
@@ -203,7 +198,7 @@ class _DetailHero extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _SoftBadge(
+          WidgetsSoftBadge(
             label:
                 '${_typeLabel(l10n, order.orderType)} · ${_statusLabel(l10n, order.statusKey)}',
             color: CoreColors.surfaceLight,
@@ -211,9 +206,7 @@ class _DetailHero extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.md(context)),
           Text(
-            isAr
-                ? 'طلب #${order.id} يحتاج متابعة من الإدارة'
-                : 'Order #${order.id} admin timeline',
+            l10n.orderDetailAdminHeroTitle(order.id),
             style: CoreTypography.headlineSmall(
               context,
               CoreColors.surfaceLight,
@@ -221,9 +214,7 @@ class _DetailHero extends StatelessWidget {
           ),
           SizedBox(height: CoreSpacing.sm(context)),
           Text(
-            isAr
-                ? '${order.customerLabel} • تحقق من وقت التسليم والعربون والملاحظات قبل الإغلاق.'
-                : '${order.customerLabel} • Verify handoff timing, deposit, and notes before closing.',
+            l10n.orderDetailAdminHeroBody(order.customerLabel),
             style: CoreTypography.bodyMedium(
               context,
               CoreColors.surfaceLight.withValues(alpha: 0.88),
@@ -235,22 +226,22 @@ class _DetailHero extends StatelessWidget {
             runSpacing: CoreSpacing.sm(context),
             children: [
               _HeroChip(
-                label: isAr ? 'إجمالي الطلب' : 'Order total',
+                label: l10n.orderDetailAdminOrderTotal,
                 value: UtilityFormatJod.format(
                   order.totalJod,
                   suffix: l10n.currencyJod,
                 ),
               ),
               _HeroChip(
-                label: isAr ? 'العربون' : 'Deposit',
+                label: l10n.orderDetailAdminDeposit,
                 value: UtilityFormatJod.format(
                   order.depositJod,
                   suffix: l10n.currencyJod,
                 ),
               ),
               _HeroChip(
-                label: isAr ? 'وقت في الطريق' : 'On route',
-                value: isAr ? '٢٨ دقيقة' : '28 min',
+                label: l10n.orderDetailAdminOnRoute,
+                value: l10n.orderDetailAdminOnRouteValue,
               ),
             ],
           ),
@@ -264,15 +255,15 @@ void _sendGuestUpdate(
   BuildContext context,
   WidgetRef ref,
   ModelOrderSummary order,
-  bool isAr,
+  AppLocalizations l10n,
 ) {
   UtilityMockFeedback.showActionSheet(
     context: context,
-    title: isAr ? 'إرسال تحديث للضيف' : 'Send guest update',
+    title: l10n.orderDetailAdminSendGuestUpdateTitle,
     message: order.customerLabel,
     actions: [
       MockSheetAction(
-        label: isAr ? 'الطلب قيد التحضير' : 'Order is preparing',
+        label: l10n.orderDetailAdminUpdatePreparing,
         icon: Icons.soup_kitchen_outlined,
         onSelected: () {
           ref
@@ -280,12 +271,12 @@ void _sendGuestUpdate(
               .updateOrderStatus(order.id, 'preparing');
           UtilityMockFeedback.showSuccess(
             context,
-            isAr ? 'تم إرسال التحديث' : 'Update sent',
+            l10n.orderDetailAdminUpdateSent,
           );
         },
       ),
       MockSheetAction(
-        label: isAr ? 'الطلب جاهز' : 'Order is ready',
+        label: l10n.orderDetailAdminUpdateReady,
         icon: Icons.check_circle_outline,
         onSelected: () {
           ref
@@ -293,12 +284,12 @@ void _sendGuestUpdate(
               .updateOrderStatus(order.id, 'ready');
           UtilityMockFeedback.showSuccess(
             context,
-            isAr ? 'تم إرسال التحديث' : 'Update sent',
+            l10n.orderDetailAdminUpdateSent,
           );
         },
       ),
       MockSheetAction(
-        label: isAr ? 'المندوب في الطريق' : 'Driver is on the way',
+        label: l10n.orderDetailAdminUpdateOnWay,
         icon: Icons.delivery_dining_outlined,
         onSelected: () {
           ref
@@ -306,17 +297,20 @@ void _sendGuestUpdate(
               .updateOrderStatus(order.id, 'on_way');
           UtilityMockFeedback.showSuccess(
             context,
-            isAr ? 'تم إرسال التحديث' : 'Update sent',
+            l10n.orderDetailAdminUpdateSent,
           );
         },
       ),
       MockSheetAction(
-        label: isAr ? 'تأخير — نعتذر' : 'Delay — we apologize',
+        label: l10n.orderDetailAdminUpdateDelay,
         icon: Icons.schedule_outlined,
         onSelected: () {
+          ref
+              .read(adminOrdersProvider.notifier)
+              .updateOrderStatus(order.id, 'delayed');
           UtilityMockFeedback.showSuccess(
             context,
-            isAr ? 'تم إرسال تنبيه التأخير' : 'Delay notice sent',
+            l10n.orderDetailAdminDelayNoticeSent,
           );
         },
       ),
@@ -386,34 +380,32 @@ class _GuestAndPaymentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WidgetsAppCard(
-      title: isAr ? 'الضيف والدفع' : 'Guest & Payment',
+      title: l10n.orderDetailAdminGuestPaymentTitle,
       subtitle:
-          isAr
-              ? 'معلومات مختصرة للإغلاق والتواصل.'
-              : 'Key context for closing and contact.',
-      leading: _IconBubble(
+l10n.orderDetailAdminGuestPaymentSubtitle,
+      leading: WidgetsIconBubble(size: UtilitySizer.of(context, 38), iconSize: CoreContentSizes.buttonIcon(context), 
         icon: _typeIcon(order.orderType),
         color: order.orderType.color,
       ),
       child: Column(
         children: [
           _InfoLine(
-            label: isAr ? 'العميل' : 'Guest',
+            label: l10n.orderDetailAdminGuestLabel,
             value: order.customerLabel,
           ),
           _InfoLine(
-            label: isAr ? 'القناة' : 'Channel',
+            label: l10n.orderDetailAdminChannelLabel,
             value: _typeLabel(l10n, order.orderType),
           ),
           _InfoLine(
-            label: isAr ? 'المبلغ' : 'Food total',
+            label: l10n.orderDetailAdminFoodTotal,
             value: UtilityFormatJod.format(
               order.totalJod,
               suffix: l10n.currencyJod,
             ),
           ),
           _InfoLine(
-            label: isAr ? 'عربون الصواني' : 'Tray deposit',
+            label: l10n.orderDetailAdminTrayDeposit,
             value: UtilityFormatJod.format(
               order.depositJod,
               suffix: l10n.currencyJod,
@@ -437,9 +429,9 @@ class _KitchenTicketCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final prepItems = MockupCatalog.kitchenPrepItems.take(3).toList();
     return WidgetsAppCard(
-      title: isAr ? 'تذكرة المطبخ' : 'Kitchen Ticket',
-      subtitle: isAr ? 'ملخص الأصناف والمحطة.' : 'Items and station summary.',
-      leading: const _IconBubble(
+      title: l10n.orderDetailAdminKitchenTicketTitle,
+      subtitle: l10n.orderDetailAdminKitchenTicketSubtitle,
+      leading: WidgetsIconBubble(size: UtilitySizer.of(context, 38), iconSize: CoreContentSizes.buttonIcon(context), 
         icon: Icons.soup_kitchen_outlined,
         color: CoreColors.brandOrange,
       ),
@@ -449,11 +441,11 @@ class _KitchenTicketCard extends StatelessWidget {
             _TicketItemRow(
               quantity: item.quantity,
               name: isAr ? item.nameAr : item.nameEn,
-              note: isAr ? 'محطة التحضير' : 'Prep station',
+              note: l10n.orderDetailAdminPrepStationNote,
             ),
           SizedBox(height: CoreSpacing.sm(context)),
           WidgetsAppButton(
-            label: isAr ? 'افتح المطبخ' : 'Open kitchen pass',
+            label: l10n.orderDetailAdminOpenKitchen,
             onPressed: () => context.push(AppRoutePaths.kitchen),
             variant: WidgetsAppButtonVariant.outline,
             icon: Icons.restaurant_outlined,
@@ -479,16 +471,13 @@ class _AdminActionsCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return WidgetsAppCard(
-      title: isAr ? 'إجراءات الإدارة' : 'Admin Actions',
-      subtitle:
-          isAr
-              ? 'إجراءات واجهة فقط لهذه المرحلة.'
-              : 'Front-end only actions for this phase.',
+      title: l10n.orderDetailAdminActionsTitle,
+      subtitle: l10n.orderDetailAdminActionsSubtitle,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           WidgetsAppButton(
-            label: isAr ? 'اتصل بالعميل' : 'Contact guest',
+            label: l10n.orderDetailAdminContactGuest,
             onPressed: () async {
               final launched = await UtilityUrlActions.launchExternalUri(
                 Uri.parse('tel:+962790000000'),
@@ -497,7 +486,7 @@ class _AdminActionsCard extends ConsumerWidget {
               if (!launched) {
                 UtilityMockFeedback.showInfo(
                   context,
-                  isAr ? '+962 7 9000 0000' : '+962 7 9000 0000',
+                  l10n.orderDetailAdminContactPhone,
                 );
               }
             },
@@ -505,15 +494,12 @@ class _AdminActionsCard extends ConsumerWidget {
           ),
           SizedBox(height: CoreSpacing.sm(context)),
           WidgetsAppButton(
-            label: isAr ? 'تعديل حالة الطلب' : 'Change order status',
+            label: l10n.orderDetailAdminChangeStatus,
             onPressed:
                 () => UtilityMockFeedback.showActionSheet(
                   context: context,
-                  title: isAr ? 'تعديل الحالة' : 'Change status',
-                  message:
-                      isAr
-                          ? 'اختر الحالة التالية للعرض التجريبي.'
-                          : 'Choose the next mock status for this order.',
+                  title: l10n.orderDetailAdminChangeStatusTitle,
+                  message: l10n.orderDetailAdminChangeStatusMessage,
                   actions: [
                     MockSheetAction(
                       label: l10n.orderStatusReady,
@@ -548,8 +534,8 @@ class _AdminActionsCard extends ConsumerWidget {
           ),
           SizedBox(height: CoreSpacing.sm(context)),
           WidgetsAppButton(
-            label: isAr ? 'رجوع للوحة الطلبات' : 'Back to order board',
-            onPressed: () => context.push(AppRoutePaths.adminOrders),
+            label: l10n.orderDetailAdminBackToBoard,
+            onPressed: () => context.push(AppRoutePaths.operatorOrders),
             icon: Icons.view_kanban_outlined,
             variant: WidgetsAppButtonVariant.outline,
           ),
@@ -574,21 +560,15 @@ class _TimelineCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final steps = [
       _TimelineStepData(
-        title: isAr ? 'استلام الكاشير' : 'POS received',
-        detail:
-            isAr
-                ? 'تم تسجيل الطلب ودفع المبلغ.'
-                : 'Order entered and payment captured.',
+        title: l10n.orderDetailAdminPosReceived,
+        detail: l10n.orderDetailAdminTimelinePosDetail,
         time: '14:08',
         complete: true,
         icon: Icons.point_of_sale_outlined,
       ),
       _TimelineStepData(
-        title: isAr ? 'تحضير المطبخ' : 'Kitchen prep',
-        detail:
-            isAr
-                ? 'تجهيز الأصناف الأساسية والتغليف.'
-                : 'Items prepared and packed.',
+        title: l10n.orderDetailAdminKitchenPrep,
+        detail: l10n.orderDetailAdminTimelinePrepDetail,
         time: '14:16',
         complete: true,
         icon: Icons.soup_kitchen_outlined,
@@ -597,30 +577,23 @@ class _TimelineCard extends StatelessWidget {
         title: _statusLabel(l10n, order.statusKey),
         detail:
             order.statusKey == 'on_way'
-                ? (isAr
-                    ? 'المندوب في الطريق إلى العميل.'
-                    : 'Courier is on the way to the guest.')
-                : (isAr
-                    ? 'بانتظار الخطوة التالية.'
-                    : 'Waiting for the next operational step.'),
+                ? l10n.orderDetailAdminTimelineOnWayDetail
+                : l10n.orderDetailAdminTimelineWaitingDetail,
         time: '14:24',
         complete: order.statusKey == 'on_way' || order.statusKey == 'delivered',
         icon: Icons.delivery_dining_outlined,
       ),
       _TimelineStepData(
-        title: isAr ? 'إغلاق وتسوية' : 'Close & settle',
-        detail:
-            isAr
-                ? 'تأكيد التسليم، العربون، وأي رسوم كسر.'
-                : 'Confirm handoff, deposit, and any breakage fee.',
-        time: isAr ? 'قادم' : 'Next',
+        title: l10n.orderDetailAdminCloseSettle,
+        detail: l10n.orderDetailAdminTimelineCloseDetail,
+        time: l10n.orderDetailAdminTimelineNext,
         complete: false,
         icon: Icons.fact_check_outlined,
       ),
     ];
     return WidgetsAppCard(
-      title: isAr ? 'خط زمني للطلب' : 'Order Timeline',
-      subtitle: isAr ? 'من التسجيل إلى التسوية.' : 'From entry to settlement.',
+      title: l10n.orderDetailAdminTimelineTitle,
+      subtitle: l10n.orderDetailAdminTimelineSubtitle,
       child: Column(
         children: [
           for (var i = 0; i < steps.length; i++)
@@ -645,42 +618,33 @@ class _ExceptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return WidgetsAppCard(
-      title: isAr ? 'مخاطر وملاحظات' : 'Risks & Notes',
-      subtitle:
-          isAr
-              ? 'ما يحتاج صاحب المطعم معرفته قبل إغلاق الطلب.'
-              : 'What the owner should know before closing this order.',
-      leading: const _IconBubble(
+      title: l10n.orderDetailAdminRisksTitle,
+      subtitle: l10n.orderDetailAdminRisksSubtitle,
+      leading: WidgetsIconBubble(size: UtilitySizer.of(context, 38), iconSize: CoreContentSizes.buttonIcon(context), 
         icon: Icons.warning_amber_outlined,
         color: CoreColors.semanticError,
       ),
       child: Column(
         children: [
           _RiskRow(
-            label: isAr ? 'وقت التوصيل' : 'Delivery timing',
-            detail:
-                isAr
-                    ? 'تجاوز متوسط المسار بثماني دقائق.'
-                    : 'Eight minutes above route average.',
+            label: l10n.orderDetailAdminDeliveryTiming,
+            detail: l10n.orderDetailAdminRiskTimingDetail,
             color: CoreColors.semanticError,
           ),
           _RiskRow(
-            label: isAr ? 'عربون الصواني' : 'Tray deposit',
+            label: l10n.orderDetailAdminTrayDeposit,
             detail:
                 order.depositJod > 0
                     ? UtilityFormatJod.format(
                       order.depositJod,
                       suffix: l10n.currencyJod,
                     )
-                    : (isAr ? 'لا يوجد عربون' : 'No deposit'),
+                    : l10n.orderDetailAdminNoDeposit,
             color: CoreColors.semanticDeposit,
           ),
           _RiskRow(
-            label: isAr ? 'ملاحظة تشغيلية' : 'Operational note',
-            detail:
-                isAr
-                    ? 'تحقق من إعادة الصواني عند التسليم.'
-                    : 'Confirm tray return expectation at handoff.',
+            label: l10n.orderDetailAdminOperationalNote,
+            detail: l10n.orderDetailAdminRiskTrayDetail,
             color: CoreColors.brandOlive,
           ),
         ],
@@ -746,7 +710,7 @@ class _TicketItemRow extends StatelessWidget {
       padding: EdgeInsets.only(bottom: CoreSpacing.sm(context)),
       child: Row(
         children: [
-          _SoftBadge(label: 'x$quantity', color: CoreColors.brandOrange),
+          WidgetsSoftBadge(label: 'x$quantity', color: CoreColors.brandOrange),
           SizedBox(width: CoreSpacing.sm(context)),
           Expanded(
             child: Column(
@@ -789,11 +753,11 @@ class _TimelineStep extends StatelessWidget {
       children: [
         Column(
           children: [
-            _IconBubble(icon: data.icon, color: color),
+            WidgetsIconBubble(size: UtilitySizer.of(context, 38), iconSize: CoreContentSizes.buttonIcon(context), icon: data.icon, color: color),
             if (!isLast)
               Container(
                 width: 2,
-                height: 54,
+                height: UtilitySizer.of(context, 54),
                 color: color.withValues(alpha: 0.22),
               ),
           ],
@@ -816,7 +780,7 @@ class _TimelineStep extends StatelessWidget {
                         ).copyWith(fontWeight: FontWeight.w900),
                       ),
                     ),
-                    _SoftBadge(label: data.time, color: color),
+                    WidgetsSoftBadge(label: data.time, color: color),
                   ],
                 ),
                 SizedBox(height: CoreSpacing.xs(context)),
@@ -854,11 +818,11 @@ class _RiskRow extends StatelessWidget {
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       ),
       child: Row(
         children: [
-          _IconBubble(icon: Icons.priority_high_outlined, color: color),
+          WidgetsIconBubble(size: UtilitySizer.of(context, 38), iconSize: CoreContentSizes.buttonIcon(context), icon: Icons.priority_high_outlined, color: color),
           SizedBox(width: CoreSpacing.sm(context)),
           Expanded(
             child: Column(
@@ -896,11 +860,11 @@ class _HeroChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 160,
+      width: UtilitySizer.of(context, 160),
       padding: EdgeInsets.all(CoreSpacing.md(context)),
       decoration: BoxDecoration(
         color: CoreColors.surfaceLight.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(
           color: CoreColors.surfaceLight.withValues(alpha: 0.30),
         ),
@@ -925,55 +889,6 @@ class _HeroChip extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({required this.icon, required this.color});
-
-  final IconData icon;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 38,
-      height: 38,
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
-      ),
-      child: Icon(icon, color: color, size: 20),
-    );
-  }
-}
-
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({required this.label, required this.color, this.foreground});
-
-  final String label;
-  final Color color;
-  final Color? foreground;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: CoreSpacing.sm(context),
-        vertical: CoreSpacing.xs(context),
-      ),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: foreground == null ? 0.12 : 1),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-      ),
-      child: Text(
-        label,
-        style: CoreTypography.caption(
-          context,
-          foreground ?? color,
-        ).copyWith(fontWeight: FontWeight.w900),
       ),
     );
   }

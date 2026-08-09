@@ -33,7 +33,7 @@ class WidgetsFoodHero extends StatelessWidget {
           CoreColors.brandGold.withValues(alpha: 0.08),
           scheme.surface,
         ),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
         border: Border.all(color: CoreColors.brandGold.withValues(alpha: 0.24)),
       ),
       child: Padding(

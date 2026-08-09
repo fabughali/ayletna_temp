@@ -1,13 +1,18 @@
+import 'dart:async';
+
 import 'package:ayletna_restaurant_app/core/core_theme.dart';
 import 'package:ayletna_restaurant_app/data/models/model_kitchen_prep_item.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/kitchen_session_providers.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_demo_actions.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_bubble.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_ops_glance_chip.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_refresh_list.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +32,7 @@ class KitchenOrderPrepScreen extends ConsumerWidget {
     return WidgetsScaffoldPage(
       title: l10n.screenOrderPrep,
       actions: [
-        const _TimerBadge(label: '12:49'),
+        const _ElapsedTimerBadge(),
         WidgetsIconButton(
           onPressed: () => context.push(AppRoutePaths.notifications),
           icon: Icons.notifications_outlined,
@@ -36,21 +41,27 @@ class KitchenOrderPrepScreen extends ConsumerWidget {
       ],
       child: WidgetsRefreshList(
         onRefresh:
-            () async => UtilityMockFeedback.showSuccess(
+            () async => UtilityMockFeedback.showInfo(
               context,
               orderId == null ? l10n.kitchenView : l10n.prepTitle(orderId),
             ),
         child:
             orderId == null
-                ? ListView(
-                  children: [
-                    WidgetsAsyncStateCard.empty(
-                      title: l10n.kitchenPreparing,
-                      message: l10n.screenKitchenDashboardDesc,
-                      actionLabel: l10n.prepBack,
-                      onAction: () => context.go(AppRoutePaths.kitchen),
-                    ),
-                  ],
+                ? Builder(
+                  builder: (context) {
+                    final children = <Widget>[
+                      WidgetsAsyncStateCard.empty(
+                        title: l10n.kitchenPreparing,
+                        message: l10n.screenKitchenDashboardDesc,
+                        actionLabel: l10n.prepBack,
+                        onAction: () => context.go(AppRoutePaths.kitchen),
+                      ),
+                    ];
+                    return ListView.builder(
+                      itemCount: children.length,
+                      itemBuilder: (context, index) => children[index],
+                    );
+                  },
                 )
                 : _ActivePrepBody(orderId: orderId, board: board, ref: ref),
       ),
@@ -115,7 +126,7 @@ class _ActivePrepBody extends StatelessWidget {
       final ok = ref.read(kitchenBoardProvider.notifier).markReady();
       if (!context.mounted) return;
       if (ok) {
-        UtilityMockFeedback.showSuccess(context, l10n.prepMarkReady);
+        UtilityDemoActions.complete(context, successMessage: l10n.prepMarkReady);
         context.go(AppRoutePaths.kitchen);
       } else {
         UtilityMockFeedback.showError(
@@ -125,8 +136,7 @@ class _ActivePrepBody extends StatelessWidget {
       }
     }
 
-    return ListView(
-      children: [
+    final children = <Widget>[
         _PrepHero(
           orderId: orderId,
           progress: progress,
@@ -146,7 +156,7 @@ class _ActivePrepBody extends StatelessWidget {
               children: [
                 _KitchenNotesPanel(onIssue: showIssueSheet),
                 SizedBox(height: CoreSpacing.lg(context)),
-                _PrepTimeline(),
+                _PrepTimeline(prepStartedAt: board.prepStartedAt),
                 SizedBox(height: CoreSpacing.lg(context)),
                 _StationActions(
                   checked: checkedCount,
@@ -178,7 +188,10 @@ class _ActivePrepBody extends StatelessWidget {
           },
         ),
         SizedBox(height: CoreSpacing.xxl(context)),
-      ],
+    ];
+    return ListView.builder(
+      itemCount: children.length,
+      itemBuilder: (context, index) => children[index],
     );
   }
 }
@@ -202,7 +215,7 @@ class _PrepHero extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return WidgetsAppCard(
-      variant: WidgetsAppCardVariant.dashboard,
+      variant: WidgetsAppCardVariant.plain,
       padding: EdgeInsets.all(CoreSpacing.lg(context)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,10 +223,10 @@ class _PrepHero extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.soup_kitchen_outlined,
-                color: scheme.primary,
-                large: true,
+                color: scheme.tertiary,
+                size: CoreContentSizes.emptyStateIcon(context), iconSize: CoreContentSizes.kpiIcon(context),
               ),
               SizedBox(width: CoreSpacing.md(context)),
               Expanded(
@@ -238,10 +251,11 @@ class _PrepHero extends StatelessWidget {
                   ],
                 ),
               ),
-              _SoftBadge(
+              WidgetsOpsGlanceChip(
                 label: l10n.prepPlated,
                 color: CoreColors.orderTypePlated,
                 icon: Icons.room_service_outlined,
+                emphasized: true,
               ),
             ],
           ),
@@ -250,36 +264,42 @@ class _PrepHero extends StatelessWidget {
             spacing: CoreSpacing.sm(context),
             runSpacing: CoreSpacing.sm(context),
             children: [
-              _SoftBadge(
+              WidgetsOpsGlanceChip(
                 label: l10n.prepCovers,
                 color: CoreColors.orderTypeDineIn,
                 icon: Icons.groups_outlined,
               ),
-              _SoftBadge(
+              WidgetsOpsGlanceChip(
                 label: l10n.prepReceived,
-                color: scheme.primary,
+                color: scheme.tertiary,
                 icon: Icons.schedule_outlined,
               ),
-              _SoftBadge(
+              WidgetsOpsGlanceChip(
                 label: l10n.prepItemsChecked(checked, total),
                 color: CoreColors.semanticSuccess,
                 icon: Icons.checklist_rtl_outlined,
+                emphasized: progress >= 1,
               ),
-              _SoftBadge(
+              WidgetsOpsGlanceChip(
                 label: l10n.prepUrgent,
                 color: CoreColors.semanticError,
                 icon: Icons.warning_amber_rounded,
+                emphasized: true,
               ),
             ],
           ),
           SizedBox(height: CoreSpacing.lg(context)),
           ClipRRect(
-            borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
+            borderRadius: BorderRadius.circular(CoreSpacing.radiusChipOf(context)),
             child: LinearProgressIndicator(
               value: progress,
-              minHeight: CoreSpacing.xs(context),
+              minHeight: CoreSpacing.sm(context) + CoreSpacing.xs(context),
               backgroundColor: scheme.surfaceContainerHighest,
-              valueColor: AlwaysStoppedAnimation<Color>(scheme.primary),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                progress >= 1
+                    ? CoreColors.semanticSuccess
+                    : CoreColors.semanticError,
+              ),
             ),
           ),
         ],
@@ -305,16 +325,16 @@ class _StationChecklist extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return WidgetsAppCard(
-      variant: WidgetsAppCardVariant.form,
+      variant: WidgetsAppCardVariant.plain,
       padding: EdgeInsets.all(CoreSpacing.lg(context)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.restaurant_menu_outlined,
-                color: scheme.primary,
+                color: scheme.tertiary,
               ),
               SizedBox(width: CoreSpacing.sm(context)),
               Expanded(
@@ -374,15 +394,15 @@ class _PrepTargetCard extends StatelessWidget {
     final name = isAr ? item.nameAr : item.nameEn;
     final specs = isAr ? item.specsAr : item.specsEn;
     final warning = isAr ? item.warningAr : item.warningEn;
-    final color = checked ? CoreColors.semanticSuccess : scheme.primary;
+    final color = checked ? CoreColors.semanticSuccess : scheme.tertiary;
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+      borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color.withValues(alpha: checked ? 0.10 : 0.06),
-          borderRadius: BorderRadius.circular(CoreSpacing.radiusCard),
+          borderRadius: BorderRadius.circular(CoreSpacing.radiusCardOf(context)),
           border: Border.all(
             color: color.withValues(alpha: checked ? 0.28 : 0.18),
           ),
@@ -409,7 +429,7 @@ class _PrepTargetCard extends StatelessWidget {
                             ).copyWith(fontWeight: FontWeight.w900),
                           ),
                         ),
-                        _SoftBadge(
+                        WidgetsOpsGlanceChip(
                           label: l10n.prepQuantity(item.quantity),
                           color: color,
                           icon: Icons.close,
@@ -458,7 +478,7 @@ class _KitchenNotesPanel extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), 
                 icon: Icons.notification_important_outlined,
                 color: CoreColors.semanticError,
               ),
@@ -472,10 +492,11 @@ class _KitchenNotesPanel extends StatelessWidget {
                   ).copyWith(fontWeight: FontWeight.w900),
                 ),
               ),
-              _SoftBadge(
+              WidgetsOpsGlanceChip(
                 label: l10n.prepUrgent,
                 color: CoreColors.semanticError,
                 icon: Icons.priority_high_outlined,
+                emphasized: true,
               ),
             ],
           ),
@@ -504,15 +525,36 @@ class _KitchenNotesPanel extends StatelessWidget {
 }
 
 class _PrepTimeline extends StatelessWidget {
+  const _PrepTimeline({this.prepStartedAt});
+
+  final DateTime? prepStartedAt;
+
+  _StageState _stageFor(int index) {
+    if (prepStartedAt == null) return _StageState.pending;
+    final elapsed = DateTime.now().difference(prepStartedAt!);
+    if (elapsed.inMinutes >= 1) {
+      return switch (index) {
+        0 => _StageState.done,
+        1 => _StageState.done,
+        2 => _StageState.current,
+        _ => _StageState.pending,
+      };
+    }
+    return switch (index) {
+      0 => _StageState.done,
+      _ => _StageState.pending,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final stages = [
-      _Stage(l10n.prepOrderReceived, _StageState.done),
-      _Stage(l10n.prepStarted, _StageState.done),
-      _Stage(l10n.prepAssemblyProgress, _StageState.current),
-      _Stage(l10n.prepFinalPlating, _StageState.pending),
+      _Stage(l10n.prepOrderReceived, _stageFor(0)),
+      _Stage(l10n.prepStarted, _stageFor(1)),
+      _Stage(l10n.prepAssemblyProgress, _stageFor(2)),
+      _Stage(l10n.prepFinalPlating, _stageFor(3)),
     ];
 
     return WidgetsAppCard(
@@ -523,7 +565,7 @@ class _PrepTimeline extends StatelessWidget {
         children: [
           Row(
             children: [
-              _IconBubble(icon: Icons.timeline_outlined, color: scheme.primary),
+              WidgetsIconBubble(borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)), icon: Icons.timeline_outlined, color: scheme.primary),
               SizedBox(width: CoreSpacing.sm(context)),
               Text(
                 l10n.prepStages,
@@ -565,7 +607,7 @@ class _StationActions extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _SoftBadge(
+          WidgetsOpsGlanceChip(
             label: l10n.prepItemsChecked(checked, total),
             color:
                 checked == total
@@ -673,7 +715,7 @@ class _WarningStrip extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: CoreColors.semanticError.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
+        borderRadius: BorderRadius.circular(CoreSpacing.radiusButtonOf(context)),
         border: Border.all(
           color: CoreColors.semanticError.withValues(alpha: 0.24),
         ),
@@ -701,100 +743,43 @@ class _WarningStrip extends StatelessWidget {
   }
 }
 
-class _SoftBadge extends StatelessWidget {
-  const _SoftBadge({
-    required this.label,
-    required this.color,
-    required this.icon,
-  });
-
-  final String label;
-  final Color color;
-  final IconData icon;
+class _ElapsedTimerBadge extends ConsumerStatefulWidget {
+  const _ElapsedTimerBadge();
 
   @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusChip),
-        border: Border.all(color: color.withValues(alpha: 0.24)),
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: CoreSpacing.sm(context),
-          vertical: CoreSpacing.xs(context),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: CoreContentSizes.orderTypeIcon(context),
-              color: color,
-            ),
-            SizedBox(width: CoreSpacing.xs(context)),
-            Text(
-              label,
-              style: CoreTypography.caption(
-                context,
-                color,
-              ).copyWith(fontWeight: FontWeight.w900),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  ConsumerState<_ElapsedTimerBadge> createState() => _ElapsedTimerBadgeState();
 }
 
-class _TimerBadge extends StatelessWidget {
-  const _TimerBadge({required this.label});
+class _ElapsedTimerBadgeState extends ConsumerState<_ElapsedTimerBadge> {
+  Timer? _timer;
 
-  final String label;
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final elapsed = ref.watch(kitchenBoardProvider.select((b) => b.formattedElapsedTime));
     return Padding(
       padding: EdgeInsets.symmetric(vertical: CoreSpacing.sm(context)),
-      child: _SoftBadge(
-        label: label,
+      child: WidgetsOpsGlanceChip(
+        label: elapsed,
         color: CoreColors.orderTypePlated,
         icon: Icons.timer_outlined,
+        emphasized: true,
       ),
     );
   }
 }
 
-class _IconBubble extends StatelessWidget {
-  const _IconBubble({
-    required this.icon,
-    required this.color,
-    this.large = false,
-  });
 
-  final IconData icon;
-  final Color color;
-  final bool large;
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(CoreSpacing.radiusButton),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(CoreSpacing.sm(context)),
-        child: Icon(
-          icon,
-          color: color,
-          size:
-              large
-                  ? CoreContentSizes.logoCard(context) * 0.52
-                  : CoreContentSizes.orderTypeIcon(context),
-        ),
-      ),
-    );
-  }
-}

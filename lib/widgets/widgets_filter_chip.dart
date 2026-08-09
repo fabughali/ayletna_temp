@@ -24,6 +24,7 @@ class WidgetsFilterChip extends StatelessWidget {
     return ChoiceChip(
       selected: selected,
       onSelected: onSelected,
+      showCheckmark: false,
       avatar:
           icon == null
               ? null
