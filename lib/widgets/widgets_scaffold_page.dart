@@ -138,6 +138,7 @@ class WidgetsScaffoldPage extends ConsumerWidget {
         path == AppRoutePaths.checkout ||
         path == AppRoutePaths.payment ||
         path == AppRoutePaths.checkoutReview ||
+        path == AppRoutePaths.orderConfirmation ||
         path == AppRoutePaths.tip ||
         path == AppRoutePaths.orderHistory ||
         path == AppRoutePaths.rewards ||
