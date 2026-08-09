@@ -3,25 +3,28 @@ import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
 import 'package:ayletna_restaurant_app/providers/app_providers.dart';
 import 'package:ayletna_restaurant_app/providers/cart_checkout_fees_providers.dart';
+import 'package:ayletna_restaurant_app/providers/cart_promo_providers.dart';
 import 'package:ayletna_restaurant_app/providers/cart_providers.dart';
 import 'package:ayletna_restaurant_app/providers/checkout_draft_providers.dart';
-import 'package:ayletna_restaurant_app/providers/order_placement_providers.dart';
+import 'package:ayletna_restaurant_app/providers/rewards_admin_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_format_jod.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_action_bar.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_async_state_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_app_text_field.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_app_switch.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_checkout_sections.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_checkout_step_strip.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_choice_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_filter_chip.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_financial_summary.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Stepped checkout — payment method and tip (step 3).
+/// Stepped checkout — payment, order summary, COD change, points (step 3).
 class CustomerCheckoutPaymentScreen extends ConsumerStatefulWidget {
   const CustomerCheckoutPaymentScreen({super.key});
 
@@ -32,46 +35,88 @@ class CustomerCheckoutPaymentScreen extends ConsumerStatefulWidget {
 
 class _CustomerCheckoutPaymentScreenState
     extends ConsumerState<CustomerCheckoutPaymentScreen> {
+  final _promoController = TextEditingController();
+  final _cashTenderedController = TextEditingController();
+
+  @override
+  void dispose() {
+    _promoController.dispose();
+    _cashTenderedController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final draft = ref.watch(checkoutDraftProvider);
     final isGuest = ref.watch(appRoleProvider) == AppRole.guest;
-    final placeOrderState = ref.watch(placeOrderProvider);
-    final isSubmitting = placeOrderState is AsyncLoading;
     final scheme = Theme.of(context).colorScheme;
     final cartLines = ref.watch(cartProvider);
     final subtotal = cartLines.fold<double>(
       0,
       (sum, line) => sum + line.unitPriceJod * line.quantity,
     );
-    final depositJod =
-        draft.fulfillment == CheckoutFulfillment.plated
-            ? ref.watch(cartCheckoutFeesProvider).platedDepositJod
+    final fees = ref.watch(cartCheckoutFeesProvider);
+    final costs = WidgetsCheckoutSummaryCosts.calculate(
+      subtotal: subtotal,
+      fulfillment: draft.fulfillment,
+      fees: fees,
+    );
+    final promo = ref.watch(cartPromoProvider);
+    final discount = promo.applied ? promo.discountJod : 0.0;
+    if (promo.applied &&
+        _promoController.text.trim().isEmpty &&
+        promo.code != null) {
+      _promoController.text = promo.code!;
+    }
+
+    final pointsBalance = ref.watch(loyaltyPointsProvider).balance;
+    final pointsValue = checkoutPointsValueJod(pointsBalance);
+    final afterPromo = (costs.totalBeforeSavings - discount + draft.tipJod)
+        .clamp(0.0, double.infinity);
+    final pointsDiscount =
+        draft.useLoyaltyPoints
+            ? double.parse(
+              pointsValue.clamp(0.0, afterPromo).toStringAsFixed(2),
+            )
             : 0.0;
-    final summaryTotal = subtotal + depositJod + draft.tipJod;
+    final summaryTotal = double.parse(
+      (afterPromo - pointsDiscount).toStringAsFixed(2),
+    );
+
+    final tendered = draft.cashTenderedJod;
+    final changeDue =
+        draft.paymentType == CheckoutPaymentType.cash &&
+                tendered != null &&
+                tendered >= summaryTotal
+            ? double.parse((tendered - summaryTotal).toStringAsFixed(2))
+            : null;
+
+    if (draft.cashTenderedJod != null &&
+        _cashTenderedController.text.trim().isEmpty) {
+      _cashTenderedController.text = draft.cashTenderedJod!.toStringAsFixed(2);
+    }
+
     final jod = l10n.currencyJod;
 
     return WidgetsScaffoldPage(
       title: l10n.cartCheckoutStepPayment,
       bottomSheet: WidgetsActionBar(
         primary: WidgetsAppButton(
-          label: isGuest ? l10n.guestSignInToOrder : l10n.cartProceedCheckout,
-          icon: Icons.check_circle_outline,
+          label: isGuest ? l10n.guestSignInToOrder : l10n.actionContinue,
+          icon: Icons.arrow_forward,
           fullWidth: true,
           onPressed:
-              isSubmitting
-                  ? null
-                  : isGuest
+              isGuest
                   ? () => context.push(AppRoutePaths.login)
-                  : () => _submitOrder(context),
+                  : () => _continueToReview(context, summaryTotal),
         ),
         secondary: WidgetsAppButton(
           label: l10n.prepBack,
           icon: Icons.arrow_back,
           variant: WidgetsAppButtonVariant.outline,
           fullWidth: true,
-          onPressed: isSubmitting ? null : () => context.pop(),
+          onPressed: () => context.pop(),
         ),
       ),
       child: ListView(
@@ -106,15 +151,109 @@ class _CustomerCheckoutPaymentScreenState
               icon: _paymentIcon(type),
               selected: draft.paymentType == type,
               onTap:
-                  isSubmitting
-                      ? () {}
-                      : () => ref
-                          .read(checkoutDraftProvider.notifier)
-                          .setPaymentType(type),
+                  () => ref
+                      .read(checkoutDraftProvider.notifier)
+                      .setPaymentType(type),
             ),
             if (type != CheckoutPaymentType.values.last)
               SizedBox(height: CoreSpacing.sm(context)),
           ],
+          if (draft.paymentType == CheckoutPaymentType.cash) ...[
+            SizedBox(height: CoreSpacing.lg(context)),
+            WidgetsAppCard(
+              variant: WidgetsAppCardVariant.form,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    l10n.checkoutCashTenderedLabel,
+                    style: CoreTypography.titleMedium(
+                      context,
+                      scheme.onSurface,
+                    ).copyWith(fontWeight: FontWeight.w900),
+                  ),
+                  SizedBox(height: CoreSpacing.md(context)),
+                  WidgetsAppTextField(
+                    controller: _cashTenderedController,
+                    label: l10n.checkoutCashTenderedLabel,
+                    hintText: l10n.checkoutCashTenderedHint,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    onChanged: (raw) {
+                      final parsed = double.tryParse(raw.trim());
+                      ref
+                          .read(checkoutDraftProvider.notifier)
+                          .setCashTenderedJod(parsed);
+                    },
+                  ),
+                  if (changeDue != null) ...[
+                    SizedBox(height: CoreSpacing.md(context)),
+                    Text(
+                      l10n.checkoutCashChangeDue(
+                        UtilityFormatJod.format(changeDue, suffix: jod),
+                      ),
+                      style: CoreTypography.bodyMedium(
+                        context,
+                        scheme.primary,
+                      ).copyWith(fontWeight: FontWeight.w800),
+                    ),
+                  ] else if (tendered != null && tendered < summaryTotal) ...[
+                    SizedBox(height: CoreSpacing.md(context)),
+                    Text(
+                      l10n.checkoutCashChangeNeedMore,
+                      style: CoreTypography.caption(
+                        context,
+                        CoreColors.semanticError,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+          SizedBox(height: CoreSpacing.lg(context)),
+          WidgetsAppCard(
+            variant: WidgetsAppCardVariant.form,
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.checkoutUseLoyaltyPoints,
+                        style: CoreTypography.titleMedium(
+                          context,
+                          scheme.onSurface,
+                        ).copyWith(fontWeight: FontWeight.w900),
+                      ),
+                      SizedBox(height: CoreSpacing.xs(context)),
+                      Text(
+                        l10n.checkoutLoyaltyPointsAvailable(
+                          '$pointsBalance',
+                          UtilityFormatJod.format(pointsValue, suffix: jod),
+                        ),
+                        style: CoreTypography.caption(
+                          context,
+                          scheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                WidgetsAppSwitch(
+                  value: draft.useLoyaltyPoints,
+                  onChanged:
+                      pointsBalance > 0
+                          ? (value) => ref
+                              .read(checkoutDraftProvider.notifier)
+                              .setUseLoyaltyPoints(value)
+                          : null,
+                ),
+              ],
+            ),
+          ),
           SizedBox(height: CoreSpacing.lg(context)),
           Text(
             l10n.cartTipTitle,
@@ -136,91 +275,78 @@ class _CustomerCheckoutPaymentScreenState
                           : '${tip.toStringAsFixed(2)} ${l10n.currencyJod}',
                   selected: draft.tipJod == tip,
                   onSelected:
-                      isSubmitting
-                          ? (_) {}
-                          : (_) => ref
-                              .read(checkoutDraftProvider.notifier)
-                              .setTipJod(tip),
+                      (_) => ref
+                          .read(checkoutDraftProvider.notifier)
+                          .setTipJod(tip),
                 ),
             ],
           ),
           SizedBox(height: CoreSpacing.lg(context)),
-          WidgetsFinancialSummary(
-            title: l10n.checkoutPaymentSummaryTitle,
-            lines: [
-              WidgetsFinancialSummaryLine(
-                label: l10n.checkoutFood,
-                value: UtilityFormatJod.format(subtotal, suffix: jod),
-                accentColor: CoreColors.semanticRevenue,
-              ),
-              if (depositJod > 0)
-                WidgetsFinancialSummaryLine(
-                  label: l10n.checkoutDeposit,
-                  value: UtilityFormatJod.format(depositJod, suffix: jod),
-                  accentColor: CoreColors.semanticDeposit,
-                ),
-              WidgetsFinancialSummaryLine(
-                label: l10n.checkoutTip,
-                value:
-                    draft.tipJod == 0
-                        ? l10n.cartNoTip
-                        : UtilityFormatJod.format(draft.tipJod, suffix: jod),
-                accentColor: CoreColors.semanticTip,
-              ),
-            ],
-            totalLabel: l10n.cartTotal,
-            totalValue: UtilityFormatJod.format(summaryTotal, suffix: jod),
-            totalColor: CoreColors.brandGold,
+          WidgetsCheckoutPromoCodeCard(
+            controller: _promoController,
+            promoApplied: promo.applied,
+            savingsJod: discount,
+            onApply: () {
+              final ok = ref.read(cartPromoProvider.notifier).applyCode(
+                _promoController.text,
+                costs.totalBeforeSavings,
+              );
+              if (!ok) {
+                UtilityMockFeedback.showWarning(
+                  context,
+                  l10n.cartInvalidPromoCode,
+                );
+                return;
+              }
+              ref.read(checkoutDraftProvider.notifier).setPromoApplied(true);
+              UtilityMockFeedback.showSuccess(context, l10n.cartPromoCode);
+            },
           ),
-          if (placeOrderState case AsyncError(:final error)) ...[
-            SizedBox(height: CoreSpacing.lg(context)),
-            WidgetsAsyncStateCard.error(
-              title: l10n.screenOrderConfirmation,
-              message: orderPlacementErrorMessage(l10n, error),
-            ),
-          ],
-          if (isSubmitting) ...[
-            SizedBox(height: CoreSpacing.lg(context)),
-            const Center(child: CircularProgressIndicator()),
-          ],
+          SizedBox(height: CoreSpacing.lg(context)),
+          WidgetsCheckoutOrderSummaryCard(
+            subtotal: subtotal,
+            fulfillment: draft.fulfillment,
+            fulfillmentCharge: costs.fulfillmentCharge,
+            tax: costs.tax,
+            tipJod: draft.tipJod,
+            discount: discount,
+            pointsDiscount: pointsDiscount,
+            total: summaryTotal,
+          ),
         ],
       ),
     );
   }
 
-  Future<void> _submitOrder(BuildContext context) async {
+  void _continueToReview(BuildContext context, double summaryTotal) {
     final l10n = AppLocalizations.of(context)!;
-    final result = await ref.read(placeOrderProvider.notifier).submit();
-    if (!context.mounted) return;
-
-    if (result != null) {
-      UtilityMockFeedback.showSuccess(context, l10n.screenOrderConfirmation);
-      context.go(AppRoutePaths.orderConfirmation);
-      return;
+    final draft = ref.read(checkoutDraftProvider);
+    if (draft.paymentType == CheckoutPaymentType.cash) {
+      final tendered = draft.cashTenderedJod;
+      if (tendered == null || tendered < summaryTotal) {
+        UtilityMockFeedback.showWarning(
+          context,
+          l10n.checkoutCashChangeNeedMore,
+        );
+        return;
+      }
     }
-
-    final state = ref.read(placeOrderProvider);
-    if (state case AsyncError(:final error)) {
-      UtilityMockFeedback.showError(
-        context,
-        orderPlacementErrorMessage(l10n, error),
-      );
-    }
+    context.push(AppRoutePaths.checkoutReview);
   }
 
   static String _paymentLabel(AppLocalizations l10n, CheckoutPaymentType type) {
     return switch (type) {
-      CheckoutPaymentType.cash => l10n.paymentMethodCash,
-      CheckoutPaymentType.card => l10n.paymentMethodCard,
-      CheckoutPaymentType.wallet => l10n.paymentMethodWallet,
+      CheckoutPaymentType.cliq => l10n.paymentMethodCliq,
+      CheckoutPaymentType.card => l10n.paymentMethodVisaMaster,
+      CheckoutPaymentType.cash => l10n.paymentMethodCashOnDelivery,
     };
   }
 
   static IconData _paymentIcon(CheckoutPaymentType type) {
     return switch (type) {
-      CheckoutPaymentType.cash => Icons.payments_outlined,
+      CheckoutPaymentType.cliq => Icons.phone_iphone_outlined,
       CheckoutPaymentType.card => Icons.credit_card_outlined,
-      CheckoutPaymentType.wallet => Icons.account_balance_wallet_outlined,
+      CheckoutPaymentType.cash => Icons.payments_outlined,
     };
   }
 
@@ -233,7 +359,7 @@ class _CustomerCheckoutPaymentScreenState
       case 2:
         break;
       case 3:
-        context.push(AppRoutePaths.orderConfirmation);
+        context.push(AppRoutePaths.checkoutReview);
     }
   }
 }

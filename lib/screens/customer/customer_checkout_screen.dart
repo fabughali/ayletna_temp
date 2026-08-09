@@ -3,17 +3,22 @@ import 'package:ayletna_restaurant_app/data/models/model_saved_address.dart';
 import 'package:ayletna_restaurant_app/data/repositories/repository_providers.dart';
 import 'package:ayletna_restaurant_app/l10n/app_localizations.dart';
 import 'package:ayletna_restaurant_app/navigation/app_route_paths.dart';
+import 'package:ayletna_restaurant_app/providers/cart_checkout_fees_providers.dart';
+import 'package:ayletna_restaurant_app/providers/cart_promo_providers.dart';
+import 'package:ayletna_restaurant_app/providers/cart_providers.dart';
 import 'package:ayletna_restaurant_app/providers/checkout_draft_providers.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
-import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_checkout_sections.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_checkout_step_strip.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_error_message.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Stepped checkout — fulfillment and delivery details (step 2).
+/// Stepped checkout — fulfillment + promo (step 2).
 class CustomerCheckoutScreen extends ConsumerStatefulWidget {
   const CustomerCheckoutScreen({super.key});
 
@@ -25,17 +30,18 @@ class CustomerCheckoutScreen extends ConsumerStatefulWidget {
 class _CustomerCheckoutScreenState
     extends ConsumerState<CustomerCheckoutScreen> {
   bool _showMoreFulfillment = false;
-
-  static const _primaryFulfillments = [
-    CheckoutFulfillment.dineIn,
-    CheckoutFulfillment.takeaway,
-    CheckoutFulfillment.delivery,
-  ];
+  final _promoController = TextEditingController();
 
   static const _extraFulfillments = [
     CheckoutFulfillment.groupDelivery,
     CheckoutFulfillment.plated,
   ];
+
+  @override
+  void dispose() {
+    _promoController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,12 +50,25 @@ class _CustomerCheckoutScreenState
     final addressesAsync = ref.watch(savedAddressesProvider);
     final addressRequired = _requiresAddress(draft.fulfillment);
     final showMore =
-        _showMoreFulfillment ||
-        _extraFulfillments.contains(draft.fulfillment);
-    final visibleOptions = [
-      ..._primaryFulfillments,
-      if (showMore) ..._extraFulfillments,
-    ];
+        _showMoreFulfillment || _extraFulfillments.contains(draft.fulfillment);
+    final cartLines = ref.watch(cartProvider);
+    final subtotal = cartLines.fold<double>(
+      0,
+      (sum, line) => sum + line.unitPriceJod * line.quantity,
+    );
+    final fees = ref.watch(cartCheckoutFeesProvider);
+    final costs = WidgetsCheckoutSummaryCosts.calculate(
+      subtotal: subtotal,
+      fulfillment: draft.fulfillment,
+      fees: fees,
+    );
+    final promo = ref.watch(cartPromoProvider);
+    final discount = promo.applied ? promo.discountJod : 0.0;
+    if (promo.applied &&
+        _promoController.text.trim().isEmpty &&
+        promo.code != null) {
+      _promoController.text = promo.code!;
+    }
 
     final children = <Widget>[
       WidgetsPageHeader(
@@ -63,40 +82,18 @@ class _CustomerCheckoutScreenState
         onStepTapped: (step) => _jumpToStep(context, step),
       ),
       SizedBox(height: CoreSpacing.lg(context)),
-      Text(
-        l10n.cartFulfillmentTitle,
-        style: CoreTypography.titleMedium(
-          context,
-          Theme.of(context).colorScheme.onSurface,
-        ).copyWith(fontWeight: FontWeight.w900),
-      ),
-      SizedBox(height: CoreSpacing.md(context)),
-      Wrap(
-        spacing: CoreSpacing.sm(context),
-        runSpacing: CoreSpacing.sm(context),
-        children: [
-          for (final option in visibleOptions)
-            ChoiceChip(
-              label: Text(_fulfillmentLabel(l10n, option)),
-              selected: draft.fulfillment == option,
-              onSelected:
-                  (_) => ref
-                      .read(checkoutDraftProvider.notifier)
-                      .setFulfillment(option),
-            ),
-        ],
-      ),
-      Align(
-        alignment: AlignmentDirectional.centerStart,
-        child: TextButton(
-          onPressed:
-              () => setState(() => _showMoreFulfillment = !_showMoreFulfillment),
-          child: Text(
-            showMore
-                ? l10n.cartHideFulfillmentOptions
-                : l10n.cartMoreFulfillmentOptions,
-          ),
-        ),
+      WidgetsCheckoutFulfillmentSection(
+        selected: draft.fulfillment,
+        showMore: showMore,
+        onToggleMore:
+            () => setState(() => _showMoreFulfillment = !_showMoreFulfillment),
+        onSelected: (value) {
+          ref.read(checkoutDraftProvider.notifier).setFulfillment(value);
+          if (_extraFulfillments.contains(value)) {
+            setState(() => _showMoreFulfillment = true);
+          }
+        },
+        onTerms: () => context.push(AppRoutePaths.terms),
       ),
       if (addressRequired) ...[
         SizedBox(height: CoreSpacing.lg(context)),
@@ -113,6 +110,24 @@ class _CustomerCheckoutScreenState
               ),
         ),
       ],
+      SizedBox(height: CoreSpacing.lg(context)),
+      WidgetsCheckoutPromoCodeCard(
+        controller: _promoController,
+        promoApplied: promo.applied,
+        savingsJod: discount,
+        onApply: () {
+          final ok = ref.read(cartPromoProvider.notifier).applyCode(
+            _promoController.text,
+            costs.totalBeforeSavings,
+          );
+          if (!ok) {
+            UtilityMockFeedback.showWarning(context, l10n.cartInvalidPromoCode);
+            return;
+          }
+          ref.read(checkoutDraftProvider.notifier).setPromoApplied(true);
+          UtilityMockFeedback.showSuccess(context, l10n.cartPromoCode);
+        },
+      ),
       SizedBox(height: CoreSpacing.xxl(context)),
       WidgetsAppButton(
         label: l10n.actionContinue,
@@ -149,19 +164,6 @@ class _CustomerCheckoutScreenState
         fulfillment == CheckoutFulfillment.plated;
   }
 
-  static String _fulfillmentLabel(
-    AppLocalizations l10n,
-    CheckoutFulfillment fulfillment,
-  ) {
-    return switch (fulfillment) {
-      CheckoutFulfillment.dineIn => l10n.orderTypeDineIn,
-      CheckoutFulfillment.takeaway => l10n.orderTypeTakeaway,
-      CheckoutFulfillment.delivery => l10n.orderTypeDelivery,
-      CheckoutFulfillment.groupDelivery => l10n.cartGroupDeliveryTitle,
-      CheckoutFulfillment.plated => l10n.orderTypePlated,
-    };
-  }
-
   static void _jumpToStep(BuildContext context, int step) {
     switch (step) {
       case 0:
@@ -169,8 +171,9 @@ class _CustomerCheckoutScreenState
       case 1:
         break;
       case 2:
-      case 3:
         context.push(AppRoutePaths.payment);
+      case 3:
+        context.push(AppRoutePaths.checkoutReview);
     }
   }
 }

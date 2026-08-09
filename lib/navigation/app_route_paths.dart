@@ -33,6 +33,7 @@ abstract final class AppRoutePaths {
   static const checkout = '/checkout';
   static const tip = '/tip';
   static const payment = '/payment';
+  static const checkoutReview = '/checkout-review';
   static const orderConfirmation = '/order-confirmation';
   static const orderTracking = '/order-tracking';
   static const orderHistory = '/order-history';

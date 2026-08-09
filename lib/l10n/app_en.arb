@@ -923,6 +923,28 @@
   "paymentMethodCash": "Cash",
   "paymentMethodCard": "Card / Visa",
   "paymentMethodWallet": "Wallet",
+  "paymentMethodCliq": "CliQ",
+  "paymentMethodVisaMaster": "Visa / Mastercard",
+  "paymentMethodCashOnDelivery": "Cash on delivery",
+  "checkoutLoyaltyPointsDiscount": "Loyalty points",
+  "checkoutUseLoyaltyPoints": "Deduct loyalty points from total",
+  "checkoutLoyaltyPointsAvailable": "{points} points available (−{amount})",
+  "@checkoutLoyaltyPointsAvailable": {
+    "placeholders": {
+      "points": { "type": "String" },
+      "amount": { "type": "String" }
+    }
+  },
+  "checkoutCashTenderedLabel": "I will pay with",
+  "checkoutCashTenderedHint": "e.g. 20.00",
+  "checkoutCashChangeDue": "Change due: {amount}",
+  "@checkoutCashChangeDue": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "checkoutCashChangeNeedMore": "Amount must be at least the order total.",
+  "checkoutReviewSubtitle": "Confirm fulfillment, payment, and totals before placing your order.",
   "paymentErrorDemo": "Payment declined. Please try another method.",
   "cashierCurrentOrder": "Current Order",
   "cashierWalkIn": "Walk-in",
@@ -3038,7 +3060,7 @@
   },
   "supportChatTicketFromLiveChat": "Help request from live chat",
   "supportChatTicketTitle": "Live chat",
-  "cartCompleteOrderTitle": "Complete your order",
+  "cartCompleteOrderTitle": "Related products",
   "cartPopularAddonsSubtitle": "Popular add-ons for your basket",
   "cashierConfirmLogTip": "Log this tip amount to the shift total?",
   "checkoutPaymentSummaryTitle": "Payment summary",

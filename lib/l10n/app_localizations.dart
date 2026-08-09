@@ -4532,6 +4532,72 @@ abstract class AppLocalizations {
   /// **'Wallet'**
   String get paymentMethodWallet;
 
+  /// No description provided for @paymentMethodCliq.
+  ///
+  /// In en, this message translates to:
+  /// **'CliQ'**
+  String get paymentMethodCliq;
+
+  /// No description provided for @paymentMethodVisaMaster.
+  ///
+  /// In en, this message translates to:
+  /// **'Visa / Mastercard'**
+  String get paymentMethodVisaMaster;
+
+  /// No description provided for @paymentMethodCashOnDelivery.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash on delivery'**
+  String get paymentMethodCashOnDelivery;
+
+  /// No description provided for @checkoutLoyaltyPointsDiscount.
+  ///
+  /// In en, this message translates to:
+  /// **'Loyalty points'**
+  String get checkoutLoyaltyPointsDiscount;
+
+  /// No description provided for @checkoutUseLoyaltyPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'Deduct loyalty points from total'**
+  String get checkoutUseLoyaltyPoints;
+
+  /// No description provided for @checkoutLoyaltyPointsAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'{points} points available (−{amount})'**
+  String checkoutLoyaltyPointsAvailable(String points, String amount);
+
+  /// No description provided for @checkoutCashTenderedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'I will pay with'**
+  String get checkoutCashTenderedLabel;
+
+  /// No description provided for @checkoutCashTenderedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 20.00'**
+  String get checkoutCashTenderedHint;
+
+  /// No description provided for @checkoutCashChangeDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Change due: {amount}'**
+  String checkoutCashChangeDue(String amount);
+
+  /// No description provided for @checkoutCashChangeNeedMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount must be at least the order total.'**
+  String get checkoutCashChangeNeedMore;
+
+  /// No description provided for @checkoutReviewSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm fulfillment, payment, and totals before placing your order.'**
+  String get checkoutReviewSubtitle;
+
   /// No description provided for @paymentErrorDemo.
   ///
   /// In en, this message translates to:
@@ -15449,7 +15515,7 @@ abstract class AppLocalizations {
   /// No description provided for @cartCompleteOrderTitle.
   ///
   /// In en, this message translates to:
-  /// **'Complete your order'**
+  /// **'Related products'**
   String get cartCompleteOrderTitle;
 
   /// No description provided for @cartPopularAddonsSubtitle.

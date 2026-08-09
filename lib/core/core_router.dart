@@ -47,6 +47,7 @@ import 'package:ayletna_restaurant_app/screens/shared/user_personal_settings_scr
 import 'package:ayletna_restaurant_app/screens/customer/customer_addresses_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_cart_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_checkout_payment_screen.dart';
+import 'package:ayletna_restaurant_app/screens/customer/customer_checkout_review_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_checkout_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_category_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_combo_builder_screen.dart';
@@ -280,6 +281,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         redirect:
             (_, __) => redirectCollapsedCheckoutRoute(AppRoutePaths.payment),
         builder: (_, __) => const CustomerCheckoutPaymentScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.checkoutReview,
+        redirect:
+            (_, __) =>
+                redirectCollapsedCheckoutRoute(AppRoutePaths.checkoutReview),
+        builder: (_, __) => const CustomerCheckoutReviewScreen(),
       ),
       GoRoute(
         path: AppRoutePaths.orderConfirmation,
