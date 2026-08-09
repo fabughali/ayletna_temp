@@ -39,6 +39,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get favoritesRemoved => 'Removed from favorites';
 
   @override
+  String get favoritesEmptyTitle => 'No favorites yet';
+
+  @override
+  String get favoritesEmptySubtitle =>
+      'Tap the heart on a dish to save it here for quick reorder.';
+
+  @override
+  String get favoritesClearAll => 'Clear all favorites';
+
+  @override
   String get actionAddToCart => 'Add to Cart';
 
   @override
@@ -1249,6 +1259,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get screenMenu => 'Menu';
+
+  @override
+  String get screenFavorites => 'Favorites';
 
   @override
   String get screenCategory => 'Category';

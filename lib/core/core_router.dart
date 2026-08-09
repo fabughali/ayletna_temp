@@ -54,6 +54,7 @@ import 'package:ayletna_restaurant_app/screens/customer/customer_combos_screen.d
 import 'package:ayletna_restaurant_app/screens/customer/customer_discounts_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_edit_profile_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_faq_screen.dart';
+import 'package:ayletna_restaurant_app/screens/customer/customer_favorites_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_blog_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_home_screen.dart';
 import 'package:ayletna_restaurant_app/screens/customer/customer_loyalty_screen.dart';
@@ -221,6 +222,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutePaths.category,
         builder: (_, __) => const CustomerCategoryScreen(),
+      ),
+      GoRoute(
+        path: AppRoutePaths.favorites,
+        builder: (_, __) => const CustomerFavoritesScreen(),
       ),
       GoRoute(
         path: AppRoutePaths.productDetail,

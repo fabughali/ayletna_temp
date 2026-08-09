@@ -158,6 +158,24 @@ abstract class AppLocalizations {
   /// **'Removed from favorites'**
   String get favoritesRemoved;
 
+  /// No description provided for @favoritesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No favorites yet'**
+  String get favoritesEmptyTitle;
+
+  /// No description provided for @favoritesEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the heart on a dish to save it here for quick reorder.'**
+  String get favoritesEmptySubtitle;
+
+  /// No description provided for @favoritesClearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all favorites'**
+  String get favoritesClearAll;
+
   /// No description provided for @actionAddToCart.
   ///
   /// In en, this message translates to:
@@ -2461,6 +2479,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Menu'**
   String get screenMenu;
+
+  /// No description provided for @screenFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get screenFavorites;
 
   /// No description provided for @screenCategory.
   ///

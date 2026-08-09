@@ -1,5 +1,6 @@
 import 'package:ayletna_restaurant_app/data/models/model_customer_notification.dart';
 import 'package:ayletna_restaurant_app/data/models/model_customer_notification_category.dart';
+import 'package:ayletna_restaurant_app/data/models/model_menu_item.dart';
 import 'package:ayletna_restaurant_app/data/mockup/mockup_catalog.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -111,9 +112,20 @@ class FavoriteMenuIdsNotifier extends StateNotifier<Set<String>> {
     state = {...state, id};
     return true;
   }
+
+  void clearAll() => state = const {};
 }
 
 final favoriteMenuIdsProvider =
     StateNotifierProvider<FavoriteMenuIdsNotifier, Set<String>>(
       (ref) => FavoriteMenuIdsNotifier(),
     );
+
+/// Resolved favorite menu items for the customer Favorites screen.
+final favoriteMenuItemsProvider = Provider<List<ModelMenuItem>>((ref) {
+  final ids = ref.watch(favoriteMenuIdsProvider);
+  return [
+    for (final id in ids)
+      if (MockupCatalog.itemById(id) case final item?) item,
+  ];
+});
