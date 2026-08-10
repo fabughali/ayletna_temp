@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 /// Six-digit OTP fields — each cell is a strict 1:1 square.
+///
+/// Typing a digit advances focus to the next cell. Completing all six digits
+/// calls [onCompleted] once.
 class WidgetsOtpInput extends StatefulWidget {
   const WidgetsOtpInput({required this.onCompleted, super.key});
 
@@ -18,6 +21,18 @@ class _WidgetsOtpInputState extends State<WidgetsOtpInput> {
 
   final _controllers = List.generate(_length, (_) => TextEditingController());
   final _focusNodes = List.generate(_length, (_) => FocusNode());
+  bool _mutating = false;
+  String? _lastCompleted;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _focusNodes.first.requestFocus();
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -30,14 +45,64 @@ class _WidgetsOtpInputState extends State<WidgetsOtpInput> {
     super.dispose();
   }
 
+  void _setControllerText(int index, String text) {
+    _mutating = true;
+    _controllers[index].value = TextEditingValue(
+      text: text,
+      selection: TextSelection.collapsed(offset: text.length),
+    );
+    _mutating = false;
+  }
+
   void _onChanged(int index, String value) {
-    if (value.length == 1 && index < _length - 1) {
+    if (_mutating) {
+      return;
+    }
+
+    final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
+    if (digitsOnly.length > 1) {
+      _distributeDigits(index, digitsOnly);
+      return;
+    }
+
+    if (digitsOnly != value) {
+      _setControllerText(index, digitsOnly);
+    }
+
+    if (digitsOnly.length == 1 && index < _length - 1) {
       _focusNodes[index + 1].requestFocus();
     }
-    final code = _controllers.map((c) => c.text).join();
-    if (code.length == _length) {
-      widget.onCompleted(code);
+
+    _emitIfComplete();
+  }
+
+  void _distributeDigits(int startIndex, String digits) {
+    final capped = digits.length > _length - startIndex
+        ? digits.substring(0, _length - startIndex)
+        : digits;
+    for (var i = 0; i < capped.length; i++) {
+      _setControllerText(startIndex + i, capped[i]);
     }
+    final nextIndex = startIndex + capped.length;
+    if (nextIndex >= _length) {
+      _focusNodes[_length - 1].unfocus();
+    } else {
+      _focusNodes[nextIndex].requestFocus();
+    }
+    _emitIfComplete();
+  }
+
+  void _emitIfComplete() {
+    final code = _controllers.map((c) => c.text).join();
+    if (code.length != _length || _controllers.any((c) => c.text.isEmpty)) {
+      _lastCompleted = null;
+      return;
+    }
+    if (_lastCompleted == code) {
+      return;
+    }
+    _lastCompleted = code;
+    widget.onCompleted(code);
   }
 
   void _onBackspace(int index) {
@@ -45,10 +110,8 @@ class _WidgetsOtpInputState extends State<WidgetsOtpInput> {
       return;
     }
     _focusNodes[index - 1].requestFocus();
-    _controllers[index - 1]
-      ..text = ''
-      ..selection = const TextSelection.collapsed(offset: 0);
-    _onChanged(index - 1, '');
+    _setControllerText(index - 1, '');
+    _lastCompleted = null;
   }
 
   double _gapForWidth(BuildContext context, double maxWidth, double cellWidth) {
@@ -171,7 +234,7 @@ class _OtpCellState extends State<_OtpCell> {
   @override
   void initState() {
     super.initState();
-    widget.focusNode.addListener(_rebuild);
+    widget.focusNode.addListener(_onFocusChanged);
     widget.controller.addListener(_handleTextChanged);
   }
 
@@ -179,8 +242,8 @@ class _OtpCellState extends State<_OtpCell> {
   void didUpdateWidget(covariant _OtpCell oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.focusNode != widget.focusNode) {
-      oldWidget.focusNode.removeListener(_rebuild);
-      widget.focusNode.addListener(_rebuild);
+      oldWidget.focusNode.removeListener(_onFocusChanged);
+      widget.focusNode.addListener(_onFocusChanged);
     }
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_handleTextChanged);
@@ -190,12 +253,20 @@ class _OtpCellState extends State<_OtpCell> {
 
   @override
   void dispose() {
-    widget.focusNode.removeListener(_rebuild);
+    widget.focusNode.removeListener(_onFocusChanged);
     widget.controller.removeListener(_handleTextChanged);
     super.dispose();
   }
 
-  void _rebuild() => setState(() {});
+  void _onFocusChanged() {
+    setState(() {});
+    if (widget.focusNode.hasFocus && widget.controller.text.isNotEmpty) {
+      widget.controller.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: widget.controller.text.length,
+      );
+    }
+  }
 
   void _handleTextChanged() {
     widget.onChanged(widget.controller.text);
@@ -266,13 +337,16 @@ class _OtpCellState extends State<_OtpCell> {
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(1),
+                      // Allow paste of a full code; [_onChanged] keeps one digit
+                      // per cell and advances focus.
+                      LengthLimitingTextInputFormatter(6),
                     ],
                     textAlign: TextAlign.center,
                     textDirection: TextDirection.ltr,
                     maxLines: 1,
                     enableInteractiveSelection: false,
-                    spellCheckConfiguration: const SpellCheckConfiguration.disabled(),
+                    spellCheckConfiguration:
+                        const SpellCheckConfiguration.disabled(),
                     selectionControls: materialTextSelectionControls,
                     textHeightBehavior: const TextHeightBehavior(
                       applyHeightToFirstAscent: false,
