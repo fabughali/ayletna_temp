@@ -18,6 +18,7 @@ import 'package:ayletna_restaurant_app/widgets/widgets_checkout_sections.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_checkout_step_strip.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_choice_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_filter_chip.dart';
+import 'package:ayletna_restaurant_app/widgets/widgets_icon_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_page_header.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_scaffold_page.dart';
 import 'package:flutter/material.dart';
@@ -140,7 +141,13 @@ class _CustomerCheckoutPaymentScreenState
     return WidgetsScaffoldPage(
       title: l10n.cartCheckoutStepPayment,
       showLeading: false,
-      actions: const [],
+      actions: [
+        WidgetsIconButton(
+          icon: Icons.support_agent_outlined,
+          tooltip: l10n.screenSupport,
+          onPressed: () => context.push(AppRoutePaths.support),
+        ),
+      ],
       bottomSheet: WidgetsActionBar(
         primary: WidgetsAppButton(
           label: isGuest ? l10n.guestSignInToOrder : l10n.actionContinue,
