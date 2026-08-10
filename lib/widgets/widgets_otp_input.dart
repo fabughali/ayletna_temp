@@ -337,7 +337,9 @@ class _OtpCellState extends State<_OtpCell> {
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(1),
+                      // Allow paste of a full code; [_onChanged] keeps one digit
+                      // per cell and advances focus.
+                      LengthLimitingTextInputFormatter(6),
                     ],
                     textAlign: TextAlign.center,
                     textDirection: TextDirection.ltr,
