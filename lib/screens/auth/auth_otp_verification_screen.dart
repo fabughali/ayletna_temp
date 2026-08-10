@@ -9,6 +9,7 @@ import 'package:ayletna_restaurant_app/providers/auth_session_providers.dart';
 import 'package:ayletna_restaurant_app/providers/role_permissions_providers.dart';
 import 'package:ayletna_restaurant_app/providers/session_providers.dart';
 import 'package:ayletna_restaurant_app/utilities/utility_mock_feedback.dart';
+import 'package:ayletna_restaurant_app/utilities/utility_sizer.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_button.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_app_card.dart';
 import 'package:ayletna_restaurant_app/widgets/widgets_avatar.dart';
@@ -126,7 +127,7 @@ class _AuthOtpCardState extends ConsumerState<AuthOtpCard> {
 
   Timer? _timer;
   int _remainingSeconds = _initialCountdownSeconds;
-  String _otpCode = '';
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -152,6 +153,9 @@ class _AuthOtpCardState extends ConsumerState<AuthOtpCard> {
   }
 
   void _resendCode() {
+    if (_isSubmitting) {
+      return;
+    }
     final l10n = AppLocalizations.of(context)!;
     final auth = ref.read(authSessionProvider.notifier);
     final sent = auth.resendOtp();
@@ -164,8 +168,18 @@ class _AuthOtpCardState extends ConsumerState<AuthOtpCard> {
     UtilityMockFeedback.showSuccess(context, l10n.authOtpResent);
   }
 
-  Future<void> _submitVerification() async {
-    await widget.onVerify(_otpCode);
+  Future<void> _submitVerification(String code) async {
+    if (_isSubmitting || code.length != 6) {
+      return;
+    }
+    setState(() => _isSubmitting = true);
+    try {
+      await widget.onVerify(code);
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
   }
 
   @override
@@ -236,25 +250,26 @@ class _AuthOtpCardState extends ConsumerState<AuthOtpCard> {
             ),
             SizedBox(height: CoreSpacing.xxl(context)),
             WidgetsOtpInput(
-              onCompleted: (code) {
-                setState(() => _otpCode = code);
-              },
+              onCompleted: _submitVerification,
             ),
+            if (_isSubmitting || authState.isVerifyingOtp) ...[
+              SizedBox(height: CoreSpacing.xl(context)),
+              Center(
+                child: SizedBox.square(
+                  dimension: CoreContentSizes.loadingIndicator(context),
+                  child: CircularProgressIndicator(
+                    strokeWidth: UtilitySizer.of(context, 2),
+                  ),
+                ),
+              ),
+            ],
             SizedBox(height: CoreSpacing.xl(context)),
             _ResendCountdownAction(
               remainingSeconds: _remainingSeconds,
               resendAttempts: resendAttempts,
               maxResendAttempts: AuthSessionNotifier.maxResendAttempts,
+              enabled: !_isSubmitting && !authState.isVerifyingOtp,
               onResend: _resendCode,
-            ),
-            SizedBox(height: CoreSpacing.xxl(context)),
-            WidgetsAppButton(
-              label: l10n.actionVerify,
-              onPressed: authState.isVerifyingOtp ? null : _submitVerification,
-              icon:
-                  authState.isVerifyingOtp
-                      ? null
-                      : Icons.verified_user_outlined,
             ),
             SizedBox(height: CoreSpacing.xxl(context)),
             const Divider(),
@@ -331,12 +346,14 @@ class _ResendCountdownAction extends StatelessWidget {
     required this.remainingSeconds,
     required this.resendAttempts,
     required this.maxResendAttempts,
+    required this.enabled,
     required this.onResend,
   });
 
   final int remainingSeconds;
   final int resendAttempts;
   final int maxResendAttempts;
+  final bool enabled;
   final VoidCallback onResend;
 
   @override
@@ -344,16 +361,25 @@ class _ResendCountdownAction extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final scheme = Theme.of(context).colorScheme;
     final canResend =
-        remainingSeconds == 0 && resendAttempts < maxResendAttempts;
+        enabled &&
+        remainingSeconds == 0 &&
+        resendAttempts < maxResendAttempts;
 
     if (canResend) {
-      return Align(
-        alignment: Alignment.center,
-        child: WidgetsAppButton(
-          label: l10n.otpResendCode,
+      return Center(
+        child: TextButton(
           onPressed: onResend,
-          icon: Icons.refresh_outlined,
-          variant: WidgetsAppButtonVariant.ghost,
+          child: Text(
+            l10n.otpResendCode,
+            style: CoreTypography.bodyMedium(
+              context,
+              scheme.primary,
+            ).copyWith(
+              fontWeight: FontWeight.w800,
+              decoration: TextDecoration.underline,
+              decorationColor: scheme.primary,
+            ),
+          ),
         ),
       );
     }
