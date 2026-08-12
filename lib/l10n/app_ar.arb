@@ -935,7 +935,7 @@
       "amount": { "type": "String" }
     }
   },
-  "checkoutCashTenderedLabel": "سأدفع بمبلغ",
+  "checkoutCashTenderedLabel": "ملاحظة: أحضر فكة من:",
   "checkoutCashTenderedHint": "مثال 20.00",
   "checkoutCashChangeDue": "الباقي للعميل: {amount}",
   "@checkoutCashChangeDue": {
@@ -944,6 +944,13 @@
     }
   },
   "checkoutCashChangeNeedMore": "يجب أن يكون المبلغ على الأقل إجمالي الطلب.",
+  "checkoutCashDenominationOption": "{amount} {currency}",
+  "@checkoutCashDenominationOption": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "currency": { "type": "String" }
+    }
+  },
   "checkoutReviewSubtitle": "راجع طريقة الاستلام والدفع والإجمالي قبل تأكيد الطلب.",
   "paymentErrorDemo": "تم رفض الدفع. جرّب طريقة أخرى.",
   "cashierCurrentOrder": "الطلب الحالي",

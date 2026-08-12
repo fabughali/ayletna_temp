@@ -39,7 +39,6 @@ class _CustomerCheckoutPaymentScreenState
   static const _presetTips = [0.0, 0.5, 1.0, 2.0];
 
   final _promoController = TextEditingController();
-  final _cashTenderedController = TextEditingController();
   final _customTipController = TextEditingController();
   bool _customTipSelected = false;
 
@@ -57,7 +56,6 @@ class _CustomerCheckoutPaymentScreenState
   @override
   void dispose() {
     _promoController.dispose();
-    _cashTenderedController.dispose();
     _customTipController.dispose();
     super.dispose();
   }
@@ -123,18 +121,34 @@ class _CustomerCheckoutPaymentScreenState
       (afterPromo - pointsDiscount).toStringAsFixed(2),
     );
 
+    final cashDenominations =
+        checkoutCashChangeDenominationsForTotal(summaryTotal);
     final tendered = draft.cashTenderedJod;
+    final tenderedStillAvailable =
+        tendered != null &&
+        cashDenominations.any((amount) => (amount - tendered).abs() < 0.001);
+    if (draft.paymentType == CheckoutPaymentType.cash &&
+        tendered != null &&
+        !tenderedStillAvailable) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final current = ref.read(checkoutDraftProvider).cashTenderedJod;
+        if (current == null) return;
+        final stillOk = cashDenominations.any(
+          (amount) => (amount - current).abs() < 0.001,
+        );
+        if (!stillOk) {
+          ref.read(checkoutDraftProvider.notifier).setCashTenderedJod(null);
+        }
+      });
+    }
     final changeDue =
         draft.paymentType == CheckoutPaymentType.cash &&
                 tendered != null &&
+                tenderedStillAvailable &&
                 tendered >= summaryTotal
             ? double.parse((tendered - summaryTotal).toStringAsFixed(2))
             : null;
-
-    if (draft.cashTenderedJod != null &&
-        _cashTenderedController.text.trim().isEmpty) {
-      _cashTenderedController.text = draft.cashTenderedJod!.toStringAsFixed(2);
-    }
 
     final jod = l10n.currencyJod;
 
@@ -205,7 +219,8 @@ class _CustomerCheckoutPaymentScreenState
             if (type != CheckoutPaymentType.values.last)
               SizedBox(height: CoreSpacing.sm(context)),
           ],
-          if (draft.paymentType == CheckoutPaymentType.cash) ...[
+          if (draft.paymentType == CheckoutPaymentType.cash &&
+              cashDenominations.isNotEmpty) ...[
             SizedBox(height: CoreSpacing.lg(context)),
             WidgetsAppCard(
               variant: WidgetsAppCardVariant.form,
@@ -220,19 +235,35 @@ class _CustomerCheckoutPaymentScreenState
                     ).copyWith(fontWeight: FontWeight.w900),
                   ),
                   SizedBox(height: CoreSpacing.md(context)),
-                  WidgetsAppTextField(
-                    controller: _cashTenderedController,
-                    label: l10n.checkoutCashTenderedLabel,
-                    hintText: l10n.checkoutCashTenderedHint,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    onChanged: (raw) {
-                      final parsed = double.tryParse(raw.trim());
-                      ref
-                          .read(checkoutDraftProvider.notifier)
-                          .setCashTenderedJod(parsed);
-                    },
+                  Wrap(
+                    spacing: CoreSpacing.sm(context),
+                    runSpacing: CoreSpacing.sm(context),
+                    children: [
+                      for (final amount in cashDenominations)
+                        WidgetsFilterChip(
+                          label: l10n.checkoutCashDenominationOption(
+                            amount == amount.roundToDouble()
+                                ? amount.toStringAsFixed(0)
+                                : amount.toStringAsFixed(2),
+                            jod,
+                          ),
+                          selected:
+                              tenderedStillAvailable &&
+                              tendered != null &&
+                              (tendered - amount).abs() < 0.001,
+                          onSelected: (_) {
+                            final selected =
+                                tenderedStillAvailable &&
+                                tendered != null &&
+                                (tendered - amount).abs() < 0.001;
+                            ref
+                                .read(checkoutDraftProvider.notifier)
+                                .setCashTenderedJod(
+                                  selected ? null : amount,
+                                );
+                          },
+                        ),
+                    ],
                   ),
                   if (changeDue != null) ...[
                     SizedBox(height: CoreSpacing.md(context)),
@@ -244,15 +275,6 @@ class _CustomerCheckoutPaymentScreenState
                         context,
                         scheme.primary,
                       ).copyWith(fontWeight: FontWeight.w800),
-                    ),
-                  ] else if (tendered != null && tendered < summaryTotal) ...[
-                    SizedBox(height: CoreSpacing.md(context)),
-                    Text(
-                      l10n.checkoutCashChangeNeedMore,
-                      style: CoreTypography.caption(
-                        context,
-                        CoreColors.semanticError,
-                      ),
                     ),
                   ],
                 ],
@@ -402,9 +424,14 @@ class _CustomerCheckoutPaymentScreenState
   void _continueToReview(BuildContext context, double summaryTotal) {
     final l10n = AppLocalizations.of(context)!;
     final draft = ref.read(checkoutDraftProvider);
+    // Cash change note is optional. When total ≤ 50, chips are always > total,
+    // so a selected bill below total is only a stale/edge case. When total > 50,
+    // every denomination is offered and may be below the total — still allow continue.
     if (draft.paymentType == CheckoutPaymentType.cash) {
       final tendered = draft.cashTenderedJod;
-      if (tendered == null || tendered < summaryTotal) {
+      if (summaryTotal <= 50 &&
+          tendered != null &&
+          tendered < summaryTotal) {
         UtilityMockFeedback.showWarning(
           context,
           l10n.checkoutCashChangeNeedMore,
