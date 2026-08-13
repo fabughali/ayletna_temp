@@ -935,7 +935,7 @@
       "amount": { "type": "String" }
     }
   },
-  "checkoutCashTenderedLabel": "I will pay with",
+  "checkoutCashTenderedLabel": "Note: bring change of:",
   "checkoutCashTenderedHint": "e.g. 20.00",
   "checkoutCashChangeDue": "Change due: {amount}",
   "@checkoutCashChangeDue": {
@@ -944,6 +944,13 @@
     }
   },
   "checkoutCashChangeNeedMore": "Amount must be at least the order total.",
+  "checkoutCashDenominationOption": "{amount} {currency}",
+  "@checkoutCashDenominationOption": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "currency": { "type": "String" }
+    }
+  },
   "checkoutReviewSubtitle": "Confirm fulfillment, payment, and totals before placing your order.",
   "paymentErrorDemo": "Payment declined. Please try another method.",
   "cashierCurrentOrder": "Current Order",

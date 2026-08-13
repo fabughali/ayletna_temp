@@ -4571,7 +4571,7 @@ abstract class AppLocalizations {
   /// No description provided for @checkoutCashTenderedLabel.
   ///
   /// In en, this message translates to:
-  /// **'I will pay with'**
+  /// **'Note: bring change of:'**
   String get checkoutCashTenderedLabel;
 
   /// No description provided for @checkoutCashTenderedHint.
@@ -4591,6 +4591,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Amount must be at least the order total.'**
   String get checkoutCashChangeNeedMore;
+
+  /// No description provided for @checkoutCashDenominationOption.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} {currency}'**
+  String checkoutCashDenominationOption(String amount, String currency);
 
   /// No description provided for @checkoutReviewSubtitle.
   ///

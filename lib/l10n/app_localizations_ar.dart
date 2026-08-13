@@ -2368,7 +2368,7 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
-  String get checkoutCashTenderedLabel => 'سأدفع بمبلغ';
+  String get checkoutCashTenderedLabel => 'ملاحظة: أحضر فكة من:';
 
   @override
   String get checkoutCashTenderedHint => 'مثال 20.00';
@@ -2381,6 +2381,11 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get checkoutCashChangeNeedMore =>
       'يجب أن يكون المبلغ على الأقل إجمالي الطلب.';
+
+  @override
+  String checkoutCashDenominationOption(String amount, String currency) {
+    return '$amount $currency';
+  }
 
   @override
   String get checkoutReviewSubtitle =>

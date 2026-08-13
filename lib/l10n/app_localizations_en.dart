@@ -2377,7 +2377,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get checkoutCashTenderedLabel => 'I will pay with';
+  String get checkoutCashTenderedLabel => 'Note: bring change of:';
 
   @override
   String get checkoutCashTenderedHint => 'e.g. 20.00';
@@ -2390,6 +2390,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get checkoutCashChangeNeedMore =>
       'Amount must be at least the order total.';
+
+  @override
+  String checkoutCashDenominationOption(String amount, String currency) {
+    return '$amount $currency';
+  }
 
   @override
   String get checkoutReviewSubtitle =>

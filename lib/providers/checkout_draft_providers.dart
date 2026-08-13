@@ -8,6 +8,28 @@ enum CheckoutPaymentType { cliq, card, cash }
 /// Mock redeem rate: 800 loyalty points = 1.00 JOD (matches 200 pts → 0.25 JOD).
 const double kCheckoutRedeemPointsPerJod = 800;
 
+/// COD bill denominations offered as an optional “bring change” note.
+const List<double> kCheckoutCashChangeDenominations = [
+  1,
+  5,
+  10,
+  20,
+  50,
+];
+
+/// Denominations the customer may select for cash-on-delivery change.
+///
+/// Normally only values **strictly greater** than [orderTotalJod] are offered.
+/// When the total is **more than 50 JOD**, every denomination is offered.
+List<double> checkoutCashChangeDenominationsForTotal(double orderTotalJod) {
+  if (orderTotalJod > 50) {
+    return List<double>.unmodifiable(kCheckoutCashChangeDenominations);
+  }
+  return kCheckoutCashChangeDenominations
+      .where((amount) => amount > orderTotalJod)
+      .toList(growable: false);
+}
+
 class CheckoutDraft {
   const CheckoutDraft({
     this.fulfillment = CheckoutFulfillment.delivery,
