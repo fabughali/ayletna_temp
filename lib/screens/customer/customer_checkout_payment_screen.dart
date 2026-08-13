@@ -124,12 +124,16 @@ class _CustomerCheckoutPaymentScreenState
     final cashDenominations =
         checkoutCashChangeDenominationsForTotal(summaryTotal);
     final tendered = draft.cashTenderedJod;
-    final tenderedStillAvailable =
+    final double? selectedBill =
         tendered != null &&
-        cashDenominations.any((amount) => (amount - tendered).abs() < 0.001);
+                cashDenominations.any(
+                  (amount) => (amount - tendered).abs() < 0.001,
+                )
+            ? tendered
+            : null;
     if (draft.paymentType == CheckoutPaymentType.cash &&
         tendered != null &&
-        !tenderedStillAvailable) {
+        selectedBill == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         final current = ref.read(checkoutDraftProvider).cashTenderedJod;
@@ -144,10 +148,9 @@ class _CustomerCheckoutPaymentScreenState
     }
     final changeDue =
         draft.paymentType == CheckoutPaymentType.cash &&
-                tendered != null &&
-                tenderedStillAvailable &&
-                tendered >= summaryTotal
-            ? double.parse((tendered - summaryTotal).toStringAsFixed(2))
+                selectedBill != null &&
+                selectedBill >= summaryTotal
+            ? double.parse((selectedBill - summaryTotal).toStringAsFixed(2))
             : null;
 
     final jod = l10n.currencyJod;
@@ -248,14 +251,12 @@ class _CustomerCheckoutPaymentScreenState
                             jod,
                           ),
                           selected:
-                              tenderedStillAvailable &&
-                              tendered != null &&
-                              (tendered - amount).abs() < 0.001,
+                              selectedBill != null &&
+                              (selectedBill - amount).abs() < 0.001,
                           onSelected: (_) {
                             final selected =
-                                tenderedStillAvailable &&
-                                tendered != null &&
-                                (tendered - amount).abs() < 0.001;
+                                selectedBill != null &&
+                                (selectedBill - amount).abs() < 0.001;
                             ref
                                 .read(checkoutDraftProvider.notifier)
                                 .setCashTenderedJod(
